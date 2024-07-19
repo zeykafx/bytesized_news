@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "286405169123",
+    "project_id": "bytesized-news",
+    "storage_bucket": "bytesized-news.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286405169123:android:c66e2f1af3e7305fb21ad6",
+        "android_client_info": {
+          "package_name": "com.zeykafx.bytes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUuN8jh3siOttcA26Gid-VgILXW-AX5tY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286405169123:android:4796eede57acedfab21ad6",
+        "android_client_info": {
+          "package_name": "com.zeykafx.bytesized_news"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUuN8jh3siOttcA26Gid-VgILXW-AX5tY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
