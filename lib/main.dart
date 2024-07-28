@@ -1,18 +1,23 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import 'package:myapp/views/home/home.dart';
-import 'package:myapp/views/settings/settings_store.dart';
+import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/home/home.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:isar/isar.dart';
 import 'firebase_options.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,14 +38,23 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  if (!Platform.isWindows) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [FeedItemSchema, FeedSchema],
+    directory: dir.path,
+  );
 
   runApp(
     MultiProvider(
@@ -68,9 +82,6 @@ class _MyAppState extends State<MyApp> {
     settingsStore = context.read<SettingsStore>();
   }
 
-  ColorScheme? lightColorScheme;
-  ColorScheme? darkColorScheme;
-
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
     return ThemeData(
       useMaterial3: true,
@@ -93,15 +104,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (light, dark) {
-        lightColorScheme = light;
-        darkColorScheme = dark;
-
         return Observer(
           builder: (context) {
             return MaterialApp(
               title: 'ByteSized News',
-              theme: lightTheme(lightColorScheme),
-              darkTheme: darkTheme(darkColorScheme),
+              theme: lightTheme(light),
+              darkTheme: darkTheme(dark),
               themeMode: settingsStore.darkMode == DarkMode.system
                   ? ThemeMode.system
                   : settingsStore.darkMode == DarkMode.dark

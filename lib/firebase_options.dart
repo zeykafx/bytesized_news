@@ -73,4 +73,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'bytesized-news.appspot.com',
     measurementId: 'G-QK2NKEHM1J',
   );
+
 }

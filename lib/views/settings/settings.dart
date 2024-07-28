@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:myapp/views/settings/settings_store.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
 
   @override
-  _SettingsState createState() => _SettingsState();
+  State<Settings> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
@@ -59,8 +59,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
               subtitle: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: SegmentedButton(
-                  style:
-                      const ButtonStyle(visualDensity: VisualDensity.compact),
+                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
                   segments: darkModeNames
                       .map(
                         (option) => ButtonSegment(
@@ -73,19 +72,13 @@ class _GeneralSettingsState extends State<GeneralSettings> {
                       )
                       .toList(),
                   selected: {darkModeNames[settingsStore.darkMode.index]},
-                  onSelectionChanged: (selection) {
+                  onSelectionChanged: (selection) async {
                     settingsStore.setDarkMode(
                       DarkMode.values[darkModeNames.indexOf(selection.first)],
                     );
                   },
                 ),
-              )
-
-              // trailing: Switch(
-              //   value: settingsStore.darkMode,
-              //   onChanged: (bool value) {},
-              // ),
-              ),
+              )),
         ],
       );
     });
@@ -118,8 +111,7 @@ class _AboutSectionState extends State<AboutSection> {
                 title: const Text(
                   "Bytesized News",
                 ),
-                subtitle: Text(
-                    "Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
+                subtitle: Text("Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
               ),
               ListTile(
                 title: const Text(
@@ -128,8 +120,7 @@ class _AboutSectionState extends State<AboutSection> {
                 subtitle: const Row(
                   children: [
                     Text("If you like this app, you can support me at "),
-                    Text("paypal.me/zeykafx",
-                        style: TextStyle(color: Colors.blue)),
+                    Text("paypal.me/zeykafx", style: TextStyle(color: Colors.blue)),
                   ],
                 ),
                 onTap: () {
