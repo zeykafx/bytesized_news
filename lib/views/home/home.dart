@@ -82,40 +82,43 @@ class _HomeState extends State<Home> {
                               if (homeStore.feedItems.isEmpty && !homeStore.loading) ...[
                                 const Center(child: Text("No feedItems loaded")),
                               ],
-                              ...homeStore.feedItems.map(
-                                (item) => Card(
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                  elevation: 0,
-                                  color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
-                                  child: SelectableRegion(
-                                    focusNode: FocusNode(),
-                                    selectionControls: MaterialTextSelectionControls(),
-                                    child: ListTile(
-                                      title: Text("${item.title} - ${item.feed?.name}"),
-                                      subtitle: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(item.description.split("\n").first),
-                                          Text(
-                                            formatTime(item.publishedDate.millisecondsSinceEpoch),
-                                            style: TextStyle(color: Theme.of(context).dividerColor),
-                                          ),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => Story(
-                                              feedItem: item,
+                              // some trickery to get the index of each element as well as the item
+                              // this is used to animate each card fading in with a delay.
+                              ...homeStore.feedItems.asMap().map(
+                                (idx, item) => MapEntry(idx, Card(
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                    elevation: 0,
+                                    color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+                                    child: SelectableRegion(
+                                      focusNode: FocusNode(),
+                                      selectionControls: MaterialTextSelectionControls(),
+                                      child: ListTile(
+                                        title: Text("${item.title} - ${item.feed?.name}"),
+                                        subtitle: Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item.description.split("\n").first),
+                                            Text(
+                                              formatTime(item.publishedDate.millisecondsSinceEpoch),
+                                              style: TextStyle(color: Theme.of(context).dividerColor),
                                             ),
-                                          ),
-                                        );
-                                      },
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => Story(
+                                                feedItem: item,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ).animate(delay: Duration(milliseconds: item.id * 100)).fadeIn(),
-                              ),
+                                  ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
+                                ),
+                              ).values.toList(),
                             ],
                           ),
                         ),

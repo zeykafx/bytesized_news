@@ -1,5 +1,7 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/story/story_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 
@@ -13,48 +15,42 @@ class Story extends StatefulWidget {
 }
 
 class _StoryState extends State<Story> {
-  late WebViewController controller;
-  bool loading = false;
-  int progress = 0;
+  final StoryStore storyStore = StoryStore();
 
-  bool isLocked = true;
-  bool isCollapsed = true;
-  bool isExpanded = false;
-  final bsbController = BottomSheetBarController();
+  late WebViewController controller;
 
   @override
   void initState() {
     super.initState();
+    storyStore.feedItem = widget.feedItem;
 
-    bsbController.addListener(onBsbChanged);
+    storyStore.bsbController.addListener(onBsbChanged);
 
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            setState(() {
-              this.progress = progress;
-            });
+            storyStore.progress = progress;
           },
           onPageStarted: (String url) {
-            setState(() {
-              loading = true;
-            });
+            storyStore.loading = true;
           },
           onPageFinished: (String url) {
-            setState(() {
-              loading = false;
-            });
+            storyStore.loading = false;
           },
           onHttpError: (HttpResponseError error) {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Failed to open article"),
-                duration: Duration(seconds: 30),
-              ),
-            );
+            print(error.response?.statusCode);
+            if (error.response == null || error.response?.statusCode == 404) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Failed to open article"),
+                  duration: Duration(seconds: 30),
+                ),
+              );
+            }
+
           },
           onWebResourceError: (WebResourceError error) {},
         ),
@@ -63,110 +59,104 @@ class _StoryState extends State<Story> {
   }
 
   void onBsbChanged() {
-    if (bsbController.isCollapsed && !isCollapsed) {
+    if (storyStore.bsbController.isCollapsed && !storyStore.isCollapsed) {
       setState(() {
-        isCollapsed = true;
-        isExpanded = false;
+        storyStore.isCollapsed = true;
+        storyStore.isExpanded = false;
       });
-    } else if (bsbController.isExpanded && !isExpanded) {
+    } else if (storyStore.bsbController.isExpanded && !storyStore.isExpanded) {
       setState(() {
-        isCollapsed = false;
-        isExpanded = true;
+        storyStore.isCollapsed = false;
+        storyStore.isExpanded = true;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.feedItem.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              controller.reload();
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
-            onPressed: () {
-              controller.canGoBack().then((value) {
-                if (value) {
-                  controller.goBack();
-                }
-              });
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-          IconButton(
-            onPressed: () {
-              controller.canGoForward().then((value) {
-                if (value) {
-                  controller.goForward();
-                }
-              });
-            },
-            icon: const Icon(Icons.arrow_forward),
-          ),
-        ],
-      ),
-      body: BottomSheetBar(
-        controller: bsbController,
-        borderRadius: const BorderRadius.all(Radius.circular(100)),
-        backdropColor: Theme.of(context).colorScheme.surface,
-        locked: isLocked,
-        body: Center(
-          child: Stack(
-            children: [
-              loading
-                  ? LinearProgressIndicator(value: progress / 100)
-                  : const SizedBox(),
-              WebViewWidget(controller: controller),
-            ],
-          ),
-        ),
-        expandedBuilder: (ScrollController) {
-          return Placeholder();
-        },
-        collapsed: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+    return Observer(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.feedItem.title),
+          actions: [
             IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              onPressed: () async {
+              onPressed: () {
+                controller.reload();
+              },
+              icon: const Icon(Icons.refresh),
+            ),
+            IconButton(
+              onPressed: () {
                 controller.canGoBack().then((value) {
                   if (value) {
                     controller.goBack();
                   }
                 });
               },
+              icon: const Icon(Icons.arrow_back),
             ),
             IconButton(
-                onPressed: () {
+              onPressed: () {
+                controller.canGoForward().then((value) {
+                  if (value) {
+                    controller.goForward();
+                  }
+                });
+              },
+              icon: const Icon(Icons.arrow_forward),
+            ),
+          ],
+        ),
+        body: BottomSheetBar(
+          controller: storyStore.bsbController,
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          backdropColor: Theme.of(context).colorScheme.surface,
+          locked: storyStore.isLocked,
+          body: Center(
+            child: Stack(
+              children: [
+                storyStore.loading
+                    ? LinearProgressIndicator(value: storyStore.progress / 100)
+                    : const SizedBox(),
+                WebViewWidget(controller: controller),
+              ],
+            ),
+          ),
+          expandedBuilder: (ScrollController _) {
+            return const Placeholder();
+          },
+          collapsed: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () async {
                   controller.canGoBack().then((value) {
                     if (value) {
                       controller.goBack();
                     }
                   });
                 },
-                icon: const Icon(Icons.replay)),
-            IconButton(
-                onPressed: () {
-                  bsbController.expand();
-                },
-                icon: const Icon(Icons.arrow_upward)),
-          ],
+              ),
+              IconButton(
+                  onPressed: () {
+                    controller.canGoBack().then((value) {
+                      if (value) {
+                        controller.goBack();
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.replay)),
+              IconButton(
+                  onPressed: () {
+                    storyStore.bsbController.expand();
+                  },
+                  icon: const Icon(Icons.arrow_upward)),
+            ],
+          ),
         ),
-        // body: Center(
-        //   child: Stack(
-        //     children: [
-        //       loading ? LinearProgressIndicator(value: progress / 100) : const SizedBox(),
-        //       WebViewWidget(controller: controller),
-        //     ],
-        //   ),
-        // ),
-      ),
-    );
+      );
+    });
   }
 }
