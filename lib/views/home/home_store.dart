@@ -1,5 +1,4 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
@@ -7,7 +6,6 @@ import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';
-import 'package:html/parser.dart' as html_parser;
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:rss_dart/domain/rss_item.dart';
 
@@ -40,8 +38,6 @@ abstract class _HomeStore with Store {
       isar.writeTxn(
         () => isar.feeds.putAll([
           Feed("The Verge", "http://www.theverge.com/rss/frontpage", "The Verge is a technology news site"),
-          Feed("TechCrunch", "http://feeds.feedburner.com/TechCrunch/", "TechCrunch is a technology news site"),
-          Feed("Wired", "http://feeds.wired.com/wired/index", "Wired is a technology news site"),
         ]),
       );
 
@@ -58,9 +54,14 @@ abstract class _HomeStore with Store {
       print("Fetched ${feedItems.length} feed items from Isar");
     }
 
-    if (feedItems.isEmpty || feedItems.first.timeFetched.difference(DateTime.now()).inMinutes > 15) {
-      fetchItems();
+    // find the corresponding feeds for each feed item
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
     }
+
+    // if (feedItems.isEmpty || feedItems.first.timeFetched.difference(DateTime.now()).inMinutes > 15) {
+    fetchItems();
+    // }
   }
 
   @action
@@ -89,16 +90,25 @@ abstract class _HomeStore with Store {
           print("Using Atom feed");
         }
       }
+
       if (usingRssFeed) {
         items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
       } else {
         items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
       }
 
-      isar.writeTxn(() => isar.feedItems.putAll(items));
-      feedItems.addAll(items);
+      // only add items that are not already in the database
+      for (FeedItem item in items) {
+        List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
+        if (dbItems.isEmpty) {
+          isar.writeTxn(() => isar.feedItems.put(item));
+          // also add those items to the feedItems list
+          feedItems.add(item);
+        }
+      }
     }
 
+    // sort feed items by published date
     feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     loading = false;
   }

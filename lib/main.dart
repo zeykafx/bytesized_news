@@ -3,9 +3,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/views/story/story.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Animate.restartOnHotReload;
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -41,13 +44,13 @@ void main() async {
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   if (!Platform.isWindows) {
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
+    // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    //
+    // // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    //   return true;
+    // };
   }
 
   final dir = await getApplicationDocumentsDirectory();
@@ -115,7 +118,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                       ? ThemeMode.dark
                       : ThemeMode.light,
-              home: const Home(),
+              home: const SafeArea(child: Home()),
             );
           },
         );

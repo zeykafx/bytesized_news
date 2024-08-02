@@ -28,10 +28,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -66,12 +63,21 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyCNCfZ6vMGlYx0PYc7YNLR9mHDo_5rV0uc',
-    appId: '1:286405169123:web:5ec8dd1c91512fefb21ad6',
+    appId: '1:286405169123:web:70af5915f7b8b148b21ad6',
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
     authDomain: 'bytesized-news.firebaseapp.com',
     storageBucket: 'bytesized-news.appspot.com',
-    measurementId: 'G-QK2NKEHM1J',
+    measurementId: 'G-J7FNJ3G4SP',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDxr2z80RAHK7hVKO6DmgXWHWz2BkJt4rY',
+    appId: '1:286405169123:ios:9c12da3f04b400b4b21ad6',
+    messagingSenderId: '286405169123',
+    projectId: 'bytesized-news',
+    storageBucket: 'bytesized-news.appspot.com',
+    iosBundleId: 'com.zeykafx.bytesizedNews',
   );
 
 }

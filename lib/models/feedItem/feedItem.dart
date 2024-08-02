@@ -4,19 +4,24 @@ import 'package:html_main_element/html_main_element.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:isar/isar.dart';
-import 'package:datify/datify.dart';
 
 part "feedItem.g.dart";
 
 @collection
 class FeedItem {
   Id id = Isar.autoIncrement;
+  @Index()
+  late String url;
+
   late String title;
   late String description;
   late List<String> authors;
   late DateTime publishedDate;
   late DateTime timeFetched;
-  IsarLink<Feed> feed = IsarLink<Feed>();
+  late String feedName;
+
+  @ignore
+  Feed? feed;
 
   static ReadabilityConfig config = ReadabilityConfig(
     readableTags: [
@@ -86,16 +91,19 @@ class FeedItem {
   }) {
     FeedItem feedItem = FeedItem();
 
+    feedItem.url = item.links.first.href ?? "no link";
+
     feedItem.title = item.title!;
     feedItem.authors = item.authors.map((author) => author.name!).toList();
-    feedItem.publishedDate = Datify.parse(item.published!).result.date!;
+    feedItem.publishedDate = DateTime.parse(item.published!);
 
     // parse html content into description
     final document = html_parser.parse(item.content!);
     Element mainElement = readabilityMainElement(document.documentElement!, config);
     feedItem.description = mainElement.text.trim();
     feedItem.timeFetched = DateTime.now();
-    feedItem.feed.value = feed;
+    feedItem.feedName = feed.name;
+    feedItem.feed = feed;
 
     return feedItem;
   }
@@ -105,18 +113,21 @@ class FeedItem {
     required Feed feed,
   }) {
     FeedItem feedItem = FeedItem();
+
+    feedItem.url = item.source?.value ?? "no link";
+
     feedItem.title = item.title!;
     feedItem.authors = item.author != null ? item.author!.split(",") : [];
-    print(item.pubDate);
-    feedItem.publishedDate = Datify.parse(item.pubDate!).result.date!;
+    // print(item.pubDate);
+    feedItem.publishedDate = DateTime.parse(item.pubDate!);
 
     // parse html content into description
     final document = html_parser.parse(item.content ?? item.description!);
     Element mainElement = readabilityMainElement(document.documentElement!, config);
     feedItem.description = mainElement.text.trim();
     feedItem.timeFetched = DateTime.now();
-    feedItem.feed.value = feed;
-
+    feedItem.feedName = feed.name;
+    feedItem.feed = feed;
     return feedItem;
   }
 }
