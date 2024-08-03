@@ -22,33 +22,43 @@ const FeedItemSchema = CollectionSchema(
       name: r'authors',
       type: IsarType.stringList,
     ),
-    r'description': PropertySchema(
+    r'bookmarked': PropertySchema(
       id: 1,
+      name: r'bookmarked',
+      type: IsarType.bool,
+    ),
+    r'description': PropertySchema(
+      id: 2,
       name: r'description',
       type: IsarType.string,
     ),
     r'feedName': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'feedName',
       type: IsarType.string,
     ),
     r'publishedDate': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'publishedDate',
       type: IsarType.dateTime,
     ),
+    r'read': PropertySchema(
+      id: 5,
+      name: r'read',
+      type: IsarType.bool,
+    ),
     r'timeFetched': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'timeFetched',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'url',
       type: IsarType.string,
     )
@@ -108,12 +118,14 @@ void _feedItemSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeStringList(offsets[0], object.authors);
-  writer.writeString(offsets[1], object.description);
-  writer.writeString(offsets[2], object.feedName);
-  writer.writeDateTime(offsets[3], object.publishedDate);
-  writer.writeDateTime(offsets[4], object.timeFetched);
-  writer.writeString(offsets[5], object.title);
-  writer.writeString(offsets[6], object.url);
+  writer.writeBool(offsets[1], object.bookmarked);
+  writer.writeString(offsets[2], object.description);
+  writer.writeString(offsets[3], object.feedName);
+  writer.writeDateTime(offsets[4], object.publishedDate);
+  writer.writeBool(offsets[5], object.read);
+  writer.writeDateTime(offsets[6], object.timeFetched);
+  writer.writeString(offsets[7], object.title);
+  writer.writeString(offsets[8], object.url);
 }
 
 FeedItem _feedItemDeserialize(
@@ -124,13 +136,15 @@ FeedItem _feedItemDeserialize(
 ) {
   final object = FeedItem();
   object.authors = reader.readStringList(offsets[0]) ?? [];
-  object.description = reader.readString(offsets[1]);
-  object.feedName = reader.readString(offsets[2]);
+  object.bookmarked = reader.readBool(offsets[1]);
+  object.description = reader.readString(offsets[2]);
+  object.feedName = reader.readString(offsets[3]);
   object.id = id;
-  object.publishedDate = reader.readDateTime(offsets[3]);
-  object.timeFetched = reader.readDateTime(offsets[4]);
-  object.title = reader.readString(offsets[5]);
-  object.url = reader.readString(offsets[6]);
+  object.publishedDate = reader.readDateTime(offsets[4]);
+  object.read = reader.readBool(offsets[5]);
+  object.timeFetched = reader.readDateTime(offsets[6]);
+  object.title = reader.readString(offsets[7]);
+  object.url = reader.readString(offsets[8]);
   return object;
 }
 
@@ -144,16 +158,20 @@ P _feedItemDeserializeProp<P>(
     case 0:
       return (reader.readStringList(offset) ?? []) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 4:
       return (reader.readDateTime(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 6:
+      return (reader.readDateTime(offset)) as P;
+    case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -510,6 +528,16 @@ extension FeedItemQueryFilter
         upper,
         includeUpper,
       );
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> bookmarkedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'bookmarked',
+        value: value,
+      ));
     });
   }
 
@@ -881,6 +909,16 @@ extension FeedItemQueryFilter
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> readEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'read',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> timeFetchedEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -1203,6 +1241,18 @@ extension FeedItemQueryLinks
     on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
 
 extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookmarked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByBookmarkedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookmarked', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -1236,6 +1286,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByPublishedDateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'publishedDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'read', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'read', Sort.desc);
     });
   }
 
@@ -1278,6 +1340,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
 
 extension FeedItemQuerySortThenBy
     on QueryBuilder<FeedItem, FeedItem, QSortThenBy> {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookmarked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByBookmarkedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookmarked', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -1326,6 +1400,18 @@ extension FeedItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'read', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'read', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByTimeFetched() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'timeFetched', Sort.asc);
@@ -1371,6 +1457,12 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'bookmarked');
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByDescription(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1388,6 +1480,12 @@ extension FeedItemQueryWhereDistinct
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByPublishedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'publishedDate');
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'read');
     });
   }
 
@@ -1426,6 +1524,12 @@ extension FeedItemQueryProperty
     });
   }
 
+  QueryBuilder<FeedItem, bool, QQueryOperations> bookmarkedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'bookmarked');
+    });
+  }
+
   QueryBuilder<FeedItem, String, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
@@ -1441,6 +1545,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, DateTime, QQueryOperations> publishedDateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'publishedDate');
+    });
+  }
+
+  QueryBuilder<FeedItem, bool, QQueryOperations> readProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'read');
     });
   }
 

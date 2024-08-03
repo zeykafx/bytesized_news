@@ -112,4 +112,10 @@ abstract class _HomeStore with Store {
     feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     loading = false;
   }
+
+  Future<void> toggleItemRead(int itemId, {bool toggle = false}) async {
+    feedItems[itemId].read = toggle ? !feedItems[itemId].read : true;
+
+    await isar.writeTxn(() => isar.feedItems.put(feedItems[itemId]));
+  }
 }

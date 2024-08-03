@@ -10,6 +10,7 @@ part "feedItem.g.dart";
 @collection
 class FeedItem {
   Id id = Isar.autoIncrement;
+
   @Index()
   late String url;
 
@@ -19,6 +20,9 @@ class FeedItem {
   late DateTime publishedDate;
   late DateTime timeFetched;
   late String feedName;
+
+  bool read = false;
+  bool bookmarked = false;
 
   @ignore
   Feed? feed;

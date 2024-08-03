@@ -84,41 +84,96 @@ class _HomeState extends State<Home> {
                               ],
                               // some trickery to get the index of each element as well as the item
                               // this is used to animate each card fading in with a delay.
-                              ...homeStore.feedItems.asMap().map(
-                                (idx, item) => MapEntry(idx, Card(
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                    elevation: 0,
-                                    color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
-                                    child: SelectableRegion(
-                                      focusNode: FocusNode(),
-                                      selectionControls: MaterialTextSelectionControls(),
-                                      child: ListTile(
-                                        title: Text("${item.title} - ${item.feed?.name}"),
-                                        subtitle: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(item.description.split("\n").first),
-                                            Text(
-                                              formatTime(item.publishedDate.millisecondsSinceEpoch),
-                                              style: TextStyle(color: Theme.of(context).dividerColor),
+                              ...homeStore.feedItems
+                                  .asMap()
+                                  .map(
+                                    (idx, item) => MapEntry(
+                                      idx,
+                                      Card(
+                                        shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(15))),
+                                        elevation: 0,
+                                        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+                                        child: SelectableRegion(
+                                          focusNode: FocusNode(),
+                                          selectionControls: MaterialTextSelectionControls(),
+                                          child: ListTile(
+                                            title: Text("${item.title} - ${item.feed?.name}"),
+                                            subtitle: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(item.description.split("\n").first),
+                                                Text(
+                                                  formatTime(item.publishedDate.millisecondsSinceEpoch),
+                                                  style: TextStyle(color: Theme.of(context).dividerColor),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) => Story(
-                                                feedItem: item,
+                                            textColor: item.read
+                                                ? Theme.of(context).dividerColor
+                                                : Theme.of(context).textTheme.bodyMedium?.color,
+                                            onTap: () {
+                                              homeStore.toggleItemRead(idx);
+                                              // force update the state to change the list tile's color to gray
+                                              setState(() {});
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) => Story(
+                                                    feedItem: item,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            trailing: PopupMenuButton(
+                                              elevation: 20,
+                                              icon: const Icon(Icons.more_vert),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                side: BorderSide(
+                                                    color: Theme.of(context).colorScheme.secondaryContainer,
+                                                    width: 0.3),
                                               ),
+                                              onSelected: (int index) {
+                                                switch (index) {
+                                                  case 0:
+                                                    {
+                                                      homeStore.toggleItemRead(idx, toggle: true);
+                                                      setState(() {});
+                                                      break;
+                                                    }
+                                                }
+                                              },
+                                              itemBuilder: (BuildContext context) {
+                                                return [
+                                                  PopupMenuItem(
+                                                    value: 0,
+                                                    child: Wrap(
+                                                      children: [
+                                                        const Padding(
+                                                          padding: EdgeInsets.only(left: 10),
+                                                          child: Icon(
+                                                            Icons.check,
+                                                            size: 19,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 20),
+                                                          child: Text(item.read ? "Mark as Unread" : "Mark as Read"),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ];
+                                              },
                                             ),
-                                          );
-                                        },
-                                      ),
+                                          ),
+                                        ),
+                                      ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
                                     ),
-                                  ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
-                                ),
-                              ).values.toList(),
+                                  )
+                                  .values
+                                  .toList(),
                             ],
                           ),
                         ),

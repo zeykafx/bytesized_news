@@ -1,5 +1,6 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -40,7 +41,9 @@ class _StoryState extends State<Story> {
             storyStore.loading = false;
           },
           onHttpError: (HttpResponseError error) {
-            print(error.response?.statusCode);
+            if (kDebugMode) {
+              print("Error when fetching page: ${error.response?.statusCode}");
+            }
             if (error.response == null || error.response?.statusCode == 404) {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
