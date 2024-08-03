@@ -117,7 +117,7 @@ class _AboutSectionState extends State<AboutSection> {
                 title: const Text(
                   "Made by Corentin Detry",
                 ),
-                subtitle: const Row(
+                subtitle: const Wrap(
                   children: [
                     Text("If you like this app, you can support me at "),
                     Text("paypal.me/zeykafx", style: TextStyle(color: Colors.blue)),
@@ -143,6 +143,7 @@ class SettingsSection extends StatelessWidget {
     required this.title,
     required this.children,
   });
+
   final String title;
   final List<Widget> children;
 

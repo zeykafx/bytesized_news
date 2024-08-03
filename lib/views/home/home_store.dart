@@ -1,3 +1,4 @@
+import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -29,10 +30,19 @@ abstract class _HomeStore with Store {
   @observable
   Isar isar = Isar.getInstance()!;
 
+  @observable
+  late DbUtils dbUtils;
+
   @action
   Future<bool> init() async {
-    feeds = await isar.feeds.where().findAll();
-    print("Fetched ${feeds.length} feeds from Isar");
+    dbUtils = DbUtils(isar: isar);
+
+    // feeds = await isar.feeds.where().findAll();
+    feeds = await dbUtils.getFeeds();
+
+    if (kDebugMode) {
+      print("Fetched ${feeds.length} feeds from Isar");
+    }
 
     if (feeds.isEmpty) {
       isar.writeTxn(
@@ -41,7 +51,8 @@ abstract class _HomeStore with Store {
         ]),
       );
 
-      feeds = await isar.feeds.where().findAll();
+      // feeds = await isar.feeds.where().findAll();
+      feeds = await dbUtils.getFeeds();
     }
     return true;
   }
@@ -49,15 +60,16 @@ abstract class _HomeStore with Store {
   @action
   Future<void> getItems() async {
     // get all feed items from Isar, sorted by published date
-    feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
+    // feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
+    feedItems = await dbUtils.getItems(feeds);
     if (kDebugMode) {
       print("Fetched ${feedItems.length} feed items from Isar");
     }
 
     // find the corresponding feeds for each feed item
-    for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
-    }
+    // for (FeedItem item in feedItems) {
+    //   item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    // }
 
     // if (feedItems.isEmpty || feedItems.first.timeFetched.difference(DateTime.now()).inMinutes > 15) {
     fetchItems();
@@ -98,14 +110,15 @@ abstract class _HomeStore with Store {
       }
 
       // only add items that are not already in the database
-      for (FeedItem item in items) {
-        List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
-        if (dbItems.isEmpty) {
-          isar.writeTxn(() => isar.feedItems.put(item));
-          // also add those items to the feedItems list
-          feedItems.add(item);
-        }
-      }
+      // for (FeedItem item in items) {
+      //   List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
+      //   if (dbItems.isEmpty) {
+      //     isar.writeTxn(() => isar.feedItems.put(item));
+      //     // also add those items to the feedItems list
+      //     feedItems.add(item);
+      //   }
+      // }
+      feedItems.addAll(await dbUtils.addNewItems(items));
     }
 
     // sort feed items by published date
@@ -116,6 +129,7 @@ abstract class _HomeStore with Store {
   Future<void> toggleItemRead(int itemId, {bool toggle = false}) async {
     feedItems[itemId].read = toggle ? !feedItems[itemId].read : true;
 
-    await isar.writeTxn(() => isar.feedItems.put(feedItems[itemId]));
+    // await isar.writeTxn(() => isar.feedItems.put(feedItems[itemId]));
+    await dbUtils.updateItemInDb(feedItems[itemId]);
   }
 }

@@ -23,10 +23,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -72,6 +69,15 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDxr2z80RAHK7hVKO6DmgXWHWz2BkJt4rY',
+    appId: '1:286405169123:ios:6ff383b1f80bff5fb21ad6',
+    messagingSenderId: '286405169123',
+    projectId: 'bytesized-news',
+    storageBucket: 'bytesized-news.appspot.com',
+    iosBundleId: 'com.zeykafx.bytesizedNews.RunnerTests',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDxr2z80RAHK7hVKO6DmgXWHWz2BkJt4rY',
     appId: '1:286405169123:ios:9c12da3f04b400b4b21ad6',
     messagingSenderId: '286405169123',

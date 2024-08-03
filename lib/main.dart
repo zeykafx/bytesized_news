@@ -117,7 +117,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                       ? ThemeMode.dark
                       : ThemeMode.light,
-              home: const SafeArea(child: Home()),
+              home: const Home(),
             );
           },
         );

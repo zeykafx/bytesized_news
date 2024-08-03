@@ -86,6 +86,25 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
+  late final _$dbUtilsAtom = Atom(name: '_HomeStore.dbUtils', context: context);
+
+  @override
+  DbUtils get dbUtils {
+    _$dbUtilsAtom.reportRead();
+    return super.dbUtils;
+  }
+
+  bool _dbUtilsIsInitialized = false;
+
+  @override
+  set dbUtils(DbUtils value) {
+    _$dbUtilsAtom
+        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
+      super.dbUtils = value;
+      _dbUtilsIsInitialized = true;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_HomeStore.init', context: context);
 
@@ -117,7 +136,8 @@ feeds: ${feeds},
 feedItems: ${feedItems},
 initialized: ${initialized},
 loading: ${loading},
-isar: ${isar}
+isar: ${isar},
+dbUtils: ${dbUtils}
     ''';
   }
 }
