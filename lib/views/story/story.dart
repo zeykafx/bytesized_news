@@ -25,87 +25,79 @@ class _StoryState extends State<Story> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.feedItem.title),
-          actions: [
-            IconButton(
-              onPressed: () {
-                storyStore.controller.reload();
-              },
-              icon: const Icon(Icons.refresh),
-            ),
-            IconButton(
-              onPressed: () {
-                storyStore.controller.canGoBack().then((value) {
-                  if (value) {
-                    storyStore.controller.goBack();
-                  }
-                });
-              },
-              icon: const Icon(Icons.arrow_back),
-            ),
-            IconButton(
-              onPressed: () {
-                storyStore.controller.canGoForward().then((value) {
-                  if (value) {
-                    storyStore.controller.goForward();
-                  }
-                });
-              },
-              icon: const Icon(Icons.arrow_forward),
-            ),
-          ],
-        ),
-        body: BottomSheetBar(
-          controller: storyStore.bsbController,
-          borderRadius: const BorderRadius.all(Radius.circular(100)),
-          backdropColor: Theme.of(context).colorScheme.surface,
-          locked: storyStore.isLocked,
-          body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: Observer(builder: (_) {
+          return Text("${storyStore.feedItem.title} - ${storyStore.feedItem.feedName}");
+        }),
+      ),
+      body: BottomSheetBar(
+        controller: storyStore.bsbController,
+        borderRadius: const BorderRadius.all(Radius.circular(100)),
+        backdropColor: Theme.of(context).colorScheme.surface,
+        locked: storyStore.isLocked,
+        body: Observer(builder: (_) {
+          return Center(
             child: Stack(
               children: [
                 storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
                 storyStore.initialized ? WebViewWidget(controller: storyStore.controller) : const CircularProgressIndicator(),
               ],
             ),
-          ),
-          expandedBuilder: (ScrollController _) {
-            return const Placeholder();
-          },
-          collapsed: Row(
+          );
+        }),
+        expandedBuilder: (ScrollController _) {
+          return const Placeholder();
+        },
+        collapsed: Observer(builder: (_) {
+          return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // RELOAD
+              IconButton(
+                onPressed: () {
+                  storyStore.controller.reload();
+                },
+                icon: const Icon(Icons.refresh),
+              ),
+              // BACK
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 onPressed: () async {
-                  storyStore.controller.canGoBack().then((value) {
-                    if (value) {
-                      storyStore.controller.goBack();
-                    }
-                  });
-                },
-              ),
-              IconButton(
-                  onPressed: () {
-                    storyStore.controller.canGoBack().then((value) {
+                  storyStore.controller.canGoBack().then(
+                    (value) {
                       if (value) {
                         storyStore.controller.goBack();
                       }
-                    });
-                  },
-                  icon: const Icon(Icons.replay)),
+                    },
+                  );
+                },
+              ),
+              // FORWARD
               IconButton(
-                  onPressed: () {
-                    storyStore.bsbController.expand();
-                  },
-                  icon: const Icon(Icons.arrow_upward)),
+                onPressed: () {
+                  storyStore.controller.canGoForward().then((value) {
+                    if (value) {
+                      storyStore.controller.goForward();
+                    }
+                  });
+                },
+                icon: const Icon(Icons.arrow_forward_ios),
+              ),
+              // BOOKMARK
+              IconButton(
+                isSelected: storyStore.isBookmarked,
+                onPressed: () {
+                  storyStore.bookmarkItem();
+                  widget.feedItem.bookmarked = storyStore.isBookmarked;
+                },
+                icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+              ),
             ],
-          ),
-        ),
-      );
-    });
+          );
+        }),
+      ),
+    );
   }
 }

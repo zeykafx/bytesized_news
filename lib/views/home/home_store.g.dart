@@ -28,13 +28,13 @@ mixin _$HomeStore on _HomeStore, Store {
       Atom(name: '_HomeStore.feedItems', context: context);
 
   @override
-  List<FeedItem> get feedItems {
+  ObservableList<FeedItem> get feedItems {
     _$feedItemsAtom.reportRead();
     return super.feedItems;
   }
 
   @override
-  set feedItems(List<FeedItem> value) {
+  set feedItems(ObservableList<FeedItem> value) {
     _$feedItemsAtom.reportWrite(value, super.feedItems, () {
       super.feedItems = value;
     });

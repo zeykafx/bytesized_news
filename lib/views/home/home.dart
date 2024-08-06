@@ -90,10 +90,11 @@ class _HomeState extends State<Home> {
                                     (idx, item) => MapEntry(
                                       idx,
                                       Card(
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(15))),
+                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
                                         elevation: 0,
-                                        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+                                        color: !item.bookmarked
+                                            ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4)
+                                            : Theme.of(context).colorScheme.secondaryContainer,
                                         child: SelectableRegion(
                                           focusNode: FocusNode(),
                                           selectionControls: MaterialTextSelectionControls(),
@@ -110,35 +111,45 @@ class _HomeState extends State<Home> {
                                                 ),
                                               ],
                                             ),
-                                            textColor: item.read
-                                                ? Theme.of(context).dividerColor
-                                                : Theme.of(context).textTheme.bodyMedium?.color,
+                                            textColor: item.read ? Theme.of(context).dividerColor : Theme.of(context).textTheme.bodyMedium?.color,
                                             onTap: () {
                                               homeStore.toggleItemRead(idx);
                                               // force update the state to change the list tile's color to gray
                                               setState(() {});
-                                              Navigator.of(context).push(
+                                              Navigator.of(context)
+                                                  .push(
                                                 MaterialPageRoute(
                                                   builder: (context) => Story(
                                                     feedItem: item,
                                                   ),
                                                 ),
-                                              );
+                                              )
+                                                  .then((_) {
+                                                // update the state of the list items after the story view is popped
+                                                // this is done because if the item was bookmarked while in the story view, we want to show that in the list
+                                                setState(() {});
+                                              });
                                             },
+                                            dense: true,
                                             trailing: PopupMenuButton(
                                               elevation: 20,
                                               icon: const Icon(Icons.more_vert),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10),
-                                                side: BorderSide(
-                                                    color: Theme.of(context).colorScheme.secondaryContainer,
-                                                    width: 0.3),
+                                                side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
                                               ),
                                               onSelected: (int index) {
                                                 switch (index) {
                                                   case 0:
                                                     {
                                                       homeStore.toggleItemRead(idx, toggle: true);
+                                                      // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
+                                                      setState(() {});
+                                                      break;
+                                                    }
+                                                  case 1:
+                                                    {
+                                                      homeStore.toggleItemBookmarked(idx, toggle: true);
                                                       setState(() {});
                                                       break;
                                                     }
@@ -146,6 +157,7 @@ class _HomeState extends State<Home> {
                                               },
                                               itemBuilder: (BuildContext context) {
                                                 return [
+                                                  // MARK AS READ/UNREAD
                                                   PopupMenuItem(
                                                     value: 0,
                                                     child: Wrap(
@@ -163,6 +175,25 @@ class _HomeState extends State<Home> {
                                                         ),
                                                       ],
                                                     ),
+                                                  ),
+                                                  // BOOKMARK
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    child: Wrap(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 10),
+                                                          child: Icon(
+                                                            item.bookmarked ? Icons.bookmark_added : Icons.bookmark_add,
+                                                            size: 19,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 20),
+                                                          child: Text(item.bookmarked ? "Remove from bookmarks" : "Add to bookmarks"),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   )
                                                 ];
                                               },
@@ -172,8 +203,7 @@ class _HomeState extends State<Home> {
                                       ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
                                     ),
                                   )
-                                  .values
-                                  .toList(),
+                                  .values,
                             ],
                           ),
                         ),

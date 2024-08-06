@@ -134,4 +134,36 @@ class FeedItem {
     feedItem.feed = feed;
     return feedItem;
   }
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      url.hashCode ^
+      title.hashCode ^
+      description.hashCode ^
+      authors.hashCode ^
+      publishedDate.hashCode ^
+      timeFetched.hashCode ^
+      feedName.hashCode ^
+      read.hashCode ^
+      bookmarked.hashCode ^
+      feed.hashCode.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FeedItem &&
+        other.id == id &&
+        other.url == url &&
+        other.title == title &&
+        other.description == description &&
+        other.authors == authors &&
+        other.publishedDate == publishedDate &&
+        other.timeFetched == timeFetched &&
+        other.feedName == feedName &&
+        other.read == read &&
+        other.bookmarked == bookmarked &&
+        other.feed == feed;
+  }
 }

@@ -1,18 +1,27 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/database/db_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-import '../../models/feedItem/feedItem.dart';
 
 part 'story_store.g.dart';
 
 class StoryStore = _StoryStore with _$StoryStore;
 
 abstract class _StoryStore with Store {
+  Isar isar = Isar.getInstance()!;
+
   @observable
-  FeedItem? feedItem;
+  late DbUtils dbUtils;
+
+  @observable
+  late FeedItem feedItem;
+
+  @observable
+  bool isBookmarked = false;
 
   @observable
   int progress = 0;
@@ -39,7 +48,11 @@ abstract class _StoryStore with Store {
   bool initialized = false;
 
   void init(FeedItem item, BuildContext context) {
+    dbUtils = DbUtils(isar: isar);
+
     feedItem = item;
+    isBookmarked = feedItem.bookmarked;
+
     bsbController.addListener(onBsbChanged);
 
     controller = WebViewController()
@@ -72,7 +85,7 @@ abstract class _StoryStore with Store {
           onWebResourceError: (WebResourceError error) {},
         ),
       )
-      ..loadRequest(Uri.parse(feedItem!.url));
+      ..loadRequest(Uri.parse(feedItem.url));
     initialized = true;
   }
 
@@ -85,5 +98,13 @@ abstract class _StoryStore with Store {
       isCollapsed = false;
       isExpanded = true;
     }
+  }
+
+  @action
+  void bookmarkItem() {
+    feedItem.bookmarked = !feedItem.bookmarked;
+    isBookmarked = feedItem.bookmarked;
+    print(feedItem.bookmarked);
+    dbUtils.updateItemInDb(feedItem);
   }
 }

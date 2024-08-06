@@ -19,7 +19,7 @@ abstract class _HomeStore with Store {
   List<Feed> feeds = [];
 
   @observable
-  List<FeedItem> feedItems = [];
+  ObservableList<FeedItem> feedItems = <FeedItem>[].asObservable();
 
   @observable
   bool initialized = false;
@@ -57,14 +57,12 @@ abstract class _HomeStore with Store {
   @action
   Future<void> getItems() async {
     // get all feed items from Isar, sorted by published date
-    feedItems = await dbUtils.getItems(feeds);
+    feedItems = (await dbUtils.getItems(feeds)).asObservable();
     if (kDebugMode) {
       print("Fetched ${feedItems.length} feed items from Isar");
     }
 
-    // if (feedItems.isEmpty || feedItems.first.timeFetched.difference(DateTime.now()).inMinutes > 15) {
     fetchItems();
-    // }
   }
 
   @action
@@ -110,6 +108,12 @@ abstract class _HomeStore with Store {
 
   Future<void> toggleItemRead(int itemId, {bool toggle = false}) async {
     feedItems[itemId].read = toggle ? !feedItems[itemId].read : true;
+
+    await dbUtils.updateItemInDb(feedItems[itemId]);
+  }
+
+  Future<void> toggleItemBookmarked(int itemId, {bool toggle = false}) async {
+    feedItems[itemId].bookmarked = toggle ? !feedItems[itemId].bookmarked : true;
 
     await dbUtils.updateItemInDb(feedItems[itemId]);
   }
