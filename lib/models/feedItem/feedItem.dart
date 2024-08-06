@@ -97,7 +97,7 @@ class FeedItem {
 
     feedItem.url = item.links.first.href ?? "no link";
 
-    feedItem.title = item.title!;
+    feedItem.title = item.title!.trim();
     feedItem.authors = item.authors.map((author) => author.name!).toList();
     feedItem.publishedDate = DateTime.parse(item.published!);
 
@@ -120,7 +120,7 @@ class FeedItem {
 
     feedItem.url = item.source?.value ?? "no link";
 
-    feedItem.title = item.title!;
+    feedItem.title = item.title!.trim();
     feedItem.authors = item.author != null ? item.author!.split(",") : [];
     // print(item.pubDate);
     feedItem.publishedDate = DateTime.parse(item.pubDate!);

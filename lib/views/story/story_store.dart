@@ -24,6 +24,12 @@ abstract class _StoryStore with Store {
   bool isBookmarked = false;
 
   @observable
+  bool canGoForward = false;
+
+  @observable
+  bool canGoBack = false;
+
+  @observable
   int progress = 0;
 
   @observable
@@ -61,6 +67,10 @@ abstract class _StoryStore with Store {
         NavigationDelegate(
           onProgress: (int progress) {
             progress = progress;
+          },
+          onUrlChange: (UrlChange _) async {
+            canGoBack = await controller.canGoBack();
+            canGoForward = await controller.canGoForward();
           },
           onPageStarted: (String url) {
             loading = true;
@@ -104,7 +114,6 @@ abstract class _StoryStore with Store {
   void bookmarkItem() {
     feedItem.bookmarked = !feedItem.bookmarked;
     isBookmarked = feedItem.bookmarked;
-    print(feedItem.bookmarked);
     dbUtils.updateItemInDb(feedItem);
   }
 }

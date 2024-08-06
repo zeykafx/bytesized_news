@@ -19,12 +19,20 @@ class _SettingsState extends State<Settings> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: ListView(
-        shrinkWrap: true,
-        children: const [
-          GeneralSettings(),
-          AboutSection(),
-        ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GeneralSettings(),
+                AboutSection(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

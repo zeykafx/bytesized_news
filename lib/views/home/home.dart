@@ -65,10 +65,47 @@ class _HomeState extends State<Home> {
                 alignment: Alignment.topCenter,
                 child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Text('Articles: ${homeStore.feedItems.length} loaded'),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          PopupMenuButton(
+                              elevation: 10,
+                              child: TextButton.icon(
+                                onPressed: null,
+                                icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                                label: const Text("All articles"),
+                              ),
+                              // icon: const Icon(Icons.more_vert),
+                              // shape: RoundedRectangleBorder(
+                              //   borderRadius: BorderRadius.circular(10),
+                              //   side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
+                              // ),
+                              // onSelected: (int index) {
+                              //   switch (index) {
+                              //     case 0:
+                              //       {
+                              //         homeStore.toggleItemRead(idx, toggle: true);
+                              //         // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
+                              //         setState(() {});
+                              //         break;
+                              //       }
+                              //     case 1:
+                              //       {
+                              //         homeStore.toggleItemBookmarked(idx, toggle: true);
+                              //         setState(() {});
+                              //         break;
+                              //       }
+                              //   }
+                              // },
+                              itemBuilder: (BuildContext _) {
+                                return [];
+                              })
+                        ],
+                      ),
                       Skeletonizer(
                         enabled: homeStore.loading,
                         child: Container(

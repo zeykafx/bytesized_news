@@ -105,6 +105,21 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
+  late final _$sortAtom = Atom(name: '_HomeStore.sort', context: context);
+
+  @override
+  FeedListSort get sort {
+    _$sortAtom.reportRead();
+    return super.sort;
+  }
+
+  @override
+  set sort(FeedListSort value) {
+    _$sortAtom.reportWrite(value, super.sort, () {
+      super.sort = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_HomeStore.init', context: context);
 
@@ -137,7 +152,8 @@ feedItems: ${feedItems},
 initialized: ${initialized},
 loading: ${loading},
 isar: ${isar},
-dbUtils: ${dbUtils}
+dbUtils: ${dbUtils},
+sort: ${sort}
     ''';
   }
 }

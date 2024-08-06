@@ -65,6 +65,38 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$canGoForwardAtom =
+      Atom(name: '_StoryStore.canGoForward', context: context);
+
+  @override
+  bool get canGoForward {
+    _$canGoForwardAtom.reportRead();
+    return super.canGoForward;
+  }
+
+  @override
+  set canGoForward(bool value) {
+    _$canGoForwardAtom.reportWrite(value, super.canGoForward, () {
+      super.canGoForward = value;
+    });
+  }
+
+  late final _$canGoBackAtom =
+      Atom(name: '_StoryStore.canGoBack', context: context);
+
+  @override
+  bool get canGoBack {
+    _$canGoBackAtom.reportRead();
+    return super.canGoBack;
+  }
+
+  @override
+  set canGoBack(bool value) {
+    _$canGoBackAtom.reportWrite(value, super.canGoBack, () {
+      super.canGoBack = value;
+    });
+  }
+
   late final _$progressAtom =
       Atom(name: '_StoryStore.progress', context: context);
 
@@ -224,6 +256,8 @@ mixin _$StoryStore on _StoryStore, Store {
 dbUtils: ${dbUtils},
 feedItem: ${feedItem},
 isBookmarked: ${isBookmarked},
+canGoForward: ${canGoForward},
+canGoBack: ${canGoBack},
 progress: ${progress},
 loading: ${loading},
 isLocked: ${isLocked},

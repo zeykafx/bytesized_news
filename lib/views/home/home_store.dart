@@ -12,6 +12,8 @@ import 'package:rss_dart/domain/rss_item.dart';
 
 part 'home_store.g.dart';
 
+enum FeedListSort { byDate, today, unread, read, bookmarked }
+
 class HomeStore = _HomeStore with _$HomeStore;
 
 abstract class _HomeStore with Store {
@@ -32,6 +34,9 @@ abstract class _HomeStore with Store {
 
   @observable
   late DbUtils dbUtils;
+
+  @observable
+  FeedListSort sort = FeedListSort.byDate;
 
   @action
   Future<bool> init() async {
