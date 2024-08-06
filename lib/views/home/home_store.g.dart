@@ -144,6 +144,32 @@ mixin _$HomeStore on _HomeStore, Store {
     return _$fetchItemsAsyncAction.run(() => super.fetchItems());
   }
 
+  late final _$toggleItemReadAsyncAction =
+      AsyncAction('_HomeStore.toggleItemRead', context: context);
+
+  @override
+  Future<void> toggleItemRead(int itemId, {bool toggle = false}) {
+    return _$toggleItemReadAsyncAction
+        .run(() => super.toggleItemRead(itemId, toggle: toggle));
+  }
+
+  late final _$toggleItemBookmarkedAsyncAction =
+      AsyncAction('_HomeStore.toggleItemBookmarked', context: context);
+
+  @override
+  Future<void> toggleItemBookmarked(int itemId, {bool toggle = false}) {
+    return _$toggleItemBookmarkedAsyncAction
+        .run(() => super.toggleItemBookmarked(itemId, toggle: toggle));
+  }
+
+  late final _$changeSortAsyncAction =
+      AsyncAction('_HomeStore.changeSort', context: context);
+
+  @override
+  Future<void> changeSort(FeedListSort sort) {
+    return _$changeSortAsyncAction.run(() => super.changeSort(sort));
+  }
+
   @override
   String toString() {
     return '''

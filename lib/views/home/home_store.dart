@@ -14,6 +14,21 @@ part 'home_store.g.dart';
 
 enum FeedListSort { byDate, today, unread, read, bookmarked }
 
+String feedListSortToString(FeedListSort sort) {
+  switch (sort) {
+    case FeedListSort.byDate:
+      return "By Date";
+    case FeedListSort.today:
+      return "Today";
+    case FeedListSort.unread:
+      return "Unread";
+    case FeedListSort.read:
+      return "Read";
+    case FeedListSort.bookmarked:
+      return "Bookmarked";
+  }
+}
+
 class HomeStore = _HomeStore with _$HomeStore;
 
 abstract class _HomeStore with Store {
@@ -111,15 +126,49 @@ abstract class _HomeStore with Store {
     loading = false;
   }
 
+  @action
   Future<void> toggleItemRead(int itemId, {bool toggle = false}) async {
     feedItems[itemId].read = toggle ? !feedItems[itemId].read : true;
 
     await dbUtils.updateItemInDb(feedItems[itemId]);
   }
 
+  @action
   Future<void> toggleItemBookmarked(int itemId, {bool toggle = false}) async {
     feedItems[itemId].bookmarked = toggle ? !feedItems[itemId].bookmarked : true;
 
     await dbUtils.updateItemInDb(feedItems[itemId]);
+  }
+
+  @action
+  Future<void> changeSort(FeedListSort sort) async {
+    this.sort = sort;
+
+    switch (sort) {
+      case FeedListSort.byDate:
+        feedItems = (await dbUtils.getItems(feeds)).asObservable();
+        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+        break;
+      case FeedListSort.today:
+        feedItems = (await dbUtils.getTodaysItems(feeds)).asObservable();
+        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+        // feedItems = feedItems.where((item) => item.publishedDate.day == DateTime.now().day).toList().asObservable();
+        break;
+      case FeedListSort.unread:
+        feedItems = (await dbUtils.getUnreadItems(feeds)).asObservable();
+        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+        // feedItems = feedItems.where((item) => !item.read).toList().asObservable();
+        break;
+      case FeedListSort.read:
+        feedItems = (await dbUtils.getReadItems(feeds)).asObservable();
+        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+        // feedItems = feedItems.where((item) => item.read).toList().asObservable();
+        break;
+      case FeedListSort.bookmarked:
+        feedItems = (await dbUtils.getBookmarkedItems(feeds)).asObservable();
+        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+        // feedItems = feedItems.where((item) => item.bookmarked).toList().asObservable();
+        break;
+    }
   }
 }

@@ -73,36 +73,71 @@ class _HomeState extends State<Home> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           PopupMenuButton(
-                              elevation: 10,
+                              elevation: 20,
                               child: TextButton.icon(
                                 onPressed: null,
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                                label: const Text("All articles"),
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Theme.of(context).textTheme.bodyLarge!.color,
+                                ),
+                                label: Text(
+                                  feedListSortToString(homeStore.sort),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
                               ),
-                              // icon: const Icon(Icons.more_vert),
-                              // shape: RoundedRectangleBorder(
-                              //   borderRadius: BorderRadius.circular(10),
-                              //   side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
-                              // ),
-                              // onSelected: (int index) {
-                              //   switch (index) {
-                              //     case 0:
-                              //       {
-                              //         homeStore.toggleItemRead(idx, toggle: true);
-                              //         // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
-                              //         setState(() {});
-                              //         break;
-                              //       }
-                              //     case 1:
-                              //       {
-                              //         homeStore.toggleItemBookmarked(idx, toggle: true);
-                              //         setState(() {});
-                              //         break;
-                              //       }
-                              //   }
-                              // },
+                              onSelected: (int value) {
+                                switch (value) {
+                                  case 0:
+                                    {
+                                      homeStore.changeSort(FeedListSort.byDate);
+                                      break;
+                                    }
+                                  case 1:
+                                    {
+                                      homeStore.changeSort(FeedListSort.today);
+                                      break;
+                                    }
+                                  case 2:
+                                    {
+                                      homeStore.changeSort(FeedListSort.unread);
+                                      break;
+                                    }
+                                  case 3:
+                                    {
+                                      homeStore.changeSort(FeedListSort.read);
+                                      break;
+                                    }
+                                  case 4:
+                                    {
+                                      homeStore.changeSort(FeedListSort.bookmarked);
+                                      break;
+                                    }
+                                }
+                              },
+                              // by date, today, unread, read, bookmarked
                               itemBuilder: (BuildContext _) {
-                                return [];
+                                return [
+                                  const PopupMenuItem(
+                                    value: 0,
+                                    child: Text("All articles"),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 1,
+                                    child: Text("Today"),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 2,
+                                    child: Text("Unread"),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 3,
+                                    child: Text("Read"),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 4,
+                                    child: Text("Bookmarked"),
+                                  ),
+                                ];
                               })
                         ],
                       ),
@@ -117,7 +152,7 @@ class _HomeState extends State<Home> {
                                 const Center(child: LinearProgressIndicator()),
                               ],
                               if (homeStore.feedItems.isEmpty && !homeStore.loading) ...[
-                                const Center(child: Text("No feedItems loaded")),
+                                const Center(child: Text("No stories loaded")),
                               ],
                               // some trickery to get the index of each element as well as the item
                               // this is used to animate each card fading in with a delay.
@@ -162,6 +197,8 @@ class _HomeState extends State<Home> {
                                                 ),
                                               )
                                                   .then((_) {
+                                                // update the sort after the story view is popped
+                                                homeStore.changeSort(homeStore.sort);
                                                 // update the state of the list items after the story view is popped
                                                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                                                 setState(() {});

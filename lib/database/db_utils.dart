@@ -12,8 +12,7 @@ class DbUtils {
   }
 
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
-    List<FeedItem> feedItems = [];
-    feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
+    List<FeedItem> feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
 
     // find the corresponding feeds for each feed item
     for (FeedItem item in feedItems) {
@@ -22,16 +21,42 @@ class DbUtils {
     return feedItems;
   }
 
-  Future<List<FeedItem>> getUnreadItems() async {
-    return await isar.feedItems.filter().readEqualTo(false).sortByPublishedDateDesc().findAll();
+  Future<List<FeedItem>> getTodaysItems(List<Feed> feeds) async {
+    List<FeedItem> feedItems = await isar.feedItems
+        .filter()
+        .publishedDateBetween(DateTime.now().subtract(const Duration(days: 1)), DateTime.now())
+        .sortByPublishedDateDesc()
+        .findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
   }
 
-  Future<List<FeedItem>> getReadItems() async {
-    return await isar.feedItems.filter().readEqualTo(true).sortByPublishedDateDesc().findAll();
+  Future<List<FeedItem>> getUnreadItems(List<Feed> feeds) async {
+    List<FeedItem> feedItems = await isar.feedItems.filter().readEqualTo(false).sortByPublishedDateDesc().findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
   }
 
-  Future<List<FeedItem>> getBookmarkedItems() async {
-    return await isar.feedItems.filter().bookmarkedEqualTo(true).sortByPublishedDateDesc().findAll();
+  Future<List<FeedItem>> getReadItems(List<Feed> feeds) async {
+    // return await isar.feedItems.filter().readEqualTo(true).sortByPublishedDateDesc().findAll();
+    List<FeedItem> feedItems = await isar.feedItems.filter().readEqualTo(true).sortByPublishedDateDesc().findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
+  }
+
+  Future<List<FeedItem>> getBookmarkedItems(List<Feed> feeds) async {
+    // return await isar.feedItems.filter().bookmarkedEqualTo(true).sortByPublishedDateDesc().findAll();
+    List<FeedItem> feedItems = await isar.feedItems.filter().bookmarkedEqualTo(true).sortByPublishedDateDesc().findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
   }
 
   Future<List<FeedItem>> getItemsFromFeed(Feed feed) async {
