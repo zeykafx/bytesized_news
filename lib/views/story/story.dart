@@ -1,6 +1,5 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -18,61 +17,10 @@ class Story extends StatefulWidget {
 class _StoryState extends State<Story> {
   final StoryStore storyStore = StoryStore();
 
-  late WebViewController controller;
-
   @override
   void initState() {
+    storyStore.init(widget.feedItem, context);
     super.initState();
-    storyStore.feedItem = widget.feedItem;
-
-    storyStore.bsbController.addListener(onBsbChanged);
-
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            storyStore.progress = progress;
-          },
-          onPageStarted: (String url) {
-            storyStore.loading = true;
-          },
-          onPageFinished: (String url) {
-            storyStore.loading = false;
-          },
-          onHttpError: (HttpResponseError error) {
-            if (kDebugMode) {
-              print("Error when fetching page: ${error.response?.statusCode}");
-            }
-            if (error.response == null || error.response?.statusCode == 404) {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Failed to open article"),
-                  duration: Duration(seconds: 30),
-                ),
-              );
-            }
-
-          },
-          onWebResourceError: (WebResourceError error) {},
-        ),
-      )
-      ..loadRequest(Uri.parse(widget.feedItem.url));
-  }
-
-  void onBsbChanged() {
-    if (storyStore.bsbController.isCollapsed && !storyStore.isCollapsed) {
-      setState(() {
-        storyStore.isCollapsed = true;
-        storyStore.isExpanded = false;
-      });
-    } else if (storyStore.bsbController.isExpanded && !storyStore.isExpanded) {
-      setState(() {
-        storyStore.isCollapsed = false;
-        storyStore.isExpanded = true;
-      });
-    }
   }
 
   @override
@@ -84,15 +32,15 @@ class _StoryState extends State<Story> {
           actions: [
             IconButton(
               onPressed: () {
-                controller.reload();
+                storyStore.controller.reload();
               },
               icon: const Icon(Icons.refresh),
             ),
             IconButton(
               onPressed: () {
-                controller.canGoBack().then((value) {
+                storyStore.controller.canGoBack().then((value) {
                   if (value) {
-                    controller.goBack();
+                    storyStore.controller.goBack();
                   }
                 });
               },
@@ -100,9 +48,9 @@ class _StoryState extends State<Story> {
             ),
             IconButton(
               onPressed: () {
-                controller.canGoForward().then((value) {
+                storyStore.controller.canGoForward().then((value) {
                   if (value) {
-                    controller.goForward();
+                    storyStore.controller.goForward();
                   }
                 });
               },
@@ -118,10 +66,8 @@ class _StoryState extends State<Story> {
           body: Center(
             child: Stack(
               children: [
-                storyStore.loading
-                    ? LinearProgressIndicator(value: storyStore.progress / 100)
-                    : const SizedBox(),
-                WebViewWidget(controller: controller),
+                storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
+                storyStore.initialized ? WebViewWidget(controller: storyStore.controller) : const CircularProgressIndicator(),
               ],
             ),
           ),
@@ -135,18 +81,18 @@ class _StoryState extends State<Story> {
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 onPressed: () async {
-                  controller.canGoBack().then((value) {
+                  storyStore.controller.canGoBack().then((value) {
                     if (value) {
-                      controller.goBack();
+                      storyStore.controller.goBack();
                     }
                   });
                 },
               ),
               IconButton(
                   onPressed: () {
-                    controller.canGoBack().then((value) {
+                    storyStore.controller.canGoBack().then((value) {
                       if (value) {
-                        controller.goBack();
+                        storyStore.controller.goBack();
                       }
                     });
                   },
