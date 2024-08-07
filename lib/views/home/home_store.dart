@@ -1,5 +1,6 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
@@ -11,23 +12,6 @@ import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:rss_dart/domain/rss_item.dart';
 
 part 'home_store.g.dart';
-
-enum FeedListSort { byDate, today, unread, read, bookmarked }
-
-String feedListSortToString(FeedListSort sort) {
-  switch (sort) {
-    case FeedListSort.byDate:
-      return "By Date";
-    case FeedListSort.today:
-      return "Today";
-    case FeedListSort.unread:
-      return "Unread";
-    case FeedListSort.read:
-      return "Read";
-    case FeedListSort.bookmarked:
-      return "Bookmarked";
-  }
-}
 
 class HomeStore = _HomeStore with _$HomeStore;
 
@@ -50,11 +34,15 @@ abstract class _HomeStore with Store {
   @observable
   late DbUtils dbUtils;
 
+  // @observable
+  // FeedListSort sort = FeedListSort.byDate;
+
   @observable
-  FeedListSort sort = FeedListSort.byDate;
+  late SettingsStore settingsStore;
 
   @action
-  Future<bool> init() async {
+  Future<bool> init({required SettingsStore setStore}) async {
+    settingsStore = setStore;
     dbUtils = DbUtils(isar: isar);
     feeds = await dbUtils.getFeeds();
 
@@ -77,12 +65,19 @@ abstract class _HomeStore with Store {
   @action
   Future<void> getItems() async {
     // get all feed items from Isar, sorted by published date
-    feedItems = (await dbUtils.getItems(feeds)).asObservable();
+    // feedItems = (await dbUtils.getItems(feeds)).asObservable();
+
+    // this doesn't change the sort but it does fetch the right items from the DB for the current sort
+    changeSort(settingsStore.sort);
+
     if (kDebugMode) {
       print("Fetched ${feedItems.length} feed items from Isar");
     }
 
-    fetchItems();
+    // only fetch items from the feeds if we are sorting by date, today, or unread, the rest of the sorts do not require fetching new items
+    if (settingsStore.sort == FeedListSort.byDate || settingsStore.sort == FeedListSort.today || settingsStore.sort == FeedListSort.unread) {
+      fetchItems();
+    }
   }
 
   @action
@@ -142,7 +137,7 @@ abstract class _HomeStore with Store {
 
   @action
   Future<void> changeSort(FeedListSort sort) async {
-    this.sort = sort;
+    settingsStore.setSort(sort);
 
     switch (sort) {
       case FeedListSort.byDate:
@@ -170,5 +165,9 @@ abstract class _HomeStore with Store {
         // feedItems = feedItems.where((item) => item.bookmarked).toList().asObservable();
         break;
     }
+  }
+
+  Future<void> markAllAsRead(bool read) async {
+    await dbUtils.markAllAsRead(feedItems, read);
   }
 }

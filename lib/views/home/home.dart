@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> init() async {
-    await homeStore.init();
+    await homeStore.init(setStore: settingsStore);
     await homeStore.getItems();
   }
 
@@ -53,7 +53,7 @@ class _HomeState extends State<Home> {
       body: Observer(builder: (context) {
         return RefreshIndicator(
           onRefresh: () async {
-            homeStore.fetchItems();
+            homeStore.getItems();
           },
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -68,78 +68,98 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          PopupMenuButton(
-                              elevation: 20,
-                              child: TextButton.icon(
-                                onPressed: null,
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Theme.of(context).textTheme.bodyLarge!.color,
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            PopupMenuButton(
+                                elevation: 20,
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  icon: Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                                  ),
+                                  label: Text(
+                                    feedListSortToString(homeStore.settingsStore.sort),
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
                                 ),
-                                label: Text(
-                                  feedListSortToString(homeStore.sort),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                              onSelected: (int value) {
-                                switch (value) {
-                                  case 0:
-                                    {
-                                      homeStore.changeSort(FeedListSort.byDate);
-                                      break;
-                                    }
-                                  case 1:
-                                    {
-                                      homeStore.changeSort(FeedListSort.today);
-                                      break;
-                                    }
-                                  case 2:
-                                    {
-                                      homeStore.changeSort(FeedListSort.unread);
-                                      break;
-                                    }
-                                  case 3:
-                                    {
-                                      homeStore.changeSort(FeedListSort.read);
-                                      break;
-                                    }
-                                  case 4:
-                                    {
-                                      homeStore.changeSort(FeedListSort.bookmarked);
-                                      break;
-                                    }
-                                }
+                                onSelected: (int value) {
+                                  switch (value) {
+                                    case 0:
+                                      {
+                                        homeStore.changeSort(FeedListSort.byDate);
+                                        break;
+                                      }
+                                    case 1:
+                                      {
+                                        homeStore.changeSort(FeedListSort.today);
+                                        break;
+                                      }
+                                    case 2:
+                                      {
+                                        homeStore.changeSort(FeedListSort.unread);
+                                        break;
+                                      }
+                                    case 3:
+                                      {
+                                        homeStore.changeSort(FeedListSort.read);
+                                        break;
+                                      }
+                                    case 4:
+                                      {
+                                        homeStore.changeSort(FeedListSort.bookmarked);
+                                        break;
+                                      }
+                                  }
+                                },
+                                // by date, today, unread, read, bookmarked
+                                itemBuilder: (BuildContext _) {
+                                  return [
+                                    const PopupMenuItem(
+                                      value: 0,
+                                      child: Text("All articles"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 1,
+                                      child: Text("Today"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 2,
+                                      child: Text("Unread"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 3,
+                                      child: Text("Read"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 4,
+                                      child: Text("Bookmarked"),
+                                    ),
+                                  ];
+                                }),
+                            TextButton.icon(
+                              onPressed: () {
+                                homeStore.markAllAsRead(true);
+                                setState(() {});
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: const Text("Marked all as read!"),
+                                  action: SnackBarAction(
+                                      label: "Cancel",
+                                      onPressed: () {
+                                        homeStore.markAllAsRead(false);
+                                        setState(() {});
+                                      }),
+                                ));
                               },
-                              // by date, today, unread, read, bookmarked
-                              itemBuilder: (BuildContext _) {
-                                return [
-                                  const PopupMenuItem(
-                                    value: 0,
-                                    child: Text("All articles"),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 1,
-                                    child: Text("Today"),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 2,
-                                    child: Text("Unread"),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 3,
-                                    child: Text("Read"),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 4,
-                                    child: Text("Bookmarked"),
-                                  ),
-                                ];
-                              })
-                        ],
+                              label: const Text("Mark all as read"),
+                              icon: const Icon(Icons.playlist_add_check_rounded),
+                            ),
+                          ],
+                        ),
                       ),
                       Skeletonizer(
                         enabled: homeStore.loading,
@@ -198,7 +218,7 @@ class _HomeState extends State<Home> {
                                               )
                                                   .then((_) {
                                                 // update the sort after the story view is popped
-                                                homeStore.changeSort(homeStore.sort);
+                                                homeStore.changeSort(homeStore.settingsStore.sort);
                                                 // update the state of the list items after the story view is popped
                                                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                                                 setState(() {});

@@ -81,4 +81,11 @@ class DbUtils {
     }
     return feedItems;
   }
+
+  Future<void> markAllAsRead(List<FeedItem> feedItems, bool read) async {
+    for (FeedItem item in feedItems) {
+      item.read = read;
+    }
+    await isar.writeTxn(() => isar.feedItems.putAll(feedItems));
+  }
 }
