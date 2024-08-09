@@ -44,6 +44,7 @@ abstract class _HomeStore with Store {
   Future<bool> init({required SettingsStore setStore}) async {
     settingsStore = setStore;
     dbUtils = DbUtils(isar: isar);
+
     feeds = await dbUtils.getFeeds();
 
     if (kDebugMode) {

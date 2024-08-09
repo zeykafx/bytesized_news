@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> {
     return ThemeData(
       useMaterial3: true,
       colorScheme: lightColorScheme,
-      colorSchemeSeed: lightColorScheme == null ? Colors.orange : null,
+      colorSchemeSeed: lightColorScheme == null ? Colors.red : null,
       brightness: Brightness.light,
     );
   }
@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
     return ThemeData(
       useMaterial3: true,
       colorScheme: darkColorScheme,
-      colorSchemeSeed: darkColorScheme == null ? Colors.orange : null,
+      colorSchemeSeed: darkColorScheme == null ? Colors.red : null,
       brightness: Brightness.dark,
     );
   }

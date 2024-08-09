@@ -1,9 +1,12 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class Story extends StatefulWidget {
   final FeedItem feedItem;
@@ -15,11 +18,18 @@ class Story extends StatefulWidget {
 }
 
 class _StoryState extends State<Story> {
+  late SettingsStore settingsStore;
   final StoryStore storyStore = StoryStore();
+  final GlobalKey webViewKey = GlobalKey();
 
   @override
   void initState() {
-    storyStore.init(widget.feedItem, context);
+    settingsStore = context.read<SettingsStore>();
+
+    PlatformInAppWebViewController.debugLoggingSettings.enabled = false;
+
+    storyStore.init(widget.feedItem, context, settingsStore);
+
     super.initState();
   }
 
@@ -36,7 +46,7 @@ class _StoryState extends State<Story> {
 
         // if we can go back, go back, otherwise pop the page
         if (storyStore.canGoBack) {
-          storyStore.controller.goBack();
+          storyStore.controller?.goBack();
         } else {
           Navigator.of(context).pop();
         }
@@ -57,7 +67,38 @@ class _StoryState extends State<Story> {
               child: Stack(
                 children: [
                   storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
-                  storyStore.initialized ? WebViewWidget(controller: storyStore.controller) : const CircularProgressIndicator(),
+                  storyStore.initialized
+                      ? InAppWebView(
+                          key: webViewKey,
+                          initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
+                          initialSettings: storyStore.settings,
+                          onWebViewCreated: (controller) {
+                            storyStore.controller = controller;
+                          },
+                          onLoadStart: storyStore.onLoadStart,
+                          onPermissionRequest: (controller, request) async {
+                            return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+                          },
+                          shouldOverrideUrlLoading: (controller, navigationAction) async {
+                            var uri = navigationAction.request.url!;
+
+                            if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                              if (await canLaunchUrl(uri)) {
+                                // Launch the App
+                                await launchUrl(
+                                  uri,
+                                );
+                                // and cancel the request
+                                return NavigationActionPolicy.CANCEL;
+                              }
+                            }
+
+                            return NavigationActionPolicy.ALLOW;
+                          },
+                          onLoadStop: storyStore.onLoadStop,
+                          onProgressChanged: storyStore.onProgressChanged,
+                        )
+                      : const CircularProgressIndicator(),
                 ],
               ),
             );
@@ -73,7 +114,7 @@ class _StoryState extends State<Story> {
                 // RELOAD
                 IconButton(
                   onPressed: () {
-                    storyStore.controller.reload();
+                    storyStore.controller?.reload();
                   },
                   icon: const Icon(Icons.refresh),
                 ),
@@ -82,7 +123,7 @@ class _StoryState extends State<Story> {
                 IconButton(
                   onPressed: () {
                     if (storyStore.canGoBack) {
-                      storyStore.controller.goBack();
+                      storyStore.controller?.goBack();
                     }
                   },
                   icon: Icon(
@@ -95,7 +136,7 @@ class _StoryState extends State<Story> {
                 IconButton(
                   onPressed: () {
                     if (storyStore.canGoForward) {
-                      storyStore.controller.goForward();
+                      storyStore.controller?.goForward();
                     }
                   },
                   icon: Icon(

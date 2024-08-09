@@ -24,7 +24,7 @@ enum FeedListSort { byDate, today, unread, read, bookmarked }
 String feedListSortToString(FeedListSort sort) {
   switch (sort) {
     case FeedListSort.byDate:
-      return "By Date";
+      return "All Articles";
     case FeedListSort.today:
       return "Today";
     case FeedListSort.unread:

@@ -197,13 +197,13 @@ mixin _$StoryStore on _StoryStore, Store {
       Atom(name: '_StoryStore.controller', context: context);
 
   @override
-  WebViewController get controller {
+  InAppWebViewController? get controller {
     _$controllerAtom.reportRead();
     return super.controller;
   }
 
   @override
-  set controller(WebViewController value) {
+  set controller(InAppWebViewController? value) {
     _$controllerAtom.reportWrite(value, super.controller, () {
       super.controller = value;
     });
@@ -223,6 +223,84 @@ mixin _$StoryStore on _StoryStore, Store {
     _$initializedAtom.reportWrite(value, super.initialized, () {
       super.initialized = value;
     });
+  }
+
+  late final _$adUrlFiltersAtom =
+      Atom(name: '_StoryStore.adUrlFilters', context: context);
+
+  @override
+  List<String> get adUrlFilters {
+    _$adUrlFiltersAtom.reportRead();
+    return super.adUrlFilters;
+  }
+
+  @override
+  set adUrlFilters(List<String> value) {
+    _$adUrlFiltersAtom.reportWrite(value, super.adUrlFilters, () {
+      super.adUrlFilters = value;
+    });
+  }
+
+  late final _$contentBlockersAtom =
+      Atom(name: '_StoryStore.contentBlockers', context: context);
+
+  @override
+  List<ContentBlocker> get contentBlockers {
+    _$contentBlockersAtom.reportRead();
+    return super.contentBlockers;
+  }
+
+  @override
+  set contentBlockers(List<ContentBlocker> value) {
+    _$contentBlockersAtom.reportWrite(value, super.contentBlockers, () {
+      super.contentBlockers = value;
+    });
+  }
+
+  late final _$settingsAtom =
+      Atom(name: '_StoryStore.settings', context: context);
+
+  @override
+  InAppWebViewSettings get settings {
+    _$settingsAtom.reportRead();
+    return super.settings;
+  }
+
+  bool _settingsIsInitialized = false;
+
+  @override
+  set settings(InAppWebViewSettings value) {
+    _$settingsAtom
+        .reportWrite(value, _settingsIsInitialized ? super.settings : null, () {
+      super.settings = value;
+      _settingsIsInitialized = true;
+    });
+  }
+
+  late final _$onProgressChangedAsyncAction =
+      AsyncAction('_StoryStore.onProgressChanged', context: context);
+
+  @override
+  Future<void> onProgressChanged(InAppWebViewController controller, int prog) {
+    return _$onProgressChangedAsyncAction
+        .run(() => super.onProgressChanged(controller, prog));
+  }
+
+  late final _$onLoadStopAsyncAction =
+      AsyncAction('_StoryStore.onLoadStop', context: context);
+
+  @override
+  Future<void> onLoadStop(InAppWebViewController controller, WebUri? url) {
+    return _$onLoadStopAsyncAction.run(() => super.onLoadStop(controller, url));
+  }
+
+  late final _$onLoadStartAsyncAction =
+      AsyncAction('_StoryStore.onLoadStart', context: context);
+
+  @override
+  Future<void> onLoadStart(InAppWebViewController controller, WebUri? url) {
+    return _$onLoadStartAsyncAction
+        .run(() => super.onLoadStart(controller, url));
   }
 
   late final _$_StoryStoreActionController =
@@ -265,7 +343,10 @@ isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
 bsbController: ${bsbController},
 controller: ${controller},
-initialized: ${initialized}
+initialized: ${initialized},
+adUrlFilters: ${adUrlFilters},
+contentBlockers: ${contentBlockers},
+settings: ${settings}
     ''';
   }
 }

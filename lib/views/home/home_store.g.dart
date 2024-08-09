@@ -105,18 +105,23 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
-  late final _$sortAtom = Atom(name: '_HomeStore.sort', context: context);
+  late final _$settingsStoreAtom =
+      Atom(name: '_HomeStore.settingsStore', context: context);
 
   @override
-  FeedListSort get sort {
-    _$sortAtom.reportRead();
-    return super.sort;
+  SettingsStore get settingsStore {
+    _$settingsStoreAtom.reportRead();
+    return super.settingsStore;
   }
 
+  bool _settingsStoreIsInitialized = false;
+
   @override
-  set sort(FeedListSort value) {
-    _$sortAtom.reportWrite(value, super.sort, () {
-      super.sort = value;
+  set settingsStore(SettingsStore value) {
+    _$settingsStoreAtom.reportWrite(
+        value, _settingsStoreIsInitialized ? super.settingsStore : null, () {
+      super.settingsStore = value;
+      _settingsStoreIsInitialized = true;
     });
   }
 
@@ -124,8 +129,8 @@ mixin _$HomeStore on _HomeStore, Store {
       AsyncAction('_HomeStore.init', context: context);
 
   @override
-  Future<bool> init() {
-    return _$initAsyncAction.run(() => super.init());
+  Future<bool> init({required SettingsStore setStore}) {
+    return _$initAsyncAction.run(() => super.init(setStore: setStore));
   }
 
   late final _$getItemsAsyncAction =
@@ -179,7 +184,7 @@ initialized: ${initialized},
 loading: ${loading},
 isar: ${isar},
 dbUtils: ${dbUtils},
-sort: ${sort}
+settingsStore: ${settingsStore}
     ''';
   }
 }

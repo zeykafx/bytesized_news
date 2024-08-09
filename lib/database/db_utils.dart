@@ -71,14 +71,18 @@ class DbUtils {
     List<FeedItem> feedItems = [];
 
     // only add items that are not already in the database
-    for (FeedItem item in items) {
-      List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
-      if (dbItems.isEmpty) {
-        isar.writeTxn(() => isar.feedItems.put(item));
-        // also add those items to the feedItems list
-        feedItems.add(item);
+    isar.writeTxn(() async {
+      for (FeedItem item in items) {
+        List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
+        if (dbItems.isEmpty) {
+          // isar.writeTxn(() => isar.feedItems.put(item));
+          isar.feedItems.put(item);
+          // also add those items to the feedItems list
+          feedItems.add(item);
+        }
       }
-    }
+    });
+
     return feedItems;
   }
 

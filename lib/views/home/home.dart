@@ -60,6 +60,8 @@ class _HomeState extends State<Home> {
             child: Card(
               margin: EdgeInsets.zero,
               elevation: 0,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25))),
+              clipBehavior: Clip.hardEdge,
               color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
               child: Align(
                 alignment: Alignment.topCenter,
@@ -121,7 +123,7 @@ class _HomeState extends State<Home> {
                                   return [
                                     const PopupMenuItem(
                                       value: 0,
-                                      child: Text("All articles"),
+                                      child: Text("All Articles"),
                                     ),
                                     const PopupMenuItem(
                                       value: 1,
@@ -143,19 +145,34 @@ class _HomeState extends State<Home> {
                                 }),
                             TextButton.icon(
                               onPressed: () {
-                                homeStore.markAllAsRead(true);
-                                setState(() {});
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: const Text("Marked all as read!"),
-                                  action: SnackBarAction(
-                                      label: "Cancel",
-                                      onPressed: () {
-                                        homeStore.markAllAsRead(false);
-                                        setState(() {});
-                                      }),
-                                ));
+                                bool allRead = homeStore.feedItems.every((item) => item.read);
+                                if (allRead) {
+                                  homeStore.markAllAsRead(false);
+                                  setState(() {});
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: const Text("Marked all as unread!"),
+                                    action: SnackBarAction(
+                                        label: "Undo",
+                                        onPressed: () {
+                                          homeStore.markAllAsRead(true);
+                                          setState(() {});
+                                        }),
+                                  ));
+                                } else {
+                                  homeStore.markAllAsRead(true);
+                                  setState(() {});
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: const Text("Marked all as read!"),
+                                    action: SnackBarAction(
+                                        label: "Undo",
+                                        onPressed: () {
+                                          homeStore.markAllAsRead(false);
+                                          setState(() {});
+                                        }),
+                                  ));
+                                }
                               },
-                              label: const Text("Mark all as read"),
+                              label: Text(homeStore.feedItems.every((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
                               icon: const Icon(Icons.playlist_add_check_rounded),
                             ),
                           ],
