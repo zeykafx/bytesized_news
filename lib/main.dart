@@ -7,6 +7,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,8 @@ import 'package:path_provider/path_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Animate.restartOnHotReload;
+
+  await dotenv.load(fileName: ".env");
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
   final SharedPreferences prefs = await SharedPreferences.getInstance();

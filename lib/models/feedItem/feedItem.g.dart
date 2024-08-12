@@ -17,53 +17,63 @@ const FeedItemSchema = CollectionSchema(
   name: r'FeedItem',
   id: -4620245456200782061,
   properties: {
-    r'authors': PropertySchema(
+    r'aiSummary': PropertySchema(
       id: 0,
+      name: r'aiSummary',
+      type: IsarType.string,
+    ),
+    r'authors': PropertySchema(
+      id: 1,
       name: r'authors',
       type: IsarType.stringList,
     ),
     r'bookmarked': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'bookmarked',
       type: IsarType.bool,
     ),
     r'description': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'description',
       type: IsarType.string,
     ),
     r'feedName': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'feedName',
       type: IsarType.string,
     ),
     r'hashCode': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'hashCode',
       type: IsarType.long,
     ),
     r'publishedDate': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'publishedDate',
       type: IsarType.dateTime,
     ),
     r'read': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'read',
       type: IsarType.bool,
     ),
+    r'summarized': PropertySchema(
+      id: 8,
+      name: r'summarized',
+      type: IsarType.bool,
+    ),
     r'timeFetched': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'timeFetched',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'url',
       type: IsarType.string,
     )
@@ -102,6 +112,7 @@ int _feedItemEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.aiSummary.length * 3;
   bytesCount += 3 + object.authors.length * 3;
   {
     for (var i = 0; i < object.authors.length; i++) {
@@ -122,16 +133,18 @@ void _feedItemSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeStringList(offsets[0], object.authors);
-  writer.writeBool(offsets[1], object.bookmarked);
-  writer.writeString(offsets[2], object.description);
-  writer.writeString(offsets[3], object.feedName);
-  writer.writeLong(offsets[4], object.hashCode);
-  writer.writeDateTime(offsets[5], object.publishedDate);
-  writer.writeBool(offsets[6], object.read);
-  writer.writeDateTime(offsets[7], object.timeFetched);
-  writer.writeString(offsets[8], object.title);
-  writer.writeString(offsets[9], object.url);
+  writer.writeString(offsets[0], object.aiSummary);
+  writer.writeStringList(offsets[1], object.authors);
+  writer.writeBool(offsets[2], object.bookmarked);
+  writer.writeString(offsets[3], object.description);
+  writer.writeString(offsets[4], object.feedName);
+  writer.writeLong(offsets[5], object.hashCode);
+  writer.writeDateTime(offsets[6], object.publishedDate);
+  writer.writeBool(offsets[7], object.read);
+  writer.writeBool(offsets[8], object.summarized);
+  writer.writeDateTime(offsets[9], object.timeFetched);
+  writer.writeString(offsets[10], object.title);
+  writer.writeString(offsets[11], object.url);
 }
 
 FeedItem _feedItemDeserialize(
@@ -141,16 +154,18 @@ FeedItem _feedItemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = FeedItem();
-  object.authors = reader.readStringList(offsets[0]) ?? [];
-  object.bookmarked = reader.readBool(offsets[1]);
-  object.description = reader.readString(offsets[2]);
-  object.feedName = reader.readString(offsets[3]);
+  object.aiSummary = reader.readString(offsets[0]);
+  object.authors = reader.readStringList(offsets[1]) ?? [];
+  object.bookmarked = reader.readBool(offsets[2]);
+  object.description = reader.readString(offsets[3]);
+  object.feedName = reader.readString(offsets[4]);
   object.id = id;
-  object.publishedDate = reader.readDateTime(offsets[5]);
-  object.read = reader.readBool(offsets[6]);
-  object.timeFetched = reader.readDateTime(offsets[7]);
-  object.title = reader.readString(offsets[8]);
-  object.url = reader.readString(offsets[9]);
+  object.publishedDate = reader.readDateTime(offsets[6]);
+  object.read = reader.readBool(offsets[7]);
+  object.summarized = reader.readBool(offsets[8]);
+  object.timeFetched = reader.readDateTime(offsets[9]);
+  object.title = reader.readString(offsets[10]);
+  object.url = reader.readString(offsets[11]);
   return object;
 }
 
@@ -162,24 +177,28 @@ P _feedItemDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 1:
-      return (reader.readBool(offset)) as P;
-    case 2:
       return (reader.readString(offset)) as P;
+    case 1:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 2:
+      return (reader.readBool(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
-    case 5:
-      return (reader.readDateTime(offset)) as P;
-    case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
-      return (reader.readDateTime(offset)) as P;
-    case 8:
       return (reader.readString(offset)) as P;
+    case 5:
+      return (reader.readLong(offset)) as P;
+    case 6:
+      return (reader.readDateTime(offset)) as P;
+    case 7:
+      return (reader.readBool(offset)) as P;
+    case 8:
+      return (reader.readBool(offset)) as P;
     case 9:
+      return (reader.readDateTime(offset)) as P;
+    case 10:
+      return (reader.readString(offset)) as P;
+    case 11:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -319,6 +338,137 @@ extension FeedItemQueryWhere on QueryBuilder<FeedItem, FeedItem, QWhereClause> {
 
 extension FeedItemQueryFilter
     on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'aiSummary',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'aiSummary',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'aiSummary',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'aiSummary',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      aiSummaryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'aiSummary',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -980,6 +1130,16 @@ extension FeedItemQueryFilter
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> summarizedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'summarized',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> timeFetchedEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -1302,6 +1462,18 @@ extension FeedItemQueryLinks
     on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
 
 extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByAiSummary() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'aiSummary', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByAiSummaryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'aiSummary', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByBookmarked() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bookmarked', Sort.asc);
@@ -1374,6 +1546,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortBySummarized() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'summarized', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortBySummarizedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'summarized', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByTimeFetched() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'timeFetched', Sort.asc);
@@ -1413,6 +1597,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
 
 extension FeedItemQuerySortThenBy
     on QueryBuilder<FeedItem, FeedItem, QSortThenBy> {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByAiSummary() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'aiSummary', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByAiSummaryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'aiSummary', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByBookmarked() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bookmarked', Sort.asc);
@@ -1497,6 +1693,18 @@ extension FeedItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenBySummarized() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'summarized', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenBySummarizedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'summarized', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByTimeFetched() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'timeFetched', Sort.asc);
@@ -1536,6 +1744,13 @@ extension FeedItemQuerySortThenBy
 
 extension FeedItemQueryWhereDistinct
     on QueryBuilder<FeedItem, FeedItem, QDistinct> {
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByAiSummary(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'aiSummary', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByAuthors() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'authors');
@@ -1580,6 +1795,12 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctBySummarized() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'summarized');
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByTimeFetched() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'timeFetched');
@@ -1606,6 +1827,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<FeedItem, String, QQueryOperations> aiSummaryProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'aiSummary');
     });
   }
 
@@ -1648,6 +1875,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, bool, QQueryOperations> readProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'read');
+    });
+  }
+
+  QueryBuilder<FeedItem, bool, QQueryOperations> summarizedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'summarized');
     });
   }
 

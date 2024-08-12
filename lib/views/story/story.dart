@@ -1,7 +1,10 @@
+import 'package:bytesized_news/main.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,35 +71,108 @@ class _StoryState extends State<Story> {
                 children: [
                   storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
                   storyStore.initialized
-                      ? InAppWebView(
-                          key: webViewKey,
-                          initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
-                          initialSettings: storyStore.settings,
-                          onWebViewCreated: (controller) {
-                            storyStore.controller = controller;
-                          },
-                          onLoadStart: storyStore.onLoadStart,
-                          onPermissionRequest: (controller, request) async {
-                            return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
-                          },
-                          shouldOverrideUrlLoading: (controller, navigationAction) async {
-                            var uri = navigationAction.request.url!;
+                      ? Stack(
+                          children: [
+                            InAppWebView(
+                              key: webViewKey,
+                              initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
+                              initialSettings: storyStore.settings,
+                              onWebViewCreated: (controller) {
+                                storyStore.controller = controller;
+                              },
+                              onPermissionRequest: (controller, request) async {
+                                return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+                              },
+                              shouldOverrideUrlLoading: (controller, navigationAction) async {
+                                var uri = navigationAction.request.url!;
 
-                            if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
-                              if (await canLaunchUrl(uri)) {
-                                // Launch the App
-                                await launchUrl(
-                                  uri,
-                                );
-                                // and cancel the request
-                                return NavigationActionPolicy.CANCEL;
-                              }
-                            }
+                                if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                                  if (await canLaunchUrl(uri)) {
+                                    // Launch the App
+                                    await launchUrl(
+                                      uri,
+                                    );
+                                    // and cancel the request
+                                    return NavigationActionPolicy.CANCEL;
+                                  }
+                                }
 
-                            return NavigationActionPolicy.ALLOW;
-                          },
-                          onLoadStop: storyStore.onLoadStop,
-                          onProgressChanged: storyStore.onProgressChanged,
+                                return NavigationActionPolicy.ALLOW;
+                              },
+                              onLoadStart: storyStore.onLoadStart,
+                              onLoadStop: storyStore.onLoadStop,
+                              onProgressChanged: storyStore.onProgressChanged,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Column(
+                                children: [
+                                  storyStore.aiLoading
+                                      ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                                          duration: const Duration(milliseconds: 1500),
+                                          colors: [
+                                            const Color(0xBFFFFF00),
+                                            const Color(0xBF00FF00),
+                                            const Color(0xBF00FFFF),
+                                            const Color(0xBF0033FF),
+                                            const Color(0xBFFF00FF),
+                                            const Color(0xBFFF0000),
+                                            const Color(0xBFFFFF00),
+                                          ],
+                                        )
+                                      : const SizedBox(),
+                                  storyStore.feedItemSummarized
+                                      ? Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20),
+                                            ),
+                                            color: Theme.of(context).colorScheme.surface,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Card(
+                                              elevation: 0,
+                                              shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(20),
+                                                ),
+                                              ),
+                                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(15),
+                                                child: SelectableText(storyStore.feedItem.aiSummary, style: Theme.of(context).textTheme.bodySmall),
+                                              ),
+                                            ),
+                                          ).animate().fadeIn().then().shimmer(
+                                            duration: const Duration(milliseconds: 1200),
+                                            curve: Curves.easeInOutSine,
+                                            colors: [
+                                              const Color(0x00FFFF00),
+                                              const Color(0xBFFFFF00),
+                                              const Color(0xBF00FF00),
+                                              const Color(0xBF00FFFF),
+                                              const Color(0xBF0033FF),
+                                              const Color(0xBFFF00FF),
+                                              const Color(0xBFFF0000),
+                                              const Color(0xBFFFFF00),
+                                              // const Color(0xFFFF00),
+                                            ],
+                                          ),
+                                        ).animate(controller: storyStore.animationController).slideY(
+                                            begin: 2,
+                                            end: 0,
+                                            curve: Curves.easeInOutSine,
+                                            duration: const Duration(milliseconds: 500),
+                                          )
+                                      : const SizedBox(),
+                                ],
+                              ),
+                            ),
+                          ],
                         )
                       : const CircularProgressIndicator(),
                 ],
@@ -104,7 +180,7 @@ class _StoryState extends State<Story> {
             );
           }),
           expandedBuilder: (ScrollController _) {
-            return const Placeholder();
+            return const SizedBox();
           },
           collapsed: Observer(builder: (_) {
             return Row(
@@ -144,6 +220,32 @@ class _StoryState extends State<Story> {
                     color: storyStore.canGoForward ? null : Colors.grey.withOpacity(0.5),
                   ),
                 ),
+
+                storyStore.feedItemSummarized
+                    ? IconButton(
+                        onPressed: storyStore.hideAiSummary,
+                        icon: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Align(
+                              alignment: Alignment.topRight,
+                              widthFactor: 2,
+                              heightFactor: 3,
+                              child: Icon(LucideIcons.sparkles, size: 14),
+                            ),
+                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                          ],
+                        ),
+                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                      )
+                    : IconButton(
+                        onPressed: () {
+                          storyStore.summarizeArticle();
+                        },
+                        icon: const Icon(LucideIcons.sparkles),
+                        tooltip: "Summarize Article",
+                      ),
+
                 // BOOKMARK
                 Stack(
                   children: [

@@ -71,7 +71,7 @@ class DbUtils {
     List<FeedItem> feedItems = [];
 
     // only add items that are not already in the database
-    isar.writeTxn(() async {
+    await isar.writeTxn(() async {
       for (FeedItem item in items) {
         List<FeedItem> dbItems = await isar.feedItems.where().filter().urlEqualTo(item.url).findAll();
         if (dbItems.isEmpty) {

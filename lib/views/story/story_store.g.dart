@@ -277,6 +277,91 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$aiUtilsAtom =
+      Atom(name: '_StoryStore.aiUtils', context: context);
+
+  @override
+  AiUtils get aiUtils {
+    _$aiUtilsAtom.reportRead();
+    return super.aiUtils;
+  }
+
+  @override
+  set aiUtils(AiUtils value) {
+    _$aiUtilsAtom.reportWrite(value, super.aiUtils, () {
+      super.aiUtils = value;
+    });
+  }
+
+  late final _$feedItemSummarizedAtom =
+      Atom(name: '_StoryStore.feedItemSummarized', context: context);
+
+  @override
+  bool get feedItemSummarized {
+    _$feedItemSummarizedAtom.reportRead();
+    return super.feedItemSummarized;
+  }
+
+  @override
+  set feedItemSummarized(bool value) {
+    _$feedItemSummarizedAtom.reportWrite(value, super.feedItemSummarized, () {
+      super.feedItemSummarized = value;
+    });
+  }
+
+  late final _$aiLoadingAtom =
+      Atom(name: '_StoryStore.aiLoading', context: context);
+
+  @override
+  bool get aiLoading {
+    _$aiLoadingAtom.reportRead();
+    return super.aiLoading;
+  }
+
+  @override
+  set aiLoading(bool value) {
+    _$aiLoadingAtom.reportWrite(value, super.aiLoading, () {
+      super.aiLoading = value;
+    });
+  }
+
+  late final _$hideSummaryAtom =
+      Atom(name: '_StoryStore.hideSummary', context: context);
+
+  @override
+  bool get hideSummary {
+    _$hideSummaryAtom.reportRead();
+    return super.hideSummary;
+  }
+
+  @override
+  set hideSummary(bool value) {
+    _$hideSummaryAtom.reportWrite(value, super.hideSummary, () {
+      super.hideSummary = value;
+    });
+  }
+
+  late final _$animationControllerAtom =
+      Atom(name: '_StoryStore.animationController', context: context);
+
+  @override
+  AnimationController get animationController {
+    _$animationControllerAtom.reportRead();
+    return super.animationController;
+  }
+
+  bool _animationControllerIsInitialized = false;
+
+  @override
+  set animationController(AnimationController value) {
+    _$animationControllerAtom.reportWrite(value,
+        _animationControllerIsInitialized ? super.animationController : null,
+        () {
+      super.animationController = value;
+      _animationControllerIsInitialized = true;
+    });
+  }
+
   late final _$onProgressChangedAsyncAction =
       AsyncAction('_StoryStore.onProgressChanged', context: context);
 
@@ -294,6 +379,14 @@ mixin _$StoryStore on _StoryStore, Store {
     return _$onLoadStopAsyncAction.run(() => super.onLoadStop(controller, url));
   }
 
+  late final _$summarizeArticleAsyncAction =
+      AsyncAction('_StoryStore.summarizeArticle', context: context);
+
+  @override
+  Future<void> summarizeArticle() {
+    return _$summarizeArticleAsyncAction.run(() => super.summarizeArticle());
+  }
+
   late final _$onLoadStartAsyncAction =
       AsyncAction('_StoryStore.onLoadStart', context: context);
 
@@ -305,6 +398,17 @@ mixin _$StoryStore on _StoryStore, Store {
 
   late final _$_StoryStoreActionController =
       ActionController(name: '_StoryStore', context: context);
+
+  @override
+  void hideAiSummary() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.hideAiSummary');
+    try {
+      return super.hideAiSummary();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void onBsbChanged() {
@@ -346,7 +450,12 @@ controller: ${controller},
 initialized: ${initialized},
 adUrlFilters: ${adUrlFilters},
 contentBlockers: ${contentBlockers},
-settings: ${settings}
+settings: ${settings},
+aiUtils: ${aiUtils},
+feedItemSummarized: ${feedItemSummarized},
+aiLoading: ${aiLoading},
+hideSummary: ${hideSummary},
+animationController: ${animationController}
     ''';
   }
 }

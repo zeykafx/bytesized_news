@@ -1,13 +1,17 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+import 'package:bytesized_news/AI/ai_util.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:openai_dart/openai_dart.dart';
 
 part 'story_store.g.dart';
 
@@ -79,6 +83,21 @@ abstract class _StoryStore with Store {
   @observable
   late InAppWebViewSettings settings;
 
+  @observable
+  AiUtils aiUtils = AiUtils();
+
+  @observable
+  bool feedItemSummarized = false;
+
+  @observable
+  bool aiLoading = false;
+
+  @observable
+  bool hideSummary = false;
+
+  @observable
+  late AnimationController animationController;
+
   void init(FeedItem item, BuildContext context, SettingsStore setStore) {
     settingsStore = setStore;
 
@@ -86,43 +105,14 @@ abstract class _StoryStore with Store {
 
     feedItem = item;
     isBookmarked = feedItem.bookmarked;
+    feedItemSummarized = feedItem.summarized;
 
     bsbController.addListener(onBsbChanged);
 
-    // controller = WebViewController()
-    //   ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    //   ..setNavigationDelegate(
-    //     NavigationDelegate(
-    //       onProgress: (int progress) {
-    //         this.progress = progress;
-    //       },
-    //       onUrlChange: (UrlChange _) async {},
-    //       onPageStarted: (String url) {
-    //         loading = true;
-    //       },
-    //       onPageFinished: (String url) async {
-    //         loading = false;
-    //         canGoBack = await controller.canGoBack();
-    //         canGoForward = await controller.canGoForward();
-    //       },
-    //       onHttpError: (HttpResponseError error) {
-    //         if (kDebugMode) {
-    //           print("Error when fetching page: ${error.response?.statusCode}");
-    //         }
-    //         if (error.response == null || error.response?.statusCode == 404) {
-    //           Navigator.of(context).pop();
-    //           ScaffoldMessenger.of(context).showSnackBar(
-    //             const SnackBar(
-    //               content: Text("Failed to open article"),
-    //               duration: Duration(seconds: 30),
-    //             ),
-    //           );
-    //         }
-    //       },
-    //       onWebResourceError: (WebResourceError error) {},
-    //     ),
-    //   )
-    //   ..loadRequest(Uri.parse(feedItem.url));
+    animationController = AnimationController(
+      vsync: Navigator.of(context),
+      duration: const Duration(milliseconds: 150),
+    );
 
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
@@ -167,25 +157,45 @@ abstract class _StoryStore with Store {
 
   @action
   Future<void> onProgressChanged(InAppWebViewController controller, int prog) async {
-    if (prog == 100) {
-      loading = false;
-      canGoBack = await controller.canGoBack();
-      canGoForward = await controller.canGoForward();
-‡
-      controller.getHtml().then((val) {});
-    }
-
     progress = prog;
   }
 
   @action
   Future<void> onLoadStop(InAppWebViewController controller, WebUri? url) async {
     loading = false;
+    canGoBack = await controller.canGoBack();
+    canGoForward = await controller.canGoForward();
+  }
+
+  @action
+  Future<void> summarizeArticle() async {
+    String? htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
+
+    if (aiLoading || htmlValue == null || feedItem.summarized) {
+      return;
+    }
+
+    Document document = parse(htmlValue);
+
+    aiLoading = true;
+
+    feedItem.aiSummary = await aiUtils.summarize(document.body!.text, feedItem);
+    feedItem.summarized = true;
+    await dbUtils.updateItemInDb(feedItem);
+
+    feedItemSummarized = true;
+    aiLoading = false;
   }
 
   @action
   Future<void> onLoadStart(InAppWebViewController controller, WebUri? url) async {
     loading = true;
+  }
+
+  @action
+  void hideAiSummary() {
+    hideSummary = !hideSummary;
+    animationController.toggle();
   }
 
   @action

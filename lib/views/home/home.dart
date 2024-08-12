@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   Future<void> init() async {
     await homeStore.init(setStore: settingsStore);
     await homeStore.getItems();
+    setState(() {});
   }
 
   @override
@@ -172,7 +173,7 @@ class _HomeState extends State<Home> {
                                   ));
                                 }
                               },
-                              label: Text(homeStore.feedItems.every((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
+                              label: Text(homeStore.feedItems.any((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
                               icon: const Icon(Icons.playlist_add_check_rounded),
                             ),
                           ],
@@ -213,7 +214,7 @@ class _HomeState extends State<Home> {
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text(item.description.split("\n").first),
+                                                item.summarized ? Text("Summary: ${item.aiSummary}") : Text(item.description.split("\n").first),
                                                 Text(
                                                   formatTime(item.publishedDate.millisecondsSinceEpoch),
                                                   style: TextStyle(color: Theme.of(context).dividerColor),

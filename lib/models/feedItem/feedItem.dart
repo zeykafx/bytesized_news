@@ -1,4 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fb;
 import 'package:html/dom.dart';
 import 'package:html_main_element/html_main_element.dart';
 import 'package:rss_dart/dart_rss.dart';
@@ -23,6 +24,9 @@ class FeedItem {
 
   bool read = false;
   bool bookmarked = false;
+
+  String aiSummary = "";
+  bool summarized = false;
 
   @ignore
   Feed? feed;
@@ -89,10 +93,10 @@ class FeedItem {
     ],
   );
 
-  static FeedItem fromAtomItem({
+  static Future<FeedItem> fromAtomItem({
     required AtomItem item,
     required Feed feed,
-  }) {
+  }) async {
     FeedItem feedItem = FeedItem();
 
     feedItem.url = item.links.first.href ?? "no link";
@@ -109,13 +113,20 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
+    fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    if (existingSummary.docs.isNotEmpty) {
+      feedItem.aiSummary = existingSummary.docs.first.get("summary");
+      feedItem.summarized = true;
+    }
+
     return feedItem;
   }
 
-  static FeedItem fromRssItem({
+  static Future<FeedItem> fromRssItem({
     required RssItem item,
     required Feed feed,
-  }) {
+  }) async {
     FeedItem feedItem = FeedItem();
 
     feedItem.url = item.source?.value ?? "no link";
@@ -132,6 +143,14 @@ class FeedItem {
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
+
+    fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    if (existingSummary.docs.isNotEmpty) {
+      feedItem.aiSummary = existingSummary.docs.first.get("summary");
+      feedItem.summarized = true;
+    }
+
     return feedItem;
   }
 

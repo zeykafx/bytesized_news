@@ -52,7 +52,7 @@ abstract class _HomeStore with Store {
     }
 
     if (feeds.isEmpty) {
-      isar.writeTxn(
+      await isar.writeTxn(
         () => isar.feeds.putAll([
           Feed("The Verge", "http://www.theverge.com/rss/frontpage", "The Verge is a technology news site"),
         ]),
@@ -76,9 +76,9 @@ abstract class _HomeStore with Store {
     }
 
     // only fetch items from the feeds if we are sorting by date, today, or unread, the rest of the sorts do not require fetching new items
-    if (settingsStore.sort == FeedListSort.byDate || settingsStore.sort == FeedListSort.today || settingsStore.sort == FeedListSort.unread) {
-      await fetchItems();
-    }
+    // if (settingsStore.sort == FeedListSort.byDate || settingsStore.sort == FeedListSort.today || settingsStore.sort == FeedListSort.unread) {
+    await fetchItems();
+    // }
   }
 
   @action
@@ -109,9 +109,15 @@ abstract class _HomeStore with Store {
       }
 
       if (usingRssFeed) {
-        items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
+        // items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
+        for (RssItem item in rssFeed.items) {
+          items.add(await FeedItem.fromRssItem(item: item, feed: feed));
+        }
       } else {
-        items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
+        // items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
+        for (AtomItem item in atomFeed.items) {
+          items.add(await FeedItem.fromAtomItem(item: item, feed: feed));
+        }
       }
 
       feedItems.addAll(await dbUtils.addNewItems(items));
