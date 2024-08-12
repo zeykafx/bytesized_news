@@ -171,6 +171,8 @@ abstract class _StoryStore with Store {
       loading = false;
       canGoBack = await controller.canGoBack();
       canGoForward = await controller.canGoForward();
+‡
+      controller.getHtml().then((val) {});
     }
 
     progress = prog;

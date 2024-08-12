@@ -69,7 +69,7 @@ abstract class _HomeStore with Store {
     // feedItems = (await dbUtils.getItems(feeds)).asObservable();
 
     // this doesn't change the sort but it does fetch the right items from the DB for the current sort
-    changeSort(settingsStore.sort);
+    await changeSort(settingsStore.sort);
 
     if (kDebugMode) {
       print("Fetched ${feedItems.length} feed items from Isar");
@@ -77,7 +77,7 @@ abstract class _HomeStore with Store {
 
     // only fetch items from the feeds if we are sorting by date, today, or unread, the rest of the sorts do not require fetching new items
     if (settingsStore.sort == FeedListSort.byDate || settingsStore.sort == FeedListSort.today || settingsStore.sort == FeedListSort.unread) {
-      fetchItems();
+      await fetchItems();
     }
   }
 
