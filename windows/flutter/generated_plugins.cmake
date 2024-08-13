@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   cloud_firestore
+  desktop_webview_auth
   dynamic_color
   firebase_auth
   firebase_core

@@ -5,6 +5,10 @@ PODS:
     - Firebase/Firestore (= 10.29.0)
     - firebase_core
     - Flutter
+  - cloud_functions (5.0.4):
+    - Firebase/Functions (= 10.29.0)
+    - firebase_core
+    - Flutter
   - Firebase/Analytics (10.29.0):
     - Firebase/Core
   - Firebase/Auth (10.29.0):
@@ -21,6 +25,9 @@ PODS:
   - Firebase/Firestore (10.29.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.29.0)
+  - Firebase/Functions (10.29.0):
+    - Firebase/CoreOnly
+    - FirebaseFunctions (~> 10.29.0)
   - Firebase/Performance (10.29.0):
     - Firebase/CoreOnly
     - FirebasePerformance (~> 10.29.0)
@@ -71,6 +78,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
     - RecaptchaInterop (~> 100.0)
+  - FirebaseAuthInterop (10.29.0)
   - FirebaseCore (10.29.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.12)
@@ -109,11 +117,20 @@ PODS:
     - FirebaseFirestoreGRPCCPPBinary (= 1.62.1)
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30911.0, >= 2.30908.0)
+  - FirebaseFunctions (10.29.0):
+    - FirebaseAppCheckInterop (~> 10.10)
+    - FirebaseAuthInterop (~> 10.25)
+    - FirebaseCore (~> 10.0)
+    - FirebaseCoreExtension (~> 10.0)
+    - FirebaseMessagingInterop (~> 10.0)
+    - FirebaseSharedSwift (~> 10.0)
+    - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - FirebaseInstallations (10.29.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
+  - FirebaseMessagingInterop (10.29.0)
   - FirebasePerformance (10.29.0):
     - FirebaseCore (~> 10.5)
     - FirebaseInstallations (~> 10.0)
@@ -246,6 +263,7 @@ PODS:
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -272,6 +290,7 @@ SPEC REPOS:
     - FirebaseAnalytics
     - FirebaseAppCheckInterop
     - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
@@ -282,7 +301,9 @@ SPEC REPOS:
     - FirebaseFirestoreGRPCCoreBinary
     - FirebaseFirestoreGRPCCPPBinary
     - FirebaseFirestoreInternalBinary
+    - FirebaseFunctions
     - FirebaseInstallations
+    - FirebaseMessagingInterop
     - FirebasePerformance
     - FirebaseRemoteConfig
     - FirebaseRemoteConfigInterop
@@ -304,6 +325,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audio_session/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  cloud_functions:
+    :path: ".symlinks/plugins/cloud_functions/ios"
   firebase_analytics:
     :path: ".symlinks/plugins/firebase_analytics/ios"
   firebase_auth:
@@ -350,6 +373,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
   cloud_firestore: 8a2ff2bb050f87d0ca996866625cefbe2395a83b
+  cloud_functions: b499cfa8500e51c7d6d1ced8ee8f4e7d3cdc5827
   Firebase: cec914dab6fd7b1bd8ab56ea07ce4e03dd251c2d
   firebase_analytics: 04491d1ee74c8e7c2330c96afc54188a969b06ee
   firebase_auth: 8dbfcdd635cc4fb2ea213aeee8c9a979b3d3373b
@@ -360,6 +384,7 @@ SPEC CHECKSUMS:
   FirebaseAnalytics: 23717de130b779aa506e757edb9713d24b6ffeda
   FirebaseAppCheckInterop: 6a1757cfd4067d8e00fccd14fcc1b8fd78cfac07
   FirebaseAuth: e2ebfaf9fb4638a1c9a3b0efd17d1b90943987cd
+  FirebaseAuthInterop: 17db81e9b198afb0f95ce48c133825727eed55d3
   FirebaseCore: 30e9c1cbe3d38f5f5e75f48bfcea87d7c358ec16
   FirebaseCoreExtension: 705ca5b14bf71d2564a0ddc677df1fc86ffa600f
   FirebaseCoreInternal: df84dd300b561c27d5571684f389bf60b0a5c934
@@ -371,7 +396,9 @@ SPEC CHECKSUMS:
   FirebaseFirestoreGRPCCoreBinary: 1243fc6604a52912694635f891916976924931ed
   FirebaseFirestoreGRPCCPPBinary: e447b3a7c060c0abfc4e2c9f6fb53bf7635ded66
   FirebaseFirestoreInternalBinary: 8a6fe5f91269d3482f253c7a936e341389bfd52e
+  FirebaseFunctions: 6ccbc8546a950b8e4dac3d3d8c8f66e23ab647a2
   FirebaseInstallations: 913cf60d0400ebd5d6b63a28b290372ab44590dd
+  FirebaseMessagingInterop: afa5a4da1d615d109cf9fcf37479af96f6c3623a
   FirebasePerformance: d0ac4aa90f8c1aedeb8d0329a56e2d77d8d9e004
   FirebaseRemoteConfig: 48ef3f243742a8d72422ccfc9f986e19d7de53fd
   FirebaseRemoteConfigInterop: 6efda51fb5e2f15b16585197e26eaa09574e8a4d

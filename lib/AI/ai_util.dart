@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:openai_dart/openai_dart.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class AiUtils {
   int maxSummaryLength = 3;
@@ -10,6 +11,18 @@ class AiUtils {
   OpenAIClient client = OpenAIClient(apiKey: dotenv.env['OPENAI_API_KEY']!);
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
+
+  Future<String> summarizeWithFirebase(FeedItem feedItem) async {
+    final result = await functions.httpsCallable('helloWorld').call(
+      {
+        "text": "Hello, World from Flutter!",
+      },
+    );
+    var response = result.data as String;
+    print("Response: $response");
+    return "empty";
+  }
 
   Future<String> summarize(String text, FeedItem feedItem) async {
     // check firestore for existing summary

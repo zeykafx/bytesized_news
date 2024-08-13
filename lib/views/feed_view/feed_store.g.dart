@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'home_store.dart';
+part of 'feed_store.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,8 +8,8 @@ part of 'home_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$HomeStore on _HomeStore, Store {
-  late final _$feedsAtom = Atom(name: '_HomeStore.feeds', context: context);
+mixin _$FeedStore on _FeedStore, Store {
+  late final _$feedsAtom = Atom(name: '_FeedStore.feeds', context: context);
 
   @override
   List<Feed> get feeds {
@@ -25,7 +25,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$feedItemsAtom =
-      Atom(name: '_HomeStore.feedItems', context: context);
+      Atom(name: '_FeedStore.feedItems', context: context);
 
   @override
   ObservableList<FeedItem> get feedItems {
@@ -41,7 +41,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$initializedAtom =
-      Atom(name: '_HomeStore.initialized', context: context);
+      Atom(name: '_FeedStore.initialized', context: context);
 
   @override
   bool get initialized {
@@ -56,7 +56,7 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
-  late final _$loadingAtom = Atom(name: '_HomeStore.loading', context: context);
+  late final _$loadingAtom = Atom(name: '_FeedStore.loading', context: context);
 
   @override
   bool get loading {
@@ -71,7 +71,7 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
-  late final _$isarAtom = Atom(name: '_HomeStore.isar', context: context);
+  late final _$isarAtom = Atom(name: '_FeedStore.isar', context: context);
 
   @override
   Isar get isar {
@@ -86,7 +86,7 @@ mixin _$HomeStore on _HomeStore, Store {
     });
   }
 
-  late final _$dbUtilsAtom = Atom(name: '_HomeStore.dbUtils', context: context);
+  late final _$dbUtilsAtom = Atom(name: '_FeedStore.dbUtils', context: context);
 
   @override
   DbUtils get dbUtils {
@@ -106,7 +106,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$settingsStoreAtom =
-      Atom(name: '_HomeStore.settingsStore', context: context);
+      Atom(name: '_FeedStore.settingsStore', context: context);
 
   @override
   SettingsStore get settingsStore {
@@ -126,7 +126,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$initAsyncAction =
-      AsyncAction('_HomeStore.init', context: context);
+      AsyncAction('_FeedStore.init', context: context);
 
   @override
   Future<bool> init({required SettingsStore setStore}) {
@@ -134,7 +134,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$getItemsAsyncAction =
-      AsyncAction('_HomeStore.getItems', context: context);
+      AsyncAction('_FeedStore.getItems', context: context);
 
   @override
   Future<void> getItems() {
@@ -142,7 +142,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$fetchItemsAsyncAction =
-      AsyncAction('_HomeStore.fetchItems', context: context);
+      AsyncAction('_FeedStore.fetchItems', context: context);
 
   @override
   Future<void> fetchItems() {
@@ -150,7 +150,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$toggleItemReadAsyncAction =
-      AsyncAction('_HomeStore.toggleItemRead', context: context);
+      AsyncAction('_FeedStore.toggleItemRead', context: context);
 
   @override
   Future<void> toggleItemRead(int itemId, {bool toggle = false}) {
@@ -159,7 +159,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$toggleItemBookmarkedAsyncAction =
-      AsyncAction('_HomeStore.toggleItemBookmarked', context: context);
+      AsyncAction('_FeedStore.toggleItemBookmarked', context: context);
 
   @override
   Future<void> toggleItemBookmarked(int itemId, {bool toggle = false}) {
@@ -168,7 +168,7 @@ mixin _$HomeStore on _HomeStore, Store {
   }
 
   late final _$changeSortAsyncAction =
-      AsyncAction('_HomeStore.changeSort', context: context);
+      AsyncAction('_FeedStore.changeSort', context: context);
 
   @override
   Future<void> changeSort(FeedListSort sort) {

@@ -11,11 +11,11 @@ import 'package:rss_dart/domain/atom_item.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:rss_dart/domain/rss_item.dart';
 
-part 'home_store.g.dart';
+part 'feed_store.g.dart';
 
-class HomeStore = _HomeStore with _$HomeStore;
+class FeedStore = _FeedStore with _$FeedStore;
 
-abstract class _HomeStore with Store {
+abstract class _FeedStore with Store {
   @observable
   List<Feed> feeds = [];
 

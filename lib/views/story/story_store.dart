@@ -153,6 +153,8 @@ abstract class _StoryStore with Store {
     );
 
     initialized = true;
+
+    aiUtils.summarizeWithFirebase(feedItem);
   }
 
   @action

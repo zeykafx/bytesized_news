@@ -1,7 +1,7 @@
 import 'package:bytesized_news/views/story/story.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:bytesized_news/views/home/home_store.dart';
+import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
@@ -9,16 +9,16 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:time_formatter/time_formatter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class FeedView extends StatefulWidget {
+  const FeedView({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<FeedView> createState() => _FeedViewState();
 }
 
-class _HomeState extends State<Home> {
+class _FeedViewState extends State<FeedView> {
   late SettingsStore settingsStore;
-  final HomeStore homeStore = HomeStore();
+  final FeedStore feedStore = FeedStore();
 
   @override
   void initState() {
@@ -28,8 +28,8 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> init() async {
-    await homeStore.init(setStore: settingsStore);
-    await homeStore.getItems();
+    await feedStore.init(setStore: settingsStore);
+    await feedStore.getItems();
     setState(() {});
   }
 
@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
       body: Observer(builder: (context) {
         return RefreshIndicator(
           onRefresh: () async {
-            homeStore.getItems();
+            feedStore.getItems();
           },
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -86,7 +86,7 @@ class _HomeState extends State<Home> {
                                     color: Theme.of(context).textTheme.bodyLarge!.color,
                                   ),
                                   label: Text(
-                                    feedListSortToString(homeStore.settingsStore.sort),
+                                    feedListSortToString(feedStore.settingsStore.sort),
                                     style: Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
@@ -94,27 +94,27 @@ class _HomeState extends State<Home> {
                                   switch (value) {
                                     case 0:
                                       {
-                                        homeStore.changeSort(FeedListSort.byDate);
+                                        feedStore.changeSort(FeedListSort.byDate);
                                         break;
                                       }
                                     case 1:
                                       {
-                                        homeStore.changeSort(FeedListSort.today);
+                                        feedStore.changeSort(FeedListSort.today);
                                         break;
                                       }
                                     case 2:
                                       {
-                                        homeStore.changeSort(FeedListSort.unread);
+                                        feedStore.changeSort(FeedListSort.unread);
                                         break;
                                       }
                                     case 3:
                                       {
-                                        homeStore.changeSort(FeedListSort.read);
+                                        feedStore.changeSort(FeedListSort.read);
                                         break;
                                       }
                                     case 4:
                                       {
-                                        homeStore.changeSort(FeedListSort.bookmarked);
+                                        feedStore.changeSort(FeedListSort.bookmarked);
                                         break;
                                       }
                                   }
@@ -146,55 +146,55 @@ class _HomeState extends State<Home> {
                                 }),
                             TextButton.icon(
                               onPressed: () {
-                                bool allRead = homeStore.feedItems.every((item) => item.read);
+                                bool allRead = feedStore.feedItems.every((item) => item.read);
                                 if (allRead) {
-                                  homeStore.markAllAsRead(false);
+                                  feedStore.markAllAsRead(false);
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                     content: const Text("Marked all as unread!"),
                                     action: SnackBarAction(
                                         label: "Undo",
                                         onPressed: () {
-                                          homeStore.markAllAsRead(true);
+                                          feedStore.markAllAsRead(true);
                                           setState(() {});
                                         }),
                                   ));
                                 } else {
-                                  homeStore.markAllAsRead(true);
+                                  feedStore.markAllAsRead(true);
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                     content: const Text("Marked all as read!"),
                                     action: SnackBarAction(
                                         label: "Undo",
                                         onPressed: () {
-                                          homeStore.markAllAsRead(false);
+                                          feedStore.markAllAsRead(false);
                                           setState(() {});
                                         }),
                                   ));
                                 }
                               },
-                              label: Text(homeStore.feedItems.any((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
+                              label: Text(feedStore.feedItems.any((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
                               icon: const Icon(Icons.playlist_add_check_rounded),
                             ),
                           ],
                         ),
                       ),
                       Skeletonizer(
-                        enabled: homeStore.loading,
+                        enabled: feedStore.loading,
                         child: Container(
                           constraints: const BoxConstraints(maxWidth: 500),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (homeStore.loading) ...[
+                              if (feedStore.loading) ...[
                                 const Center(child: LinearProgressIndicator()),
                               ],
-                              if (homeStore.feedItems.isEmpty && !homeStore.loading) ...[
+                              if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
                                 const Center(child: Text("No stories loaded")),
                               ],
                               // some trickery to get the index of each element as well as the item
                               // this is used to animate each card fading in with a delay.
-                              ...homeStore.feedItems
+                              ...feedStore.feedItems
                                   .asMap()
                                   .map(
                                     (idx, item) => MapEntry(
@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
                                             ),
                                             textColor: item.read ? Theme.of(context).dividerColor : Theme.of(context).textTheme.bodyMedium?.color,
                                             onTap: () {
-                                              homeStore.toggleItemRead(idx);
+                                              feedStore.toggleItemRead(idx);
                                               // force update the state to change the list tile's color to gray
                                               setState(() {});
                                               Navigator.of(context)
@@ -236,7 +236,7 @@ class _HomeState extends State<Home> {
                                               )
                                                   .then((_) {
                                                 // update the sort after the story view is popped
-                                                homeStore.changeSort(homeStore.settingsStore.sort);
+                                                feedStore.changeSort(feedStore.settingsStore.sort);
                                                 // update the state of the list items after the story view is popped
                                                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                                                 setState(() {});
@@ -254,14 +254,14 @@ class _HomeState extends State<Home> {
                                                 switch (index) {
                                                   case 0:
                                                     {
-                                                      homeStore.toggleItemRead(idx, toggle: true);
+                                                      feedStore.toggleItemRead(idx, toggle: true);
                                                       // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
                                                       setState(() {});
                                                       break;
                                                     }
                                                   case 1:
                                                     {
-                                                      homeStore.toggleItemBookmarked(idx, toggle: true);
+                                                      feedStore.toggleItemBookmarked(idx, toggle: true);
                                                       setState(() {});
                                                       break;
                                                     }

@@ -3,9 +3,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -13,7 +15,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
-import 'package:bytesized_news/views/home/home.dart';
+import 'package:bytesized_news/views/feed_view/feed_view.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +46,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  FirebaseUIAuth.configureProviders([
+    EmailAuthProvider(),
+  ]);
 
   if (!Platform.isWindows) {
     // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -120,7 +125,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                       ? ThemeMode.dark
                       : ThemeMode.light,
-              home: const Home(),
+              home: const Auth(),
             );
           },
         );
