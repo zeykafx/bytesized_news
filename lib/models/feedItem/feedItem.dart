@@ -164,7 +164,13 @@ class FeedItem {
     if (img != null) {
       feedItem.imageUrl = img.attributes['src']!;
     } else {
-      feedItem.imageUrl = "";
+      // search for media:content tag
+      String? url = item.media?.contents.first.url;
+      if (url != null && url.isNotEmpty) {
+        feedItem.imageUrl = url;
+      } else {
+        feedItem.imageUrl = "";
+      }
     }
 
     // Element mainElement = readabilityMainElement(document.documentElement!, config);
