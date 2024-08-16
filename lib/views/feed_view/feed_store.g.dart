@@ -105,6 +105,39 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$authAtom = Atom(name: '_FeedStore.auth', context: context);
+
+  @override
+  FirebaseAuth get auth {
+    _$authAtom.reportRead();
+    return super.auth;
+  }
+
+  @override
+  set auth(FirebaseAuth value) {
+    _$authAtom.reportWrite(value, super.auth, () {
+      super.auth = value;
+    });
+  }
+
+  late final _$userAtom = Atom(name: '_FeedStore.user', context: context);
+
+  @override
+  User? get user {
+    _$userAtom.reportRead();
+    return super.user;
+  }
+
+  bool _userIsInitialized = false;
+
+  @override
+  set user(User? value) {
+    _$userAtom.reportWrite(value, _userIsInitialized ? super.user : null, () {
+      super.user = value;
+      _userIsInitialized = true;
+    });
+  }
+
   late final _$settingsStoreAtom =
       Atom(name: '_FeedStore.settingsStore', context: context);
 
@@ -125,12 +158,34 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$authStoreAtom =
+      Atom(name: '_FeedStore.authStore', context: context);
+
+  @override
+  AuthStore get authStore {
+    _$authStoreAtom.reportRead();
+    return super.authStore;
+  }
+
+  bool _authStoreIsInitialized = false;
+
+  @override
+  set authStore(AuthStore value) {
+    _$authStoreAtom.reportWrite(
+        value, _authStoreIsInitialized ? super.authStore : null, () {
+      super.authStore = value;
+      _authStoreIsInitialized = true;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedStore.init', context: context);
 
   @override
-  Future<bool> init({required SettingsStore setStore}) {
-    return _$initAsyncAction.run(() => super.init(setStore: setStore));
+  Future<bool> init(
+      {required SettingsStore setStore, required AuthStore authStore}) {
+    return _$initAsyncAction
+        .run(() => super.init(setStore: setStore, authStore: authStore));
   }
 
   late final _$getItemsAsyncAction =
@@ -184,7 +239,10 @@ initialized: ${initialized},
 loading: ${loading},
 isar: ${isar},
 dbUtils: ${dbUtils},
-settingsStore: ${settingsStore}
+auth: ${auth},
+user: ${user},
+settingsStore: ${settingsStore},
+authStore: ${authStore}
     ''';
   }
 }

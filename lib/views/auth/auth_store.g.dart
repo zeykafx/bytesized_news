@@ -24,6 +24,22 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$initializedAtom =
+      Atom(name: '_AuthStore.initialized', context: context);
+
+  @override
+  bool get initialized {
+    _$initializedAtom.reportRead();
+    return super.initialized;
+  }
+
+  @override
+  set initialized(bool value) {
+    _$initializedAtom.reportWrite(value, super.initialized, () {
+      super.initialized = value;
+    });
+  }
+
   late final _$userAtom = Atom(name: '_AuthStore.user', context: context);
 
   @override
@@ -39,11 +55,29 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$userTierAtom =
+      Atom(name: '_AuthStore.userTier', context: context);
+
+  @override
+  Tier get userTier {
+    _$userTierAtom.reportRead();
+    return super.userTier;
+  }
+
+  @override
+  set userTier(Tier value) {
+    _$userTierAtom.reportWrite(value, super.userTier, () {
+      super.userTier = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
 auth: ${auth},
-user: ${user}
+initialized: ${initialized},
+user: ${user},
+userTier: ${userTier}
     ''';
   }
 }

@@ -2,6 +2,7 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
@@ -10,6 +11,8 @@ import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 import 'package:rss_dart/domain/rss_item.dart';
+
+import '../auth/auth_store.dart';
 
 part 'feed_store.g.dart';
 
@@ -34,19 +37,28 @@ abstract class _FeedStore with Store {
   @observable
   late DbUtils dbUtils;
 
-  // @observable
-  // FeedListSort sort = FeedListSort.byDate;
+  @observable
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  @observable
+  late User? user;
 
   @observable
   late SettingsStore settingsStore;
 
+  @observable
+  late AuthStore authStore;
+
   @action
-  Future<bool> init({required SettingsStore setStore}) async {
+  Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
+    this.authStore = authStore;
+
     dbUtils = DbUtils(isar: isar);
 
     feeds = await dbUtils.getFeeds();
 
+    user = auth.currentUser;
     if (kDebugMode) {
       print("Fetched ${feeds.length} feeds from Isar");
     }
@@ -111,12 +123,12 @@ abstract class _FeedStore with Store {
       if (usingRssFeed) {
         // items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
         for (RssItem item in rssFeed.items) {
-          items.add(await FeedItem.fromRssItem(item: item, feed: feed));
+          items.add(await FeedItem.fromRssItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       } else {
         // items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
         for (AtomItem item in atomFeed.items) {
-          items.add(await FeedItem.fromAtomItem(item: item, feed: feed));
+          items.add(await FeedItem.fromAtomItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       }
 
@@ -174,7 +186,11 @@ abstract class _FeedStore with Store {
     }
   }
 
-  Future<void> markAllAsRead(bool read) async {
-    await dbUtils.markAllAsRead(feedItems, read);
+  Future<void> markAllAsRead(bool read, {List<FeedItem>? unreadItems}) async {
+    if (unreadItems != null) {
+      await dbUtils.markAllAsRead(unreadItems, read);
+    } else {
+      await dbUtils.markAllAsRead(feedItems, read);
+    }
   }
 }

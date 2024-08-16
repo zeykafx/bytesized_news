@@ -87,7 +87,15 @@ class DbUtils {
   }
 
   Future<void> markAllAsRead(List<FeedItem> feedItems, bool read) async {
-    for (FeedItem item in feedItems) {
+    List<FeedItem> unreadItems;
+
+    if (read) {
+      unreadItems = feedItems.where((item) => !item.read).toList();
+    } else {
+      unreadItems = feedItems.where((item) => item.read).toList();
+    }
+
+    for (FeedItem item in unreadItems) {
       item.read = read;
     }
     await isar.writeTxn(() => isar.feedItems.putAll(feedItems));

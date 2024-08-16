@@ -4,10 +4,14 @@ import 'dart:ui';
 
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -66,10 +70,14 @@ void main() async {
     directory: dir.path,
   );
 
+  final AuthStore authStore = AuthStore();
+  await authStore.init();
+
   runApp(
     MultiProvider(
       providers: [
         Provider<SettingsStore>(create: (_) => settingsStore),
+        Provider<AuthStore>(create: (_) => authStore),
       ],
       child: const MyApp(),
     ),
@@ -86,10 +94,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final SettingsStore settingsStore;
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  User? user;
+
   @override
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
+    user = auth.currentUser;
   }
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
@@ -125,7 +138,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                       ? ThemeMode.dark
                       : ThemeMode.light,
-              home: const Auth(),
+              home: user == null ? const Auth() : const FeedView(),
             );
           },
         );

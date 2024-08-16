@@ -1,5 +1,6 @@
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
+import 'package:bytesized_news/views/feed_view/feed_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -22,10 +23,11 @@ class _EmailVerifyState extends State<EmailVerify> {
         if (kDebugMode) {
           print("Email verified");
         }
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const Profile(),
+            builder: (context) => const FeedView(),
           ),
+          (route) => false, // remove all routes
         );
       } else {
         if (kDebugMode) {
@@ -56,16 +58,17 @@ class _EmailVerifyState extends State<EmailVerify> {
         EmailVerifiedAction(() {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const Profile(),
+              builder: (context) => const FeedView(),
             ),
           );
         }),
         AuthCancelledAction((context) {
           FirebaseUIAuth.signOut(context: context);
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => const Auth(),
             ),
+            (route) => false, // remove all routes
           );
         }),
       ],

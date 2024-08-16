@@ -1,4 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fb;
 import 'package:html/dom.dart';
 import 'package:html_main_element/html_main_element.dart';
@@ -96,6 +97,7 @@ class FeedItem {
   static Future<FeedItem> fromAtomItem({
     required AtomItem item,
     required Feed feed,
+    required Tier userTier,
   }) async {
     FeedItem feedItem = FeedItem();
 
@@ -113,11 +115,13 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
-    fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-    if (existingSummary.docs.isNotEmpty) {
-      feedItem.aiSummary = existingSummary.docs.first.get("summary");
-      feedItem.summarized = true;
+    if (userTier == Tier.premium) {
+      fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+      if (existingSummary.docs.isNotEmpty) {
+        feedItem.aiSummary = existingSummary.docs.first.get("summary");
+        feedItem.summarized = true;
+      }
     }
 
     return feedItem;
@@ -126,6 +130,7 @@ class FeedItem {
   static Future<FeedItem> fromRssItem({
     required RssItem item,
     required Feed feed,
+    required Tier userTier,
   }) async {
     FeedItem feedItem = FeedItem();
 
@@ -144,11 +149,13 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
-    fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-    if (existingSummary.docs.isNotEmpty) {
-      feedItem.aiSummary = existingSummary.docs.first.get("summary");
-      feedItem.summarized = true;
+    if (userTier == Tier.premium) {
+      fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+      if (existingSummary.docs.isNotEmpty) {
+        feedItem.aiSummary = existingSummary.docs.first.get("summary");
+        feedItem.summarized = true;
+      }
     }
 
     return feedItem;

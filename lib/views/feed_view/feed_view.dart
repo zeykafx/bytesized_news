@@ -1,3 +1,6 @@
+import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:bytesized_news/views/auth/sub_views/profile.dart';
 import 'package:bytesized_news/views/story/story.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -18,17 +21,19 @@ class FeedView extends StatefulWidget {
 
 class _FeedViewState extends State<FeedView> {
   late SettingsStore settingsStore;
+  late AuthStore authStore;
   final FeedStore feedStore = FeedStore();
 
   @override
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
+    authStore = context.read<AuthStore>();
     init();
   }
 
   Future<void> init() async {
-    await feedStore.init(setStore: settingsStore);
+    await feedStore.init(setStore: settingsStore, authStore: authStore);
     await feedStore.getItems();
     setState(() {});
   }
@@ -38,6 +43,17 @@ class _FeedViewState extends State<FeedView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("News"),
+        // profile button
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const Profile(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.account_circle),
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -160,6 +176,7 @@ class _FeedViewState extends State<FeedView> {
                                         }),
                                   ));
                                 } else {
+                                  List<FeedItem> unreadItems = feedStore.feedItems.where((item) => !item.read).toList();
                                   feedStore.markAllAsRead(true);
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -167,7 +184,7 @@ class _FeedViewState extends State<FeedView> {
                                     action: SnackBarAction(
                                         label: "Undo",
                                         onPressed: () {
-                                          feedStore.markAllAsRead(false);
+                                          feedStore.markAllAsRead(false, unreadItems: unreadItems);
                                           setState(() {});
                                         }),
                                   ));

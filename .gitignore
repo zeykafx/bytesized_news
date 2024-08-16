@@ -45,3 +45,4 @@ app.*.map.json
 /macos/build/
 
 .env
+/functions/.env.bytesized-news

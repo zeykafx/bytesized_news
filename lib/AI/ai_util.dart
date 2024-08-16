@@ -1,5 +1,6 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:openai_dart/openai_dart.dart';
@@ -12,16 +13,19 @@ class AiUtils {
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   Future<String> summarizeWithFirebase(FeedItem feedItem) async {
     final result = await functions.httpsCallable('helloWorld').call(
       {
-        "text": "Hello, World from Flutter!",
+        "text": feedItem.url,
       },
     );
-    var response = result.data as String;
-    print("Response: $response");
-    return "empty";
+    var response = result.data as Map<String, dynamic>;
+    if (response["error"] != null) {
+      throw Exception(response["error"]);
+    }
+    return response["summary"];
   }
 
   Future<String> summarize(String text, FeedItem feedItem) async {

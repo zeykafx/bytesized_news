@@ -383,8 +383,9 @@ mixin _$StoryStore on _StoryStore, Store {
       AsyncAction('_StoryStore.summarizeArticle', context: context);
 
   @override
-  Future<void> summarizeArticle() {
-    return _$summarizeArticleAsyncAction.run(() => super.summarizeArticle());
+  Future<void> summarizeArticle(BuildContext context) {
+    return _$summarizeArticleAsyncAction
+        .run(() => super.summarizeArticle(context));
   }
 
   late final _$onLoadStartAsyncAction =
