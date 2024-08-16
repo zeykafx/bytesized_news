@@ -76,6 +76,8 @@ dependencies:
   cloud_functions: ^5.0.4
   firebase_ui_auth: ^1.15.0
   firebase_dynamic_links: ^6.0.4
+  cached_network_image: ^3.4.0
+  any_date: ^1.0.3
 
 
 

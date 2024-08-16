@@ -147,7 +147,7 @@ class _StoryState extends State<Story> {
                                               color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(15),
-                                                child: SelectableText(storyStore.feedItem.aiSummary, style: Theme.of(context).textTheme.bodySmall),
+                                                child: SelectableText(storyStore.feedItem.aiSummary, style: Theme.of(context).textTheme.bodyLarge),
                                               ),
                                             ),
                                           ).animate().fadeIn().then().shimmer(

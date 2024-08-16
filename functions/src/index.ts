@@ -12,8 +12,9 @@ const db = getFirestore();
 const openaiKey = defineString("OPENAI_API_KEY");
 
 
-export const helloWorld = onCall({region: "europe-west1"}, async (request) => {
-  const articleUrl = request.data.text;
+export const summarize = onCall({region: "europe-west1"}, async (request) => {
+  const articleUrl: string = request.data.text;
+  const title: string = request.data.title;
   const uid = request.auth?.uid;
   logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
 
@@ -62,8 +63,11 @@ export const helloWorld = onCall({region: "europe-west1"}, async (request) => {
   // save the summary in firestore
   const res = await db.collection("summaries").add({
     url: articleUrl,
+    title: title,
     summary: summary,
     generatedAt: new Date().getTime(),
+    // expires in a week
+    expirationTimestamp: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
   });
 
   logger.info("Summary created: " + res.id);

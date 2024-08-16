@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
 
 part 'feed.g.dart';
@@ -7,12 +10,19 @@ class Feed {
   Id id = Isar.autoIncrement;
   final String name;
   final String link;
-  final String description;
+  late String iconUrl;
 
-  Feed(this.name, this.link, this.description);
+  Feed(this.name, this.link) {
+    Uri uri = Uri.parse(link);
+    iconUrl = "https://icon.horse/icon/${uri.host}";
+  }
 
-  @override
-  String toString() {
-    return 'Feed{name: $name, link: $link, description: $description}';
+  static Future<Feed> createFeed(String url) async {
+    Dio dio = Dio();
+    Response response = await dio.get(url);
+    Document document = parse(response.data);
+    String? title = document.querySelector('title')?.text;
+
+    return Feed(title ?? 'Untitled Feed', url);
   }
 }

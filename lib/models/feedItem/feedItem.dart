@@ -1,3 +1,4 @@
+import 'package:any_date/any_date.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fb;
@@ -18,6 +19,7 @@ class FeedItem {
 
   late String title;
   late String description;
+  late String imageUrl;
   late List<String> authors;
   late DateTime publishedDate;
   late DateTime timeFetched;
@@ -105,12 +107,23 @@ class FeedItem {
 
     feedItem.title = item.title!.trim();
     feedItem.authors = item.authors.map((author) => author.name!).toList();
-    feedItem.publishedDate = DateTime.parse(item.published!);
+
+    AnyDate parser = const AnyDate();
+    feedItem.publishedDate = parser.parse(item.published!);
 
     // parse html content into description
     final document = html_parser.parse(item.content!);
-    Element mainElement = readabilityMainElement(document.documentElement!, config);
-    feedItem.description = mainElement.text.trim();
+
+    // find the image and print the src
+    var img = document.querySelector('img');
+    if (img != null) {
+      feedItem.imageUrl = img.attributes['src']!;
+    } else {
+      feedItem.imageUrl = "";
+    }
+
+    // Element mainElement = readabilityMainElement(document.documentElement!, config);
+    feedItem.description = document.documentElement!.text.trim();
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
@@ -134,17 +147,28 @@ class FeedItem {
   }) async {
     FeedItem feedItem = FeedItem();
 
-    feedItem.url = item.source?.value ?? "no link";
+    feedItem.url = item.link ?? "no link";
 
     feedItem.title = item.title!.trim();
     feedItem.authors = item.author != null ? item.author!.split(",") : [];
     // print(item.pubDate);
-    feedItem.publishedDate = DateTime.parse(item.pubDate!);
+
+    AnyDate parser = const AnyDate();
+    feedItem.publishedDate = parser.parse(item.pubDate!);
 
     // parse html content into description
-    final document = html_parser.parse(item.content ?? item.description!);
-    Element mainElement = readabilityMainElement(document.documentElement!, config);
-    feedItem.description = mainElement.text.trim();
+    final document = html_parser.parse(item.content!.value);
+
+    // find the image and print the src
+    var img = document.querySelector('img');
+    if (img != null) {
+      feedItem.imageUrl = img.attributes['src']!;
+    } else {
+      feedItem.imageUrl = "";
+    }
+
+    // Element mainElement = readabilityMainElement(document.documentElement!, config);
+    feedItem.description = document.documentElement!.text.trim();
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;

@@ -178,6 +178,70 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$isLockedAtom =
+      Atom(name: '_FeedStore.isLocked', context: context);
+
+  @override
+  bool get isLocked {
+    _$isLockedAtom.reportRead();
+    return super.isLocked;
+  }
+
+  @override
+  set isLocked(bool value) {
+    _$isLockedAtom.reportWrite(value, super.isLocked, () {
+      super.isLocked = value;
+    });
+  }
+
+  late final _$isCollapsedAtom =
+      Atom(name: '_FeedStore.isCollapsed', context: context);
+
+  @override
+  bool get isCollapsed {
+    _$isCollapsedAtom.reportRead();
+    return super.isCollapsed;
+  }
+
+  @override
+  set isCollapsed(bool value) {
+    _$isCollapsedAtom.reportWrite(value, super.isCollapsed, () {
+      super.isCollapsed = value;
+    });
+  }
+
+  late final _$isExpandedAtom =
+      Atom(name: '_FeedStore.isExpanded', context: context);
+
+  @override
+  bool get isExpanded {
+    _$isExpandedAtom.reportRead();
+    return super.isExpanded;
+  }
+
+  @override
+  set isExpanded(bool value) {
+    _$isExpandedAtom.reportWrite(value, super.isExpanded, () {
+      super.isExpanded = value;
+    });
+  }
+
+  late final _$bsbControllerAtom =
+      Atom(name: '_FeedStore.bsbController', context: context);
+
+  @override
+  BottomSheetBarController get bsbController {
+    _$bsbControllerAtom.reportRead();
+    return super.bsbController;
+  }
+
+  @override
+  set bsbController(BottomSheetBarController value) {
+    _$bsbControllerAtom.reportWrite(value, super.bsbController, () {
+      super.bsbController = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedStore.init', context: context);
 
@@ -186,6 +250,14 @@ mixin _$FeedStore on _FeedStore, Store {
       {required SettingsStore setStore, required AuthStore authStore}) {
     return _$initAsyncAction
         .run(() => super.init(setStore: setStore, authStore: authStore));
+  }
+
+  late final _$getFeedsAsyncAction =
+      AsyncAction('_FeedStore.getFeeds', context: context);
+
+  @override
+  Future<void> getFeeds() {
+    return _$getFeedsAsyncAction.run(() => super.getFeeds());
   }
 
   late final _$getItemsAsyncAction =
@@ -230,6 +302,20 @@ mixin _$FeedStore on _FeedStore, Store {
     return _$changeSortAsyncAction.run(() => super.changeSort(sort));
   }
 
+  late final _$_FeedStoreActionController =
+      ActionController(name: '_FeedStore', context: context);
+
+  @override
+  void onBsbChanged() {
+    final _$actionInfo = _$_FeedStoreActionController.startAction(
+        name: '_FeedStore.onBsbChanged');
+    try {
+      return super.onBsbChanged();
+    } finally {
+      _$_FeedStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
@@ -242,7 +328,11 @@ dbUtils: ${dbUtils},
 auth: ${auth},
 user: ${user},
 settingsStore: ${settingsStore},
-authStore: ${authStore}
+authStore: ${authStore},
+isLocked: ${isLocked},
+isCollapsed: ${isCollapsed},
+isExpanded: ${isExpanded},
+bsbController: ${bsbController}
     ''';
   }
 }

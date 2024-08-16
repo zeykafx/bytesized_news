@@ -1,3 +1,4 @@
+import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -49,12 +50,26 @@ abstract class _FeedStore with Store {
   @observable
   late AuthStore authStore;
 
+  @observable
+  bool isLocked = false;
+
+  @observable
+  bool isCollapsed = false;
+
+  @observable
+  bool isExpanded = false;
+
+  @observable
+  BottomSheetBarController bsbController = BottomSheetBarController();
+
   @action
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
     this.authStore = authStore;
 
     dbUtils = DbUtils(isar: isar);
+
+    bsbController.addListener(onBsbChanged);
 
     feeds = await dbUtils.getFeeds();
 
@@ -66,13 +81,19 @@ abstract class _FeedStore with Store {
     if (feeds.isEmpty) {
       await isar.writeTxn(
         () => isar.feeds.putAll([
-          Feed("The Verge", "http://www.theverge.com/rss/frontpage", "The Verge is a technology news site"),
+          Feed("The Verge", "http://www.theverge.com/rss/frontpage"),
+          Feed("Vox", "https://www.vox.com/rss/index.xml"),
         ]),
       );
 
       feeds = await dbUtils.getFeeds();
     }
     return true;
+  }
+
+  @action
+  Future<void> getFeeds() async {
+    feeds = await dbUtils.getFeeds();
   }
 
   @action
@@ -122,12 +143,12 @@ abstract class _FeedStore with Store {
 
       if (usingRssFeed) {
         // items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
-        for (RssItem item in rssFeed.items) {
+        for (RssItem item in rssFeed.items.take(20)) {
           items.add(await FeedItem.fromRssItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       } else {
         // items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
-        for (AtomItem item in atomFeed.items) {
+        for (AtomItem item in atomFeed.items.take(20)) {
           items.add(await FeedItem.fromAtomItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       }
@@ -191,6 +212,17 @@ abstract class _FeedStore with Store {
       await dbUtils.markAllAsRead(unreadItems, read);
     } else {
       await dbUtils.markAllAsRead(feedItems, read);
+    }
+  }
+
+  @action
+  void onBsbChanged() {
+    if (bsbController.isCollapsed && !isCollapsed) {
+      isCollapsed = true;
+      isExpanded = false;
+    } else if (bsbController.isExpanded && !isExpanded) {
+      isCollapsed = false;
+      isExpanded = true;
     }
   }
 }

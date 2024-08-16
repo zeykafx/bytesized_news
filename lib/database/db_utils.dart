@@ -1,4 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:isar/isar.dart';
 
@@ -9,6 +10,10 @@ class DbUtils {
 
   Future<List<Feed>> getFeeds() async {
     return await isar.feeds.where().findAll();
+  }
+
+  Future<void> addFeed(Feed feed) async {
+    await isar.writeTxn(() => isar.feeds.put(feed));
   }
 
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
@@ -99,5 +104,19 @@ class DbUtils {
       item.read = read;
     }
     await isar.writeTxn(() => isar.feedItems.putAll(feedItems));
+  }
+
+  Future<List<FeedGroup>> getFeedGroups(List<Feed> feeds) async {
+    List<FeedGroup> feedGroups = await isar.feedGroups.where().findAll();
+
+    // find the corresponding feeds for each feed item
+    for (FeedGroup item in feedGroups) {
+      // item.feed = feeds.firstWhere((feed) => feed.name == item.name);
+      for (String feedName in item.feedNames) {
+        item.feeds.add(feeds.firstWhere((feed) => feed.name == feedName));
+      }
+    }
+
+    return feedGroups;
   }
 }

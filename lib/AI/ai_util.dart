@@ -16,9 +16,10 @@ class AiUtils {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   Future<String> summarizeWithFirebase(FeedItem feedItem) async {
-    final result = await functions.httpsCallable('helloWorld').call(
+    final result = await functions.httpsCallable('summarize').call(
       {
         "text": feedItem.url,
+        "title": feedItem.title,
       },
     );
     var response = result.data as Map<String, dynamic>;
