@@ -160,14 +160,14 @@ class FeedItem {
     final document = html_parser.parse(item.content!.value);
 
     // find the image and print the src
-    var img = document.querySelector('img');
-    if (img != null) {
-      feedItem.imageUrl = img.attributes['src']!;
+// search for media:content tag
+    String? url = item.media?.contents.first.url;
+    if (url != null && url.isNotEmpty) {
+      feedItem.imageUrl = url;
     } else {
-      // search for media:content tag
-      String? url = item.media?.contents.first.url;
-      if (url != null && url.isNotEmpty) {
-        feedItem.imageUrl = url;
+      var img = document.querySelector('img');
+      if (img != null) {
+        feedItem.imageUrl = img.attributes['src']!;
       } else {
         feedItem.imageUrl = "";
       }

@@ -77,8 +77,8 @@ FeedGroup _feedGroupDeserialize(
 ) {
   final object = FeedGroup(
     reader.readString(offsets[1]),
-    reader.readStringList(offsets[0]) ?? [],
   );
+  object.feedNames = reader.readStringList(offsets[0]) ?? [];
   object.id = id;
   return object;
 }

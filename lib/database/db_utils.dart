@@ -16,6 +16,18 @@ class DbUtils {
     await isar.writeTxn(() => isar.feeds.put(feed));
   }
 
+  Future<void> deleteFeed(Feed feed) async {
+    await isar.writeTxn(() => isar.feeds.delete(feed.id));
+  }
+
+  Future<void> deleteFeeds(List<Feed> feeds) async {
+    await isar.writeTxn(() => isar.feeds.deleteAll(feeds.map((elem) => elem.id).toList()));
+  }
+
+  Future<void> deleteFeedItems(Feed feed) async {
+    await isar.writeTxn(() => isar.feedItems.where().filter().feedNameEqualTo(feed.name).deleteAll());
+  }
+
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
 
@@ -111,12 +123,27 @@ class DbUtils {
 
     // find the corresponding feeds for each feed item
     for (FeedGroup item in feedGroups) {
-      // item.feed = feeds.firstWhere((feed) => feed.name == item.name);
       for (String feedName in item.feedNames) {
         item.feeds.add(feeds.firstWhere((feed) => feed.name == feedName));
       }
     }
 
     return feedGroups;
+  }
+
+  Future<void> addFeedGroup(FeedGroup feedGroup) async {
+    await isar.writeTxn(() => isar.feedGroups.put(feedGroup));
+  }
+
+  Future<void> deleteFeedGroup(FeedGroup feedGroup) async {
+    await isar.writeTxn(() => isar.feedGroups.delete(feedGroup.id));
+  }
+
+  Future<void> deleteFeedGroups(List<FeedGroup> feedGroups) async {
+    await isar.writeTxn(() => isar.feedGroups.deleteAll(feedGroups.map((elem) => elem.id).toList()));
+  }
+
+  Future<void> addFeedsToFeedGroup(FeedGroup feedGroup) async {
+    await isar.writeTxn(() => isar.feedGroups.put(feedGroup));
   }
 }

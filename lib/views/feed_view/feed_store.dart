@@ -1,10 +1,12 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
@@ -22,6 +24,9 @@ class FeedStore = _FeedStore with _$FeedStore;
 abstract class _FeedStore with Store {
   @observable
   List<Feed> feeds = [];
+
+  @observable
+  ObservableList<FeedGroup> feedGroups = <FeedGroup>[].asObservable();
 
   @observable
   ObservableList<FeedItem> feedItems = <FeedItem>[].asObservable();
@@ -72,8 +77,6 @@ abstract class _FeedStore with Store {
     bsbController.addListener(onBsbChanged);
 
     feeds = await dbUtils.getFeeds();
-
-    user = auth.currentUser;
     if (kDebugMode) {
       print("Fetched ${feeds.length} feeds from Isar");
     }
@@ -88,12 +91,25 @@ abstract class _FeedStore with Store {
 
       feeds = await dbUtils.getFeeds();
     }
+
+    feedGroups = (await dbUtils.getFeedGroups(feeds)).asObservable();
+    if (kDebugMode) {
+      print("Fetched ${feedGroups.length} feedGroups from Isar");
+    }
+    user = auth.currentUser;
+
+    initialized = true;
     return true;
   }
 
   @action
   Future<void> getFeeds() async {
     feeds = await dbUtils.getFeeds();
+  }
+
+  @action
+  Future<void> getFeedGroups() async {
+    feedGroups = (await dbUtils.getFeedGroups(feeds)).asObservable();
   }
 
   @action
@@ -119,7 +135,6 @@ abstract class _FeedStore with Store {
     Dio dio = Dio();
 
     loading = true;
-    // String url = "http://www.theverge.com/rss/frontpage";
     for (Feed feed in feeds) {
       if (kDebugMode) {
         print("Fetching feed items for ${feed.name}");
@@ -223,6 +238,20 @@ abstract class _FeedStore with Store {
     } else if (bsbController.isExpanded && !isExpanded) {
       isCollapsed = false;
       isExpanded = true;
+    }
+  }
+
+  @action
+  Future<void> createFeedGroup(String feedGroupName, BuildContext context) async {
+    FeedGroup feedGroup = FeedGroup(feedGroupName);
+    try {
+      await dbUtils.addFeedGroup(feedGroup);
+      feedGroups.add(feedGroup);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully created Feed Group!")));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to create Feed Group: error: ${e.toString()}"),
+      ));
     }
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -66,7 +67,7 @@ void main() async {
 
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
-    [FeedItemSchema, FeedSchema],
+    [FeedItemSchema, FeedSchema, FeedGroupSchema],
     directory: dir.path,
   );
 

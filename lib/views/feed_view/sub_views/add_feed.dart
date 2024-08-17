@@ -155,10 +155,10 @@ class _AddFeedState extends State<AddFeed> {
                           if (kDebugMode) {
                             print("Adding feed to db: $feedLink");
                           }
+                          await widget.getFeeds();
 
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
-                          widget.getFeeds();
                         },
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,

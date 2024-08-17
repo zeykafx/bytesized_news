@@ -3,6 +3,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager.dart';
 import 'package:bytesized_news/views/story/story.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:time_formatter/time_formatter.dart';
@@ -44,6 +46,11 @@ class _FeedViewState extends State<FeedView> {
 
   Future<void> wrappedGetFeeds() async {
     await feedStore.getFeeds();
+    setState(() {});
+  }
+
+  Future<void> wrappedGetFeedGroups() async {
+    await feedStore.getFeedGroups();
     setState(() {});
   }
 
@@ -81,7 +88,7 @@ class _FeedViewState extends State<FeedView> {
         borderRadius: const BorderRadius.all(Radius.circular(100)),
         backdropColor: Theme.of(context).colorScheme.surface,
         locked: feedStore.isLocked,
-        body: Observer(builder: (context) {
+        body: Observer(builder: (_) {
           return RefreshIndicator(
             onRefresh: () async {
               feedStore.getItems();
@@ -196,15 +203,18 @@ class _FeedViewState extends State<FeedView> {
                                     List<FeedItem> unreadItems = feedStore.feedItems.where((item) => !item.read).toList();
                                     feedStore.markAllAsRead(true);
                                     setState(() {});
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: const Text("Marked all as read!"),
-                                      action: SnackBarAction(
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text("Marked all as read!"),
+                                        action: SnackBarAction(
                                           label: "Undo",
                                           onPressed: () {
                                             feedStore.markAllAsRead(false, unreadItems: unreadItems);
                                             setState(() {});
-                                          }),
-                                    ));
+                                          },
+                                        ),
+                                      ),
+                                    );
                                   }
                                 },
                                 label: Text(feedStore.feedItems.any((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
@@ -274,21 +284,41 @@ class _FeedViewState extends State<FeedView> {
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
                                                   // item.summarized ? Text("Summary: ${item.aiSummary}") : Text(item.description.split("\n").first),
-                                                  Chip(
-                                                    label: Text(
-                                                      item.feedName,
-                                                      style: const TextStyle(fontSize: 10),
-                                                    ),
-                                                    elevation: 0,
-                                                    side: const BorderSide(width: 0, color: Colors.transparent),
-                                                    padding: const EdgeInsets.all(0),
-                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                                    visualDensity: VisualDensity.compact,
-                                                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                                                    shape: const RoundedRectangleBorder(
-                                                      side: BorderSide(width: 0, color: Colors.transparent),
-                                                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                                                    ),
+                                                  Row(
+                                                    children: [
+                                                      Chip(
+                                                        label: Text(
+                                                          item.feedName,
+                                                          style: const TextStyle(fontSize: 10),
+                                                        ),
+                                                        avatar: CachedNetworkImage(
+                                                          imageUrl: item.feed!.iconUrl,
+                                                          width: 15,
+                                                          height: 15,
+                                                        ),
+                                                        elevation: 0,
+                                                        side: const BorderSide(width: 0, color: Colors.transparent),
+                                                        padding: const EdgeInsets.all(0),
+                                                        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                                        visualDensity: VisualDensity.compact,
+                                                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                                        shape: const RoundedRectangleBorder(
+                                                          side: BorderSide(width: 0, color: Colors.transparent),
+                                                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                                                        ),
+                                                      ),
+
+                                                      const SizedBox(width: 10),
+
+                                                      // star icon to show if the item has been summarized by AI or not
+                                                      item.summarized
+                                                          ? Icon(
+                                                              LucideIcons.sparkles,
+                                                              color: Theme.of(context).dividerColor,
+                                                              size: 15,
+                                                            )
+                                                          : const SizedBox(),
+                                                    ],
                                                   ),
                                                   Row(
                                                     children: [
@@ -407,44 +437,8 @@ class _FeedViewState extends State<FeedView> {
             ),
           );
         }),
-        expandedBuilder: (ScrollController scrollController) {
-          return Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              // search bar
-              // ...
-
-              // add feed button, new feed group button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => AddFeed(
-                                  getFeeds: wrappedGetFeeds,
-                                )),
-                      );
-                    },
-                    label: const Text("Add Feed"),
-                    icon: const Icon(LucideIcons.rss),
-                  ),
-                  TextButton.icon(
-                    onPressed: () {},
-                    label: const Text("Create Feed Group"),
-                    icon: const Icon(LucideIcons.folder_plus),
-                  ),
-                ],
-              ),
-
-              // pinned feeds/feed groups
-              // ...
-
-              // all feeds and feed groups
-              // ...
-            ],
-          );
+        expandedBuilder: (ScrollController controller) {
+          return FeedManager(feedStore: feedStore, wrappedGetFeeds: wrappedGetFeeds, wrappedGetFeedGroups: wrappedGetFeedGroups);
         },
         collapsed: Observer(builder: (BuildContext _) {
           return Row(

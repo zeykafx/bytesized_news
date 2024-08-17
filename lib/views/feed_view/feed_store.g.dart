@@ -24,6 +24,22 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$feedGroupsAtom =
+      Atom(name: '_FeedStore.feedGroups', context: context);
+
+  @override
+  ObservableList<FeedGroup> get feedGroups {
+    _$feedGroupsAtom.reportRead();
+    return super.feedGroups;
+  }
+
+  @override
+  set feedGroups(ObservableList<FeedGroup> value) {
+    _$feedGroupsAtom.reportWrite(value, super.feedGroups, () {
+      super.feedGroups = value;
+    });
+  }
+
   late final _$feedItemsAtom =
       Atom(name: '_FeedStore.feedItems', context: context);
 
@@ -260,6 +276,14 @@ mixin _$FeedStore on _FeedStore, Store {
     return _$getFeedsAsyncAction.run(() => super.getFeeds());
   }
 
+  late final _$getFeedGroupsAsyncAction =
+      AsyncAction('_FeedStore.getFeedGroups', context: context);
+
+  @override
+  Future<void> getFeedGroups() {
+    return _$getFeedGroupsAsyncAction.run(() => super.getFeedGroups());
+  }
+
   late final _$getItemsAsyncAction =
       AsyncAction('_FeedStore.getItems', context: context);
 
@@ -302,6 +326,15 @@ mixin _$FeedStore on _FeedStore, Store {
     return _$changeSortAsyncAction.run(() => super.changeSort(sort));
   }
 
+  late final _$createFeedGroupAsyncAction =
+      AsyncAction('_FeedStore.createFeedGroup', context: context);
+
+  @override
+  Future<void> createFeedGroup(String feedGroupName, BuildContext context) {
+    return _$createFeedGroupAsyncAction
+        .run(() => super.createFeedGroup(feedGroupName, context));
+  }
+
   late final _$_FeedStoreActionController =
       ActionController(name: '_FeedStore', context: context);
 
@@ -320,6 +353,7 @@ mixin _$FeedStore on _FeedStore, Store {
   String toString() {
     return '''
 feeds: ${feeds},
+feedGroups: ${feedGroups},
 feedItems: ${feedItems},
 initialized: ${initialized},
 loading: ${loading},

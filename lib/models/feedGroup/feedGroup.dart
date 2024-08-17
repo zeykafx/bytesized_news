@@ -7,10 +7,10 @@ part 'feedGroup.g.dart';
 class FeedGroup {
   Id id = Isar.autoIncrement;
   final String name;
-  final List<String> feedNames;
+  List<String> feedNames = List.empty(growable: true);
 
   @ignore
-  late List<Feed> feeds;
+  List<Feed> feeds = [];
 
-  FeedGroup(this.name, this.feedNames);
+  FeedGroup(this.name);
 }
