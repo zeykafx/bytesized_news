@@ -1,16 +1,18 @@
-# myapp
+# Bytesized News
 
-A new Flutter project.
+Bytesized News is an RSS reader that allows you to read the latest news from your favorite sources in a single place.
+With a paid account you can summarize articles with a click of a button (with AI).
 
-## Getting Started
+The app is built with Flutter and Mobx.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Add RSS & ATOM feeds
+- Read articles with a built-in browser
+- Auto dark mode in web browser
+- Ad blocker in web browser
+- Summarize articles with AI (paid feature)
+- Sort articles by date or title, read or unread, bookmarked
+- Bookmark articles
+- Create feed groups (folders) to easily organize your feeds and navigate between them
+- Curated list of popular feeds (soon)
