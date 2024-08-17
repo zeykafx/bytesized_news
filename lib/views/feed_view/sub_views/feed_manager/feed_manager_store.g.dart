@@ -16,6 +16,13 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
           Computed<bool>(() => super.areFeedGroupsSelected,
               name: '_FeedManagerStore.areFeedGroupsSelected'))
       .value;
+  Computed<bool>? _$areFeedsSelectedComputed;
+
+  @override
+  bool get areFeedsSelected => (_$areFeedsSelectedComputed ??= Computed<bool>(
+          () => super.areFeedsSelected,
+          name: '_FeedManagerStore.areFeedsSelected'))
+      .value;
   Computed<bool>? _$areMoreThanOneFeedGroupsSelectedComputed;
 
   @override
@@ -223,6 +230,7 @@ selectedFeedGroups: ${selectedFeedGroups},
 isar: ${isar},
 dbUtils: ${dbUtils},
 areFeedGroupsSelected: ${areFeedGroupsSelected},
+areFeedsSelected: ${areFeedsSelected},
 areMoreThanOneFeedGroupsSelected: ${areMoreThanOneFeedGroupsSelected}
     ''';
   }

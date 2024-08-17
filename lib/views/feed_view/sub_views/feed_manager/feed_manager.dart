@@ -9,12 +9,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
+import 'edit_feed_group.dart';
+
 class FeedManager extends StatefulWidget {
   final FeedStore feedStore;
   final Function wrappedGetFeeds;
   final Function wrappedGetFeedGroups;
+  final Function wrappedGetItems;
 
-  const FeedManager({super.key, required this.feedStore, required this.wrappedGetFeeds, required this.wrappedGetFeedGroups});
+  const FeedManager({super.key, required this.feedStore, required this.wrappedGetFeeds, required this.wrappedGetFeedGroups, required this.wrappedGetItems});
 
   @override
   State<FeedManager> createState() => _FeedManagerState();
@@ -72,12 +75,13 @@ class _FeedManagerState extends State<FeedManager> {
                                 MaterialPageRoute(
                                   builder: (context) => AddFeed(
                                     getFeeds: widget.wrappedGetFeeds,
+                                    getItems: widget.wrappedGetItems,
                                   ),
                                 ),
                               )
                                   .then((_) async {
                                 await widget.wrappedGetFeeds();
-
+                                await widget.wrappedGetItems();
                                 setState(() {});
                               });
                             },
@@ -277,6 +281,24 @@ class _FeedManagerState extends State<FeedManager> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
+                            // CANCEL SELECTION
+                            TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  feedManagerStore.selectionMode = false;
+                                  feedManagerStore.selectedFeeds.clear();
+                                  feedManagerStore.selectedFeedGroups.clear();
+                                });
+                              },
+                              icon: const Icon(Icons.cancel_outlined),
+                              label: const Text("Cancel"),
+                            ),
+
+                            const SizedBox(
+                              height: 25,
+                              child: VerticalDivider(),
+                            ),
+
                             // PIN FEED
                             TextButton.icon(
                               onPressed: () {
@@ -290,6 +312,39 @@ class _FeedManagerState extends State<FeedManager> {
                               height: 25,
                               child: VerticalDivider(),
                             ),
+
+                            // EDIT FEED GROUP
+                            if (feedManagerStore.areFeedGroupsSelected &&
+                                !feedManagerStore.areFeedsSelected &&
+                                feedManagerStore.selectedFeedGroups.length == 1) ...[
+                              TextButton.icon(
+                                onPressed: () {
+                                  feedManagerStore.toggleSelectionMode();
+
+                                  Navigator.of(context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (context) => EditFeedGroup(
+                                        feedGroup: feedManagerStore.selectedFeedGroups.first,
+                                        feedManagerStore: feedManagerStore,
+                                      ),
+                                    ),
+                                  )
+                                      .then((_) async {
+                                    feedManagerStore.selectedFeeds.clear();
+                                    feedManagerStore.selectedFeedGroups.clear();
+                                    await widget.wrappedGetFeedGroups();
+                                    setState(() {});
+                                  });
+                                },
+                                icon: const Icon(Icons.edit_outlined),
+                                label: const Text("Edit"),
+                              ),
+                              const SizedBox(
+                                height: 25,
+                                child: VerticalDivider(),
+                              ),
+                            ],
 
                             // ADD TO GROUP
                             TextButton.icon(
@@ -390,10 +445,34 @@ class _FeedManagerState extends State<FeedManager> {
                             // DELETE FEED/FEED GROUP
                             TextButton.icon(
                               onPressed: () async {
-                                await feedManagerStore.handleDelete();
-                                setState(() {});
-                                widget.wrappedGetFeeds();
-                                widget.wrappedGetFeedGroups();
+                                // show dialog to confirm deletion
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text("Confirm Delete?"),
+                                      content: const Text("Are you sure you want to delete the selected items?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            await feedManagerStore.handleDelete();
+                                            await widget.wrappedGetFeeds();
+                                            await widget.wrappedGetFeedGroups();
+                                            setState(() {});
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Delete"),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
                               },
                               icon: const Icon(Icons.delete_outline),
                               label: const Text("Delete"),

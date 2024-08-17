@@ -6,7 +6,7 @@ part 'feedGroup.g.dart';
 @collection
 class FeedGroup {
   Id id = Isar.autoIncrement;
-  final String name;
+  String name;
   List<String> feedNames = List.empty(growable: true);
 
   @ignore

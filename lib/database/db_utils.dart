@@ -131,6 +131,7 @@ class DbUtils {
     return feedGroups;
   }
 
+  // can be used as update too
   Future<void> addFeedGroup(FeedGroup feedGroup) async {
     await isar.writeTxn(() => isar.feedGroups.put(feedGroup));
   }

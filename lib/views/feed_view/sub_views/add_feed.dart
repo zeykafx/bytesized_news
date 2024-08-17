@@ -10,9 +10,10 @@ import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
 
 class AddFeed extends StatefulWidget {
-  Function getFeeds;
+  final Function getFeeds;
+  final Function getItems;
 
-  AddFeed({super.key, required this.getFeeds});
+  AddFeed({super.key, required this.getFeeds, required this.getItems});
 
   @override
   State<AddFeed> createState() => _AddFeedState();
@@ -148,14 +149,16 @@ class _AddFeedState extends State<AddFeed> {
                           validLink = true;
 
                           if (feedName.isEmpty) {
-                            addFeedToDb(await Feed.createFeed(feedLink));
+                            await addFeedToDb(await Feed.createFeed(feedLink));
                           } else {
-                            addFeedToDb(Feed(feedName, feedLink));
+                            await addFeedToDb(Feed(feedName, feedLink));
                           }
                           if (kDebugMode) {
                             print("Adding feed to db: $feedLink");
                           }
-                          await widget.getFeeds();
+
+                          // await widget.getFeeds();
+                          // await widget.getItems();
 
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));

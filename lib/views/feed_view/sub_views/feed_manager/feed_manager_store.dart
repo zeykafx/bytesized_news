@@ -24,6 +24,9 @@ abstract class _FeedManagerStore with Store {
   bool get areFeedGroupsSelected => selectedFeedGroups.isNotEmpty;
 
   @computed
+  bool get areFeedsSelected => selectedFeeds.isNotEmpty;
+
+  @computed
   bool get areMoreThanOneFeedGroupsSelected => selectedFeedGroups.length > 1;
 
   @observable

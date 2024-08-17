@@ -54,6 +54,11 @@ class _FeedViewState extends State<FeedView> {
     setState(() {});
   }
 
+  Future<void> wrappedGetItems() async {
+    await feedStore.getItems();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -438,7 +443,8 @@ class _FeedViewState extends State<FeedView> {
           );
         }),
         expandedBuilder: (ScrollController controller) {
-          return FeedManager(feedStore: feedStore, wrappedGetFeeds: wrappedGetFeeds, wrappedGetFeedGroups: wrappedGetFeedGroups);
+          return FeedManager(
+              feedStore: feedStore, wrappedGetFeeds: wrappedGetFeeds, wrappedGetFeedGroups: wrappedGetFeedGroups, wrappedGetItems: wrappedGetItems);
         },
         collapsed: Observer(builder: (BuildContext _) {
           return Row(
