@@ -3,8 +3,10 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 
@@ -118,86 +120,13 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  void addFeedsToGroupDialog(BuildContext context) {
-    if (!areFeedGroupsSelected) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            List<FeedGroup> selectedFeedGroups = [];
-            return StatefulBuilder(builder: (context, Function dialogSetState) {
-              return AlertDialog(
-                title: const Text("Add Feeds to Feed Group(s)"),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // SELECTABLE FEED GROUPS
-                    ...feedStore.feedGroups.map(
-                      (FeedGroup feedGroup) => Card.outlined(
-                        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
-                        clipBehavior: Clip.hardEdge,
-                        child: ListTile(
-                          leading: feedGroup.feeds.isEmpty
-                              ? const Icon(
-                                  LucideIcons.folder,
-                                  size: 15,
-                                )
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ...feedGroup.feeds.take(3).map(
-                                          (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
-                                        ),
-                                  ],
-                                ),
-                          title: Text(feedGroup.name),
-                          trailing: selectedFeedGroups.contains(feedGroup) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
-                          onTap: () {
-                            if (selectedFeedGroups.contains(feedGroup)) {
-                              dialogSetState(() {
-                                selectedFeedGroups.remove(feedGroup);
-                              });
-                            } else {
-                              dialogSetState(() {
-                                selectedFeedGroups.add(feedGroup);
-                              });
-                            }
-                          },
-                          selected: selectedFeedGroups.contains(feedGroup),
-                          selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      addFeedsToFeedGroup(selectedFeedGroups);
-                      setSelectedFeed([]);
-                      toggleSelectionMode();
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Confirm"),
-                  ),
-                ],
-              );
-            });
-          });
-    }
-  }
-
-  @action
   Future<void> addFeedsToFeedGroup(List<FeedGroup> feedGroupsToAddFeedsTo) async {
     for (FeedGroup feedGroup in feedGroupsToAddFeedsTo) {
+      if (kDebugMode) {
+        print("Adding ${selectedFeeds.map((feed) => feed.name).toList()} to feed group: ${feedGroup.name}");
+      }
       // remove the selected feeds that are already in the feedGroup
-      List<Feed> localSelectedFeeds = List.from(selectedFeeds);
-      localSelectedFeeds.removeWhere((feed) => feedGroup.feedNames.contains(feed.name));
+      List<Feed> localSelectedFeeds = selectedFeeds.where((feed) => !feedGroup.feedNames.contains(feed.name)).toList();
 
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedNames = feedGroup.feedNames + localSelectedFeeds.map((feed) => feed.name).toList();
@@ -260,17 +189,23 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  Future<void> handleDelete() async {
+  Future<void> handleDelete({bool toggleSelection = true}) async {
     if (areFeedGroupsSelected) {
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
       feedStore.feedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
+
+      // also remove from the pinned list
+      feedStore.pinnedFeedsOrFeedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
     }
 
     if (areFeedsSelected) {
       // Delete selected feeds
       await dbUtils.deleteFeeds(selectedFeeds);
       feedStore.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
+
+      // also remove from the pinned list
+      feedStore.pinnedFeedsOrFeedGroups.removeWhere((feed) => selectedFeeds.contains(feed));
 
       // also remove feedItems from the feed in the db
       for (Feed feed in selectedFeeds) {
@@ -288,13 +223,15 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    toggleSelectionMode();
+    if (toggleSelection) {
+      toggleSelectionMode();
+    }
     selectedFeeds.clear();
     selectedFeedGroups.clear();
   }
 
   @action
-  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin) async {
+  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin, {bool toggleSelection = true}) async {
     if (feedOrFeedGroup.runtimeType == Feed) {
       Feed feed = feedOrFeedGroup;
       feed.isPinned = pin;
@@ -323,8 +260,10 @@ abstract class _FeedManagerStore with Store {
       await dbUtils.addFeedGroup(feedGroup);
     }
 
-    selectedFeeds.clear();
-    selectedFeedGroups.clear();
-    toggleSelectionMode();
+    if (toggleSelection) {
+      selectedFeeds.clear();
+      selectedFeedGroups.clear();
+      toggleSelectionMode();
+    }
   }
 }

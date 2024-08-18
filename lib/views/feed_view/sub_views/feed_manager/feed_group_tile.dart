@@ -1,73 +1,207 @@
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/edit_feed_group.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class FeedGroupTile extends StatefulWidget {
   final FeedManagerStore feedManagerStore;
+  final FeedStore feedStore;
   final FeedGroup feedGroup;
+  final Function wrappedGetFeeds;
+  final Function wrappedGetFeedGroups;
+  final Function wrappedGetPinnedFeedsOrFeedGroups;
 
-  const FeedGroupTile({super.key, required this.feedManagerStore, required this.feedGroup});
+  const FeedGroupTile({
+    super.key,
+    required this.feedManagerStore,
+    required this.feedGroup,
+    required this.feedStore,
+    required this.wrappedGetFeeds,
+    required this.wrappedGetFeedGroups,
+    required this.wrappedGetPinnedFeedsOrFeedGroups,
+  });
 
   @override
   State<FeedGroupTile> createState() => _FeedGroupTileState();
 }
 
 class _FeedGroupTileState extends State<FeedGroupTile> {
-  late FeedGroup feedGroup;
   late FeedManagerStore feedManagerStore;
+  late FeedStore feedStore;
 
   @override
   void initState() {
     super.initState();
-    feedGroup = widget.feedGroup;
     feedManagerStore = widget.feedManagerStore;
+    feedStore = widget.feedStore;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card.outlined(
-      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-      clipBehavior: Clip.hardEdge,
-      child: ListTile(
-        leading: feedGroup.feeds.isEmpty
-            ? const Icon(
-                LucideIcons.folder,
-                size: 15,
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...feedGroup.feeds.take(3).map(
-                        (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
-                      ),
-                ],
-              ),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(feedGroup.name),
-            Text(
-              "${feedGroup.feeds.length} feed${feedGroup.feeds.length == 1 ? "" : "s"}",
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).dividerColor,
-              ),
+    return Observer(builder: (context) {
+      return Card.outlined(
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        clipBehavior: Clip.hardEdge,
+        child: Center(
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            visualDensity: VisualDensity.compact,
+            dense: true,
+            leading: widget.feedGroup.feeds.isEmpty
+                ? const Icon(
+                    LucideIcons.folder,
+                    size: 15,
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...widget.feedGroup.feeds.take(3).map(
+                            (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
+                          ),
+                    ],
+                  ),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.feedGroup.name),
+                Text(
+                  "${widget.feedGroup.feeds.length} feed${widget.feedGroup.feeds.length == 1 ? "" : "s"}",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
+              ],
             ),
-          ],
+            selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeedGroups.contains(widget.feedGroup),
+            selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
+            onLongPress: () => feedManagerStore.handleFeedGroupLongPress(widget.feedGroup),
+            onTap: () => feedManagerStore.handleFeedGroupTap(widget.feedGroup),
+            trailing: Stack(
+              // mainAxisSize: MainAxisSize.min,
+              children: [
+                !feedManagerStore.selectionMode
+                    ? PopupMenuButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.more_vert),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: "pin",
+                            child: Row(
+                              children: [
+                                widget.feedGroup.isPinned ? const Icon(Icons.push_pin) : const Icon(Icons.push_pin_outlined),
+                                const SizedBox(width: 5),
+                                Text(widget.feedGroup.isPinned ? "Unpin Feed Group" : "Pin Feed Group"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: "edit",
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit_outlined),
+                                SizedBox(width: 5),
+                                Text("Edit"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: "delete",
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete),
+                                SizedBox(width: 5),
+                                Text("Delete"),
+                              ],
+                            ),
+                          ),
+                        ],
+                        onSelected: (value) async {
+                          if (value == "pin") {
+                            if (widget.feedGroup.isPinned) {
+                              // UNPIN
+                              await feedManagerStore.pinOrUnpinItem(
+                                widget.feedGroup,
+                                false,
+                                toggleSelection: false,
+                              );
+                              await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                            } else {
+                              // PIN ITEM
+                              await feedManagerStore.pinOrUnpinItem(
+                                widget.feedGroup,
+                                true,
+                                toggleSelection: false,
+                              );
+                              await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                              setState(() {});
+                            }
+                          } else if (value == "edit") {
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                builder: (context) => EditFeedGroup(
+                                  feedGroup: widget.feedGroup,
+                                  feedManagerStore: feedManagerStore,
+                                ),
+                              ),
+                            )
+                                .then((_) async {
+                              await widget.wrappedGetFeedGroups();
+                              await widget.wrappedGetPinnedFeedsOrFeedGroups();
+
+                              setState(() {});
+                            });
+                          } else if (value == "delete") {
+                            // show dialog to confirm deletion
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text("Confirm Delete?"),
+                                  content: const Text("Are you sure you want to delete the selected items?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        feedManagerStore.selectedFeedGroups.add(widget.feedGroup);
+                                        await feedManagerStore.handleDelete(toggleSelection: false);
+                                        await widget.wrappedGetFeeds();
+                                        await widget.wrappedGetFeedGroups();
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Delete"),
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                      )
+                    : const SizedBox(),
+                Visibility(
+                  visible: feedManagerStore.selectionMode,
+                  child: feedManagerStore.selectedFeedGroups.contains(widget.feedGroup)
+                      ? const Icon(Icons.check_circle_rounded)
+                      : const Icon(Icons.circle_outlined),
+                )
+              ],
+            ),
+          ),
         ),
-        trailing: feedManagerStore.selectionMode
-            ? feedManagerStore.selectedFeedGroups.contains(feedGroup)
-                ? const Icon(Icons.check_circle_rounded)
-                : const Icon(Icons.circle_outlined)
-            : null,
-        selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeedGroups.contains(feedGroup),
-        selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-        onLongPress: () => feedManagerStore.handleFeedGroupLongPress(feedGroup),
-        onTap: () => feedManagerStore.handleFeedGroupTap(feedGroup),
-      ),
-    );
+      );
+    });
   }
 }

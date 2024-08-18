@@ -137,17 +137,20 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
       AsyncAction('_FeedManagerStore.handleDelete', context: context);
 
   @override
-  Future<void> handleDelete() {
-    return _$handleDeleteAsyncAction.run(() => super.handleDelete());
+  Future<void> handleDelete({bool toggleSelection = true}) {
+    return _$handleDeleteAsyncAction
+        .run(() => super.handleDelete(toggleSelection: toggleSelection));
   }
 
   late final _$pinOrUnpinItemAsyncAction =
       AsyncAction('_FeedManagerStore.pinOrUnpinItem', context: context);
 
   @override
-  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin) {
-    return _$pinOrUnpinItemAsyncAction
-        .run(() => super.pinOrUnpinItem(feedOrFeedGroup, pin));
+  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin,
+      {bool toggleSelection = true}) {
+    return _$pinOrUnpinItemAsyncAction.run(() => super.pinOrUnpinItem(
+        feedOrFeedGroup, pin,
+        toggleSelection: toggleSelection));
   }
 
   late final _$_FeedManagerStoreActionController =

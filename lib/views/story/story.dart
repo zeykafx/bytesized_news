@@ -41,6 +41,7 @@ class _StoryState extends State<Story> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mediaQuery = MediaQuery.of(context);
     return PopScope(
       // cannot pop this page by default, but if we popped from some way (such as the navigator), we can pop this page
       canPop: false,
@@ -147,7 +148,12 @@ class _StoryState extends State<Story> {
                                               color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(15),
-                                                child: SelectableText(storyStore.feedItem.aiSummary, style: Theme.of(context).textTheme.bodyLarge),
+                                                child: SelectableText(
+                                                  storyStore.feedItem.aiSummary,
+                                                  style: mediaQuery.size.width > 600
+                                                      ? Theme.of(context).textTheme.bodyMedium
+                                                      : Theme.of(context).textTheme.bodySmall,
+                                                ),
                                               ),
                                             ),
                                           ).animate().fadeIn().then().shimmer(

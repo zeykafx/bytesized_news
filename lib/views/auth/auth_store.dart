@@ -26,6 +26,10 @@ abstract class _AuthStore with Store {
   }
 
   Future<void> init() async {
+    if (user == null) {
+      initialized = true;
+      return;
+    }
     var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
     if (userData["tier"] != null) {
       if (userData["tier"] == "premium") {
