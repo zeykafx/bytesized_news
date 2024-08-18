@@ -95,14 +95,14 @@ class _FeedViewState extends State<FeedView> {
           ),
         ],
       ),
-      body: BottomSheetBar(
-        controller: feedStore.bsbController,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-        color: Theme.of(context).colorScheme.surfaceContainerLow.withOpacity(1),
-        locked: feedStore.isLocked,
-        borderRadiusExpanded: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-        body: Observer(builder: (_) {
-          return RefreshIndicator(
+      body: Observer(builder: (context) {
+        return BottomSheetBar(
+          controller: feedStore.bsbController,
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+          borderRadiusExpanded: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+          color: Theme.of(context).colorScheme.surfaceContainerLow.withOpacity(1),
+          locked: feedStore.isLocked,
+          body: RefreshIndicator(
             onRefresh: () async {
               feedStore.getItems();
             },
@@ -448,87 +448,97 @@ class _FeedViewState extends State<FeedView> {
                 ),
               ),
             ),
-          );
-        }),
-        expandedBuilder: (ScrollController controller) {
-          return FeedManager(
-            feedStore: feedStore,
-            wrappedGetFeeds: wrappedGetFeeds,
-            wrappedGetFeedGroups: wrappedGetFeedGroups,
-            wrappedGetItems: wrappedGetItems,
-            wrappedGetPinnedFeedsOrFeedGroups: wrappedGetPinnedFeedsOrFeedGroups,
-            scrollController: controller,
-          );
-        },
-        height: 80,
-        collapsed: Observer(builder: (BuildContext _) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // little handle
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 5),
-                child: Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(10),
+          ),
+          expandedBuilder: (ScrollController controller) {
+            return FeedManager(
+              feedStore: feedStore,
+              wrappedGetFeeds: wrappedGetFeeds,
+              wrappedGetFeedGroups: wrappedGetFeedGroups,
+              wrappedGetItems: wrappedGetItems,
+              wrappedGetPinnedFeedsOrFeedGroups: wrappedGetPinnedFeedsOrFeedGroups,
+              scrollController: controller,
+            );
+          },
+          height: 80,
+          collapsed: Observer(builder: (BuildContext _) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // little handle
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 5),
+                  child: Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).dividerColor.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
-                      if (elem.runtimeType == Feed) {
-                        Feed feed = elem;
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // all feeds button
+                      Card.outlined(
+                        child: IconButton(
+                          onPressed: () {
+                            // feedStore.setSelectedFeed([]);
+                          },
+                          icon: const Icon(Icons.all_inbox_rounded),
+                        ),
+                      ),
 
-                        return Card.outlined(
-                          child: IconButton(
-                            onPressed: () {
-                              // sort for this feed
-                            },
-                            icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 25, height: 25),
-                          ),
-                        );
-                      } else {
-                        FeedGroup feedGroup = elem;
+                      ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
+                        if (elem.runtimeType == Feed) {
+                          Feed feed = elem;
 
-                        return Card.outlined(
-                          child: IconButton(
-                            onPressed: () {
-                              // sort for this feed group
-                            },
-                            icon: feedGroup.feeds.isEmpty
-                                ? const Icon(
-                                    LucideIcons.folder,
-                                    size: 15,
-                                  )
-                                : Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ...feedGroup.feeds.take(3).map(
-                                            (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
-                                          ),
-                                    ],
-                                  ),
-                          ),
-                        );
-                      }
-                    }),
-                  ],
+                          return Card.outlined(
+                            child: IconButton(
+                              onPressed: () {
+                                // sort for this feed
+                              },
+                              icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 25, height: 25),
+                            ),
+                          );
+                        } else {
+                          FeedGroup feedGroup = elem;
+
+                          return Card.outlined(
+                            child: IconButton(
+                              onPressed: () {
+                                // sort for this feed group
+                              },
+                              icon: feedGroup.feeds.isEmpty
+                                  ? const Icon(
+                                      LucideIcons.folder,
+                                      size: 15,
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ...feedGroup.feeds.take(3).map(
+                                              (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
+                                            ),
+                                      ],
+                                    ),
+                            ),
+                          );
+                        }
+                      }),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        }),
-      ),
+              ],
+            );
+          }),
+        );
+      }),
     );
   }
 }

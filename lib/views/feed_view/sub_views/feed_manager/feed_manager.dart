@@ -56,8 +56,8 @@ class _FeedManagerState extends State<FeedManager> {
         // if we are currently selecting things, get out of the selection mode and reset the selected feeds, otherwise collapse the bsb
         if (feedManagerStore.selectionMode) {
           feedManagerStore.toggleSelectionMode();
-          feedManagerStore.setSelectedFeed([]);
-          feedManagerStore.setSelectedFeedGroup([]);
+          feedManagerStore.selectedFeeds.clear();
+          feedManagerStore.selectedFeedGroups.clear();
         } else {
           feedStore.bsbController.collapse();
         }
@@ -148,23 +148,27 @@ class _FeedManagerState extends State<FeedManager> {
                                 Feed feed = element;
 
                                 return FeedTile(
+                                  key: ValueKey(feed.id),
                                   feedManagerStore: feedManagerStore,
                                   feedStore: feedStore,
                                   feed: feed,
                                   wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                   wrappedGetFeeds: widget.wrappedGetFeeds,
                                   wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
+                                  isInPinnedList: true,
                                 );
                               } else {
                                 FeedGroup feedGroup = element;
 
                                 return FeedGroupTile(
+                                  key: ValueKey(feedGroup.id + 1000),
                                   feedManagerStore: feedManagerStore,
                                   feedStore: feedStore,
                                   feedGroup: feedGroup,
                                   wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
                                   wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                   wrappedGetFeeds: widget.wrappedGetFeeds,
+                                  isInPinnedList: true,
                                 );
                               }
                             }),
@@ -192,12 +196,10 @@ class _FeedManagerState extends State<FeedManager> {
                               // FeedGroups
 
                               GridView.count(
-                                // direction: Axis.horizontal,
-                                // spacing: 1,
-                                // runSpacing: 1,
                                 crossAxisCount: 2,
                                 childAspectRatio: mediaQuery.size.width > 500 ? 3.5 : 3,
                                 shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
                                 children: [
                                   ...feedStore.feedGroups.map((FeedGroup feedGroup) {
                                     return FeedGroupTile(
@@ -207,6 +209,7 @@ class _FeedManagerState extends State<FeedManager> {
                                       wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
                                       wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                       wrappedGetFeeds: widget.wrappedGetFeeds,
+                                      isInPinnedList: false,
                                     );
                                   }),
                                 ],
@@ -225,6 +228,7 @@ class _FeedManagerState extends State<FeedManager> {
                                   wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                   wrappedGetFeeds: widget.wrappedGetFeeds,
                                   wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
+                                  isInPinnedList: false,
                                 );
                               }),
                             ],

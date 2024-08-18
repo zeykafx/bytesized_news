@@ -14,6 +14,7 @@ class FeedTile extends StatefulWidget {
   final Function wrappedGetFeeds;
   final Function wrappedGetFeedGroups;
   final Function wrappedGetPinnedFeedsOrFeedGroups;
+  final bool isInPinnedList;
 
   const FeedTile({
     super.key,
@@ -23,6 +24,7 @@ class FeedTile extends StatefulWidget {
     required this.wrappedGetFeeds,
     required this.wrappedGetFeedGroups,
     required this.wrappedGetPinnedFeedsOrFeedGroups,
+    required this.isInPinnedList,
   });
 
   @override
@@ -50,6 +52,12 @@ class _FeedTileState extends State<FeedTile> {
           leading: CachedNetworkImage(imageUrl: widget.feed.iconUrl, width: 20, height: 20),
           title: Text(widget.feed.name),
           dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          visualDensity: VisualDensity.compact,
+          selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeeds.contains(widget.feed),
+          selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
+          onLongPress: () => feedManagerStore.handleFeedTileLongPress(widget.feed),
+          onTap: () => feedManagerStore.handleFeedTileTap(widget.feed),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -57,6 +65,28 @@ class _FeedTileState extends State<FeedTile> {
                   ? PopupMenuButton(
                       icon: const Icon(Icons.more_vert),
                       itemBuilder: (context) => [
+                        if (widget.isInPinnedList) ...[
+                          const PopupMenuItem(
+                            value: "up",
+                            child: Row(
+                              children: [
+                                Icon(Icons.arrow_upward),
+                                SizedBox(width: 5),
+                                Text("Move Up"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: "down",
+                            child: Row(
+                              children: [
+                                Icon(Icons.arrow_downward),
+                                SizedBox(width: 5),
+                                Text("Move Down"),
+                              ],
+                            ),
+                          ),
+                        ],
                         PopupMenuItem(
                           value: "pin",
                           child: Row(
@@ -89,6 +119,18 @@ class _FeedTileState extends State<FeedTile> {
                         ),
                       ],
                       onSelected: (value) async {
+                        if (value == "up") {
+                          int newIndex = widget.feed.pinnedPosition - 1;
+                          await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feed.pinnedPosition, newIndex);
+                          // await widget.wrappedGetFeedGroups();
+                          await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                          setState(() {});
+                        } else if (value == "down") {
+                          int newIndex = widget.feed.pinnedPosition + 1;
+                          await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feed.pinnedPosition, newIndex);
+                          await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                          setState(() {});
+                        }
                         if (value == "pin") {
                           if (widget.feed.isPinned) {
                             // UNPIN
@@ -223,13 +265,9 @@ class _FeedTileState extends State<FeedTile> {
               Visibility(
                 visible: feedManagerStore.selectionMode,
                 child: feedManagerStore.selectedFeeds.contains(widget.feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
-              )
+              ),
             ],
           ),
-          selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeeds.contains(widget.feed),
-          selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-          onLongPress: () => feedManagerStore.handleFeedTileLongPress(widget.feed),
-          onTap: () => feedManagerStore.handleFeedTileTap(widget.feed),
         ),
       );
     });

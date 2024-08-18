@@ -2,11 +2,8 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 
@@ -264,6 +261,31 @@ abstract class _FeedManagerStore with Store {
       selectedFeeds.clear();
       selectedFeedGroups.clear();
       toggleSelectionMode();
+    }
+  }
+
+  @action
+  Future<void> reorderPinnedFeedsOrFeedGroups(int oldIndex, int newIndex) async {
+    // check the index bounds
+    if (newIndex >= feedStore.pinnedFeedsOrFeedGroups.length) {
+      newIndex = feedStore.pinnedFeedsOrFeedGroups.length - 1;
+    }
+
+    if (newIndex < 0) {
+      newIndex = 0;
+    }
+
+    final item = feedStore.pinnedFeedsOrFeedGroups.removeAt(oldIndex);
+    feedStore.pinnedFeedsOrFeedGroups.insert(newIndex, item);
+
+    for (int i = 0; i < feedStore.pinnedFeedsOrFeedGroups.length; i++) {
+      feedStore.pinnedFeedsOrFeedGroups[i].pinnedPosition = i;
+
+      if (feedStore.pinnedFeedsOrFeedGroups[i] is Feed) {
+        await dbUtils.addFeed(feedStore.pinnedFeedsOrFeedGroups[i]);
+      } else if (feedStore.pinnedFeedsOrFeedGroups[i] is FeedGroup) {
+        await dbUtils.addFeedGroup(feedStore.pinnedFeedsOrFeedGroups[i]);
+      }
     }
   }
 }

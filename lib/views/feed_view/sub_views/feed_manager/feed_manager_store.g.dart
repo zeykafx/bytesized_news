@@ -153,6 +153,16 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
         toggleSelection: toggleSelection));
   }
 
+  late final _$reorderPinnedFeedsOrFeedGroupsAsyncAction = AsyncAction(
+      '_FeedManagerStore.reorderPinnedFeedsOrFeedGroups',
+      context: context);
+
+  @override
+  Future<void> reorderPinnedFeedsOrFeedGroups(int oldIndex, int newIndex) {
+    return _$reorderPinnedFeedsOrFeedGroupsAsyncAction
+        .run(() => super.reorderPinnedFeedsOrFeedGroups(oldIndex, newIndex));
+  }
+
   late final _$_FeedManagerStoreActionController =
       ActionController(name: '_FeedManagerStore', context: context);
 

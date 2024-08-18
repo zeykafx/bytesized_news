@@ -14,6 +14,7 @@ class FeedGroupTile extends StatefulWidget {
   final Function wrappedGetFeeds;
   final Function wrappedGetFeedGroups;
   final Function wrappedGetPinnedFeedsOrFeedGroups;
+  final bool isInPinnedList;
 
   const FeedGroupTile({
     super.key,
@@ -23,6 +24,7 @@ class FeedGroupTile extends StatefulWidget {
     required this.wrappedGetFeeds,
     required this.wrappedGetFeedGroups,
     required this.wrappedGetPinnedFeedsOrFeedGroups,
+    required this.isInPinnedList,
   });
 
   @override
@@ -82,14 +84,35 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
             selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
             onLongPress: () => feedManagerStore.handleFeedGroupLongPress(widget.feedGroup),
             onTap: () => feedManagerStore.handleFeedGroupTap(widget.feedGroup),
-            trailing: Stack(
-              // mainAxisSize: MainAxisSize.min,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 !feedManagerStore.selectionMode
                     ? PopupMenuButton(
-                        padding: EdgeInsets.zero,
                         icon: const Icon(Icons.more_vert),
                         itemBuilder: (context) => [
+                          if (widget.isInPinnedList) ...[
+                            const PopupMenuItem(
+                              value: "up",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.arrow_upward),
+                                  SizedBox(width: 5),
+                                  Text("Move Up"),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: "down",
+                              child: Row(
+                                children: [
+                                  Icon(Icons.arrow_downward),
+                                  SizedBox(width: 5),
+                                  Text("Move Down"),
+                                ],
+                              ),
+                            ),
+                          ],
                           PopupMenuItem(
                             value: "pin",
                             child: Row(
@@ -122,7 +145,17 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                           ),
                         ],
                         onSelected: (value) async {
-                          if (value == "pin") {
+                          if (value == "up") {
+                            int newIndex = widget.feedGroup.pinnedPosition - 1;
+                            await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feedGroup.pinnedPosition, newIndex);
+                            await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                            setState(() {});
+                          } else if (value == "down") {
+                            int newIndex = widget.feedGroup.pinnedPosition + 1;
+                            await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feedGroup.pinnedPosition, newIndex);
+                            await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                            setState(() {});
+                          } else if (value == "pin") {
                             if (widget.feedGroup.isPinned) {
                               // UNPIN
                               await feedManagerStore.pinOrUnpinItem(
@@ -196,7 +229,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                   child: feedManagerStore.selectedFeedGroups.contains(widget.feedGroup)
                       ? const Icon(Icons.check_circle_rounded)
                       : const Icon(Icons.circle_outlined),
-                )
+                ),
               ],
             ),
           ),
