@@ -22,10 +22,20 @@ const FeedGroupSchema = CollectionSchema(
       name: r'feedNames',
       type: IsarType.stringList,
     ),
-    r'name': PropertySchema(
+    r'isPinned': PropertySchema(
       id: 1,
+      name: r'isPinned',
+      type: IsarType.bool,
+    ),
+    r'name': PropertySchema(
+      id: 2,
       name: r'name',
       type: IsarType.string,
+    ),
+    r'pinnedPosition': PropertySchema(
+      id: 3,
+      name: r'pinnedPosition',
+      type: IsarType.long,
     )
   },
   estimateSize: _feedGroupEstimateSize,
@@ -66,7 +76,9 @@ void _feedGroupSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeStringList(offsets[0], object.feedNames);
-  writer.writeString(offsets[1], object.name);
+  writer.writeBool(offsets[1], object.isPinned);
+  writer.writeString(offsets[2], object.name);
+  writer.writeLong(offsets[3], object.pinnedPosition);
 }
 
 FeedGroup _feedGroupDeserialize(
@@ -76,10 +88,12 @@ FeedGroup _feedGroupDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = FeedGroup(
-    reader.readString(offsets[1]),
+    reader.readString(offsets[2]),
   );
   object.feedNames = reader.readStringList(offsets[0]) ?? [];
   object.id = id;
+  object.isPinned = reader.readBool(offsets[1]);
+  object.pinnedPosition = reader.readLong(offsets[3]);
   return object;
 }
 
@@ -93,7 +107,11 @@ P _feedGroupDeserializeProp<P>(
     case 0:
       return (reader.readStringList(offset) ?? []) as P;
     case 1:
+      return (reader.readBool(offset)) as P;
+    case 2:
       return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -467,6 +485,16 @@ extension FeedGroupQueryFilter
     });
   }
 
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> isPinnedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPinned',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> nameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -596,6 +624,62 @@ extension FeedGroupQueryFilter
       ));
     });
   }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+      pinnedPositionEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+      pinnedPositionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+      pinnedPositionLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+      pinnedPositionBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pinnedPosition',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension FeedGroupQueryObject
@@ -605,6 +689,18 @@ extension FeedGroupQueryLinks
     on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {}
 
 extension FeedGroupQuerySortBy on QueryBuilder<FeedGroup, FeedGroup, QSortBy> {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -614,6 +710,18 @@ extension FeedGroupQuerySortBy on QueryBuilder<FeedGroup, FeedGroup, QSortBy> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByPinnedPositionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.desc);
     });
   }
 }
@@ -632,6 +740,18 @@ extension FeedGroupQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -641,6 +761,18 @@ extension FeedGroupQuerySortThenBy
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenByPinnedPositionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.desc);
     });
   }
 }
@@ -653,10 +785,22 @@ extension FeedGroupQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPinned');
+    });
+  }
+
   QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pinnedPosition');
     });
   }
 }
@@ -675,9 +819,21 @@ extension FeedGroupQueryProperty
     });
   }
 
+  QueryBuilder<FeedGroup, bool, QQueryOperations> isPinnedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPinned');
+    });
+  }
+
   QueryBuilder<FeedGroup, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<FeedGroup, int, QQueryOperations> pinnedPositionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pinnedPosition');
     });
   }
 }

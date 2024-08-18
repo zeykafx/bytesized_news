@@ -24,6 +24,23 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$pinnedFeedsOrFeedGroupsAtom =
+      Atom(name: '_FeedStore.pinnedFeedsOrFeedGroups', context: context);
+
+  @override
+  ObservableList<dynamic> get pinnedFeedsOrFeedGroups {
+    _$pinnedFeedsOrFeedGroupsAtom.reportRead();
+    return super.pinnedFeedsOrFeedGroups;
+  }
+
+  @override
+  set pinnedFeedsOrFeedGroups(ObservableList<dynamic> value) {
+    _$pinnedFeedsOrFeedGroupsAtom
+        .reportWrite(value, super.pinnedFeedsOrFeedGroups, () {
+      super.pinnedFeedsOrFeedGroups = value;
+    });
+  }
+
   late final _$feedGroupsAtom =
       Atom(name: '_FeedStore.feedGroups', context: context);
 
@@ -284,6 +301,15 @@ mixin _$FeedStore on _FeedStore, Store {
     return _$getFeedGroupsAsyncAction.run(() => super.getFeedGroups());
   }
 
+  late final _$getPinnedFeedsOrFeedGroupsAsyncAction =
+      AsyncAction('_FeedStore.getPinnedFeedsOrFeedGroups', context: context);
+
+  @override
+  Future<void> getPinnedFeedsOrFeedGroups() {
+    return _$getPinnedFeedsOrFeedGroupsAsyncAction
+        .run(() => super.getPinnedFeedsOrFeedGroups());
+  }
+
   late final _$getItemsAsyncAction =
       AsyncAction('_FeedStore.getItems', context: context);
 
@@ -353,6 +379,7 @@ mixin _$FeedStore on _FeedStore, Store {
   String toString() {
     return '''
 feeds: ${feeds},
+pinnedFeedsOrFeedGroups: ${pinnedFeedsOrFeedGroups},
 feedGroups: ${feedGroups},
 feedItems: ${feedItems},
 initialized: ${initialized},

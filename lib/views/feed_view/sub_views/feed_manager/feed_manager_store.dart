@@ -95,8 +95,9 @@ abstract class _FeedManagerStore with Store {
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
       feedStore.feedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
-      toggleSelectionMode();
-    } else {
+    }
+
+    if (areFeedsSelected) {
       // Delete selected feeds
       await dbUtils.deleteFeeds(selectedFeeds);
       feedStore.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
@@ -114,8 +115,46 @@ abstract class _FeedManagerStore with Store {
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
         }
-        toggleSelectionMode();
       }
     }
+
+    toggleSelectionMode();
+    selectedFeeds.clear();
+    selectedFeedGroups.clear();
+  }
+
+  @action
+  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin) async {
+    if (feedOrFeedGroup.runtimeType == Feed) {
+      Feed feed = feedOrFeedGroup;
+      feed.isPinned = pin;
+      if (pin) {
+        feedStore.pinnedFeedsOrFeedGroups.add(feed);
+        // yes, this is stupid. like, i know the item is gonna be at the end of the list, but I'm doing this because,
+        // idk, there might be multiple items added at once and maybe, somehow, someway, it might get messed up or something?
+        feed.pinnedPosition = feedStore.pinnedFeedsOrFeedGroups.indexOf(feed);
+      } else {
+        feedStore.pinnedFeedsOrFeedGroups.remove(feed);
+        feed.pinnedPosition = -1;
+      }
+
+      await dbUtils.addFeed(feed);
+    } else {
+      FeedGroup feedGroup = feedOrFeedGroup;
+      feedGroup.isPinned = pin;
+      if (pin) {
+        feedStore.pinnedFeedsOrFeedGroups.add(feedGroup);
+        feedGroup.pinnedPosition = feedStore.pinnedFeedsOrFeedGroups.indexOf(feedGroup);
+      } else {
+        feedStore.pinnedFeedsOrFeedGroups.remove(feedGroup);
+        feedGroup.pinnedPosition = -1;
+      }
+
+      await dbUtils.addFeedGroup(feedGroup);
+    }
+
+    selectedFeeds.clear();
+    selectedFeedGroups.clear();
+    toggleSelectionMode();
   }
 }

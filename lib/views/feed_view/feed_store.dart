@@ -26,6 +26,9 @@ abstract class _FeedStore with Store {
   List<Feed> feeds = [];
 
   @observable
+  ObservableList<dynamic> pinnedFeedsOrFeedGroups = <dynamic>[].asObservable(); // Feed or FeedGroup
+
+  @observable
   ObservableList<FeedGroup> feedGroups = <FeedGroup>[].asObservable();
 
   @observable
@@ -96,6 +99,9 @@ abstract class _FeedStore with Store {
     if (kDebugMode) {
       print("Fetched ${feedGroups.length} feedGroups from Isar");
     }
+
+    await getPinnedFeedsOrFeedGroups();
+
     user = auth.currentUser;
 
     initialized = true;
@@ -110,6 +116,27 @@ abstract class _FeedStore with Store {
   @action
   Future<void> getFeedGroups() async {
     feedGroups = (await dbUtils.getFeedGroups(feeds)).asObservable();
+  }
+
+  @action
+  Future<void> getPinnedFeedsOrFeedGroups() async {
+    await getFeeds();
+    await getFeedGroups();
+    pinnedFeedsOrFeedGroups = [].asObservable();
+    for (Feed feed in feeds) {
+      if (feed.isPinned) {
+        pinnedFeedsOrFeedGroups.add(feed);
+      }
+    }
+
+    for (FeedGroup feedGroup in feedGroups) {
+      if (feedGroup.isPinned) {
+        pinnedFeedsOrFeedGroups.add(feedGroup);
+      }
+    }
+
+    // sort based on pinnedPosition
+    pinnedFeedsOrFeedGroups.sort((a, b) => a.pinnedPosition.compareTo(b.pinnedPosition));
   }
 
   @action

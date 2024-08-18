@@ -34,68 +34,6 @@ class FeedItem {
   @ignore
   Feed? feed;
 
-  static ReadabilityConfig config = ReadabilityConfig(
-    readableTags: [
-      'p',
-      'div',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'td',
-      'pre',
-    ],
-    positiveClasses: [
-      'article',
-      'body',
-      'content',
-      'entry',
-      'hentry',
-      'h-entry',
-      'main',
-      'page',
-      'pagination',
-      'post',
-      'text',
-      'blog',
-      'feedItem',
-    ],
-    negativeClasses: [
-      'hidden',
-      ' hid ',
-      'banner',
-      'image',
-      'img',
-      'figure',
-      'figcaption',
-      'combx',
-      'comment',
-      'com-',
-      'contact',
-      'foot',
-      'footer',
-      'footnote',
-      'gdpr',
-      'masthead',
-      'media',
-      'meta',
-      'outbrain',
-      'promo',
-      'related',
-      'scroll',
-      'share',
-      'shoutbox',
-      'sidebar',
-      'skyscraper',
-      'sponsor',
-      'shopping',
-      'tags',
-      'tool',
-      'widget',
-    ],
-  );
-
   static Future<FeedItem> fromAtomItem({
     required AtomItem item,
     required Feed feed,
@@ -128,14 +66,14 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
-    if (userTier == Tier.premium) {
-      fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-      if (existingSummary.docs.isNotEmpty) {
-        feedItem.aiSummary = existingSummary.docs.first.get("summary");
-        feedItem.summarized = true;
-      }
-    }
+    // if (userTier == Tier.premium) {
+    //   fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+    //   var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    //   if (existingSummary.docs.isNotEmpty) {
+    //     feedItem.aiSummary = existingSummary.docs.first.get("summary");
+    //     feedItem.summarized = true;
+    //   }
+    // }
 
     return feedItem;
   }
@@ -179,14 +117,14 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
-    if (userTier == Tier.premium) {
-      fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-      if (existingSummary.docs.isNotEmpty) {
-        feedItem.aiSummary = existingSummary.docs.first.get("summary");
-        feedItem.summarized = true;
-      }
-    }
+    // if (userTier == Tier.premium) {
+    //   fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
+    //   var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    //   if (existingSummary.docs.isNotEmpty) {
+    //     feedItem.aiSummary = existingSummary.docs.first.get("summary");
+    //     feedItem.summarized = true;
+    //   }
+    // }
 
     return feedItem;
   }

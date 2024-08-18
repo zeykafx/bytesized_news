@@ -8,6 +8,8 @@ class FeedGroup {
   Id id = Isar.autoIncrement;
   String name;
   List<String> feedNames = List.empty(growable: true);
+  bool isPinned = false;
+  int pinnedPosition = -1;
 
   @ignore
   List<Feed> feeds = [];

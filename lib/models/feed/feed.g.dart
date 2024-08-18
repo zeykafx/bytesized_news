@@ -22,15 +22,25 @@ const FeedSchema = CollectionSchema(
       name: r'iconUrl',
       type: IsarType.string,
     ),
-    r'link': PropertySchema(
+    r'isPinned': PropertySchema(
       id: 1,
+      name: r'isPinned',
+      type: IsarType.bool,
+    ),
+    r'link': PropertySchema(
+      id: 2,
       name: r'link',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'name',
       type: IsarType.string,
+    ),
+    r'pinnedPosition': PropertySchema(
+      id: 4,
+      name: r'pinnedPosition',
+      type: IsarType.long,
     )
   },
   estimateSize: _feedEstimateSize,
@@ -66,8 +76,10 @@ void _feedSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.iconUrl);
-  writer.writeString(offsets[1], object.link);
-  writer.writeString(offsets[2], object.name);
+  writer.writeBool(offsets[1], object.isPinned);
+  writer.writeString(offsets[2], object.link);
+  writer.writeString(offsets[3], object.name);
+  writer.writeLong(offsets[4], object.pinnedPosition);
 }
 
 Feed _feedDeserialize(
@@ -77,11 +89,13 @@ Feed _feedDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Feed(
+    reader.readString(offsets[3]),
     reader.readString(offsets[2]),
-    reader.readString(offsets[1]),
   );
   object.iconUrl = reader.readString(offsets[0]);
   object.id = id;
+  object.isPinned = reader.readBool(offsets[1]);
+  object.pinnedPosition = reader.readLong(offsets[4]);
   return object;
 }
 
@@ -95,9 +109,13 @@ P _feedDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -371,6 +389,15 @@ extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> isPinnedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPinned',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterFilterCondition> linkEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -626,6 +653,59 @@ extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> pinnedPositionEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> pinnedPositionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> pinnedPositionLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pinnedPosition',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> pinnedPositionBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pinnedPosition',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension FeedQueryObject on QueryBuilder<Feed, Feed, QFilterCondition> {}
@@ -642,6 +722,18 @@ extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
   QueryBuilder<Feed, Feed, QAfterSortBy> sortByIconUrlDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iconUrl', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
     });
   }
 
@@ -666,6 +758,18 @@ extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
   QueryBuilder<Feed, Feed, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByPinnedPositionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.desc);
     });
   }
 }
@@ -695,6 +799,18 @@ extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> thenByLink() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'link', Sort.asc);
@@ -718,6 +834,18 @@ extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByPinnedPositionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pinnedPosition', Sort.desc);
+    });
+  }
 }
 
 extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
@@ -725,6 +853,12 @@ extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'iconUrl', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QDistinct> distinctByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPinned');
     });
   }
 
@@ -739,6 +873,12 @@ extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QDistinct> distinctByPinnedPosition() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pinnedPosition');
     });
   }
 }
@@ -756,6 +896,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Feed, bool, QQueryOperations> isPinnedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPinned');
+    });
+  }
+
   QueryBuilder<Feed, String, QQueryOperations> linkProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'link');
@@ -765,6 +911,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
   QueryBuilder<Feed, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Feed, int, QQueryOperations> pinnedPositionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pinnedPosition');
     });
   }
 }

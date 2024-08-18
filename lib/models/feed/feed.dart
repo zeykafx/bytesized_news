@@ -12,6 +12,9 @@ class Feed {
   final String link;
   late String iconUrl;
 
+  bool isPinned = false;
+  int pinnedPosition = -1;
+
   Feed(this.name, this.link) {
     Uri uri = Uri.parse(link);
     iconUrl = "https://icon.horse/icon/${uri.host}";

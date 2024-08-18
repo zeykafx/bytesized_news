@@ -1,4 +1,6 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
@@ -56,6 +58,11 @@ class _FeedViewState extends State<FeedView> {
 
   Future<void> wrappedGetItems() async {
     await feedStore.getItems();
+    setState(() {});
+  }
+
+  Future<void> wrappedGetPinnedFeedsOrFeedGroups() async {
+    await feedStore.getPinnedFeedsOrFeedGroups();
     setState(() {});
   }
 
@@ -444,21 +451,52 @@ class _FeedViewState extends State<FeedView> {
         }),
         expandedBuilder: (ScrollController controller) {
           return FeedManager(
-              feedStore: feedStore, wrappedGetFeeds: wrappedGetFeeds, wrappedGetFeedGroups: wrappedGetFeedGroups, wrappedGetItems: wrappedGetItems);
+            feedStore: feedStore,
+            wrappedGetFeeds: wrappedGetFeeds,
+            wrappedGetFeedGroups: wrappedGetFeedGroups,
+            wrappedGetItems: wrappedGetItems,
+            wrappedGetPinnedFeedsOrFeedGroups: wrappedGetPinnedFeedsOrFeedGroups,
+          );
         },
         collapsed: Observer(builder: (BuildContext _) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ...feedStore.feeds.map((elem) {
-                return TextButton.icon(
-                  onPressed: () {
-                    // sort for this feed or feed group
-                  },
-                  icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 20, height: 20),
-                  label: Text(elem.name),
-                );
+              ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
+                if (elem.runtimeType == Feed) {
+                  Feed feed = elem;
+
+                  return TextButton.icon(
+                    onPressed: () {
+                      // sort for this feed
+                    },
+                    icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 20, height: 20),
+                    label: Text(elem.name),
+                  );
+                } else {
+                  FeedGroup feedGroup = elem;
+
+                  return TextButton.icon(
+                    onPressed: () {
+                      // sort for this feed group
+                    },
+                    icon: feedGroup.feeds.isEmpty
+                        ? const Icon(
+                            LucideIcons.folder,
+                            size: 15,
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ...feedGroup.feeds.take(3).map(
+                                    (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
+                                  ),
+                            ],
+                          ),
+                    label: Text(elem.name),
+                  );
+                }
               }),
             ],
           );

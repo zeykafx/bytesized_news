@@ -141,6 +141,15 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     return _$handleDeleteAsyncAction.run(() => super.handleDelete());
   }
 
+  late final _$pinOrUnpinItemAsyncAction =
+      AsyncAction('_FeedManagerStore.pinOrUnpinItem', context: context);
+
+  @override
+  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin) {
+    return _$pinOrUnpinItemAsyncAction
+        .run(() => super.pinOrUnpinItem(feedOrFeedGroup, pin));
+  }
+
   late final _$_FeedManagerStoreActionController =
       ActionController(name: '_FeedManagerStore', context: context);
 
