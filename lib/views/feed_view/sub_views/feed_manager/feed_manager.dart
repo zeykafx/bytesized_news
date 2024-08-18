@@ -3,7 +3,9 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_group_tile.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_tile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -90,6 +92,7 @@ class _FeedManagerState extends State<FeedManager> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
+                                // ADD FEED BUTTON
                                 Expanded(
                                   child: TextButton.icon(
                                     onPressed: () {
@@ -112,43 +115,11 @@ class _FeedManagerState extends State<FeedManager> {
                                     icon: const Icon(LucideIcons.rss),
                                   ),
                                 ),
+
+                                // CREATE FEED GROUP BUTTON
                                 Expanded(
                                   child: TextButton.icon(
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            TextEditingController feedGroupNameController = TextEditingController();
-                                            return AlertDialog(
-                                              title: const Text("Create Feed Group"),
-                                              content: TextField(
-                                                controller: feedGroupNameController,
-                                                autocorrect: true,
-                                                enableSuggestions: true,
-                                                textCapitalization: TextCapitalization.words,
-                                                decoration: const InputDecoration(
-                                                  border: OutlineInputBorder(),
-                                                  labelText: "Feed Group Name",
-                                                ),
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("Cancel"),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    feedStore.createFeedGroup(feedGroupNameController.text, context);
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("Create"),
-                                                ),
-                                              ],
-                                            );
-                                          });
-                                    },
+                                    onPressed: () => feedManagerStore.createFeedGroupDialog(context),
                                     label: const Text("Create Feed Group"),
                                     icon: const Icon(LucideIcons.folder_plus),
                                   ),
@@ -177,109 +148,16 @@ class _FeedManagerState extends State<FeedManager> {
                             if (element.runtimeType == Feed) {
                               Feed feed = element;
 
-                              return Card.outlined(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                                clipBehavior: Clip.hardEdge,
-                                child: ListTile(
-                                  leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
-                                  title: Text(feed.name),
-                                  trailing: feedManagerStore.selectionMode
-                                      ? feedManagerStore.selectedFeeds.contains(feed)
-                                          ? const Icon(Icons.check_circle_rounded)
-                                          : const Icon(Icons.circle_outlined)
-                                      : null,
-                                  selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeeds.contains(feed),
-                                  selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-                                  onLongPress: () {
-                                    if (!feedManagerStore.selectionMode) {
-                                      feedManagerStore.toggleSelectionMode();
-                                    }
-                                    if (!feedManagerStore.selectedFeeds.contains(feed)) {
-                                      feedManagerStore.addSelectedFeed(feed);
-                                    } else {
-                                      feedManagerStore.removeSelectedFeed(feed);
-                                      if (feedManagerStore.selectedFeeds.isEmpty && feedManagerStore.selectedFeedGroups.isEmpty) {
-                                        feedManagerStore.toggleSelectionMode();
-                                      }
-                                    }
-                                  },
-                                  onTap: () {
-                                    if (feedManagerStore.selectionMode && !feedManagerStore.selectedFeeds.contains(feed)) {
-                                      feedManagerStore.addSelectedFeed(feed);
-                                    } else if (feedManagerStore.selectionMode) {
-                                      feedManagerStore.removeSelectedFeed(feed);
-                                      if (feedManagerStore.selectedFeeds.isEmpty && feedManagerStore.selectedFeedGroups.isEmpty) {
-                                        feedManagerStore.toggleSelectionMode();
-                                      }
-                                    }
-                                  },
-                                ),
+                              return FeedTile(
+                                feedManagerStore: feedManagerStore,
+                                feed: feed,
                               );
                             } else {
                               FeedGroup feedGroup = element;
 
-                              return Card.outlined(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                                clipBehavior: Clip.hardEdge,
-                                child: ListTile(
-                                  leading: feedGroup.feeds.isEmpty
-                                      ? const Icon(
-                                          LucideIcons.folder,
-                                          size: 15,
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ...feedGroup.feeds.take(3).map(
-                                                  (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
-                                                ),
-                                          ],
-                                        ),
-                                  title: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(feedGroup.name),
-                                      Text(
-                                        "${feedGroup.feeds.length} feed${feedGroup.feeds.length == 1 ? "" : "s"}",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Theme.of(context).dividerColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: feedManagerStore.selectionMode
-                                      ? feedManagerStore.selectedFeedGroups.contains(feedGroup)
-                                          ? const Icon(Icons.check_circle_rounded)
-                                          : const Icon(Icons.circle_outlined)
-                                      : null,
-                                  selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeedGroups.contains(feedGroup),
-                                  selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-                                  onLongPress: () {
-                                    if (!feedManagerStore.selectionMode) {
-                                      feedManagerStore.toggleSelectionMode();
-                                    }
-                                    if (!feedManagerStore.selectedFeedGroups.contains(feedGroup)) {
-                                      feedManagerStore.addSelectedFeedGroup(feedGroup);
-                                    } else {
-                                      feedManagerStore.removeSelectedFeedGroup(feedGroup);
-                                      if (feedManagerStore.selectedFeedGroups.isEmpty && feedManagerStore.selectedFeeds.isEmpty) {
-                                        feedManagerStore.toggleSelectionMode();
-                                      }
-                                    }
-                                  },
-                                  onTap: () {
-                                    if (feedManagerStore.selectionMode && !feedManagerStore.selectedFeedGroups.contains(feedGroup)) {
-                                      feedManagerStore.addSelectedFeedGroup(feedGroup);
-                                    } else if (feedManagerStore.selectionMode) {
-                                      feedManagerStore.removeSelectedFeedGroup(feedGroup);
-                                      if (feedManagerStore.selectedFeedGroups.isEmpty && feedManagerStore.selectedFeeds.isEmpty) {
-                                        feedManagerStore.toggleSelectionMode();
-                                      }
-                                    }
-                                  },
-                                ),
+                              return FeedGroupTile(
+                                feedManagerStore: feedManagerStore,
+                                feedGroup: feedGroup,
                               );
                             }
                           }),
@@ -318,70 +196,12 @@ class _FeedManagerState extends State<FeedManager> {
                                 shrinkWrap: true,
                                 // mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  ...feedStore.feedGroups.map((elem) {
-                                    return Card.outlined(
-                                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                                      clipBehavior: Clip.hardEdge,
-                                      child: ListTile(
-                                        leading: elem.feeds.isEmpty
-                                            ? const Icon(
-                                                LucideIcons.folder,
-                                                size: 15,
-                                              )
-                                            : Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  ...elem.feeds.take(3).map(
-                                                        (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
-                                                      ),
-                                                ],
-                                              ),
-                                        title: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(elem.name),
-                                            Text(
-                                              "${elem.feeds.length} feed${elem.feeds.length == 1 ? "" : "s"}",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Theme.of(context).dividerColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        trailing: feedManagerStore.selectionMode
-                                            ? feedManagerStore.selectedFeedGroups.contains(elem)
-                                                ? const Icon(Icons.check_circle_rounded)
-                                                : const Icon(Icons.circle_outlined)
-                                            : null,
-                                        selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeedGroups.contains(elem),
-                                        selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-                                        onLongPress: () {
-                                          if (!feedManagerStore.selectionMode) {
-                                            feedManagerStore.toggleSelectionMode();
-                                          }
-                                          if (!feedManagerStore.selectedFeedGroups.contains(elem)) {
-                                            feedManagerStore.addSelectedFeedGroup(elem);
-                                          } else {
-                                            feedManagerStore.removeSelectedFeedGroup(elem);
-                                            if (feedManagerStore.selectedFeedGroups.isEmpty && feedManagerStore.selectedFeeds.isEmpty) {
-                                              feedManagerStore.toggleSelectionMode();
-                                            }
-                                          }
-                                        },
-                                        onTap: () {
-                                          if (feedManagerStore.selectionMode && !feedManagerStore.selectedFeedGroups.contains(elem)) {
-                                            feedManagerStore.addSelectedFeedGroup(elem);
-                                          } else if (feedManagerStore.selectionMode) {
-                                            feedManagerStore.removeSelectedFeedGroup(elem);
-                                            if (feedManagerStore.selectedFeedGroups.isEmpty && feedManagerStore.selectedFeeds.isEmpty) {
-                                              feedManagerStore.toggleSelectionMode();
-                                            }
-                                          }
-                                        },
-                                      ),
+                                  ...feedStore.feedGroups.map((feedGroup) {
+                                    return FeedGroupTile(
+                                      feedManagerStore: feedManagerStore,
+                                      feedGroup: feedGroup,
                                     );
+                                    ;
                                   }),
                                 ],
                               ),
@@ -392,43 +212,9 @@ class _FeedManagerState extends State<FeedManager> {
 
                               // feeds
                               ...feedStore.feeds.map((feed) {
-                                return Card.outlined(
-                                  color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: ListTile(
-                                    leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
-                                    title: Text(feed.name),
-                                    trailing: feedManagerStore.selectionMode
-                                        ? feedManagerStore.selectedFeeds.contains(feed)
-                                            ? const Icon(Icons.check_circle_rounded)
-                                            : const Icon(Icons.circle_outlined)
-                                        : null,
-                                    selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeeds.contains(feed),
-                                    selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-                                    onLongPress: () {
-                                      if (!feedManagerStore.selectionMode) {
-                                        feedManagerStore.toggleSelectionMode();
-                                      }
-                                      if (!feedManagerStore.selectedFeeds.contains(feed)) {
-                                        feedManagerStore.addSelectedFeed(feed);
-                                      } else {
-                                        feedManagerStore.removeSelectedFeed(feed);
-                                        if (feedManagerStore.selectedFeeds.isEmpty && feedManagerStore.selectedFeedGroups.isEmpty) {
-                                          feedManagerStore.toggleSelectionMode();
-                                        }
-                                      }
-                                    },
-                                    onTap: () {
-                                      if (feedManagerStore.selectionMode && !feedManagerStore.selectedFeeds.contains(feed)) {
-                                        feedManagerStore.addSelectedFeed(feed);
-                                      } else if (feedManagerStore.selectionMode) {
-                                        feedManagerStore.removeSelectedFeed(feed);
-                                        if (feedManagerStore.selectedFeeds.isEmpty && feedManagerStore.selectedFeedGroups.isEmpty) {
-                                          feedManagerStore.toggleSelectionMode();
-                                        }
-                                      }
-                                    },
-                                  ),
+                                return FeedTile(
+                                  feedManagerStore: feedManagerStore,
+                                  feed: feed,
                                 );
                               }),
                             ],
@@ -452,11 +238,9 @@ class _FeedManagerState extends State<FeedManager> {
                                 Expanded(
                                   child: TextButton.icon(
                                     onPressed: () {
-                                      setState(() {
-                                        feedManagerStore.selectionMode = false;
-                                        feedManagerStore.selectedFeeds.clear();
-                                        feedManagerStore.selectedFeedGroups.clear();
-                                      });
+                                      feedManagerStore.selectionMode = false;
+                                      feedManagerStore.selectedFeeds.clear();
+                                      feedManagerStore.selectedFeedGroups.clear();
                                     },
                                     icon: const Icon(Icons.cancel_outlined),
                                     label: const Text("Cancel"),
@@ -571,81 +355,8 @@ class _FeedManagerState extends State<FeedManager> {
                                   Expanded(
                                     child: TextButton.icon(
                                       onPressed: () {
-                                        if (!feedManagerStore.areFeedGroupsSelected) {
-                                          showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                List<FeedGroup> selectedFeedGroups = [];
-                                                return StatefulBuilder(builder: (context, Function dialogSetState) {
-                                                  return AlertDialog(
-                                                    title: const Text("Add Feeds to Feed Group(s)"),
-                                                    content: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        // SELECTABLE FEED GROUPS
-                                                        ...feedStore.feedGroups.map(
-                                                          (FeedGroup feedGroup) => Card.outlined(
-                                                            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
-                                                            clipBehavior: Clip.hardEdge,
-                                                            child: ListTile(
-                                                              leading: feedGroup.feeds.isEmpty
-                                                                  ? const Icon(
-                                                                      LucideIcons.folder,
-                                                                      size: 15,
-                                                                    )
-                                                                  : Row(
-                                                                      mainAxisSize: MainAxisSize.min,
-                                                                      children: [
-                                                                        ...feedGroup.feeds.take(3).map(
-                                                                              (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
-                                                                            ),
-                                                                      ],
-                                                                    ),
-                                                              title: Text(feedGroup.name),
-                                                              trailing: selectedFeedGroups.contains(feedGroup)
-                                                                  ? const Icon(Icons.check_circle_rounded)
-                                                                  : const Icon(Icons.circle_outlined),
-                                                              onTap: () {
-                                                                if (selectedFeedGroups.contains(feedGroup)) {
-                                                                  dialogSetState(() {
-                                                                    selectedFeedGroups.remove(feedGroup);
-                                                                  });
-                                                                } else {
-                                                                  dialogSetState(() {
-                                                                    selectedFeedGroups.add(feedGroup);
-                                                                  });
-                                                                }
-                                                              },
-                                                              selected: selectedFeedGroups.contains(feedGroup),
-                                                              selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
-                                                            ),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context).pop();
-                                                        },
-                                                        child: const Text("Cancel"),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          feedManagerStore.addFeedsToFeedGroup(selectedFeedGroups);
-                                                          feedManagerStore.setSelectedFeed([]);
-                                                          feedManagerStore.toggleSelectionMode();
-                                                          Navigator.of(context).pop();
-                                                          // update the ui to update the feed groups
-                                                          setState(() {});
-                                                        },
-                                                        child: const Text("Confirm"),
-                                                      ),
-                                                    ],
-                                                  );
-                                                });
-                                              });
-                                        }
+                                        feedManagerStore.addFeedsToGroupDialog(context);
+                                        setState(() {});
                                       },
                                       icon: Icon(
                                         LucideIcons.folder_plus,

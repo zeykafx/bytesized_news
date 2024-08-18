@@ -231,6 +231,61 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   }
 
   @override
+  void createFeedGroupDialog(BuildContext context) {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.createFeedGroupDialog');
+    try {
+      return super.createFeedGroupDialog(context);
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleFeedTileLongPress(Feed feed) {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.handleFeedTileLongPress');
+    try {
+      return super.handleFeedTileLongPress(feed);
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleFeedTileTap(Feed feed) {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.handleFeedTileTap');
+    try {
+      return super.handleFeedTileTap(feed);
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleFeedGroupLongPress(FeedGroup feedGroup) {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.handleFeedGroupLongPress');
+    try {
+      return super.handleFeedGroupLongPress(feedGroup);
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleFeedGroupTap(FeedGroup feedGroup) {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.handleFeedGroupTap');
+    try {
+      return super.handleFeedGroupTap(feedGroup);
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 selectionMode: ${selectionMode},

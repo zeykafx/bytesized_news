@@ -2,6 +2,9 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 
@@ -77,6 +80,119 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
+  void createFeedGroupDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          TextEditingController feedGroupNameController = TextEditingController();
+
+          return AlertDialog(
+            title: const Text("Create Feed Group"),
+            content: TextField(
+              controller: feedGroupNameController,
+              autocorrect: true,
+              enableSuggestions: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Feed Group Name",
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  feedStore.createFeedGroup(feedGroupNameController.text, context);
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Create"),
+              ),
+            ],
+          );
+        });
+  }
+
+  @action
+  void addFeedsToGroupDialog(BuildContext context) {
+    if (!areFeedGroupsSelected) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            List<FeedGroup> selectedFeedGroups = [];
+            return StatefulBuilder(builder: (context, Function dialogSetState) {
+              return AlertDialog(
+                title: const Text("Add Feeds to Feed Group(s)"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // SELECTABLE FEED GROUPS
+                    ...feedStore.feedGroups.map(
+                      (FeedGroup feedGroup) => Card.outlined(
+                        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
+                        clipBehavior: Clip.hardEdge,
+                        child: ListTile(
+                          leading: feedGroup.feeds.isEmpty
+                              ? const Icon(
+                                  LucideIcons.folder,
+                                  size: 15,
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ...feedGroup.feeds.take(3).map(
+                                          (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 12, height: 12),
+                                        ),
+                                  ],
+                                ),
+                          title: Text(feedGroup.name),
+                          trailing: selectedFeedGroups.contains(feedGroup) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
+                          onTap: () {
+                            if (selectedFeedGroups.contains(feedGroup)) {
+                              dialogSetState(() {
+                                selectedFeedGroups.remove(feedGroup);
+                              });
+                            } else {
+                              dialogSetState(() {
+                                selectedFeedGroups.add(feedGroup);
+                              });
+                            }
+                          },
+                          selected: selectedFeedGroups.contains(feedGroup),
+                          selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      addFeedsToFeedGroup(selectedFeedGroups);
+                      setSelectedFeed([]);
+                      toggleSelectionMode();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Confirm"),
+                  ),
+                ],
+              );
+            });
+          });
+    }
+  }
+
+  @action
   Future<void> addFeedsToFeedGroup(List<FeedGroup> feedGroupsToAddFeedsTo) async {
     for (FeedGroup feedGroup in feedGroupsToAddFeedsTo) {
       // remove the selected feeds that are already in the feedGroup
@@ -86,6 +202,60 @@ abstract class _FeedManagerStore with Store {
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedNames = feedGroup.feedNames + localSelectedFeeds.map((feed) => feed.name).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
+    }
+  }
+
+  @action
+  void handleFeedTileLongPress(Feed feed) {
+    if (!selectionMode) {
+      toggleSelectionMode();
+    }
+    if (!selectedFeeds.contains(feed)) {
+      addSelectedFeed(feed);
+    } else {
+      removeSelectedFeed(feed);
+      if (selectedFeeds.isEmpty && selectedFeedGroups.isEmpty) {
+        toggleSelectionMode();
+      }
+    }
+  }
+
+  @action
+  void handleFeedTileTap(Feed feed) {
+    if (selectionMode && !selectedFeeds.contains(feed)) {
+      addSelectedFeed(feed);
+    } else if (selectionMode) {
+      removeSelectedFeed(feed);
+      if (selectedFeeds.isEmpty && selectedFeedGroups.isEmpty) {
+        toggleSelectionMode();
+      }
+    }
+  }
+
+  @action
+  void handleFeedGroupLongPress(FeedGroup feedGroup) {
+    if (!selectionMode) {
+      toggleSelectionMode();
+    }
+    if (!selectedFeedGroups.contains(feedGroup)) {
+      addSelectedFeedGroup(feedGroup);
+    } else {
+      removeSelectedFeedGroup(feedGroup);
+      if (selectedFeedGroups.isEmpty && selectedFeeds.isEmpty) {
+        toggleSelectionMode();
+      }
+    }
+  }
+
+  @action
+  void handleFeedGroupTap(FeedGroup feedGroup) {
+    if (selectionMode && !selectedFeedGroups.contains(feedGroup)) {
+      addSelectedFeedGroup(feedGroup);
+    } else if (selectionMode) {
+      removeSelectedFeedGroup(feedGroup);
+      if (selectedFeedGroups.isEmpty && selectedFeeds.isEmpty) {
+        toggleSelectionMode();
+      }
     }
   }
 
