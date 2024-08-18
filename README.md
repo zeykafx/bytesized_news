@@ -16,3 +16,12 @@ The app is built with Flutter and Mobx.
 - Bookmark articles
 - Create feed groups (folders) to easily organize your feeds and navigate between them
 - Curated list of popular feeds (soon)
+
+## Screenshots
+
+<img alt="Home" src="./.images/home.png" width="300"/>
+
+<img alt="Reader" src="./.images/reader.png" width="300"/>
+
+<img alt="Feed Manager" src="./.images/feed_mngr.png" width="300"/>
+<img alt="Feed Manager options" src="./.images/feed_mngr_2.png" width="300"/>
