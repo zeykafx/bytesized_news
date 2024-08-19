@@ -49,6 +49,42 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$htmlContentAtom =
+      Atom(name: '_StoryStore.htmlContent', context: context);
+
+  @override
+  String get htmlContent {
+    _$htmlContentAtom.reportRead();
+    return super.htmlContent;
+  }
+
+  bool _htmlContentIsInitialized = false;
+
+  @override
+  set htmlContent(String value) {
+    _$htmlContentAtom.reportWrite(
+        value, _htmlContentIsInitialized ? super.htmlContent : null, () {
+      super.htmlContent = value;
+      _htmlContentIsInitialized = true;
+    });
+  }
+
+  late final _$showReaderModeAtom =
+      Atom(name: '_StoryStore.showReaderMode', context: context);
+
+  @override
+  bool get showReaderMode {
+    _$showReaderModeAtom.reportRead();
+    return super.showReaderMode;
+  }
+
+  @override
+  set showReaderMode(bool value) {
+    _$showReaderModeAtom.reportWrite(value, super.showReaderMode, () {
+      super.showReaderMode = value;
+    });
+  }
+
   late final _$isBookmarkedAtom =
       Atom(name: '_StoryStore.isBookmarked', context: context);
 
@@ -362,6 +398,24 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$initAsyncAction =
+      AsyncAction('_StoryStore.init', context: context);
+
+  @override
+  Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore,
+      AuthStore authStore) {
+    return _$initAsyncAction
+        .run(() => super.init(item, context, setStore, authStore));
+  }
+
+  late final _$fetchPageHtmlAsyncAction =
+      AsyncAction('_StoryStore.fetchPageHtml', context: context);
+
+  @override
+  Future<String> fetchPageHtml() {
+    return _$fetchPageHtmlAsyncAction.run(() => super.fetchPageHtml());
+  }
+
   late final _$onProgressChangedAsyncAction =
       AsyncAction('_StoryStore.onProgressChanged', context: context);
 
@@ -401,6 +455,28 @@ mixin _$StoryStore on _StoryStore, Store {
       ActionController(name: '_StoryStore', context: context);
 
   @override
+  Map<String, String>? buildStyle(BuildContext context, dom.Element element) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.buildStyle');
+    try {
+      return super.buildStyle(context, element);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void toggleReaderMode() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.toggleReaderMode');
+    try {
+      return super.toggleReaderMode();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void hideAiSummary() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
         name: '_StoryStore.hideAiSummary');
@@ -438,6 +514,8 @@ mixin _$StoryStore on _StoryStore, Store {
     return '''
 dbUtils: ${dbUtils},
 feedItem: ${feedItem},
+htmlContent: ${htmlContent},
+showReaderMode: ${showReaderMode},
 isBookmarked: ${isBookmarked},
 canGoForward: ${canGoForward},
 canGoBack: ${canGoBack},

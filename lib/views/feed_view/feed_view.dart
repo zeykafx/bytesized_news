@@ -261,7 +261,7 @@ class _FeedViewState extends State<FeedView> {
                                           elevation: 0,
                                           color: !item.bookmarked
                                               ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2)
-                                              : Theme.of(context).colorScheme.secondaryContainer,
+                                              : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6),
                                           child: SelectableRegion(
                                             focusNode: FocusNode(),
                                             selectionControls: MaterialTextSelectionControls(),
@@ -321,16 +321,24 @@ class _FeedViewState extends State<FeedView> {
                                                         ),
                                                       ),
 
-                                                      const SizedBox(width: 10),
+                                                      if (item.bookmarked) ...[
+                                                        const SizedBox(width: 10),
+                                                        Icon(
+                                                          LucideIcons.bookmark_check,
+                                                          color: Theme.of(context).dividerColor,
+                                                          size: 15,
+                                                        )
+                                                      ],
 
                                                       // star icon to show if the item has been summarized by AI or not
-                                                      item.summarized
-                                                          ? Icon(
-                                                              LucideIcons.sparkles,
-                                                              color: Theme.of(context).dividerColor,
-                                                              size: 15,
-                                                            )
-                                                          : const SizedBox(),
+                                                      if (item.summarized) ...[
+                                                        const SizedBox(width: 10),
+                                                        Icon(
+                                                          LucideIcons.sparkles,
+                                                          color: Theme.of(context).dividerColor,
+                                                          size: 15,
+                                                        )
+                                                      ],
                                                     ],
                                                   ),
                                                   Row(

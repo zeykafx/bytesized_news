@@ -80,8 +80,6 @@ class _FeedManagerState extends State<FeedManager> {
                           const SizedBox(
                             height: 20,
                           ),
-                          // search bar
-                          // ...
 
                           // add feed button, new feed group button
                           Card.outlined(

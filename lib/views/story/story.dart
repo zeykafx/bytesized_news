@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
@@ -67,100 +68,89 @@ class _StoryState extends State<Story> {
         body: BottomSheetBar(
           controller: storyStore.bsbController,
           borderRadius: const BorderRadius.all(Radius.circular(100)),
-          backdropColor: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.surface,
           locked: storyStore.isLocked,
           body: Observer(builder: (_) {
             return Center(
               child: Stack(
                 children: [
-                  storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
+                  if (!storyStore.showReaderMode) ...[
+                    storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
+                  ],
                   storyStore.initialized
                       ? Stack(
                           children: [
-                            InAppWebView(
-                              key: webViewKey,
-                              initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
-                              initialSettings: storyStore.settings,
-                              onWebViewCreated: (controller) {
-                                storyStore.controller = controller;
-                              },
-                              onPermissionRequest: (controller, request) async {
-                                return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
-                              },
-                              shouldOverrideUrlLoading: (controller, navigationAction) async {
-                                var uri = navigationAction.request.url!;
+                            if (!storyStore.showReaderMode) ...[
+                              InAppWebView(
+                                key: webViewKey,
+                                initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
+                                initialSettings: storyStore.settings,
+                                onWebViewCreated: (controller) {
+                                  storyStore.controller = controller;
+                                },
+                                onPermissionRequest: (controller, request) async {
+                                  return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+                                },
+                                shouldOverrideUrlLoading: (controller, navigationAction) async {
+                                  var uri = navigationAction.request.url!;
 
-                                if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
-                                  if (await canLaunchUrl(uri)) {
-                                    // Launch the App
-                                    await launchUrl(
-                                      uri,
-                                    );
-                                    // and cancel the request
-                                    return NavigationActionPolicy.CANCEL;
+                                  if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                                    if (await canLaunchUrl(uri)) {
+                                      // Launch the App
+                                      await launchUrl(
+                                        uri,
+                                      );
+                                      // and cancel the request
+                                      return NavigationActionPolicy.CANCEL;
+                                    }
                                   }
-                                }
 
-                                return NavigationActionPolicy.ALLOW;
-                              },
-                              onLoadStart: storyStore.onLoadStart,
-                              onLoadStop: storyStore.onLoadStop,
-                              onProgressChanged: storyStore.onProgressChanged,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Column(
-                                children: [
-                                  storyStore.aiLoading
-                                      ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
-                                          duration: const Duration(milliseconds: 1500),
-                                          colors: [
-                                            const Color(0xBFFFFF00),
-                                            const Color(0xBF00FF00),
-                                            const Color(0xBF00FFFF),
-                                            const Color(0xBF0033FF),
-                                            const Color(0xBFFF00FF),
-                                            const Color(0xBFFF0000),
-                                            const Color(0xBFFFFF00),
-                                          ],
-                                        )
-                                      : const SizedBox(),
-                                  storyStore.feedItemSummarized
-                                      ? Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                            ),
-                                            color: Theme.of(context).colorScheme.surface,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Card(
-                                              elevation: 0,
-                                              shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(20),
-                                                ),
-                                              ),
-                                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(15),
-                                                child: SelectableText(
-                                                  storyStore.feedItem.aiSummary,
-                                                  style: mediaQuery.size.width > 600
-                                                      ? Theme.of(context).textTheme.bodyMedium
-                                                      : Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ),
-                                            ),
-                                          ).animate().fadeIn().then().shimmer(
-                                            duration: const Duration(milliseconds: 1200),
-                                            curve: Curves.easeInOutSine,
+                                  return NavigationActionPolicy.ALLOW;
+                                },
+                                onLoadStart: storyStore.onLoadStart,
+                                onLoadStop: storyStore.onLoadStop,
+                                onProgressChanged: storyStore.onProgressChanged,
+                              ),
+                            ],
+                            if (storyStore.showReaderMode) ...[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SelectableRegion(
+                                  focusNode: FocusNode(),
+                                  selectionControls: MaterialTextSelectionControls(),
+                                  child: HtmlWidget(
+                                    '''
+                                <div class="bytesized_news_html_content">
+                                   <h1>${storyStore.feedItem.title}</h1>
+                                   <p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>
+                                   <img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>
+                                   ${!storyStore.hideSummary ? '''<div class="ai_container">
+                                  <h2>Summary</h2>
+                                  <p>${storyStore.feedItem.aiSummary}</p>
+                                  </div>''' : ""}
+                                   
+                                   ${storyStore.htmlContent}
+                                   <a href="${storyStore.feedItem.url}">Source</a>
+                                </div>
+                                ''',
+                                    renderMode: RenderMode.listView,
+                                    customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (!storyStore.showReaderMode) ...[
+                              // AI SUMMARY
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Column(
+                                  children: [
+                                    storyStore.aiLoading
+                                        ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                                            duration: const Duration(milliseconds: 1500),
                                             colors: [
-                                              const Color(0x00FFFF00),
                                               const Color(0xBFFFFF00),
                                               const Color(0xBF00FF00),
                                               const Color(0xBF00FFFF),
@@ -168,19 +158,64 @@ class _StoryState extends State<Story> {
                                               const Color(0xBFFF00FF),
                                               const Color(0xBFFF0000),
                                               const Color(0xBFFFFF00),
-                                              // const Color(0xFFFF00),
                                             ],
-                                          ),
-                                        ).animate(controller: storyStore.animationController).slideY(
-                                            begin: 2,
-                                            end: 0,
-                                            curve: Curves.easeInOutSine,
-                                            duration: const Duration(milliseconds: 500),
                                           )
-                                      : const SizedBox(),
-                                ],
+                                        : const SizedBox(),
+                                    storyStore.feedItemSummarized
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20),
+                                              ),
+                                              color: Theme.of(context).colorScheme.surface,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Card(
+                                                elevation: 0,
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(20),
+                                                  ),
+                                                ),
+                                                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(15),
+                                                  child: SelectableText(
+                                                    storyStore.feedItem.aiSummary,
+                                                    style: mediaQuery.size.width > 600
+                                                        ? Theme.of(context).textTheme.bodyMedium
+                                                        : Theme.of(context).textTheme.bodySmall,
+                                                  ),
+                                                ),
+                                              ),
+                                            ).animate().fadeIn().then().shimmer(
+                                              duration: const Duration(milliseconds: 1200),
+                                              curve: Curves.easeInOutSine,
+                                              colors: [
+                                                const Color(0x00FFFF00),
+                                                const Color(0xBFFFFF00),
+                                                const Color(0xBF00FF00),
+                                                const Color(0xBF00FFFF),
+                                                const Color(0xBF0033FF),
+                                                const Color(0xBFFF00FF),
+                                                const Color(0xBFFF0000),
+                                                const Color(0xBFFFFF00),
+                                                // const Color(0xFFFF00),
+                                              ],
+                                            ),
+                                          ).animate(controller: storyStore.animationController).slideY(
+                                              begin: 2,
+                                              end: 0,
+                                              curve: Curves.easeInOutSine,
+                                              duration: const Duration(milliseconds: 500),
+                                            )
+                                        : const SizedBox(),
+                                  ],
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         )
                       : const CircularProgressIndicator(),
@@ -205,29 +240,39 @@ class _StoryState extends State<Story> {
                 ),
                 // BACK
 
-                IconButton(
-                  onPressed: () {
-                    if (storyStore.canGoBack) {
-                      storyStore.controller?.goBack();
-                    }
-                  },
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    color: storyStore.canGoBack ? null : Colors.grey.withOpacity(0.5),
+                if (!storyStore.showReaderMode) ...[
+                  IconButton(
+                    onPressed: () {
+                      if (storyStore.canGoBack) {
+                        storyStore.controller?.goBack();
+                      }
+                    },
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: storyStore.canGoBack ? null : Colors.grey.withOpacity(0.5),
+                    ),
                   ),
-                ),
 
-                // FORWARD
+                  // FORWARD
+                  IconButton(
+                    onPressed: () {
+                      if (storyStore.canGoForward) {
+                        storyStore.controller?.goForward();
+                      }
+                    },
+                    icon: Icon(
+                      Icons.arrow_forward_ios,
+                      color: storyStore.canGoForward ? null : Colors.grey.withOpacity(0.5),
+                    ),
+                  ),
+                ],
+
+                // READER MODE
                 IconButton(
                   onPressed: () {
-                    if (storyStore.canGoForward) {
-                      storyStore.controller?.goForward();
-                    }
+                    storyStore.toggleReaderMode();
                   },
-                  icon: Icon(
-                    Icons.arrow_forward_ios,
-                    color: storyStore.canGoForward ? null : Colors.grey.withOpacity(0.5),
-                  ),
+                  icon: Icon(storyStore.showReaderMode ? Icons.chrome_reader_mode : Icons.chrome_reader_mode_outlined),
                 ),
 
                 storyStore.feedItemSummarized
