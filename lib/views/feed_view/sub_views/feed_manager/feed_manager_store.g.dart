@@ -124,6 +124,17 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     return _$initAsyncAction.run(() => super.init(feedStore: feedStore));
   }
 
+  late final _$addSelectedFeedsToAFeedGroupAsyncAction = AsyncAction(
+      '_FeedManagerStore.addSelectedFeedsToAFeedGroup',
+      context: context);
+
+  @override
+  Future<void> addSelectedFeedsToAFeedGroup(
+      List<Feed> feeds, FeedGroup feedGroup) {
+    return _$addSelectedFeedsToAFeedGroupAsyncAction
+        .run(() => super.addSelectedFeedsToAFeedGroup(feeds, feedGroup));
+  }
+
   late final _$addFeedsToFeedGroupAsyncAction =
       AsyncAction('_FeedManagerStore.addFeedsToFeedGroup', context: context);
 

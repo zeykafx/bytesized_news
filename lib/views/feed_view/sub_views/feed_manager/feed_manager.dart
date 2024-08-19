@@ -70,6 +70,7 @@ class _FeedManagerState extends State<FeedManager> {
               padding: const EdgeInsets.all(8.0),
               child: Stack(
                 children: [
+                  // main content
                   Align(
                     alignment: Alignment.topCenter,
                     child: SingleChildScrollView(
@@ -124,6 +125,7 @@ class _FeedManagerState extends State<FeedManager> {
                             ),
                           ),
 
+                          // pinned feeds/feed groups
                           if (feedStore.pinnedFeedsOrFeedGroups.isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.only(left: 8, top: 15, right: 8, bottom: 5),
@@ -139,8 +141,6 @@ class _FeedManagerState extends State<FeedManager> {
                                 ],
                               ),
                             ),
-
-                            // pinned feeds/feed groups
                             ...feedStore.pinnedFeedsOrFeedGroups.map((element) {
                               if (element.runtimeType == Feed) {
                                 Feed feed = element;
@@ -172,6 +172,7 @@ class _FeedManagerState extends State<FeedManager> {
                             }),
                           ],
 
+                          // all feeds and feed groups
                           Padding(
                             padding: const EdgeInsets.only(left: 8, top: 15, right: 8, bottom: 5),
                             child: Row(
@@ -187,12 +188,10 @@ class _FeedManagerState extends State<FeedManager> {
                             ),
                           ),
 
-                          // all feeds and feed groups
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               // FeedGroups
-
                               GridView.count(
                                 crossAxisCount: 2,
                                 childAspectRatio: mediaQuery.size.width > 500 ? 3.5 : 3,
@@ -217,7 +216,7 @@ class _FeedManagerState extends State<FeedManager> {
                                 height: 10,
                               ),
 
-                              // feeds
+                              // Feeds
                               ...feedStore.feeds.map((feed) {
                                 return FeedTile(
                                   feedManagerStore: feedManagerStore,
@@ -259,15 +258,10 @@ class _FeedManagerState extends State<FeedManager> {
                                 label: const Text("Cancel"),
                               ),
 
-                              // const SizedBox(
-                              //   height: 25,
-                              //   child: VerticalDivider(),
-                              // ),
-
+                              // PIN FEED
                               if (feedManagerStore.areFeedsSelected &&
                                   !feedManagerStore.areFeedGroupsSelected &&
                                   feedManagerStore.selectedFeeds.length == 1) ...[
-                                // PIN FEED
                                 TextButton.icon(
                                   onPressed: () async {
                                     if (feedManagerStore.selectedFeeds.first.isPinned) {
@@ -287,17 +281,12 @@ class _FeedManagerState extends State<FeedManager> {
                                       : const Icon(Icons.push_pin_outlined, size: 17),
                                   label: Text(feedManagerStore.selectedFeeds.first.isPinned ? "Unpin" : "Pin"),
                                 ),
-
-                                // const SizedBox(
-                                //   height: 25,
-                                //   child: VerticalDivider(),
-                                // ),
                               ],
 
+                              // PIN FEED GROUP
                               if (!feedManagerStore.areFeedsSelected &&
                                   feedManagerStore.areFeedGroupsSelected &&
                                   feedManagerStore.selectedFeedGroups.length == 1) ...[
-                                // PIN FEED
                                 TextButton.icon(
                                   onPressed: () async {
                                     if (feedManagerStore.selectedFeedGroups.first.isPinned) {
@@ -317,11 +306,6 @@ class _FeedManagerState extends State<FeedManager> {
                                       : const Icon(Icons.push_pin_outlined, size: 17),
                                   label: Text(feedManagerStore.selectedFeedGroups.first.isPinned ? "Unpin" : "Pin"),
                                 ),
-
-                                // const SizedBox(
-                                //   height: 25,
-                                //   child: VerticalDivider(),
-                                // ),
                               ],
 
                               // EDIT FEED GROUP
@@ -354,14 +338,10 @@ class _FeedManagerState extends State<FeedManager> {
                                   icon: const Icon(Icons.edit_outlined, size: 17),
                                   label: const Text("Edit"),
                                 ),
-                                // const SizedBox(
-                                //   height: 25,
-                                //   child: VerticalDivider(),
-                                // ),
                               ],
 
+                              // ADD TO GROUP
                               if (feedManagerStore.areFeedsSelected && feedManagerStore.selectedFeeds.isNotEmpty) ...[
-                                // ADD TO GROUP
                                 TextButton.icon(
                                   onPressed: () {
                                     if (!feedManagerStore.areFeedGroupsSelected) {
@@ -461,11 +441,6 @@ class _FeedManagerState extends State<FeedManager> {
                                     ),
                                   ),
                                 ),
-
-                                // const SizedBox(
-                                //   height: 25,
-                                //   child: VerticalDivider(),
-                                // ),
                               ],
 
                               // DELETE FEED/FEED GROUP

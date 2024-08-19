@@ -1,3 +1,4 @@
+import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/edit_feed_group.dart';
@@ -134,6 +135,16 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                             ),
                           ),
                           const PopupMenuItem(
+                            value: "add_feeds",
+                            child: Row(
+                              children: [
+                                Icon(Icons.rss_feed_outlined),
+                                SizedBox(width: 5),
+                                Text("Add Feeds"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
                             value: "delete",
                             child: Row(
                               children: [
@@ -190,6 +201,65 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
 
                               setState(() {});
                             });
+                          } else if (value == "add_feeds") {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  List<Feed> selectedFeeds = [];
+                                  return StatefulBuilder(builder: (context, Function dialogSetState) {
+                                    return AlertDialog(
+                                      title: const Text("Add Feeds to this Feed Group"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // SELECTABLE FEED GROUPS
+                                          ...feedStore.feeds.map(
+                                            (Feed feed) => Card.outlined(
+                                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
+                                              clipBehavior: Clip.hardEdge,
+                                              child: ListTile(
+                                                leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
+                                                title: Text(feed.name),
+                                                trailing:
+                                                    selectedFeeds.contains(feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
+                                                onTap: () {
+                                                  if (selectedFeeds.contains(feed)) {
+                                                    dialogSetState(() {
+                                                      selectedFeeds.remove(feed);
+                                                    });
+                                                  } else {
+                                                    dialogSetState(() {
+                                                      selectedFeeds.add(feed);
+                                                    });
+                                                  }
+                                                },
+                                                selected: selectedFeeds.contains(feed),
+                                                selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            await feedManagerStore.addSelectedFeedsToAFeedGroup(selectedFeeds, widget.feedGroup);
+                                            Navigator.of(context).pop();
+                                            // // update the ui to update the feed groups
+                                            setState(() {});
+                                          },
+                                          child: const Text("Confirm"),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                                }).then((_) {});
                           } else if (value == "delete") {
                             // show dialog to confirm deletion
                             showDialog(

@@ -117,6 +117,21 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
+  Future<void> addSelectedFeedsToAFeedGroup(List<Feed> feeds, FeedGroup feedGroup) async {
+    for (Feed feed in feeds) {
+      if (kDebugMode) {
+        print("Adding ${feed.name} to ${feedGroup.name}");
+      }
+
+      if (!feedGroup.feeds.contains(feed)) {
+        feedGroup.feeds.add(feed);
+        feedGroup.feedNames = feedGroup.feedNames + [feed.name];
+        await dbUtils.addFeedGroup(feedGroup);
+      }
+    }
+  }
+
+  @action
   Future<void> addFeedsToFeedGroup(List<FeedGroup> feedGroupsToAddFeedsTo) async {
     for (FeedGroup feedGroup in feedGroupsToAddFeedsTo) {
       if (kDebugMode) {
