@@ -15,11 +15,12 @@ class AiUtils {
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<String> summarizeWithFirebase(FeedItem feedItem) async {
+  Future<String> summarizeWithFirebase(FeedItem feedItem, String content) async {
     final result = await functions.httpsCallable('summarize').call(
       {
         "text": feedItem.url,
         "title": feedItem.title,
+        "content": content,
       },
     );
     var response = result.data as Map<String, dynamic>;

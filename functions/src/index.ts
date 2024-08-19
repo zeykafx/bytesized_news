@@ -15,6 +15,7 @@ const openaiKey = defineString("OPENAI_API_KEY");
 export const summarize = onCall({region: "europe-west1"}, async (request) => {
   const articleUrl: string = request.data.text;
   const title: string = request.data.title;
+  const content = request.data.content;
   const uid = request.auth?.uid;
   logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
 
@@ -37,8 +38,14 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
   }
 
   // download the article's html
-  const article = await fetch(articleUrl);
-  const articleText = await article.text();
+  // const article = await fetch(articleUrl);
+  // const articleText = await article.text();
+
+  // check the length of the article
+  if (content.length > 10000) {
+    logger.info("Article too long: " + content.length);
+    return {error: "Error: The article is too long. Please provide a shorter article."};
+  }
 
   // create the summary with openai
   const completion = await openai.chat.completions.create({
@@ -53,7 +60,7 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
       },
       {
         role: "user",
-        content: articleText,
+        content: content,
       },
     ],
     temperature: 0.0,

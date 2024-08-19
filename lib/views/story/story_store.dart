@@ -303,7 +303,7 @@ abstract class _StoryStore with Store {
     aiLoading = true;
 
     try {
-      feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem);
+      feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem, document.body!.text);
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
