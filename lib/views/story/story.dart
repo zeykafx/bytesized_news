@@ -138,12 +138,16 @@ class _StoryState extends State<Story> {
                                   <div class="bytesized_news_html_content">
                                      <h1>${storyStore.feedItem.title}</h1>
                                      <p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>
-                                     <img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>
-                                     ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
-                                      <h2>Summary</h2>
-                                      <p>${storyStore.feedItem.aiSummary}</p>
-                                      </div>''' : ""}
                                      
+                                    
+                                   
+                                     ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+
+                                       ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                        <h2>Summary</h2>
+                                        <p>${storyStore.feedItem.aiSummary}</p>
+                                        </div>''' : ""}
+
                                      ${storyStore.htmlContent}
                                      <a href="${storyStore.feedItem.url}">Source</a>
                                   </div>

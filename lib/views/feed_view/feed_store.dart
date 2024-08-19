@@ -225,9 +225,9 @@ abstract class _FeedStore with Store {
   Future<void> changeSort(FeedListSort sort) async {
     settingsStore.setSort(sort);
 
-    if (kDebugMode) {
-      print("Changing sort to $sort");
-    }
+    // if (kDebugMode) {
+    //   print("Changing sort to $sort");
+    // }
     switch (sort) {
       case FeedListSort.byDate:
         feedItems = (await dbUtils.getItems(feeds)).asObservable();

@@ -230,6 +230,12 @@ abstract class _StoryStore with Store {
           'margin': '0 auto',
           'display': 'block',
         };
+      case "caption":
+        return {
+          'font-size': '0.8em',
+          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'text-align': 'left',
+        };
       case "figcaption":
         return {
           'font-size': '0.8em',
@@ -239,7 +245,7 @@ abstract class _StoryStore with Store {
       case 'a':
         return {
           'color': '#${Theme.of(context).colorScheme.primary.value.toRadixString(16).substring(2)}',
-          // 'text-decoration': 'none',
+          'text-decoration': 'none',
         };
 
       case 'blockquote':
@@ -306,7 +312,7 @@ abstract class _StoryStore with Store {
 
     dom.Document document = parse(htmlValue);
     if (kDebugMode) {
-      print(document.body!.text.length);
+      print("Sending ${document.body!.text.length} characters to AI for summarization");
     }
 
     aiLoading = true;

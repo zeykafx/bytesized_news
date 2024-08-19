@@ -434,8 +434,10 @@ class _FeedViewState extends State<FeedView> {
                                                   ),
                                                 )
                                                     .then((_) {
-                                                  // update the sort after the story view is popped
+                                                  // update the sort after the story view is popped,
+                                                  // this is done so that the story that was just viewed is removed if we are in the unread sort
                                                   feedStore.changeSort(feedStore.settingsStore.sort);
+
                                                   // update the state of the list items after the story view is popped
                                                   // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                                                   setState(() {});

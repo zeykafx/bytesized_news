@@ -281,7 +281,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                         await feedManagerStore.handleDelete(toggleSelection: false);
                                         await widget.wrappedGetFeeds();
                                         await widget.wrappedGetFeedGroups();
-                                        setState(() {});
+                                        // setState(() {});
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text("Delete"),

@@ -50,6 +50,11 @@ class _FeedTileState extends State<FeedTile> {
         clipBehavior: Clip.hardEdge,
         child: ListTile(
           leading: CachedNetworkImage(imageUrl: widget.feed.iconUrl, width: 20, height: 20),
+          // leading: Image.network(
+          //   widget.feed.iconUrl,
+          //   width: 20,
+          //   height: 20,
+          // ),
           title: Text(widget.feed.name),
           dense: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -216,6 +221,8 @@ class _FeedTileState extends State<FeedTile> {
                                             await feedManagerStore.addFeedsToFeedGroup(selectedFeedGroups);
                                             feedManagerStore.setSelectedFeed([]);
                                             Navigator.of(context).pop();
+
+                                            await widget.wrappedGetFeedGroups();
                                             // update the ui to update the feed groups
                                             setState(() {});
                                           },
@@ -246,10 +253,11 @@ class _FeedTileState extends State<FeedTile> {
                                   ),
                                   TextButton(
                                     onPressed: () async {
-                                      await feedManagerStore.handleDelete();
+                                      feedManagerStore.selectedFeeds.add(widget.feed);
+                                      await feedManagerStore.handleDelete(toggleSelection: false);
                                       await widget.wrappedGetFeeds();
                                       await widget.wrappedGetFeedGroups();
-                                      setState(() {});
+                                      // setState(() {});
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text("Delete"),

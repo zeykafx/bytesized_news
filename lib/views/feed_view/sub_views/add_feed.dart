@@ -157,8 +157,8 @@ class _AddFeedState extends State<AddFeed> {
                             print("Adding feed to db: $feedLink");
                           }
 
-                          // await widget.getFeeds();
-                          // await widget.getItems();
+                          await widget.getFeeds();
+                          await widget.getItems();
 
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
