@@ -1,3 +1,5 @@
+import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
 
@@ -19,7 +21,7 @@ String darkModeString(DarkMode darkMode) {
 
 const darkModeNames = ["System", "Dark", "Light"];
 
-enum FeedListSort { byDate, today, unread, read, bookmarked }
+enum FeedListSort { byDate, today, unread, read, bookmarked, feed, feedGroup }
 
 String feedListSortToString(FeedListSort sort) {
   switch (sort) {
@@ -33,6 +35,10 @@ String feedListSortToString(FeedListSort sort) {
       return "Read";
     case FeedListSort.bookmarked:
       return "Bookmarked";
+    case FeedListSort.feed:
+      return "Feed";
+    case FeedListSort.feedGroup:
+      return "Feed Group";
   }
 }
 
@@ -65,5 +71,59 @@ abstract class _SettingsStore with Store {
   @action
   setSort(FeedListSort newSort) {
     sort = newSort;
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @observable
+  Feed? sortFeed;
+
+  @action
+  void setSortFeed(Feed feed) {
+    sortFeed = feed;
+  }
+
+  @JsonKey(defaultValue: null)
+  @observable
+  String? sortFeedName;
+
+  @action
+  void setSortFeedName(String feedName) {
+    sortFeedName = feedName;
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @observable
+  FeedGroup? sortFeedGroup;
+
+  @action
+  void setSortFeedGroup(FeedGroup feedGroup) {
+    sortFeedGroup = feedGroup;
+  }
+
+  @JsonKey(defaultValue: null)
+  @observable
+  String? sortFeedGroupName;
+
+  @action
+  void setSortFeedGroupName(String feedGroupName) {
+    sortFeedGroupName = feedGroupName;
+  }
+
+  @JsonKey(defaultValue: true)
+  @observable
+  bool useReaderModeByDefault = true;
+
+  @action
+  void setUseReaderModeByDefault(bool value) {
+    useReaderModeByDefault = value;
+  }
+
+  @JsonKey(defaultValue: true)
+  @observable
+  bool showAiSummaryOnLoad = true;
+
+  @action
+  void setShowAiSummaryOnLoad(bool value) {
+    showAiSummaryOnLoad = value;
   }
 }

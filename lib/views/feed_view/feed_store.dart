@@ -84,16 +84,16 @@ abstract class _FeedStore with Store {
       print("Fetched ${feeds.length} feeds from Isar");
     }
 
-    if (feeds.isEmpty) {
-      await isar.writeTxn(
-        () => isar.feeds.putAll([
-          Feed("The Verge", "http://www.theverge.com/rss/frontpage"),
-          Feed("Vox", "https://www.vox.com/rss/index.xml"),
-        ]),
-      );
-
-      feeds = await dbUtils.getFeeds();
-    }
+    // if (feeds.isEmpty) {
+    //   await isar.writeTxn(
+    //     () => isar.feeds.putAll([
+    //       Feed("The Verge", "http://www.theverge.com/rss/frontpage"),
+    //       Feed("Vox", "https://www.vox.com/rss/index.xml"),
+    //     ]),
+    //   );
+    //
+    //   feeds = await dbUtils.getFeeds();
+    // }
 
     feedGroups = (await dbUtils.getFeedGroups(feeds)).asObservable();
     if (kDebugMode) {
@@ -163,6 +163,10 @@ abstract class _FeedStore with Store {
 
     loading = true;
     for (Feed feed in feeds) {
+      if (settingsStore.sortFeed != null && feed.name != settingsStore.sortFeed!.name) {
+        continue;
+      }
+
       if (kDebugMode) {
         print("Fetching feed items for ${feed.name}");
       }
@@ -221,6 +225,9 @@ abstract class _FeedStore with Store {
   Future<void> changeSort(FeedListSort sort) async {
     settingsStore.setSort(sort);
 
+    if (kDebugMode) {
+      print("Changing sort to $sort");
+    }
     switch (sort) {
       case FeedListSort.byDate:
         feedItems = (await dbUtils.getItems(feeds)).asObservable();
@@ -246,6 +253,16 @@ abstract class _FeedStore with Store {
         // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
         // feedItems = feedItems.where((item) => item.bookmarked).toList().asObservable();
         break;
+      case FeedListSort.feed:
+        if (settingsStore.sortFeed == null) {
+          throw Exception("sortFeed cannot be null when changing sort to FeedListSort.Feed.");
+        }
+        feedItems = (await dbUtils.getItemsFromFeed(settingsStore.sortFeed!)).asObservable();
+      case FeedListSort.feedGroup:
+        if (settingsStore.sortFeedGroup == null) {
+          throw Exception("sortFeedGroup cannot be null when changing sort to FeedListSort.FeedGroup.");
+        }
+        feedItems = (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!)).asObservable();
     }
   }
 

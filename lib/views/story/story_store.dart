@@ -4,6 +4,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:html_main_element/html_main_element.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
+import 'package:photo_view/photo_view.dart';
 import 'package:readability/readability.dart' as readability;
 
 part 'story_store.g.dart';
@@ -36,7 +38,7 @@ abstract class _StoryStore with Store {
   late String htmlContent;
 
   @observable
-  bool showReaderMode = false;
+  late bool showReaderMode;
 
   @observable
   bool isBookmarked = false;
@@ -104,7 +106,7 @@ abstract class _StoryStore with Store {
   bool aiLoading = false;
 
   @observable
-  bool hideSummary = false;
+  late bool hideSummary;
 
   @observable
   late AnimationController animationController;
@@ -113,6 +115,9 @@ abstract class _StoryStore with Store {
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
     this.authStore = authStore;
+
+    showReaderMode = settingsStore.useReaderModeByDefault;
+    hideSummary = settingsStore.showAiSummaryOnLoad;
 
     dbUtils = DbUtils(isar: isar);
 
@@ -194,7 +199,8 @@ abstract class _StoryStore with Store {
     if (element.className == "ai_container") {
       // card line container for the AI summary
       return {
-        'background-color': '#${Theme.of(context).colorScheme.surfaceContainer.value.toRadixString(16).substring(2)}',
+        'background-color':
+            '#${Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surfaceContainer.value.toRadixString(16).substring(2) : Theme.of(context).colorScheme.secondaryContainer.value.toRadixString(16).substring(2)}',
         'padding': '0px 10px 5px 10px !important',
         'margin': '0',
         'border-radius': '8px',
@@ -299,16 +305,20 @@ abstract class _StoryStore with Store {
     }
 
     dom.Document document = parse(htmlValue);
+    if (kDebugMode) {
+      print(document.body!.text.length);
+    }
 
     aiLoading = true;
-
     try {
       feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem, document.body!.text);
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -358,5 +368,27 @@ abstract class _StoryStore with Store {
     feedItem.bookmarked = !feedItem.bookmarked;
     isBookmarked = feedItem.bookmarked;
     dbUtils.updateItemInDb(feedItem);
+  }
+
+  @action
+  void showImage(String imageUrl, BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => SafeArea(
+          child: Scaffold(
+            body: Stack(
+              children: [
+                PhotoView(imageProvider: CachedNetworkImageProvider(imageUrl)),
+                Positioned(
+                  top: 0,
+                  right: 10,
+                  child: IconButton(onPressed: () => Navigator.of(ctx).pop(), icon: const Icon(Icons.close)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

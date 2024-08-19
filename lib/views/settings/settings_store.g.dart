@@ -13,12 +13,20 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           DarkMode.system
       ..sort = $enumDecodeNullable(_$FeedListSortEnumMap, json['sort'],
               unknownValue: FeedListSort.byDate) ??
-          FeedListSort.byDate;
+          FeedListSort.byDate
+      ..sortFeedName = json['sortFeedName'] as String?
+      ..sortFeedGroupName = json['sortFeedGroupName'] as String?
+      ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
+      ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'darkMode': _$DarkModeEnumMap[instance.darkMode]!,
       'sort': _$FeedListSortEnumMap[instance.sort]!,
+      'sortFeedName': instance.sortFeedName,
+      'sortFeedGroupName': instance.sortFeedGroupName,
+      'useReaderModeByDefault': instance.useReaderModeByDefault,
+      'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
     };
 
 const _$DarkModeEnumMap = {
@@ -33,6 +41,8 @@ const _$FeedListSortEnumMap = {
   FeedListSort.unread: 'unread',
   FeedListSort.read: 'read',
   FeedListSort.bookmarked: 'bookmarked',
+  FeedListSort.feed: 'feed',
+  FeedListSort.feedGroup: 'feedGroup',
 };
 
 // **************************************************************************
@@ -73,6 +83,103 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$sortFeedAtom =
+      Atom(name: '_SettingsStore.sortFeed', context: context);
+
+  @override
+  Feed? get sortFeed {
+    _$sortFeedAtom.reportRead();
+    return super.sortFeed;
+  }
+
+  @override
+  set sortFeed(Feed? value) {
+    _$sortFeedAtom.reportWrite(value, super.sortFeed, () {
+      super.sortFeed = value;
+    });
+  }
+
+  late final _$sortFeedNameAtom =
+      Atom(name: '_SettingsStore.sortFeedName', context: context);
+
+  @override
+  String? get sortFeedName {
+    _$sortFeedNameAtom.reportRead();
+    return super.sortFeedName;
+  }
+
+  @override
+  set sortFeedName(String? value) {
+    _$sortFeedNameAtom.reportWrite(value, super.sortFeedName, () {
+      super.sortFeedName = value;
+    });
+  }
+
+  late final _$sortFeedGroupAtom =
+      Atom(name: '_SettingsStore.sortFeedGroup', context: context);
+
+  @override
+  FeedGroup? get sortFeedGroup {
+    _$sortFeedGroupAtom.reportRead();
+    return super.sortFeedGroup;
+  }
+
+  @override
+  set sortFeedGroup(FeedGroup? value) {
+    _$sortFeedGroupAtom.reportWrite(value, super.sortFeedGroup, () {
+      super.sortFeedGroup = value;
+    });
+  }
+
+  late final _$sortFeedGroupNameAtom =
+      Atom(name: '_SettingsStore.sortFeedGroupName', context: context);
+
+  @override
+  String? get sortFeedGroupName {
+    _$sortFeedGroupNameAtom.reportRead();
+    return super.sortFeedGroupName;
+  }
+
+  @override
+  set sortFeedGroupName(String? value) {
+    _$sortFeedGroupNameAtom.reportWrite(value, super.sortFeedGroupName, () {
+      super.sortFeedGroupName = value;
+    });
+  }
+
+  late final _$useReaderModeByDefaultAtom =
+      Atom(name: '_SettingsStore.useReaderModeByDefault', context: context);
+
+  @override
+  bool get useReaderModeByDefault {
+    _$useReaderModeByDefaultAtom.reportRead();
+    return super.useReaderModeByDefault;
+  }
+
+  @override
+  set useReaderModeByDefault(bool value) {
+    _$useReaderModeByDefaultAtom
+        .reportWrite(value, super.useReaderModeByDefault, () {
+      super.useReaderModeByDefault = value;
+    });
+  }
+
+  late final _$showAiSummaryOnLoadAtom =
+      Atom(name: '_SettingsStore.showAiSummaryOnLoad', context: context);
+
+  @override
+  bool get showAiSummaryOnLoad {
+    _$showAiSummaryOnLoadAtom.reportRead();
+    return super.showAiSummaryOnLoad;
+  }
+
+  @override
+  set showAiSummaryOnLoad(bool value) {
+    _$showAiSummaryOnLoadAtom.reportWrite(value, super.showAiSummaryOnLoad, () {
+      super.showAiSummaryOnLoad = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -99,10 +206,82 @@ mixin _$SettingsStore on _SettingsStore, Store {
   }
 
   @override
+  void setSortFeed(Feed feed) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setSortFeed');
+    try {
+      return super.setSortFeed(feed);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setSortFeedName(String feedName) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setSortFeedName');
+    try {
+      return super.setSortFeedName(feedName);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setSortFeedGroup(FeedGroup feedGroup) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setSortFeedGroup');
+    try {
+      return super.setSortFeedGroup(feedGroup);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setSortFeedGroupName(String feedGroupName) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setSortFeedGroupName');
+    try {
+      return super.setSortFeedGroupName(feedGroupName);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setUseReaderModeByDefault(bool value) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setUseReaderModeByDefault');
+    try {
+      return super.setUseReaderModeByDefault(value);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setShowAiSummaryOnLoad(bool value) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setShowAiSummaryOnLoad');
+    try {
+      return super.setShowAiSummaryOnLoad(value);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 darkMode: ${darkMode},
-sort: ${sort}
+sort: ${sort},
+sortFeed: ${sortFeed},
+sortFeedName: ${sortFeedName},
+sortFeedGroup: ${sortFeedGroup},
+sortFeedGroupName: ${sortFeedGroupName},
+useReaderModeByDefault: ${useReaderModeByDefault},
+showAiSummaryOnLoad: ${showAiSummaryOnLoad}
     ''';
   }
 }

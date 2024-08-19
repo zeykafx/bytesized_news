@@ -42,7 +42,7 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
   // const articleText = await article.text();
 
   // check the length of the article
-  if (content.length > 10000) {
+  if (content.length > 15000) {
     logger.info("Article too long: " + content.length);
     return {error: "Error: The article is too long. Please provide a shorter article."};
   }

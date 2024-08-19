@@ -28,4 +28,25 @@ class Feed {
 
     return Feed(title ?? 'Untitled Feed', url);
   }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'link': link,
+      'iconUrl': iconUrl,
+      'isPinned': isPinned,
+      'pinnedPosition': pinnedPosition,
+    };
+  }
+
+  // fromJson
+  Feed.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        id = json['id'] ?? 0,
+        link = json['link'],
+        iconUrl = json['iconUrl'],
+        isPinned = json['isPinned'],
+        pinnedPosition = json['pinnedPosition'];
 }

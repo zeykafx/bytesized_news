@@ -261,7 +261,9 @@ class _FeedViewState extends State<FeedView> {
                                           elevation: 0,
                                           color: !item.bookmarked
                                               ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2)
-                                              : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6),
+                                              : Theme.of(context).brightness == Brightness.dark
+                                                  ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
+                                                  : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
                                           child: SelectableRegion(
                                             focusNode: FocusNode(),
                                             selectionControls: MaterialTextSelectionControls(),
@@ -494,9 +496,20 @@ class _FeedViewState extends State<FeedView> {
                     children: [
                       // all feeds button
                       Card.outlined(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: settingsStore.sort != FeedListSort.feed && settingsStore.sort != FeedListSort.feedGroup
+                                ? Theme.of(context).colorScheme.primaryFixedDim
+                                : Theme.of(context).dividerColor.withOpacity(0.5),
+                            width: settingsStore.sort != FeedListSort.feed && settingsStore.sort != FeedListSort.feedGroup ? 3 : 1,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                        ),
                         child: IconButton(
                           onPressed: () {
-                            // feedStore.setSelectedFeed([]);
+                            feedStore.changeSort(FeedListSort.byDate);
                           },
                           icon: const Icon(Icons.all_inbox_rounded),
                         ),
@@ -506,10 +519,24 @@ class _FeedViewState extends State<FeedView> {
                         if (elem.runtimeType == Feed) {
                           Feed feed = elem;
 
+                          bool isCurrentSortFeed =
+                              settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && settingsStore.sortFeed?.name == feed.name;
                           return Card.outlined(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: isCurrentSortFeed ? Theme.of(context).colorScheme.primaryFixedDim : Theme.of(context).dividerColor.withOpacity(0.5),
+                                width: isCurrentSortFeed ? 3 : 1,
+                              ),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
                             child: IconButton(
                               onPressed: () {
                                 // sort for this feed
+                                settingsStore.setSortFeed(feed);
+                                settingsStore.setSortFeedName(feed.name);
+                                feedStore.changeSort(FeedListSort.feed);
                               },
                               icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 25, height: 25),
                             ),
@@ -517,10 +544,25 @@ class _FeedViewState extends State<FeedView> {
                         } else {
                           FeedGroup feedGroup = elem;
 
+                          bool isCurrentSortFeedGroup = settingsStore.sort == FeedListSort.feedGroup &&
+                              settingsStore.sortFeedGroup != null &&
+                              settingsStore.sortFeedGroup?.name == feedGroup.name;
                           return Card.outlined(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: isCurrentSortFeedGroup ? Theme.of(context).colorScheme.primaryFixedDim : Theme.of(context).dividerColor.withOpacity(0.5),
+                                width: isCurrentSortFeedGroup ? 3 : 1,
+                              ),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
                             child: IconButton(
                               onPressed: () {
                                 // sort for this feed group
+                                settingsStore.setSortFeedGroup(feedGroup);
+                                settingsStore.setSortFeedGroupName(feedGroup.name);
+                                feedStore.changeSort(FeedListSort.feedGroup);
                               },
                               icon: feedGroup.feeds.isEmpty
                                   ? const Icon(

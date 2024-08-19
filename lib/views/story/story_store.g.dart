@@ -78,10 +78,14 @@ mixin _$StoryStore on _StoryStore, Store {
     return super.showReaderMode;
   }
 
+  bool _showReaderModeIsInitialized = false;
+
   @override
   set showReaderMode(bool value) {
-    _$showReaderModeAtom.reportWrite(value, super.showReaderMode, () {
+    _$showReaderModeAtom.reportWrite(
+        value, _showReaderModeIsInitialized ? super.showReaderMode : null, () {
       super.showReaderMode = value;
+      _showReaderModeIsInitialized = true;
     });
   }
 
@@ -370,10 +374,14 @@ mixin _$StoryStore on _StoryStore, Store {
     return super.hideSummary;
   }
 
+  bool _hideSummaryIsInitialized = false;
+
   @override
   set hideSummary(bool value) {
-    _$hideSummaryAtom.reportWrite(value, super.hideSummary, () {
+    _$hideSummaryAtom.reportWrite(
+        value, _hideSummaryIsInitialized ? super.hideSummary : null, () {
       super.hideSummary = value;
+      _hideSummaryIsInitialized = true;
     });
   }
 
@@ -504,6 +512,17 @@ mixin _$StoryStore on _StoryStore, Store {
         name: '_StoryStore.bookmarkItem');
     try {
       return super.bookmarkItem();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void showImage(String imageUrl, BuildContext context) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.showImage');
+    try {
+      return super.showImage(imageUrl, context);
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }

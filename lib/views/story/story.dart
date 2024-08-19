@@ -3,6 +3,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
+import 'package:bytesized_news/views/story/sub_views/story_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
@@ -64,6 +65,20 @@ class _StoryState extends State<Story> {
           title: Observer(builder: (_) {
             return Text("${storyStore.feedItem.title} - ${storyStore.feedItem.feedName}");
           }),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => StorySettings(
+                      storyStore: storyStore,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: BottomSheetBar(
           controller: storyStore.bsbController,
@@ -124,7 +139,7 @@ class _StoryState extends State<Story> {
                                      <h1>${storyStore.feedItem.title}</h1>
                                      <p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>
                                      <img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>
-                                     ${!storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                     ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                       <h2>Summary</h2>
                                       <p>${storyStore.feedItem.aiSummary}</p>
                                       </div>''' : ""}
@@ -135,6 +150,9 @@ class _StoryState extends State<Story> {
                                 ''',
                                     renderMode: RenderMode.listView,
                                     customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                    onTapImage: (ImageMetadata imageData) {
+                                      storyStore.showImage(imageData.sources.firstOrNull!.url, context);
+                                    },
                                   ),
                                 ),
                               ),
@@ -160,7 +178,7 @@ class _StoryState extends State<Story> {
                                           ],
                                         )
                                       : const SizedBox(),
-                                  storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                  storyStore.feedItemSummarized && storyStore.hideSummary && !storyStore.showReaderMode
                                       ? Container(
                                           decoration: BoxDecoration(
                                             borderRadius: const BorderRadius.only(
@@ -230,14 +248,17 @@ class _StoryState extends State<Story> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // RELOAD
-                IconButton(
-                  onPressed: () {
-                    storyStore.controller?.reload();
-                  },
-                  icon: const Icon(Icons.refresh),
-                ),
-                // BACK
+                if (!storyStore.showReaderMode) ...[
+                  IconButton(
+                    onPressed: () {
+                      storyStore.controller?.reload();
+                    },
+                    tooltip: "Refresh web page",
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ],
 
+                // BACK
                 if (!storyStore.showReaderMode) ...[
                   IconButton(
                     onPressed: () {
@@ -245,6 +266,7 @@ class _StoryState extends State<Story> {
                         storyStore.controller?.goBack();
                       }
                     },
+                    tooltip: "Go back",
                     icon: Icon(
                       Icons.arrow_back_ios,
                       color: storyStore.canGoBack ? null : Colors.grey.withOpacity(0.5),
@@ -258,6 +280,7 @@ class _StoryState extends State<Story> {
                         storyStore.controller?.goForward();
                       }
                     },
+                    tooltip: "Go forward",
                     icon: Icon(
                       Icons.arrow_forward_ios,
                       color: storyStore.canGoForward ? null : Colors.grey.withOpacity(0.5),
@@ -270,6 +293,7 @@ class _StoryState extends State<Story> {
                   onPressed: () {
                     storyStore.toggleReaderMode();
                   },
+                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
                   icon: Icon(storyStore.showReaderMode ? Icons.chrome_reader_mode : Icons.chrome_reader_mode_outlined),
                 ),
 

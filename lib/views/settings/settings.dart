@@ -60,33 +60,61 @@ class _GeneralSettingsState extends State<GeneralSettings> {
       return SettingsSection(
         title: "General",
         children: [
+          // DARK MODE
           ListTile(
-              title: const Text(
-                "Dark Mode",
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: SegmentedButton(
-                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                  segments: darkModeNames
-                      .map(
-                        (option) => ButtonSegment(
-                          value: option,
-                          label: Text(
-                            option,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+            title: const Text(
+              "Dark Mode",
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SegmentedButton(
+                style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                segments: darkModeNames
+                    .map(
+                      (option) => ButtonSegment(
+                        value: option,
+                        label: Text(
+                          option,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      )
-                      .toList(),
-                  selected: {darkModeNames[settingsStore.darkMode.index]},
-                  onSelectionChanged: (selection) async {
-                    settingsStore.setDarkMode(
-                      DarkMode.values[darkModeNames.indexOf(selection.first)],
-                    );
-                  },
-                ),
-              )),
+                      ),
+                    )
+                    .toList(),
+                selected: {darkModeNames[settingsStore.darkMode.index]},
+                onSelectionChanged: (selection) async {
+                  settingsStore.setDarkMode(
+                    DarkMode.values[darkModeNames.indexOf(selection.first)],
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // USE READER MODE BY DEFAULT
+          ListTile(
+            title: const Text(
+              "Use Reader Mode by Default",
+            ),
+            trailing: Switch(
+              value: settingsStore.useReaderModeByDefault,
+              onChanged: (value) {
+                settingsStore.setUseReaderModeByDefault(value);
+              },
+            ),
+          ),
+
+          // SHOW AI SUMMARY ON WEB PAGE LOAD
+          ListTile(
+            title: const Text(
+              "Show AI Summary on Web Page Load",
+            ),
+            trailing: Switch(
+              value: settingsStore.showAiSummaryOnLoad,
+              onChanged: (value) {
+                settingsStore.setShowAiSummaryOnLoad(value);
+              },
+            ),
+          ),
         ],
       );
     });

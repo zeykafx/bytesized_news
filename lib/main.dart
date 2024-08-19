@@ -74,6 +74,19 @@ void main() async {
   final AuthStore authStore = AuthStore();
   await authStore.init();
 
+  if (settingsStore.sortFeedName != null) {
+    settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();
+  }
+
+  if (settingsStore.sortFeedGroupName != null) {
+    settingsStore.sortFeedGroup = await isar.feedGroups.where().filter().nameEqualTo(settingsStore.sortFeedGroupName!).findFirst();
+
+    List<Feed> feeds = await isar.feeds.where().findAll();
+    for (String feedName in settingsStore.sortFeedGroup!.feedNames) {
+      settingsStore.sortFeedGroup!.feeds.add(feeds.firstWhere((feed) => feed.name == feedName));
+    }
+  }
+
   runApp(
     MultiProvider(
       providers: [
