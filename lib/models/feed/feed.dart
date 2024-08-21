@@ -34,43 +34,6 @@ class Feed {
     return Feed(title, url, iconUrl);
   }
 
-  // static Future<String> fetchFavicon(String url) async {
-  //   try {
-  //     url = url.split("/").getRange(0, 3).join("/");
-  //     Uri uri = Uri.parse(url);
-  //     http.Response result = await http.get(uri);
-  //     if (result.statusCode == 200) {
-  //       String htmlStr = result.body;
-  //       Document dom = parse(htmlStr);
-  //       List<Element> links = dom.getElementsByTagName("link");
-  //       for (Element link in links) {
-  //         String? rel = link.attributes["rel"];
-  //         if ((rel == "icon" || rel == "shortcut icon") && link.attributes.containsKey("href")) {
-  //           String? href = link.attributes["href"];
-  //           // prefer png over svgs
-  //           if (href!.endsWith(".svg")) {
-  //             continue;
-  //           }
-  //
-  //           Uri parsedUrl = Uri.parse(url);
-  //           if (href.startsWith("//")) {
-  //             return "${parsedUrl.scheme}:$href";
-  //           } else if (href.startsWith("/")) {
-  //             return url + href;
-  //           } else {
-  //             return href;
-  //           }
-  //         }
-  //       }
-  //     }
-  //     url = "$url/favicon.ico";
-  //     return url;
-  //   } catch (exp) {
-  //     Uri uri = Uri.parse(url);
-  //     return "https://cdn.brandfetch.io/${uri.host}/fallback/lettermark/";
-  //   }
-  // }
-
   @override
   String toString() {
     return 'Feed{name: $name, link: $link, iconUrl: $iconUrl}';

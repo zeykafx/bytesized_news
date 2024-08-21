@@ -55,7 +55,7 @@ class FeedItem {
       dom.Document document = html_parser.parse(item.content!);
 
       // find the image and print the src
-      var img = document.querySelector('img');
+      dom.Element? img = document.querySelector('img');
       if (img != null) {
         feedItem.imageUrl = img.attributes['src']!;
       } else {

@@ -197,7 +197,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
               type: FileType.custom,
               allowedExtensions: ["opml", "xml"],
             );
-            if (result != null) {
+            if (result != null && result.files.isNotEmpty) {
               String fileContent = await result.files.first.xFile.readAsString();
               // get feeds from opml file
               var (List<Feed> feeds, List<FeedGroup> feedGroups) = await OpmlUtils().getFeedsFromOpmlFile(fileContent);
@@ -212,7 +212,12 @@ class _ImportExportSectionState extends State<ImportExportSection> {
               // show dialog to confirm import, add the selected feeds to the db
               showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
+                  builder: (context) {
+                    List<Feed> selectedFeeds = List.of(loneFeeds);
+                    List<FeedGroup> selectedFeedGroups = List.of(feedGroups);
+
+                    return StatefulBuilder(builder: (context, dialogSetState) {
+                      return AlertDialog(
                         title: const Text("Import OPML file"),
                         content: SingleChildScrollView(
                           child: Column(
@@ -224,10 +229,54 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                               ...feedGroups.map((feedGroup) => ListTile(
                                     title: Text("Group: ${feedGroup.name}"),
                                     subtitle: Text(feedGroup.feedNames.join(", ")),
+                                    selected: selectedFeedGroups.contains(feedGroup),
+                                    onTap: () {
+                                      dialogSetState(() {
+                                        if (selectedFeedGroups.contains(feedGroup)) {
+                                          selectedFeedGroups.remove(feedGroup);
+                                        } else {
+                                          selectedFeedGroups.add(feedGroup);
+                                        }
+                                      });
+                                    },
+                                    trailing: Checkbox(
+                                      value: selectedFeedGroups.contains(feedGroup),
+                                      onChanged: (value) {
+                                        dialogSetState(() {
+                                          if (value!) {
+                                            selectedFeedGroups.add(feedGroup);
+                                          } else {
+                                            selectedFeedGroups.remove(feedGroup);
+                                          }
+                                        });
+                                      },
+                                    ),
                                   )),
                               // feeds that are not in a group
                               ...loneFeeds.map((feed) => ListTile(
                                     title: Text("Feed: ${feed.name}"),
+                                    selected: selectedFeeds.contains(feed),
+                                    onTap: () {
+                                      dialogSetState(() {
+                                        if (selectedFeeds.contains(feed)) {
+                                          selectedFeeds.remove(feed);
+                                        } else {
+                                          selectedFeeds.add(feed);
+                                        }
+                                      });
+                                    },
+                                    trailing: Checkbox(
+                                      value: selectedFeeds.contains(feed),
+                                      onChanged: (value) {
+                                        dialogSetState(() {
+                                          if (value!) {
+                                            selectedFeeds.add(feed);
+                                          } else {
+                                            selectedFeeds.remove(feed);
+                                          }
+                                        });
+                                      },
+                                    ),
                                   )),
                             ],
                           ),
@@ -240,12 +289,18 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () {
-                              for (Feed feed in feeds) {
-                                dbUtils.addFeed(feed);
+                            onPressed: () async {
+                              for (Feed feed in selectedFeeds) {
+                                await dbUtils.addFeed(feed);
                               }
-                              for (FeedGroup feedGroup in feedGroups) {
-                                dbUtils.addFeedGroup(feedGroup);
+                              for (FeedGroup feedGroup in selectedFeedGroups) {
+                                // add the feeds for the feedGroup
+                                for (String feedName in feedGroup.feedNames) {
+                                  Feed feed = feeds.firstWhere((feed) => feed.name == feedName);
+                                  await dbUtils.addFeed(feed);
+                                }
+
+                                await dbUtils.addFeedGroup(feedGroup);
                               }
 
                               Navigator.pop(context);
@@ -259,7 +314,9 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                             child: const Text("Import"),
                           ),
                         ],
-                      ));
+                      );
+                    });
+                  });
             } else {
               settingsStore.loading = false;
             }

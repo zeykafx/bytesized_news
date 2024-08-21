@@ -185,9 +185,6 @@ abstract class _FeedStore with Store {
       } catch (e) {
         atomFeed = AtomFeed.parse(res.data);
         usingRssFeed = false;
-        if (kDebugMode) {
-          print("Using Atom feed");
-        }
       }
 
       if (usingRssFeed) {

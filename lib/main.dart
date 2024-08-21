@@ -76,14 +76,31 @@ void main() async {
 
   if (settingsStore.sortFeedName != null) {
     settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();
+
+    if (settingsStore.sortFeed == null) {
+      settingsStore.sortFeedName = null;
+      settingsStore.sortFeed = null;
+      settingsStore.sort = FeedListSort.byDate;
+    }
   }
 
   if (settingsStore.sortFeedGroupName != null) {
     settingsStore.sortFeedGroup = await isar.feedGroups.where().filter().nameEqualTo(settingsStore.sortFeedGroupName!).findFirst();
+    if (settingsStore.sortFeedGroup == null) {
+      settingsStore.sortFeedGroupName = null;
+      settingsStore.sortFeedGroup = null;
+      settingsStore.sort = FeedListSort.byDate;
+    } else {
+      List<Feed> feeds = await isar.feeds.where().findAll();
 
-    List<Feed> feeds = await isar.feeds.where().findAll();
-    for (String feedName in settingsStore.sortFeedGroup!.feedNames) {
-      settingsStore.sortFeedGroup!.feeds.add(feeds.firstWhere((feed) => feed.name == feedName));
+      for (String feedName in settingsStore.sortFeedGroup!.feedNames) {
+        if (feeds.any((feed) => feed.name != feedName)) {
+          continue;
+        }
+        Feed feed = feeds.firstWhere((feed) => feed.name == feedName);
+
+        settingsStore.sortFeedGroup!.feeds.add(feed);
+      }
     }
   }
 
