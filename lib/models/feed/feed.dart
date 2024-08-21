@@ -17,7 +17,8 @@ class Feed {
 
   Feed(this.name, this.link) {
     Uri uri = Uri.parse(link);
-    iconUrl = "https://icon.horse/icon/${uri.host}";
+    // iconUrl = "https://icon.horse/icon/${uri.host}";
+    iconUrl = "https://cdn.brandfetch.io/${uri.host}/fallback/lettermark/";
   }
 
   static Future<Feed> createFeed(String url) async {

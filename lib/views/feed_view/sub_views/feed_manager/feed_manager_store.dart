@@ -227,7 +227,8 @@ abstract class _FeedManagerStore with Store {
         // also remove the feed from any feedGroups that it might be in
         for (FeedGroup feedGroup in feedStore.feedGroups) {
           if (feedGroup.feedNames.contains(feed.name)) {
-            feedGroup.feedNames.remove(feed.name);
+            feedGroup.feedNames = feedGroup.feedNames.where((name) => name != feed.name).toList();
+            // feedGroup.feedNames.remove(feed.name);
             feedGroup.feeds.removeWhere((f) => f.name == feed.name);
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }

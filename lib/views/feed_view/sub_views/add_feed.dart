@@ -3,8 +3,6 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:isar/isar.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
@@ -118,8 +116,6 @@ class _AddFeedState extends State<AddFeed> {
                       alignment: Alignment.centerRight,
                       child: FilledButton.tonal(
                         onPressed: () async {
-                          bool validLink = false;
-
                           Dio dio = Dio();
 
                           String feedLink = feedLinkController.text;
@@ -129,24 +125,28 @@ class _AddFeedState extends State<AddFeed> {
                           try {
                             res = await dio.get(feedLink);
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid RSS/ATOM feed")));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid link")));
                             return;
                           }
 
                           RssFeed rssFeed;
                           AtomFeed atomFeed;
                           try {
-                            rssFeed = RssFeed.parse(res.data);
+                            atomFeed = AtomFeed.parse(res.data);
                           } catch (e) {
                             try {
-                              atomFeed = AtomFeed.parse(res.data);
+                              rssFeed = RssFeed.parse(res.data);
                             } catch (e) {
-                              validLink = false;
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid RSS/ATOM feed")));
                               return;
                             }
                           }
-                          validLink = true;
+
+                          // Favicon? favicon = await FaviconFinder.getBest(feedLink);
+                          // String iconUrl = "";
+                          // if (favicon != null) {
+                          //   iconUrl = favicon.url;
+                          // }
 
                           if (feedName.isEmpty) {
                             await addFeedToDb(await Feed.createFeed(feedLink));

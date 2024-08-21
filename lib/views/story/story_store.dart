@@ -8,11 +8,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
-import 'package:html_main_element/html_main_element.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -172,6 +170,8 @@ abstract class _StoryStore with Store {
               : ForceDark.OFF,
     );
 
+    compareReaderModeLengthToPageHtml(context);
+
     initialized = true;
   }
 
@@ -179,6 +179,24 @@ abstract class _StoryStore with Store {
   Future<String> fetchPageHtml() async {
     final result = await readability.parseAsync(feedItem.url);
     return result.content!;
+  }
+
+  @action
+  Future<void> compareReaderModeLengthToPageHtml(BuildContext context) async {
+    Dio dio = Dio();
+
+    // fetch the page's html
+    var res = await dio.get(feedItem.url);
+    dom.Document doc = html_parser.parse(res.data);
+    if (doc == null) {
+      return;
+    }
+
+    print("Ratio: ${doc.body!.innerHtml.length / htmlContent.length}");
+    if (doc.outerHtml.length / htmlContent.length > 80) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("The reader view seems to have a much shorter article than the web page's full length, consider switching to the web page.")));
+    }
   }
 
   @action

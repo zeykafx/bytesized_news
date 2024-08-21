@@ -141,9 +141,6 @@ abstract class _FeedStore with Store {
 
   @action
   Future<void> getItems() async {
-    // get all feed items from Isar, sorted by published date
-    // feedItems = (await dbUtils.getItems(feeds)).asObservable();
-
     // this doesn't change the sort but it does fetch the right items from the DB for the current sort
     await changeSort(settingsStore.sort);
 
@@ -235,23 +232,15 @@ abstract class _FeedStore with Store {
         break;
       case FeedListSort.today:
         feedItems = (await dbUtils.getTodaysItems(feeds)).asObservable();
-        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-        // feedItems = feedItems.where((item) => item.publishedDate.day == DateTime.now().day).toList().asObservable();
         break;
       case FeedListSort.unread:
         feedItems = (await dbUtils.getUnreadItems(feeds)).asObservable();
-        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-        // feedItems = feedItems.where((item) => !item.read).toList().asObservable();
         break;
       case FeedListSort.read:
         feedItems = (await dbUtils.getReadItems(feeds)).asObservable();
-        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-        // feedItems = feedItems.where((item) => item.read).toList().asObservable();
         break;
       case FeedListSort.bookmarked:
         feedItems = (await dbUtils.getBookmarkedItems(feeds)).asObservable();
-        // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-        // feedItems = feedItems.where((item) => item.bookmarked).toList().asObservable();
         break;
       case FeedListSort.feed:
         if (settingsStore.sortFeed == null) {

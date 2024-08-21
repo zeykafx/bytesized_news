@@ -103,8 +103,8 @@ class _FeedManagerState extends State<FeedManager> {
                                         ),
                                       )
                                           .then((_) async {
-                                        await widget.wrappedGetFeeds();
-                                        await widget.wrappedGetItems();
+                                        // await widget.wrappedGetFeeds();
+                                        // await widget.wrappedGetItems();
                                         setState(() {});
                                       });
                                     },
@@ -495,6 +495,14 @@ class _FeedManagerState extends State<FeedManager> {
                           ),
                         ),
                       ),
+                    ),
+                  ),
+
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      "Logos by Brandfetch.com",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).dividerColor.withOpacity(0.3)),
                     ),
                   ),
                 ],

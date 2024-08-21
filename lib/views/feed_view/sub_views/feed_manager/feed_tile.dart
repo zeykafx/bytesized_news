@@ -166,7 +166,11 @@ class _FeedTileState extends State<FeedTile> {
                                       title: const Text("Add Feeds to Feed Group(s)"),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
+                                          if (feedStore.feedGroups.isEmpty) ...[
+                                            const Text("No Groups to select!"),
+                                          ],
                                           // SELECTABLE FEED GROUPS
                                           ...feedStore.feedGroups.map(
                                             (FeedGroup feedGroup) => Card.outlined(

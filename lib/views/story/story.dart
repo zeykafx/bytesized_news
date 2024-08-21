@@ -129,7 +129,7 @@ class _StoryState extends State<Story> {
                             ],
                             if (storyStore.showReaderMode) ...[
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: SelectableRegion(
                                   focusNode: FocusNode(),
                                   selectionControls: MaterialTextSelectionControls(),

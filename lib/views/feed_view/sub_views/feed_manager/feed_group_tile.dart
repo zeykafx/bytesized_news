@@ -212,6 +212,10 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
+                                          if (feedStore.feeds.isEmpty) ...[
+                                            const Text("No feeds to select!"),
+                                          ],
+
                                           // SELECTABLE FEED GROUPS
                                           ...feedStore.feeds.map(
                                             (Feed feed) => Card.outlined(

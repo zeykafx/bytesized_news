@@ -104,7 +104,7 @@ class _FeedViewState extends State<FeedView> {
           locked: feedStore.isLocked,
           body: RefreshIndicator(
             onRefresh: () async {
-              feedStore.getItems();
+              feedStore.fetchItems();
             },
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -236,222 +236,219 @@ class _FeedViewState extends State<FeedView> {
                             ],
                           ),
                         ),
-                        Skeletonizer(
-                          enabled: false,
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 500),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (feedStore.loading) ...[
-                                  const Center(child: LinearProgressIndicator()),
-                                ],
-                                if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
-                                  const Center(child: Text("No stories loaded")),
-                                ],
-                                // some trickery to get the index of each element as well as the item
-                                // this is used to animate each card fading in with a delay.
-                                ...feedStore.feedItems
-                                    .asMap()
-                                    .map(
-                                      (idx, item) => MapEntry(
-                                        idx,
-                                        Card(
-                                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                          elevation: 0,
-                                          color: !item.bookmarked
-                                              ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2)
-                                              : Theme.of(context).brightness == Brightness.dark
-                                                  ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
-                                                  : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-                                          child: SelectableRegion(
-                                            focusNode: FocusNode(),
-                                            selectionControls: MaterialTextSelectionControls(),
-                                            child: ListTile(
-                                              title: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Flexible(
-                                                    child: Text(
-                                                      item.title,
-                                                      style: const TextStyle(fontSize: 15),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  item.imageUrl.isNotEmpty
-                                                      ? Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                          ),
-                                                          clipBehavior: Clip.antiAlias,
-                                                          child: CachedNetworkImage(
-                                                            imageUrl: item.imageUrl,
-                                                            fit: BoxFit.cover,
-                                                            height: 72,
-                                                            width: 128,
-                                                          ),
-                                                        )
-                                                      : const SizedBox(),
-                                                ],
-                                              ),
-                                              subtitle: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  // item.summarized ? Text("Summary: ${item.aiSummary}") : Text(item.description.split("\n").first),
-                                                  Row(
-                                                    children: [
-                                                      Chip(
-                                                        label: Text(
-                                                          item.feedName,
-                                                          style: const TextStyle(fontSize: 10),
-                                                        ),
-                                                        avatar: CachedNetworkImage(
-                                                          imageUrl: item.feed!.iconUrl,
-                                                          width: 15,
-                                                          height: 15,
-                                                        ),
-                                                        elevation: 0,
-                                                        side: const BorderSide(width: 0, color: Colors.transparent),
-                                                        padding: const EdgeInsets.all(0),
-                                                        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                                        visualDensity: VisualDensity.compact,
-                                                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                                                        shape: const RoundedRectangleBorder(
-                                                          side: BorderSide(width: 0, color: Colors.transparent),
-                                                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                                                        ),
-                                                      ),
-
-                                                      if (item.bookmarked) ...[
-                                                        const SizedBox(width: 10),
-                                                        Icon(
-                                                          LucideIcons.bookmark_check,
-                                                          color: Theme.of(context).dividerColor,
-                                                          size: 15,
-                                                        )
-                                                      ],
-
-                                                      // star icon to show if the item has been summarized by AI or not
-                                                      if (item.summarized) ...[
-                                                        const SizedBox(width: 10),
-                                                        Icon(
-                                                          LucideIcons.sparkles,
-                                                          color: Theme.of(context).dividerColor,
-                                                          size: 15,
-                                                        )
-                                                      ],
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        formatTime(item.publishedDate.millisecondsSinceEpoch),
-                                                        style: TextStyle(color: Theme.of(context).dividerColor),
-                                                      ),
-                                                      PopupMenuButton(
-                                                        elevation: 20,
-                                                        icon: const Icon(Icons.more_vert),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
-                                                        ),
-                                                        onSelected: (int index) {
-                                                          switch (index) {
-                                                            case 0:
-                                                              {
-                                                                feedStore.toggleItemRead(idx, toggle: true);
-                                                                // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
-                                                                setState(() {});
-                                                                break;
-                                                              }
-                                                            case 1:
-                                                              {
-                                                                feedStore.toggleItemBookmarked(idx, toggle: true);
-                                                                setState(() {});
-                                                                break;
-                                                              }
-                                                          }
-                                                        },
-                                                        itemBuilder: (BuildContext context) {
-                                                          return [
-                                                            // MARK AS READ/UNREAD
-                                                            PopupMenuItem(
-                                                              value: 0,
-                                                              child: Wrap(
-                                                                children: [
-                                                                  const Padding(
-                                                                    padding: EdgeInsets.only(left: 10),
-                                                                    child: Icon(
-                                                                      Icons.check,
-                                                                      size: 19,
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: const EdgeInsets.only(left: 20),
-                                                                    child: Text(item.read ? "Mark as Unread" : "Mark as Read"),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            // BOOKMARK
-                                                            PopupMenuItem(
-                                                              value: 1,
-                                                              child: Wrap(
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets.only(left: 10),
-                                                                    child: Icon(
-                                                                      item.bookmarked ? Icons.bookmark_added : Icons.bookmark_add,
-                                                                      size: 19,
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: const EdgeInsets.only(left: 20),
-                                                                    child: Text(item.bookmarked ? "Remove from bookmarks" : "Add to bookmarks"),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
-                                                          ];
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              textColor: item.read ? Theme.of(context).dividerColor : Theme.of(context).textTheme.bodyMedium?.color,
-                                              onTap: () {
-                                                feedStore.toggleItemRead(idx);
-                                                // force update the state to change the list tile's color to gray
-                                                setState(() {});
-                                                Navigator.of(context)
-                                                    .push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) => Story(
-                                                      feedItem: item,
-                                                    ),
-                                                  ),
-                                                )
-                                                    .then((_) {
-                                                  // update the sort after the story view is popped,
-                                                  // this is done so that the story that was just viewed is removed if we are in the unread sort
-                                                  feedStore.changeSort(feedStore.settingsStore.sort);
-
-                                                  // update the state of the list items after the story view is popped
-                                                  // this is done because if the item was bookmarked while in the story view, we want to show that in the list
-                                                  setState(() {});
-                                                });
-                                              },
-                                              dense: false,
-                                            ),
-                                          ),
-                                        ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
-                                      ),
-                                    )
-                                    .values,
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 500),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (feedStore.loading) ...[
+                                const Center(child: LinearProgressIndicator()),
                               ],
-                            ),
+                              if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
+                                const Center(child: Text("No stories loaded")),
+                              ],
+                              // some trickery to get the index of each element as well as the item
+                              // this is used to animate each card fading in with a delay.
+                              ...feedStore.feedItems
+                                  .asMap()
+                                  .map(
+                                    (idx, item) => MapEntry(
+                                      idx,
+                                      Card(
+                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                        elevation: 0,
+                                        color: !item.bookmarked
+                                            ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2)
+                                            : Theme.of(context).brightness == Brightness.dark
+                                                ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
+                                                : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
+                                        child: SelectableRegion(
+                                          focusNode: FocusNode(),
+                                          selectionControls: MaterialTextSelectionControls(),
+                                          child: ListTile(
+                                            title: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    item.title,
+                                                    style: const TextStyle(fontSize: 15),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                item.imageUrl.isNotEmpty
+                                                    ? Container(
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                        clipBehavior: Clip.antiAlias,
+                                                        child: CachedNetworkImage(
+                                                          imageUrl: item.imageUrl,
+                                                          fit: BoxFit.cover,
+                                                          height: 72,
+                                                          width: 128,
+                                                        ),
+                                                      )
+                                                    : const SizedBox(),
+                                              ],
+                                            ),
+                                            subtitle: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                // item.summarized ? Text("Summary: ${item.aiSummary}") : Text(item.description.split("\n").first),
+                                                Row(
+                                                  children: [
+                                                    Chip(
+                                                      label: Text(
+                                                        item.feedName,
+                                                        style: const TextStyle(fontSize: 10),
+                                                      ),
+                                                      avatar: CachedNetworkImage(
+                                                        imageUrl: item.feed!.iconUrl,
+                                                        width: 15,
+                                                        height: 15,
+                                                      ),
+                                                      elevation: 0,
+                                                      side: const BorderSide(width: 0, color: Colors.transparent),
+                                                      padding: const EdgeInsets.all(0),
+                                                      labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                                      visualDensity: VisualDensity.compact,
+                                                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                                      shape: const RoundedRectangleBorder(
+                                                        side: BorderSide(width: 0, color: Colors.transparent),
+                                                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                                                      ),
+                                                    ),
+
+                                                    if (item.bookmarked) ...[
+                                                      const SizedBox(width: 10),
+                                                      Icon(
+                                                        LucideIcons.bookmark_check,
+                                                        color: Theme.of(context).dividerColor,
+                                                        size: 15,
+                                                      )
+                                                    ],
+
+                                                    // star icon to show if the item has been summarized by AI or not
+                                                    if (item.summarized) ...[
+                                                      const SizedBox(width: 10),
+                                                      Icon(
+                                                        LucideIcons.sparkles,
+                                                        color: Theme.of(context).dividerColor,
+                                                        size: 15,
+                                                      )
+                                                    ],
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      formatTime(item.publishedDate.millisecondsSinceEpoch),
+                                                      style: TextStyle(color: Theme.of(context).dividerColor),
+                                                    ),
+                                                    PopupMenuButton(
+                                                      elevation: 20,
+                                                      icon: const Icon(Icons.more_vert),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
+                                                      ),
+                                                      onSelected: (int index) {
+                                                        switch (index) {
+                                                          case 0:
+                                                            {
+                                                              feedStore.toggleItemRead(idx, toggle: true);
+                                                              // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
+                                                              setState(() {});
+                                                              break;
+                                                            }
+                                                          case 1:
+                                                            {
+                                                              feedStore.toggleItemBookmarked(idx, toggle: true);
+                                                              setState(() {});
+                                                              break;
+                                                            }
+                                                        }
+                                                      },
+                                                      itemBuilder: (BuildContext context) {
+                                                        return [
+                                                          // MARK AS READ/UNREAD
+                                                          PopupMenuItem(
+                                                            value: 0,
+                                                            child: Wrap(
+                                                              children: [
+                                                                const Padding(
+                                                                  padding: EdgeInsets.only(left: 10),
+                                                                  child: Icon(
+                                                                    Icons.check,
+                                                                    size: 19,
+                                                                  ),
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 20),
+                                                                  child: Text(item.read ? "Mark as Unread" : "Mark as Read"),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          // BOOKMARK
+                                                          PopupMenuItem(
+                                                            value: 1,
+                                                            child: Wrap(
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 10),
+                                                                  child: Icon(
+                                                                    item.bookmarked ? Icons.bookmark_added : Icons.bookmark_add,
+                                                                    size: 19,
+                                                                  ),
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(left: 20),
+                                                                  child: Text(item.bookmarked ? "Remove from bookmarks" : "Add to bookmarks"),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ];
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            textColor: item.read ? Theme.of(context).dividerColor : Theme.of(context).textTheme.bodyMedium?.color,
+                                            onTap: () {
+                                              feedStore.toggleItemRead(idx);
+                                              // force update the state to change the list tile's color to gray
+                                              setState(() {});
+                                              Navigator.of(context)
+                                                  .push(
+                                                MaterialPageRoute(
+                                                  builder: (context) => Story(
+                                                    feedItem: item,
+                                                  ),
+                                                ),
+                                              )
+                                                  .then((_) {
+                                                // update the sort after the story view is popped,
+                                                // this is done so that the story that was just viewed is removed if we are in the unread sort
+                                                feedStore.changeSort(feedStore.settingsStore.sort);
+
+                                                // update the state of the list items after the story view is popped
+                                                // this is done because if the item was bookmarked while in the story view, we want to show that in the list
+                                                setState(() {});
+                                              });
+                                            },
+                                            dense: false,
+                                          ),
+                                        ),
+                                      ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn(),
+                                    ),
+                                  )
+                                  .values,
+                            ],
                           ),
                         ),
                       ],

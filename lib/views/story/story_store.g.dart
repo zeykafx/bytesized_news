@@ -424,6 +424,16 @@ mixin _$StoryStore on _StoryStore, Store {
     return _$fetchPageHtmlAsyncAction.run(() => super.fetchPageHtml());
   }
 
+  late final _$compareReaderModeLengthToPageHtmlAsyncAction = AsyncAction(
+      '_StoryStore.compareReaderModeLengthToPageHtml',
+      context: context);
+
+  @override
+  Future<void> compareReaderModeLengthToPageHtml(BuildContext context) {
+    return _$compareReaderModeLengthToPageHtmlAsyncAction
+        .run(() => super.compareReaderModeLengthToPageHtml(context));
+  }
+
   late final _$onProgressChangedAsyncAction =
       AsyncAction('_StoryStore.onProgressChanged', context: context);
 
