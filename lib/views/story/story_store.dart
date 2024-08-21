@@ -188,14 +188,17 @@ abstract class _StoryStore with Store {
     // fetch the page's html
     var res = await dio.get(feedItem.url);
     dom.Document doc = html_parser.parse(res.data);
-    if (doc == null) {
+    if (doc.body == null) {
       return;
     }
 
-    print("Ratio: ${doc.body!.innerHtml.length / htmlContent.length}");
-    if (doc.outerHtml.length / htmlContent.length > 80) {
+    if (kDebugMode) {
+      print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
+    }
+    if ((doc.body!.innerHtml.length / htmlContent.length) > 80) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("The reader view seems to have a much shorter article than the web page's full length, consider switching to the web page.")));
+          content: Text("The reader view seems to have a much shorter article than the web page's full length, switching to the web page now.")));
+      showReaderMode = false;
     }
   }
 
@@ -368,6 +371,12 @@ abstract class _StoryStore with Store {
   @action
   void toggleReaderMode() {
     showReaderMode = !showReaderMode;
+    if (showReaderMode && controller != null) {
+      controller?.dispose();
+      controller = null;
+      canGoBack = false;
+      canGoForward = false;
+    }
   }
 
   @action

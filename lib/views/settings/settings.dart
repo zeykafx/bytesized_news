@@ -1,6 +1,18 @@
+import 'dart:typed_data';
+
+import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/opml/opml.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:isar/isar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -13,27 +25,52 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  late final SettingsStore settingsStore;
+
+  @override
+  void initState() {
+    super.initState();
+    settingsStore = context.read<SettingsStore>();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: Observer(builder: (context) {
+        return SingleChildScrollView(
+          child: Center(
+            child: Stack(
               children: [
-                GeneralSettings(),
-                AboutSection(),
+                Align(
+                  alignment: Alignment.center,
+                  child: Visibility(
+                    visible: settingsStore.loading,
+                    child: const CircularProgressIndicator(),
+                  ),
+                ),
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GeneralSettings(),
+                        ImportExportSection(),
+                        AboutSection(),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
@@ -118,6 +155,148 @@ class _GeneralSettingsState extends State<GeneralSettings> {
         ],
       );
     });
+  }
+}
+
+class ImportExportSection extends StatefulWidget {
+  const ImportExportSection({super.key});
+
+  @override
+  State<ImportExportSection> createState() => _ImportExportSectionState();
+}
+
+class _ImportExportSectionState extends State<ImportExportSection> {
+  late final SettingsStore settingsStore;
+
+  Isar isar = Isar.getInstance()!;
+  late DbUtils dbUtils;
+
+  @override
+  void initState() {
+    super.initState();
+    settingsStore = context.read<SettingsStore>();
+    dbUtils = DbUtils(isar: isar);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsSection(
+      title: "Import/Export",
+      children: [
+        // import OPML file
+        ListTile(
+          leading: const Icon(LucideIcons.import),
+          title: const Text(
+            "Import OPML file",
+          ),
+          onTap: () async {
+            settingsStore.loading = true;
+
+            // open file picker
+            final FilePickerResult? result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ["opml", "xml"],
+            );
+            if (result != null) {
+              String fileContent = await result.files.first.xFile.readAsString();
+              // get feeds from opml file
+              var (List<Feed> feeds, List<FeedGroup> feedGroups) = await OpmlUtils().getFeedsFromOpmlFile(fileContent);
+
+              settingsStore.loading = false;
+              if (kDebugMode) {
+                print("Importing feeds: ${feeds.map((el) => el.name)}");
+              }
+
+              List<Feed> loneFeeds = feeds.where((Feed feed) => feedGroups.every((FeedGroup feedGroup) => !feedGroup.feedNames.contains(feed.name))).toList();
+
+              // show dialog to confirm import, add the selected feeds to the db
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: const Text("Import OPML file"),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Do you want to import ${feeds.length} feeds?"),
+                              const SizedBox(height: 5),
+                              ...feedGroups.map((feedGroup) => ListTile(
+                                    title: Text("Group: ${feedGroup.name}"),
+                                    subtitle: Text(feedGroup.feedNames.join(", ")),
+                                  )),
+                              // feeds that are not in a group
+                              ...loneFeeds.map((feed) => ListTile(
+                                    title: Text("Feed: ${feed.name}"),
+                                  )),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              for (Feed feed in feeds) {
+                                dbUtils.addFeed(feed);
+                              }
+                              for (FeedGroup feedGroup in feedGroups) {
+                                dbUtils.addFeedGroup(feedGroup);
+                              }
+
+                              Navigator.pop(context);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Imported feeds from OPML file"),
+                                ),
+                              );
+                            },
+                            child: const Text("Import"),
+                          ),
+                        ],
+                      ));
+            } else {
+              settingsStore.loading = false;
+            }
+          },
+        ),
+
+        ListTile(
+          leading: const Icon(LucideIcons.folder_input),
+          title: const Text("Export feeds to OPML file"),
+          onTap: () async {
+            String xml = await OpmlUtils().exportToFile();
+
+            if (!await FlutterFileDialog.isPickDirectorySupported()) {
+              throw Exception("Pick directory is not supported on this platform");
+            }
+
+            final DirectoryLocation? pickedDirectory = await FlutterFileDialog.pickDirectory();
+
+            if (pickedDirectory != null) {
+              final filePath = await FlutterFileDialog.saveFileToDirectory(
+                directory: pickedDirectory,
+                data: Uint8List.fromList(xml.codeUnits),
+                mimeType: "text/xml",
+                fileName: "bytesized_news_export.xml",
+                replace: true,
+              );
+            }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Exported feeds to OPML file"),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }
 

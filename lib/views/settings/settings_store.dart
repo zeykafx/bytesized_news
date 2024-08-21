@@ -126,4 +126,8 @@ abstract class _SettingsStore with Store {
   void setShowAiSummaryOnLoad(bool value) {
     showAiSummaryOnLoad = value;
   }
+
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  @observable
+  bool loading = false;
 }

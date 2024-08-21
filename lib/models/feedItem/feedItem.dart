@@ -2,7 +2,7 @@ import 'package:any_date/any_date.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fb;
-import 'package:html/dom.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:html_main_element/html_main_element.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -50,18 +50,25 @@ class FeedItem {
     feedItem.publishedDate = parser.parse(item.published!);
 
     // parse html content into description
-    final document = html_parser.parse(item.content!);
 
-    // find the image and print the src
-    var img = document.querySelector('img');
-    if (img != null) {
-      feedItem.imageUrl = img.attributes['src']!;
+    if (item.content != null) {
+      dom.Document document = html_parser.parse(item.content!);
+
+      // find the image and print the src
+      var img = document.querySelector('img');
+      if (img != null) {
+        feedItem.imageUrl = img.attributes['src']!;
+      } else {
+        feedItem.imageUrl = "";
+      }
+
+      feedItem.description = document.documentElement!.text.trim();
     } else {
       feedItem.imageUrl = "";
+      feedItem.description = "";
     }
 
     // Element mainElement = readabilityMainElement(document.documentElement!, config);
-    feedItem.description = document.documentElement!.text.trim();
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
@@ -94,25 +101,32 @@ class FeedItem {
     AnyDate parser = const AnyDate();
     feedItem.publishedDate = parser.parse(item.pubDate!);
 
+    dom.Document? document;
     // parse html content into description
-    final document = html_parser.parse(item.content!.value);
-
-    // find the image and print the src
-// search for media:content tag
-    String? url = item.media?.contents.first.url;
-    if (url != null && url.isNotEmpty) {
-      feedItem.imageUrl = url;
+    if (item.content != null) {
+      document = html_parser.parse(item.content!.value);
+      feedItem.description = document.documentElement!.text.trim();
     } else {
-      var img = document.querySelector('img');
-      if (img != null) {
-        feedItem.imageUrl = img.attributes['src']!;
+      feedItem.description = "";
+    }
+
+    feedItem.imageUrl = "";
+
+    // search for media:content tag
+    if (item.media != null && item.media!.contents.isNotEmpty) {
+      String? url = item.media?.contents.first.url;
+      if (url != null && url.isNotEmpty) {
+        feedItem.imageUrl = url;
       } else {
-        feedItem.imageUrl = "";
+        if (document != null) {
+          var img = document.querySelector('img');
+          if (img != null) {
+            feedItem.imageUrl = img.attributes['src']!;
+          }
+        }
       }
     }
 
-    // Element mainElement = readabilityMainElement(document.documentElement!, config);
-    feedItem.description = document.documentElement!.text.trim();
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;

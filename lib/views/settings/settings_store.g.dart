@@ -180,6 +180,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$loadingAtom =
+      Atom(name: '_SettingsStore.loading', context: context);
+
+  @override
+  bool get loading {
+    _$loadingAtom.reportRead();
+    return super.loading;
+  }
+
+  @override
+  set loading(bool value) {
+    _$loadingAtom.reportWrite(value, super.loading, () {
+      super.loading = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -281,7 +297,8 @@ sortFeedName: ${sortFeedName},
 sortFeedGroup: ${sortFeedGroup},
 sortFeedGroupName: ${sortFeedGroupName},
 useReaderModeByDefault: ${useReaderModeByDefault},
-showAiSummaryOnLoad: ${showAiSummaryOnLoad}
+showAiSummaryOnLoad: ${showAiSummaryOnLoad},
+loading: ${loading}
     ''';
   }
 }

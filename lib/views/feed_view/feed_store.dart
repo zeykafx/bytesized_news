@@ -160,7 +160,13 @@ abstract class _FeedStore with Store {
 
     loading = true;
     for (Feed feed in feeds) {
-      if (settingsStore.sortFeed != null && feed.name != settingsStore.sortFeed!.name) {
+      // if the sort is for feeds, and the current feed is not the same as the feed we are sorting for, continue
+      if (settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && feed.name != settingsStore.sortFeed!.name) {
+        continue;
+      }
+
+      // if the sort is for feed groups, and the current feed is not in the group, do not fetch items for it
+      if (settingsStore.sort == FeedListSort.feedGroup && settingsStore.sortFeedGroup != null && !settingsStore.sortFeedGroup!.feedNames.contains(feed.name)) {
         continue;
       }
 

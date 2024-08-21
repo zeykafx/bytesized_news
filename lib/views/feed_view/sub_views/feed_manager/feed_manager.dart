@@ -75,6 +75,7 @@ class _FeedManagerState extends State<FeedManager> {
                     alignment: Alignment.topCenter,
                     child: SingleChildScrollView(
                       controller: widget.scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -228,6 +229,10 @@ class _FeedManagerState extends State<FeedManager> {
                                   isInPinnedList: false,
                                 );
                               }),
+
+                              const SizedBox(
+                                height: 100,
+                              ),
                             ],
                           ),
                         ],
@@ -241,9 +246,9 @@ class _FeedManagerState extends State<FeedManager> {
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: mediaQuery.size.width > 600 ? 30 : 5),
+                        padding: EdgeInsets.only(bottom: mediaQuery.size.width > 600 ? 30 : 15),
                         child: Card.outlined(
-                          color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(1),
                           child: OverflowBar(
                             overflowAlignment: OverflowBarAlignment.center,
                             children: [
@@ -498,13 +503,13 @@ class _FeedManagerState extends State<FeedManager> {
                     ),
                   ),
 
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      "Logos by Brandfetch.com",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).dividerColor.withOpacity(0.3)),
-                    ),
-                  ),
+                  // Align(
+                  //   alignment: Alignment.bottomCenter,
+                  //   child: Text(
+                  //     "Logos by Brandfetch.com",
+                  //     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

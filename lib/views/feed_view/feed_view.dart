@@ -85,11 +85,18 @@ class _FeedViewState extends State<FeedView> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).push(
+              Navigator.of(context)
+                  .push(
                 MaterialPageRoute(
                   builder: (context) => const Settings(),
                 ),
-              );
+              )
+                  .then((_) async {
+                await feedStore.getFeeds();
+                await feedStore.getFeedGroups();
+                await feedStore.getItems();
+                setState(() {});
+              });
             },
             icon: const Icon(Icons.settings),
           ),
@@ -301,14 +308,16 @@ class _FeedViewState extends State<FeedView> {
                                                   children: [
                                                     Chip(
                                                       label: Text(
-                                                        item.feedName,
+                                                        item.feedName.length > 20 ? "${item.feedName.substring(0, 20)}..." : item.feedName,
                                                         style: const TextStyle(fontSize: 10),
                                                       ),
-                                                      avatar: CachedNetworkImage(
-                                                        imageUrl: item.feed!.iconUrl,
-                                                        width: 15,
-                                                        height: 15,
-                                                      ),
+                                                      avatar: item.feed!.iconUrl.isNotEmpty
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: item.feed!.iconUrl,
+                                                              width: 15,
+                                                              height: 15,
+                                                            )
+                                                          : const Icon(LucideIcons.rss),
                                                       elevation: 0,
                                                       side: const BorderSide(width: 0, color: Colors.transparent),
                                                       padding: const EdgeInsets.all(0),
@@ -507,8 +516,9 @@ class _FeedViewState extends State<FeedView> {
                           ),
                         ),
                         child: IconButton(
-                          onPressed: () {
-                            feedStore.changeSort(FeedListSort.byDate);
+                          onPressed: () async {
+                            await feedStore.changeSort(FeedListSort.byDate);
+                            await feedStore.fetchItems();
                           },
                           icon: const Icon(Icons.all_inbox_rounded),
                         ),
@@ -531,11 +541,12 @@ class _FeedViewState extends State<FeedView> {
                               ),
                             ),
                             child: IconButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 // sort for this feed
                                 settingsStore.setSortFeed(feed);
                                 settingsStore.setSortFeedName(feed.name);
-                                feedStore.changeSort(FeedListSort.feed);
+                                await feedStore.changeSort(FeedListSort.feed);
+                                await feedStore.fetchItems();
                               },
                               icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 25, height: 25),
                             ),
@@ -557,11 +568,12 @@ class _FeedViewState extends State<FeedView> {
                               ),
                             ),
                             child: IconButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 // sort for this feed group
                                 settingsStore.setSortFeedGroup(feedGroup);
                                 settingsStore.setSortFeedGroupName(feedGroup.name);
-                                feedStore.changeSort(FeedListSort.feedGroup);
+                                await feedStore.changeSort(FeedListSort.feedGroup);
+                                await feedStore.fetchItems();
                               },
                               icon: feedGroup.feeds.isEmpty
                                   ? const Icon(

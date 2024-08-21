@@ -91,8 +91,8 @@ Feed _feedDeserialize(
   final object = Feed(
     reader.readString(offsets[3]),
     reader.readString(offsets[2]),
+    reader.readString(offsets[0]),
   );
-  object.iconUrl = reader.readString(offsets[0]);
   object.id = id;
   object.isPinned = reader.readBool(offsets[1]);
   object.pinnedPosition = reader.readLong(offsets[4]);

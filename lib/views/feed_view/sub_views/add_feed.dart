@@ -142,26 +142,19 @@ class _AddFeedState extends State<AddFeed> {
                             }
                           }
 
-                          // Favicon? favicon = await FaviconFinder.getBest(feedLink);
-                          // String iconUrl = "";
-                          // if (favicon != null) {
-                          //   iconUrl = favicon.url;
-                          // }
-
                           if (feedName.isEmpty) {
                             await addFeedToDb(await Feed.createFeed(feedLink));
                           } else {
-                            await addFeedToDb(Feed(feedName, feedLink));
+                            await addFeedToDb(await Feed.createFeed(feedLink, feedName: feedName));
                           }
                           if (kDebugMode) {
                             print("Adding feed to db: $feedLink");
                           }
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
 
                           await widget.getFeeds();
                           await widget.getItems();
-
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
                         },
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,

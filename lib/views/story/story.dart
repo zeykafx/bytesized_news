@@ -55,7 +55,7 @@ class _StoryState extends State<Story> {
 
         // if we can go back, go back, otherwise pop the page
         if (storyStore.canGoBack) {
-          storyStore.controller?.goBack();
+          if (storyStore.controller != null) storyStore.controller?.goBack();
         } else {
           Navigator.of(context).pop();
         }
@@ -136,10 +136,8 @@ class _StoryState extends State<Story> {
                                   child: HtmlWidget(
                                     '''
                                   <div class="bytesized_news_html_content">
-                                     <h1>${storyStore.feedItem.title}</h1>
-                                     <p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>
-                                     
-                                    
+                                     ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
+                                     ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
                                    
                                      ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 

@@ -2,6 +2,7 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -209,6 +210,15 @@ abstract class _FeedManagerStore with Store {
 
       // also remove from the pinned list
       feedStore.pinnedFeedsOrFeedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
+
+      // if this group was the current sort, remove it
+      if (feedStore.settingsStore.sort == FeedListSort.feedGroup &&
+          feedStore.settingsStore.sortFeedGroup != null &&
+          selectedFeedGroups.contains(feedStore.settingsStore.sortFeedGroup!)) {
+        feedStore.settingsStore.sortFeedGroup = null;
+        feedStore.settingsStore.sortFeedGroupName = null;
+        feedStore.changeSort(FeedListSort.byDate);
+      }
     }
 
     if (areFeedsSelected) {
@@ -223,6 +233,13 @@ abstract class _FeedManagerStore with Store {
       for (Feed feed in selectedFeeds) {
         feedStore.feedItems.removeWhere((item) => item.feedName == feed.name);
         await dbUtils.deleteFeedItems(feed);
+
+        // if this group was the current sort, remove it
+        if (feedStore.settingsStore.sort == FeedListSort.feed && feedStore.settingsStore.sortFeed != null && feedStore.settingsStore.sortFeed == feed) {
+          feedStore.settingsStore.sortFeed = null;
+          feedStore.settingsStore.sortFeedName = null;
+          feedStore.changeSort(FeedListSort.byDate);
+        }
 
         // also remove the feed from any feedGroups that it might be in
         for (FeedGroup feedGroup in feedStore.feedGroups) {
