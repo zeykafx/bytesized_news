@@ -477,7 +477,7 @@ class _FeedViewState extends State<FeedView> {
               scrollController: controller,
             );
           },
-          height: 80,
+          height: 85,
           collapsed: Observer(builder: (BuildContext _) {
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -486,7 +486,7 @@ class _FeedViewState extends State<FeedView> {
               children: [
                 // little handle
                 Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 5),
+                  padding: const EdgeInsets.only(top: 5, bottom: 3),
                   child: Container(
                     width: 50,
                     height: 5,
@@ -497,7 +497,7 @@ class _FeedViewState extends State<FeedView> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,

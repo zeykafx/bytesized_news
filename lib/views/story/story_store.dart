@@ -221,13 +221,14 @@ abstract class _StoryStore with Store {
       // card line container for the AI summary
       return {
         'background-color':
-            '#${Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.surfaceContainer.value.toRadixString(16).substring(2) : Theme.of(context).colorScheme.secondaryContainer.value.toRadixString(16).substring(2)}',
-        'padding': '0px 10px 5px 10px !important',
+            '#${Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.primaryContainer.value.toRadixString(16).substring(2) : Theme.of(context).colorScheme.secondaryContainer.value.toRadixString(16).substring(2)}',
+        'padding': '0px 10px 0px 10px !important',
         'margin': '0',
         'border-radius': '8px',
         'box-shadow': '0 0 8px 0 rgba(0,0,0,0.1)',
-        'margin-top': '10px',
-        'margin-bottom': '10px',
+        'margin-top': '5px',
+        'margin-bottom': '5px',
+        "text-align": "justify",
       };
     }
 

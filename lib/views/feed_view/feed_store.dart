@@ -157,6 +157,7 @@ abstract class _FeedStore with Store {
   @action
   Future<void> fetchItems() async {
     Dio dio = Dio();
+    bool addedItems = false;
 
     loading = true;
     for (Feed feed in feeds) {
@@ -188,18 +189,35 @@ abstract class _FeedStore with Store {
       }
 
       if (usingRssFeed) {
-        // items.addAll(rssFeed.items.map((RssItem item) => FeedItem.fromRssItem(item: item, feed: feed)).toList());
         for (RssItem item in rssFeed.items.take(20)) {
+          // check if the item is already in the list of feed items
+          if (feedItems.any((element) => element.url == item.link)) {
+            continue;
+          }
+
           items.add(await FeedItem.fromRssItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       } else {
-        // items.addAll(atomFeed.items.map((AtomItem item) => FeedItem.fromAtomItem(item: item, feed: feed)).toList());
         for (AtomItem item in atomFeed.items.take(20)) {
+          // check if the item is already in the list of feed items
+          if (feedItems.any((element) => element.url == item.links.first.href)) {
+            continue;
+          }
+
           items.add(await FeedItem.fromAtomItem(item: item, feed: feed, userTier: authStore.userTier));
         }
       }
 
+      if (items.isEmpty) {
+        continue;
+      }
       feedItems.addAll(await dbUtils.addNewItems(items));
+      addedItems = true;
+    }
+
+    if (!addedItems) {
+      loading = false;
+      return;
     }
 
     // sort feed items by published date
