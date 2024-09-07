@@ -6,6 +6,10 @@ import 'package:opml/opml.dart';
 
 class OpmlUtils {
   Future<(List<Feed>, List<FeedGroup>)> getFeedsFromOpmlFile(String fileContent) async {
+    DbUtils dbUtils = DbUtils(isar: Isar.getInstance()!);
+    List<Feed> existingFeeds = await dbUtils.getFeeds();
+    List<FeedGroup> existingFeedGroups = await dbUtils.getFeedGroups(existingFeeds);
+
     List<Feed> feeds = [];
     List<FeedGroup> feedGroups = [];
 
@@ -24,20 +28,34 @@ class OpmlUtils {
 
         for (OpmlOutline child in outline.children!) {
           if (child.xmlUrl != null) {
-            Feed feed = await Feed.createFeed(child.xmlUrl!, feedName: child.text ?? "");
+            Feed feed;
+
+            if (existingFeeds.any((element) => element.link == child.xmlUrl)) {
+              // if the feed already exists, use the existing feed
+              feed = existingFeeds.firstWhere((element) => element.link == child.xmlUrl);
+            } else {
+              // if the feed does not exist, create a new feed
+              feed = await Feed.createFeed(child.xmlUrl!, feedName: child.text ?? "");
+            }
+
             feeds.add(feed);
             feedGroup.feedNames = feedGroup.feedNames + [feed.name];
             feedGroup.feeds.add(feed);
           }
         }
 
-        feedGroups.add(feedGroup);
+        // check if there is an existing feed group with the same name and same feeds, if so, don't add it
+        if (!existingFeedGroups.any((element) => element.name == feedGroup.name && element.feeds == feedGroup.feeds)) {
+          feedGroups.add(feedGroup);
+        }
       }
 
       // handle feeds that are not in a group
       if (outline.xmlUrl != null) {
-        Feed feed = await Feed.createFeed(outline.xmlUrl!, feedName: outline.text ?? "");
-        feeds.add(feed);
+        if (!existingFeeds.any((element) => element.link == outline.xmlUrl)) {
+          Feed feed = await Feed.createFeed(outline.xmlUrl!, feedName: outline.text ?? "");
+          feeds.add(feed);
+        }
       }
     }
 

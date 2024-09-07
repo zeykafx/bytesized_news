@@ -51,18 +51,20 @@ class _SettingsState extends State<Settings> {
                     child: const CircularProgressIndicator(),
                   ),
                 ),
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GeneralSettings(),
-                        ImportExportSection(),
-                        AboutSection(),
-                      ],
+                Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GeneralSettings(),
+                          ImportExportSection(),
+                          AboutSection(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -226,58 +228,63 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                             children: [
                               Text("Do you want to import ${feeds.length} feeds?"),
                               const SizedBox(height: 5),
-                              ...feedGroups.map((feedGroup) => ListTile(
-                                    title: Text("Group: ${feedGroup.name}"),
-                                    subtitle: Text(feedGroup.feedNames.join(", ")),
-                                    selected: selectedFeedGroups.contains(feedGroup),
-                                    onTap: () {
+                              ...feedGroups.map(
+                                (feedGroup) => ListTile(
+                                  title: Text("Group: ${feedGroup.name}"),
+                                  subtitle: Text(feedGroup.feedNames.join(", ")),
+                                  selected: selectedFeedGroups.contains(feedGroup),
+                                  onTap: () {
+                                    dialogSetState(() {
+                                      if (selectedFeedGroups.contains(feedGroup)) {
+                                        selectedFeedGroups.remove(feedGroup);
+                                      } else {
+                                        selectedFeedGroups.add(feedGroup);
+                                      }
+                                    });
+                                  },
+                                  trailing: Checkbox(
+                                    value: selectedFeedGroups.contains(feedGroup),
+                                    onChanged: (value) {
                                       dialogSetState(() {
-                                        if (selectedFeedGroups.contains(feedGroup)) {
-                                          selectedFeedGroups.remove(feedGroup);
-                                        } else {
+                                        if (value!) {
                                           selectedFeedGroups.add(feedGroup);
-                                        }
-                                      });
-                                    },
-                                    trailing: Checkbox(
-                                      value: selectedFeedGroups.contains(feedGroup),
-                                      onChanged: (value) {
-                                        dialogSetState(() {
-                                          if (value!) {
-                                            selectedFeedGroups.add(feedGroup);
-                                          } else {
-                                            selectedFeedGroups.remove(feedGroup);
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  )),
-                              // feeds that are not in a group
-                              ...loneFeeds.map((feed) => ListTile(
-                                    title: Text("Feed: ${feed.name}"),
-                                    selected: selectedFeeds.contains(feed),
-                                    onTap: () {
-                                      dialogSetState(() {
-                                        if (selectedFeeds.contains(feed)) {
-                                          selectedFeeds.remove(feed);
                                         } else {
-                                          selectedFeeds.add(feed);
+                                          selectedFeedGroups.remove(feedGroup);
                                         }
                                       });
                                     },
-                                    trailing: Checkbox(
-                                      value: selectedFeeds.contains(feed),
-                                      onChanged: (value) {
-                                        dialogSetState(() {
-                                          if (value!) {
-                                            selectedFeeds.add(feed);
-                                          } else {
-                                            selectedFeeds.remove(feed);
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  )),
+                                  ),
+                                ),
+                              ),
+
+                              // feeds that are not in a group
+                              ...loneFeeds.map(
+                                (feed) => ListTile(
+                                  title: Text("Feed: ${feed.name}"),
+                                  selected: selectedFeeds.contains(feed),
+                                  onTap: () {
+                                    dialogSetState(() {
+                                      if (selectedFeeds.contains(feed)) {
+                                        selectedFeeds.remove(feed);
+                                      } else {
+                                        selectedFeeds.add(feed);
+                                      }
+                                    });
+                                  },
+                                  trailing: Checkbox(
+                                    value: selectedFeeds.contains(feed),
+                                    onChanged: (value) {
+                                      dialogSetState(() {
+                                        if (value!) {
+                                          selectedFeeds.add(feed);
+                                        } else {
+                                          selectedFeeds.remove(feed);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),

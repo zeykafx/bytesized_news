@@ -55,12 +55,10 @@ dependencies:
   package_info_plus: ^8.0.2
   firebase_performance: ^0.10.0+4
   html: ^0.15.4
-  html_main_element: ^2.1.0
   flutter_widget_from_html: ^0.15.1
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.4
-  skeletonizer: ^1.4.1+1
   webview_flutter_android: ^3.16.6
   time_formatter:
     git:
@@ -83,6 +81,7 @@ dependencies:
   opml: ^0.4.0
   file_picker: ^8.0.7
   flutter_file_dialog: ^3.0.2
+  flutter_js: ^0.8.1
 
 
 
@@ -115,6 +114,7 @@ flutter:
   assets:
     - .env
     - assets/feeds/
+    - assets/js/mercury.js
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -3,7 +3,6 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fb;
 import 'package:html/dom.dart' as dom;
-import 'package:html_main_element/html_main_element.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:isar/isar.dart';

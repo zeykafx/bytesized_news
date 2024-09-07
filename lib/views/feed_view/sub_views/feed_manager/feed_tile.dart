@@ -45,11 +45,19 @@ class _FeedTileState extends State<FeedTile> {
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
-      return Card.outlined(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+      return Card.filled(
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
         clipBehavior: Clip.hardEdge,
+        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         child: ListTile(
-          leading: CachedNetworkImage(imageUrl: widget.feed.iconUrl, width: 20, height: 20),
+          leading: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 1),
+            clipBehavior: Clip.antiAlias,
+            child: CachedNetworkImage(imageUrl: widget.feed.iconUrl, width: 17, height: 17),
+          ),
           // leading: Image.network(
           //   widget.feed.iconUrl,
           //   width: 20,

@@ -8,13 +8,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_js/flutter_js.dart';
+import 'package:flutter_js/javascript_runtime.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:photo_view/photo_view.dart';
+import 'package:readability/article.dart';
 import 'package:readability/readability.dart' as readability;
 
 part 'story_store.g.dart';
@@ -177,7 +181,7 @@ abstract class _StoryStore with Store {
 
   @action
   Future<String> fetchPageHtml() async {
-    final result = await readability.parseAsync(feedItem.url);
+    final Article result = await readability.parseAsync(feedItem.url);
     return result.content!;
   }
 
@@ -229,6 +233,14 @@ abstract class _StoryStore with Store {
         'margin-top': '5px',
         'margin-bottom': '5px',
         "text-align": "justify",
+      };
+    }
+
+    if (element.className == "tiny") {
+      return {
+        'font-size': '0.8em',
+        'color': '#${Theme.of(context).dividerColor.value.toRadixString(16).substring(2)}',
+        'text-align': 'right',
       };
     }
 

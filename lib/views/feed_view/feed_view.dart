@@ -16,7 +16,6 @@ import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:time_formatter/time_formatter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -102,6 +101,15 @@ class _FeedViewState extends State<FeedView> {
           ),
         ],
       ),
+      floatingActionButton: Observer(builder: (context) {
+        return Visibility(
+          visible: feedStore.showScrollToTop && !feedStore.isExpanded,
+          child: FloatingActionButton.small(
+            onPressed: feedStore.scrollToTop,
+            child: const Icon(Icons.arrow_upward),
+          ),
+        );
+      }),
       body: Observer(builder: (context) {
         return BottomSheetBar(
           controller: feedStore.bsbController,
@@ -127,6 +135,7 @@ class _FeedViewState extends State<FeedView> {
                     // this is needed to make the refresh indicator work all the time (because when there isn't enough items
                     // or if the screen is too tall the list wouldn't be scrollable thus not refreshable)
                     physics: const AlwaysScrollableScrollPhysics(),
+                    controller: feedStore.scrollController,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
@@ -308,7 +317,7 @@ class _FeedViewState extends State<FeedView> {
                                                   children: [
                                                     Chip(
                                                       label: Text(
-                                                        item.feedName.length > 20 ? "${item.feedName.substring(0, 20)}..." : item.feedName,
+                                                        item.feedName.length > 10 ? "${item.feedName.substring(0, 10)}..." : item.feedName,
                                                         style: const TextStyle(fontSize: 10),
                                                       ),
                                                       avatar: item.feed!.iconUrl.isNotEmpty
@@ -440,7 +449,7 @@ class _FeedViewState extends State<FeedView> {
                                                   ),
                                                 ),
                                               )
-                                                  .then((_) {
+                                                  .then((_) async {
                                                 // update the sort after the story view is popped,
                                                 // this is done so that the story that was just viewed is removed if we are in the unread sort
                                                 feedStore.changeSort(feedStore.settingsStore.sort);
@@ -448,6 +457,8 @@ class _FeedViewState extends State<FeedView> {
                                                 // update the state of the list items after the story view is popped
                                                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                                                 setState(() {});
+
+                                                await feedStore.fetchItems();
                                               });
                                             },
                                             dense: false,
@@ -548,7 +559,14 @@ class _FeedViewState extends State<FeedView> {
                                 await feedStore.changeSort(FeedListSort.feed);
                                 await feedStore.fetchItems();
                               },
-                              icon: CachedNetworkImage(imageUrl: elem.iconUrl, width: 25, height: 25),
+                              icon: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                margin: const EdgeInsets.symmetric(horizontal: 1),
+                                clipBehavior: Clip.antiAlias,
+                                child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25),
+                              ),
                             ),
                           );
                         } else {
@@ -583,9 +601,23 @@ class _FeedViewState extends State<FeedView> {
                                   : Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        ...feedGroup.feeds.take(3).map(
-                                              (feed) => CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
+                                        ...feedGroup.feeds.take(2).map(
+                                              (feed) => Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                                margin: const EdgeInsets.symmetric(horizontal: 1),
+                                                clipBehavior: Clip.antiAlias,
+                                                child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
+                                              ),
                                             ),
+                                        if (feedGroup.feeds.length > 2) ...[
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            "+${feedGroup.feeds.length - 2}",
+                                            style: TextStyle(color: Theme.of(context).dividerColor),
+                                          ),
+                                        ],
                                       ],
                                     ),
                             ),

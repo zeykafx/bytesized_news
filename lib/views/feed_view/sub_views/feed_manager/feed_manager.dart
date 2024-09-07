@@ -47,6 +47,10 @@ class _FeedManagerState extends State<FeedManager> {
     feedManagerStore.init(feedStore: feedStore);
   }
 
+  void updateState() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
@@ -167,6 +171,7 @@ class _FeedManagerState extends State<FeedManager> {
                                   wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
                                   wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                   wrappedGetFeeds: widget.wrappedGetFeeds,
+                                  updateParentState: updateState,
                                   isInPinnedList: true,
                                 );
                               }
@@ -207,6 +212,7 @@ class _FeedManagerState extends State<FeedManager> {
                                       wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
                                       wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
                                       wrappedGetFeeds: widget.wrappedGetFeeds,
+                                      updateParentState: updateState,
                                       isInPinnedList: false,
                                     );
                                   }),

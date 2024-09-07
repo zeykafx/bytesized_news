@@ -275,6 +275,38 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$scrollControllerAtom =
+      Atom(name: '_FeedStore.scrollController', context: context);
+
+  @override
+  ScrollController get scrollController {
+    _$scrollControllerAtom.reportRead();
+    return super.scrollController;
+  }
+
+  @override
+  set scrollController(ScrollController value) {
+    _$scrollControllerAtom.reportWrite(value, super.scrollController, () {
+      super.scrollController = value;
+    });
+  }
+
+  late final _$showScrollToTopAtom =
+      Atom(name: '_FeedStore.showScrollToTop', context: context);
+
+  @override
+  bool get showScrollToTop {
+    _$showScrollToTopAtom.reportRead();
+    return super.showScrollToTop;
+  }
+
+  @override
+  set showScrollToTop(bool value) {
+    _$showScrollToTopAtom.reportWrite(value, super.showScrollToTop, () {
+      super.showScrollToTop = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedStore.init', context: context);
 
@@ -376,6 +408,17 @@ mixin _$FeedStore on _FeedStore, Store {
   }
 
   @override
+  void scrollToTop() {
+    final _$actionInfo = _$_FeedStoreActionController.startAction(
+        name: '_FeedStore.scrollToTop');
+    try {
+      return super.scrollToTop();
+    } finally {
+      _$_FeedStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 feeds: ${feeds},
@@ -393,7 +436,9 @@ authStore: ${authStore},
 isLocked: ${isLocked},
 isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
-bsbController: ${bsbController}
+bsbController: ${bsbController},
+scrollController: ${scrollController},
+showScrollToTop: ${showScrollToTop}
     ''';
   }
 }

@@ -204,12 +204,13 @@ abstract class _FeedManagerStore with Store {
   @action
   Future<void> handleDelete({bool toggleSelection = true}) async {
     if (areFeedGroupsSelected) {
+      // remove from the pinned list
+      feedStore.pinnedFeedsOrFeedGroups.removeWhere(
+          (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedNames == feedGroup.feedNames).isNotEmpty);
+
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
       feedStore.feedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
-
-      // also remove from the pinned list
-      feedStore.pinnedFeedsOrFeedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
 
       // if this group was the current sort, remove it
       if (feedStore.settingsStore.sort == FeedListSort.feedGroup &&

@@ -133,28 +133,32 @@ class _StoryState extends State<Story> {
                                 child: SelectableRegion(
                                   focusNode: FocusNode(),
                                   selectionControls: MaterialTextSelectionControls(),
-                                  child: HtmlWidget(
-                                    '''
+                                  child: Container(
+                                    constraints: const BoxConstraints(maxWidth: 800),
+                                    child: HtmlWidget(
+                                      '''
                                   <div class="bytesized_news_html_content">
                                      ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                     ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                   
-                                     ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
-                                  
-                                       ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
-                                        <h2>Summary</h2>
-                                        <p>${storyStore.feedItem.aiSummary}</p>
-                                        </div>''' : ""}
-                                  
-                                     ${storyStore.htmlContent}
-                                     <a href="${storyStore.feedItem.url}">Source</a>
-                                  </div>
-                                                                  ''',
-                                    renderMode: RenderMode.listView,
-                                    customStylesBuilder: (element) => storyStore.buildStyle(context, element),
-                                    onTapImage: (ImageMetadata imageData) {
-                                      storyStore.showImage(imageData.sources.firstOrNull!.url, context);
-                                    },
+                                       ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                     
+                                       ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+                                    
+                                         ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                          <h2>Summary</h2>
+                                          <p>${storyStore.feedItem.aiSummary}</p>
+                                          <p class="tiny">Summarized by GPT-4o</p>
+                                          </div>''' : ""}
+                                    
+                                       ${storyStore.htmlContent}
+                                       <a href="${storyStore.feedItem.url}">Source</a>
+                                    </div>
+                                                                    ''',
+                                      renderMode: RenderMode.listView,
+                                      customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                      onTapImage: (ImageMetadata imageData) {
+                                        storyStore.showImage(imageData.sources.firstOrNull!.url, context);
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),

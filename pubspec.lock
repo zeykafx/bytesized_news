@@ -678,6 +678,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  flutter_js:
+    dependency: "direct main"
+    description:
+      name: flutter_js
+      sha256: d19cde4bad2f7c301ff5f69d7b3452ff91f2ca89d153569dd03e544579d8610d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -845,14 +853,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.15.4"
-  html_main_element:
-    dependency: "direct main"
-    description:
-      name: html_main_element
-      sha256: "73a0ddcae8795f20398dff2c95b74866ac03be6a2c3984422f25bc3a8fd505b2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   http:
     dependency: transitive
     description:
@@ -1357,14 +1357,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  skeletonizer:
-    dependency: "direct main"
-    description:
-      name: skeletonizer
-      sha256: "3b202e4fa9c49b017d368fb0e570d4952bcd19972b67b2face071bdd68abbfae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1450,6 +1442,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  sync_http:
+    dependency: transitive
+    description:
+      name: sync_http
+      sha256: "7f0cd72eca000d2e026bcd6f990b81d0ca06022ef4e32fb257b30d3d1014a961"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   synchronized:
     dependency: transitive
     description:
@@ -1655,10 +1655,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f652077d0bdf60abe4c1f6377448e8655008eef28f128bc023f7b5e8dfeb48fc
+      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.4"
+    version: "14.2.5"
   wakelock_plus:
     dependency: transitive
     description:

@@ -70,6 +70,12 @@ abstract class _FeedStore with Store {
   @observable
   BottomSheetBarController bsbController = BottomSheetBarController();
 
+  @observable
+  ScrollController scrollController = ScrollController();
+
+  @observable
+  bool showScrollToTop = false;
+
   @action
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
@@ -103,6 +109,14 @@ abstract class _FeedStore with Store {
     await getPinnedFeedsOrFeedGroups();
 
     user = auth.currentUser;
+
+    scrollController.addListener(() {
+      if (scrollController.offset > 200 && !showScrollToTop) {
+        showScrollToTop = true;
+      } else if (scrollController.offset < 200 && showScrollToTop) {
+        showScrollToTop = false;
+      }
+    });
 
     initialized = true;
     return true;
@@ -212,6 +226,7 @@ abstract class _FeedStore with Store {
         continue;
       }
       feedItems.addAll(await dbUtils.addNewItems(items));
+      feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
       addedItems = true;
     }
 
@@ -221,7 +236,7 @@ abstract class _FeedStore with Store {
     }
 
     // sort feed items by published date
-    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+    // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     loading = false;
   }
 
@@ -307,5 +322,10 @@ abstract class _FeedStore with Store {
         content: Text("Failed to create Feed Group: error: ${e.toString()}"),
       ));
     }
+  }
+
+  @action
+  void scrollToTop() {
+    scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 }
