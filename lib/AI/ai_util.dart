@@ -9,7 +9,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 class AiUtils {
   int maxSummaryLength = 3;
 
-  OpenAIClient client = OpenAIClient(apiKey: dotenv.env['OPENAI_API_KEY']!);
+  OpenAIClient client = OpenAIClient(apiKey: dotenv.env['DEEPSEEK_API_KEY']!, baseUrl: "https://api.deepseek.com");
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
@@ -47,7 +47,7 @@ class AiUtils {
     // get the summary of the article using OpenAI's API
     CreateChatCompletionResponse res = await client.createChatCompletion(
       request: CreateChatCompletionRequest(
-        model: const ChatCompletionModel.modelId('gpt-4o-mini'),
+        model: const ChatCompletionModel.modelId('deepseek-chat'),
         messages: [
           ChatCompletionMessage.system(
             content: 'Summarize the article in $maxSummaryLength sentences. Stick to the information in the article. Do not add any new information.',

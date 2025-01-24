@@ -146,7 +146,7 @@ class _StoryState extends State<Story> {
                                          ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                           <h2>Summary</h2>
                                           <p>${storyStore.feedItem.aiSummary}</p>
-                                          <p class="tiny">Summarized by GPT-4o</p>
+                                          <p class="tiny">Summarized by DeepSeek v3</p>
                                           </div>''' : ""}
                                     
                                        ${storyStore.htmlContent}

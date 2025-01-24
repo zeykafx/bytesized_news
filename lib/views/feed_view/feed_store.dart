@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
@@ -196,9 +198,9 @@ abstract class _FeedStore with Store {
       late RssFeed rssFeed;
       late AtomFeed atomFeed;
       try {
-        rssFeed = RssFeed.parse(res.data);
+        rssFeed = await Isolate.run(() => RssFeed.parse(res.data));
       } catch (e) {
-        atomFeed = AtomFeed.parse(res.data);
+        atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
         usingRssFeed = false;
       }
 
@@ -209,7 +211,8 @@ abstract class _FeedStore with Store {
             continue;
           }
 
-          items.add(await FeedItem.fromRssItem(item: item, feed: feed, userTier: authStore.userTier));
+          FeedItem feedItem = await FeedItem.fromRssItem(item: item, feed: feed, userTier: authStore.userTier);
+          items.add(feedItem);
         }
       } else {
         for (AtomItem item in atomFeed.items.take(20)) {
@@ -218,7 +221,8 @@ abstract class _FeedStore with Store {
             continue;
           }
 
-          items.add(await FeedItem.fromAtomItem(item: item, feed: feed, userTier: authStore.userTier));
+          FeedItem feedItem = await FeedItem.fromAtomItem(item: item, feed: feed, userTier: authStore.userTier);
+          items.add(feedItem);
         }
       }
 

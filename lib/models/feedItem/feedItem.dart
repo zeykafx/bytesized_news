@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:any_date/any_date.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';

@@ -46,7 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
     authDomain: 'bytesized-news.firebaseapp.com',
-    storageBucket: 'bytesized-news.appspot.com',
+    storageBucket: 'bytesized-news.firebasestorage.app',
     measurementId: 'G-DZ52GQ6G88',
   );
 
@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:286405169123:android:4796eede57acedfab21ad6',
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
-    storageBucket: 'bytesized-news.appspot.com',
+    storageBucket: 'bytesized-news.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -64,17 +64,19 @@ class DefaultFirebaseOptions {
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
     authDomain: 'bytesized-news.firebaseapp.com',
-    storageBucket: 'bytesized-news.appspot.com',
+    storageBucket: 'bytesized-news.firebasestorage.app',
     measurementId: 'G-J7FNJ3G4SP',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDxr2z80RAHK7hVKO6DmgXWHWz2BkJt4rY',
-    appId: '1:286405169123:ios:6ff383b1f80bff5fb21ad6',
+    appId: '1:286405169123:ios:9c12da3f04b400b4b21ad6',
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
-    storageBucket: 'bytesized-news.appspot.com',
-    iosBundleId: 'com.zeykafx.bytesizedNews.RunnerTests',
+    storageBucket: 'bytesized-news.firebasestorage.app',
+    androidClientId: '286405169123-nne1dbjjskkvvqffc7ih8s7pjna4ddgp.apps.googleusercontent.com',
+    iosClientId: '286405169123-kna6dihea27p7eckp8faq527csc5552n.apps.googleusercontent.com',
+    iosBundleId: 'com.zeykafx.bytesizedNews',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -82,7 +84,9 @@ class DefaultFirebaseOptions {
     appId: '1:286405169123:ios:9c12da3f04b400b4b21ad6',
     messagingSenderId: '286405169123',
     projectId: 'bytesized-news',
-    storageBucket: 'bytesized-news.appspot.com',
+    storageBucket: 'bytesized-news.firebasestorage.app',
+    androidClientId: '286405169123-nne1dbjjskkvvqffc7ih8s7pjna4ddgp.apps.googleusercontent.com',
+    iosClientId: '286405169123-kna6dihea27p7eckp8faq527csc5552n.apps.googleusercontent.com',
     iosBundleId: 'com.zeykafx.bytesizedNews',
   );
 

@@ -83,6 +83,19 @@ class _FeedManagerState extends State<FeedManager> {
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
+                          // little handle
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5, bottom: 3),
+                            child: Container(
+                              width: 50,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).dividerColor.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+
                           const SizedBox(
                             height: 20,
                           ),

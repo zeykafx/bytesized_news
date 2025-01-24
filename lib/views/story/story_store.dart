@@ -230,8 +230,8 @@ abstract class _StoryStore with Store {
         'margin': '0',
         'border-radius': '8px',
         'box-shadow': '0 0 8px 0 rgba(0,0,0,0.1)',
-        'margin-top': '5px',
-        'margin-bottom': '5px',
+        'margin-top': '8px',
+        'margin-bottom': '8px',
         "text-align": "justify",
       };
     }
@@ -255,6 +255,13 @@ abstract class _StoryStore with Store {
       case 'h6':
         return {'font-size': '1.0em', 'font-weight': '700'};
       case 'img':
+        return {
+          'border-radius': '8px',
+        };
+      case "image":
+        return {
+          'border-radius': '8px',
+        };
       case 'figure':
       case 'video':
       case 'iframe':
@@ -322,6 +329,16 @@ abstract class _StoryStore with Store {
 
   @action
   Future<void> summarizeArticle(BuildContext context) async {
+    if (!authStore.initialized) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error, try again in a few seconds."),
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
     if (authStore.userTier == Tier.free) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -331,27 +348,39 @@ abstract class _StoryStore with Store {
       );
       return;
     }
-    // String? htmlValue;
-    // if (!showReaderMode) {
-    //   htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
-    // } else {
-    //   htmlValue = htmlContent;
-    // }
+    String? htmlValue;
+    if (!showReaderMode) {
+      htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
+    } else {
+      htmlValue = htmlContent;
+    }
 
-    String htmlValue = htmlContent;
+    // String htmlValue = htmlContent;
 
     if (aiLoading || feedItem.summarized) {
       return;
     }
 
     dom.Document document = parse(htmlValue);
+    String docText = document.body!.text;
+
+    if (docText.length > 10000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("This webpage is too long to be summarized..."),
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
     if (kDebugMode) {
-      print("Sending ${document.body!.text.length} characters to AI for summarization");
+      print("Sending ${docText.length} characters to AI for summarization");
     }
 
     aiLoading = true;
     try {
-      feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem, document.body!.text);
+      feedItem.aiSummary = await aiUtils.summarize(docText, feedItem);
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;

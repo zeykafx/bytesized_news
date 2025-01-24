@@ -55,7 +55,10 @@ class _AuthState extends State<Auth> {
               //   ),
               // );
             }),
-            AuthStateChangeAction<SignedIn>((context, state) {
+            AuthStateChangeAction<SignedIn>((context, state) async {
+              authStore.user = authStore.auth.currentUser;
+              await authStore.init();
+
               if (!state.user!.emailVerified) {
                 // Navigator.pushNamed(context, '/verify-email');
                 Navigator.of(context).push(

@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "286405169123",
     "project_id": "bytesized-news",
-    "storage_bucket": "bytesized-news.appspot.com"
+    "storage_bucket": "bytesized-news.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,20 @@
           "package_name": "com.zeykafx.bytesized_news"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "286405169123-nne1dbjjskkvvqffc7ih8s7pjna4ddgp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zeykafx.bytesized_news",
+            "certificate_hash": "490e3788d255b409b3e3da29ac15f756371a4bb7"
+          }
+        },
+        {
+          "client_id": "286405169123-tu5clpv0ufhv2tpbl0n5msht9p7ot7b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBUuN8jh3siOttcA26Gid-VgILXW-AX5tY"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "286405169123-tu5clpv0ufhv2tpbl0n5msht9p7ot7b5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "286405169123-j8e31vno5ltosb76kg05emvq0femt5fh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zeykafx.bytesizedNews.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }
