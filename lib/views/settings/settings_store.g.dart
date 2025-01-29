@@ -17,7 +17,11 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..sortFeedName = json['sortFeedName'] as String?
       ..sortFeedGroupName = json['sortFeedGroupName'] as String?
       ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
-      ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true;
+      ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
+      ..userInterests = (json['userInterests'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          ['Technology', 'Politics'];
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -27,6 +31,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'sortFeedGroupName': instance.sortFeedGroupName,
       'useReaderModeByDefault': instance.useReaderModeByDefault,
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
+      'userInterests': instance.userInterests,
     };
 
 const _$DarkModeEnumMap = {
@@ -196,6 +201,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$userInterestsAtom =
+      Atom(name: '_SettingsStore.userInterests', context: context);
+
+  @override
+  List<String> get userInterests {
+    _$userInterestsAtom.reportRead();
+    return super.userInterests;
+  }
+
+  @override
+  set userInterests(List<String> value) {
+    _$userInterestsAtom.reportWrite(value, super.userInterests, () {
+      super.userInterests = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -298,7 +319,8 @@ sortFeedGroup: ${sortFeedGroup},
 sortFeedGroupName: ${sortFeedGroupName},
 useReaderModeByDefault: ${useReaderModeByDefault},
 showAiSummaryOnLoad: ${showAiSummaryOnLoad},
-loading: ${loading}
+loading: ${loading},
+userInterests: ${userInterests}
     ''';
   }
 }

@@ -376,22 +376,12 @@ class _FeedViewState extends State<FeedView> {
                                               ),
                                             ],
                                           ),
-                                        ).animate().fadeIn().then().shimmer(
-                                          duration: const Duration(
-                                              milliseconds: 1000),
-                                          curve: Curves.easeInOutSine,
-                                          colors: [
-                                            const Color(0x00FFFF00),
-                                            const Color(0xBFFFFF00),
-                                            const Color(0xBF00FF00),
-                                            const Color(0xBF00FFFF),
-                                            const Color(0xBF0033FF),
-                                            const Color(0xBFFF00FF),
-                                            const Color(0xBFFF0000),
-                                            const Color(0xBFFFFF00),
-                                            // const Color(0xFFFF00),
-                                          ],
-                                        );
+                                        ).animate(
+                                            delay: Duration(
+                                                milliseconds:
+                                                    idx *
+                                                        100))
+                                        .fadeIn();
                                       }
 
                                       int index = feedStore

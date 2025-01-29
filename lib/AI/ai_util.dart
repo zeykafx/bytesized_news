@@ -124,8 +124,8 @@ class AiUtils {
         messages: [
           ChatCompletionMessage.system(
             content:
-                "You are a helpful news suggestion AI, you will receive a list of titles of today's news articles for a user as well as their general interests."
-                "You must return a list of the top 5 most interesting articles (in json format) for this user based on their interests as well as the general importance of the articles, the article's IDs must not be changed."
+                "You are a helpful news suggestion AI, you will receive a list of titles of today's news articles for a user as well as their general interests (Ignore any article advertising a deal or a podcast!)"
+                "You must return a list of the top 5 most interesting articles (in json format) for this user based on their interests as well as the importance of the articles, the article's IDs must not be changed."
                 "The format must be the following: A json object with the key 'articles' which is an array of json object, each object has an ID (number), a title (string) and the feed name (string)",
           ),
           ChatCompletionMessage.user(
@@ -150,6 +150,9 @@ class AiUtils {
           orElse: () => feedItems[0]);
       suggestedArticles.add(feedItem);
     }
+    
+    // Filter out duplicates
+    suggestedArticles = suggestedArticles.toSet().toList();
 
     return suggestedArticles;
   }

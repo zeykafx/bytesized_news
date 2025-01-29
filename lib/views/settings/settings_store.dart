@@ -131,4 +131,13 @@ abstract class _SettingsStore with Store {
   @JsonKey(includeToJson: false, includeFromJson: false)
   @observable
   bool loading = false;
+
+  static const defaultUserInterests = [
+    "Technology",
+    "Politics",
+  ];
+
+  @JsonKey(defaultValue: defaultUserInterests)
+  @observable
+  List<String> userInterests = defaultUserInterests;
 }

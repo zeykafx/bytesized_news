@@ -369,15 +369,11 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(20);
+      ..take(25);
     if (todaysUnreadItems.isEmpty) {
       return;
     }
-    List<String> userInterest = [
-      "Technology",
-      "News",
-      "Development",
-    ];
+    List<String> userInterest = settingsStore.userInterests;
 
     List<FeedItem> suggestedArticles =
         await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest);

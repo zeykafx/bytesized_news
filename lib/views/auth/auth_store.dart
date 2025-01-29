@@ -30,7 +30,8 @@ abstract class _AuthStore with Store {
       initialized = true;
       return;
     }
-    var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
+    var userData =
+        await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
     if (userData["tier"] != null) {
       if (userData["tier"] == "premium") {
         userTier = Tier.premium;
