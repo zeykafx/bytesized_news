@@ -1,5 +1,4 @@
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/feed/feed.dart';
@@ -106,8 +105,7 @@ class _EditFeedState extends State<EditFeed> {
                                     .addFeed(widget.feed);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                        "Successfully updated Feed!"),
+                                    content: Text("Successfully updated Feed!"),
                                   ),
                                 );
                                 Navigator.of(context).pop();

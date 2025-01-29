@@ -173,7 +173,6 @@ abstract class _FeedStore with Store {
   @action
   Future<void> fetchItems() async {
     Dio dio = Dio();
-    bool addedItems = false;
 
     loading = true;
     for (Feed feed in feeds) {
@@ -234,10 +233,10 @@ abstract class _FeedStore with Store {
       if (items.isEmpty) {
         continue;
       }
-      items.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+      
+      // items.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
       feedItems.addAll(await dbUtils.addNewItems(items));
       feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-      addedItems = true;
     }
 
     loading = false;

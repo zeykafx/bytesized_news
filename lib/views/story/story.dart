@@ -165,7 +165,11 @@ class _StoryState extends State<Story> {
 
                                          ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                           <h2>Summary</h2>
-                                          <p>${storyStore.feedItem.aiSummary}</p>
+                                          <p>
+                                          ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
+                                          return "<p>$part</p>";
+                                        }).join("")}
+                                          </p>
                                           <p class="tiny">Summarized by LLama 3.1</p>
                                           </div>''' : ""}
 

@@ -61,10 +61,12 @@ class AiUtils {
         ),
         messages: [
           ChatCompletionMessage.system(
-            content: "Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER THAN $maxSummaryLength SENTENCES!! Stick to the information in the article. " +
-                "Do not add any new information, if an article refers to Twitter as 'X' do not do the same," +
-                " instead refer to it as 'Twitter. Always provide a translation of the units of measurements " +
-                "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!",
+            content:
+                "Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER THAN $maxSummaryLength SENTENCES!! Stick to the information in the article. "
+                "Do not add any new information, if an article refers to Twitter as 'X' do not do the same,"
+                " instead refer to it as 'Twitter. Always provide a translation of the units of measurements "
+                "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!"
+                "If you can, use bullet points with proper formatting such that each bullet point starts on its own line.",
           ),
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(text),
@@ -74,13 +76,16 @@ class AiUtils {
       ),
     );
 
+    String summary =
+        res.choices.first.message.content ?? "No summary was received...";
+
     if (kDebugMode) {
-      print("Response: ${res.choices.first.message.content}");
+      print("Response: $summary");
     }
 
     var ret = await firestore.collection("summaries").add({
       "url": feedItem.url,
-      "summary": res.choices.first.message.content,
+      "summary": summary,
       "generatedAt": DateTime.now().millisecondsSinceEpoch,
     });
 
@@ -88,6 +93,6 @@ class AiUtils {
       print("Summary added to Firestore: ${ret.id}");
     }
 
-    return res.choices.first.message.content ?? "No summary available";
+    return summary;
   }
 }

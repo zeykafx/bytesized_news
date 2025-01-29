@@ -114,7 +114,8 @@ abstract class _StoryStore with Store {
   late AnimationController animationController;
 
   @action
-  Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
+  Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore,
+      AuthStore authStore) async {
     settingsStore = setStore;
     this.authStore = authStore;
 
@@ -156,7 +157,9 @@ abstract class _StoryStore with Store {
         trigger: ContentBlockerTrigger(
           urlFilter: ".*",
         ),
-        action: ContentBlockerAction(type: ContentBlockerActionType.CSS_DISPLAY_NONE, selector: ".banner, .banners, .ads, .ad, .advert"),
+        action: ContentBlockerAction(
+            type: ContentBlockerActionType.CSS_DISPLAY_NONE,
+            selector: ".banner, .banners, .ads, .ad, .advert"),
       ),
     );
 
@@ -190,18 +193,21 @@ abstract class _StoryStore with Store {
     Dio dio = Dio();
 
     // fetch the page's html
-    var res = await dio.get(feedItem.url);
+    Response res = await dio.get(feedItem.url);
     dom.Document doc = html_parser.parse(res.data);
     if (doc.body == null) {
       return;
     }
 
     if (kDebugMode) {
-      print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
+      print(
+          "Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
     if ((doc.body!.innerHtml.length / htmlContent.length) > 100) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("The reader view seems to have a much shorter article than the web page's full length, switching to the web page now.")));
+        content: Text(
+            "The reader view seems to have a much shorter article than the web page's full length, switching to the web page now."),
+      ));
       showReaderMode = false;
     }
   }
@@ -211,11 +217,13 @@ abstract class _StoryStore with Store {
     if (element.className == 'bytesized_news_html_content') {
       return {
         'line-height': '1.5',
-        'background-color': '#${Theme.of(context).scaffoldBackgroundColor.value.toRadixString(16).substring(2)}',
+        'background-color':
+            '#${Theme.of(context).scaffoldBackgroundColor.value.toRadixString(16).substring(2)}',
         'width': 'auto',
         'height': 'auto',
         'margin': '0',
-        'word-wrap': 'break-word', // other values 'break-word', 'keep-all', 'normal'
+        'word-wrap':
+            'break-word', // other values 'break-word', 'keep-all', 'normal'
         'padding': '12px 18px !important',
         // 'text-align': "justify" // other values: 'left', 'right', 'center'
       };
@@ -239,7 +247,8 @@ abstract class _StoryStore with Store {
     if (element.className == "tiny") {
       return {
         'font-size': '0.8em',
-        'color': '#${Theme.of(context).dividerColor.value.toRadixString(16).substring(2)}',
+        'color':
+            '#${Theme.of(context).dividerColor.value.toRadixString(16).substring(2)}',
         'text-align': 'right',
       };
     }
@@ -274,23 +283,30 @@ abstract class _StoryStore with Store {
       case "caption":
         return {
           'font-size': '0.8em',
-          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'color':
+              '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
           'text-align': 'left',
         };
       case "figcaption":
         return {
           'font-size': '0.8em',
-          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'color':
+              '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
           'text-align': 'left',
         };
       case 'a':
         return {
-          'color': '#${Theme.of(context).colorScheme.primary.value.toRadixString(16).substring(2)}',
+          'color':
+              '#${Theme.of(context).colorScheme.primary.value.toRadixString(16).substring(2)}',
           'text-decoration': 'none',
         };
 
       case 'blockquote':
-        return {'margin': '0', 'padding': '0 0 0 16px', 'border-left': '4px solid #9e9e9e'};
+        return {
+          'margin': '0',
+          'padding': '0 0 0 16px',
+          'border-left': '4px solid #9e9e9e'
+        };
       case 'pre':
         return {'white-space': 'pre-wrap', 'word-break': 'break-all'};
 
@@ -298,30 +314,38 @@ abstract class _StoryStore with Store {
         return {
           'width': '100% !important',
           'table-layout': 'fixed',
-          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'border':
+              '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
           'border-collapse': 'collapse',
           'padding': '0 8px'
         };
       case 'td':
         return {
           'padding': '0 8px',
-          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'border':
+              '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
           'border-collapse': 'collapse'
         };
       case 'th':
-        return {'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}', 'border-collapse': 'collapse'};
+        return {
+          'border':
+              '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'border-collapse': 'collapse'
+        };
       default:
     }
     return null;
   }
 
   @action
-  Future<void> onProgressChanged(InAppWebViewController controller, int prog) async {
+  Future<void> onProgressChanged(
+      InAppWebViewController controller, int prog) async {
     progress = prog;
   }
 
   @action
-  Future<void> onLoadStop(InAppWebViewController controller, WebUri? url) async {
+  Future<void> onLoadStop(
+      InAppWebViewController controller, WebUri? url) async {
     loading = false;
     canGoBack = await controller.canGoBack();
     canGoForward = await controller.canGoForward();
@@ -350,7 +374,8 @@ abstract class _StoryStore with Store {
     }
     String? htmlValue;
     if (!showReaderMode) {
-      htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
+      htmlValue = await controller?.evaluateJavascript(
+          source: "window.document.getElementsByTagName('html')[0].outerHTML;");
     } else {
       htmlValue = htmlContent;
     }
@@ -364,8 +389,8 @@ abstract class _StoryStore with Store {
     dom.Document document = parse(htmlValue);
     String docText = document.body!.text;
 
-    if (docText.length > 10000) {
-      docText = docText.substring(0, 10000);
+    if (docText.length > 20000) {
+      docText = docText.substring(0, 20000);
       print(docText);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -399,16 +424,13 @@ abstract class _StoryStore with Store {
         ),
       );
     }
-    // feedItem.aiSummary = await aiUtils.summarize(document.body!.text, feedItem);
-    // feedItem.summarized = true;
-    // await dbUtils.updateItemInDb(feedItem);
 
-    // feedItemSummarized = true;
     aiLoading = false;
   }
 
   @action
-  Future<void> onLoadStart(InAppWebViewController controller, WebUri? url) async {
+  Future<void> onLoadStart(
+      InAppWebViewController controller, WebUri? url) async {
     loading = true;
   }
 
@@ -459,7 +481,9 @@ abstract class _StoryStore with Store {
                 Positioned(
                   top: 0,
                   right: 10,
-                  child: IconButton(onPressed: () => Navigator.of(ctx).pop(), icon: const Icon(Icons.close)),
+                  child: IconButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      icon: const Icon(Icons.close)),
                 ),
               ],
             ),
