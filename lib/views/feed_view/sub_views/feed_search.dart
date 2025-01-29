@@ -1,0 +1,84 @@
+import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_story_tile.dart';
+import 'package:bytesized_news/views/story/story.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
+import 'package:time_formatter/time_formatter.dart';
+
+class FeedSearch extends StatefulWidget {
+  final FeedStore feedStore;
+  const FeedSearch({
+    super.key,
+    required this.feedStore,
+  });
+
+  @override
+  State<FeedSearch> createState() => _FeedSearchState();
+}
+
+class _FeedSearchState extends State<FeedSearch> {
+  late TextEditingController textEditingController;
+  @override
+  void initState() {
+    super.initState();
+    textEditingController = TextEditingController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 1,
+        toolbarHeight: kToolbarHeight + 20,
+        centerTitle: true,
+        title: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              color: Theme.of(context).colorScheme.surfaceContainer),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: textEditingController,
+                  decoration: InputDecoration(
+                    labelText: 'Search Article',
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) async {
+                    await widget.feedStore.searchFeedItems(value);
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      body: Observer(
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: widget.feedStore.searchResults.length,
+              addAutomaticKeepAlives: false,
+              itemBuilder: (context, idx) {
+                FeedItem item = widget.feedStore.searchResults.elementAt(idx);
+                return FeedStoryTile(feedStore: widget.feedStore, item: item);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

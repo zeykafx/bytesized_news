@@ -73,6 +73,22 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$searchResultsAtom =
+      Atom(name: '_FeedStore.searchResults', context: context);
+
+  @override
+  ObservableList<FeedItem> get searchResults {
+    _$searchResultsAtom.reportRead();
+    return super.searchResults;
+  }
+
+  @override
+  set searchResults(ObservableList<FeedItem> value) {
+    _$searchResultsAtom.reportWrite(value, super.searchResults, () {
+      super.searchResults = value;
+    });
+  }
+
   late final _$initializedAtom =
       Atom(name: '_FeedStore.initialized', context: context);
 
@@ -362,18 +378,18 @@ mixin _$FeedStore on _FeedStore, Store {
       AsyncAction('_FeedStore.toggleItemRead', context: context);
 
   @override
-  Future<void> toggleItemRead(int itemId, {bool toggle = false}) {
+  Future<void> toggleItemRead(FeedItem item, {bool toggle = false}) {
     return _$toggleItemReadAsyncAction
-        .run(() => super.toggleItemRead(itemId, toggle: toggle));
+        .run(() => super.toggleItemRead(item, toggle: toggle));
   }
 
   late final _$toggleItemBookmarkedAsyncAction =
       AsyncAction('_FeedStore.toggleItemBookmarked', context: context);
 
   @override
-  Future<void> toggleItemBookmarked(int itemId, {bool toggle = false}) {
+  Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) {
     return _$toggleItemBookmarkedAsyncAction
-        .run(() => super.toggleItemBookmarked(itemId, toggle: toggle));
+        .run(() => super.toggleItemBookmarked(item, toggle: toggle));
   }
 
   late final _$changeSortAsyncAction =
@@ -391,6 +407,15 @@ mixin _$FeedStore on _FeedStore, Store {
   Future<void> createFeedGroup(String feedGroupName, BuildContext context) {
     return _$createFeedGroupAsyncAction
         .run(() => super.createFeedGroup(feedGroupName, context));
+  }
+
+  late final _$searchFeedItemsAsyncAction =
+      AsyncAction('_FeedStore.searchFeedItems', context: context);
+
+  @override
+  Future<void> searchFeedItems(String searchTerm) {
+    return _$searchFeedItemsAsyncAction
+        .run(() => super.searchFeedItems(searchTerm));
   }
 
   late final _$_FeedStoreActionController =
@@ -425,6 +450,7 @@ feeds: ${feeds},
 pinnedFeedsOrFeedGroups: ${pinnedFeedsOrFeedGroups},
 feedGroups: ${feedGroups},
 feedItems: ${feedItems},
+searchResults: ${searchResults},
 initialized: ${initialized},
 loading: ${loading},
 isar: ${isar},

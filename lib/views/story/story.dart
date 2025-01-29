@@ -157,26 +157,26 @@ class _StoryState extends State<Story> {
                                         const BoxConstraints(maxWidth: 800),
                                     child: HtmlWidget(
                                       '''
-                                  <div class="bytesized_news_html_content">
-                                     ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                       ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                    <div class="bytesized_news_html_content">
+                                       ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
+                                         ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
 
-                                       ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+                                         ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
-                                         ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
-                                          <h2>Summary</h2>
-                                          <p>
-                                          ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
+                                           ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                            <h2>Summary</h2>
+                                            <p>
+                                            ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
                                           return "<p>$part</p>";
                                         }).join("")}
-                                          </p>
-                                          <p class="tiny">Summarized by LLama 3.1</p>
-                                          </div>''' : ""}
+                                            </p>
+                                            <p class="tiny">Summarized by LLama 3.1</p>
+                                            </div>''' : ""}
 
-                                       ${storyStore.htmlContent}
-                                       <a href="${storyStore.feedItem.url}">Source</a>
-                                    </div>
-                                                                    ''',
+                                         ${storyStore.htmlContent}
+                                         <a href="${storyStore.feedItem.url}">Source</a>
+                                      </div>
+                                                                      ''',
                                       renderMode: RenderMode.listView,
                                       customStylesBuilder: (element) =>
                                           storyStore.buildStyle(
@@ -258,7 +258,8 @@ class _StoryState extends State<Story> {
                                                       color: Theme.of(context)
                                                           .colorScheme
                                                           .secondaryContainer
-                                                          .withOpacity(0.5),
+                                                          .withValues(
+                                                              alpha: 0.5),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -326,6 +327,7 @@ class _StoryState extends State<Story> {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // RELOAD
                 if (!storyStore.showReaderMode) ...[
@@ -351,7 +353,7 @@ class _StoryState extends State<Story> {
                       Icons.arrow_back_ios,
                       color: storyStore.canGoBack
                           ? null
-                          : Colors.grey.withOpacity(0.5),
+                          : Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
 
@@ -367,7 +369,7 @@ class _StoryState extends State<Story> {
                       Icons.arrow_forward_ios,
                       color: storyStore.canGoForward
                           ? null
-                          : Colors.grey.withOpacity(0.5),
+                          : Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -429,7 +431,7 @@ class _StoryState extends State<Story> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .secondary
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                         ),

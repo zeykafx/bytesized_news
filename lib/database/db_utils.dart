@@ -99,6 +99,15 @@ class DbUtils {
     feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     return feedItems;
   }
+  
+  // Return all the feeditems that contain the search result in their title
+  Future<List<FeedItem>> getSearchItems(List<Feed> feeds, String searchTerm) async {
+    List<FeedItem> feedItems = await isar.feedItems.filter().titleContains(searchTerm, caseSensitive:false).sortByPublishedDateDesc().findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
+  }
 
   Future<void> updateItemInDb(FeedItem item) async {
     await isar.writeTxn(() => isar.feedItems.put(item));
