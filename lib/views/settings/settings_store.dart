@@ -128,6 +128,15 @@ abstract class _SettingsStore with Store {
     showAiSummaryOnLoad = value;
   }
 
+  @JsonKey(defaultValue: false)
+  @observable
+  bool fetchAiSummaryOnLoad = false;
+
+  @action
+  void setFetchAiSummaryOnLoad(bool value) {
+    fetchAiSummaryOnLoad = value;
+  }
+
   @JsonKey(includeToJson: false, includeFromJson: false)
   @observable
   bool loading = false;

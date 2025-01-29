@@ -177,9 +177,13 @@ abstract class _StoryStore with Store {
               : ForceDark.OFF,
     );
 
-    compareReaderModeLengthToPageHtml(context);
+    await compareReaderModeLengthToPageHtml(context);
 
     initialized = true;
+
+    if (settingsStore.fetchAiSummaryOnLoad) {
+      await summarizeArticle(context);
+    }
   }
 
   @action
@@ -362,6 +366,10 @@ abstract class _StoryStore with Store {
       );
       return;
     }
+    
+    if (aiLoading || feedItem.summarized) {
+      return;
+    }
 
     if (authStore.userTier == Tier.free) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -381,10 +389,6 @@ abstract class _StoryStore with Store {
     }
 
     // String htmlValue = htmlContent;
-
-    if (aiLoading || feedItem.summarized) {
-      return;
-    }
 
     dom.Document document = parse(htmlValue);
     String docText = document.body!.text;

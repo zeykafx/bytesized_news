@@ -18,6 +18,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..sortFeedGroupName = json['sortFeedGroupName'] as String?
       ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
       ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
+      ..fetchAiSummaryOnLoad = json['fetchAiSummaryOnLoad'] as bool? ?? false
       ..userInterests = (json['userInterests'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -31,6 +32,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'sortFeedGroupName': instance.sortFeedGroupName,
       'useReaderModeByDefault': instance.useReaderModeByDefault,
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
+      'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
       'userInterests': instance.userInterests,
     };
 
@@ -185,6 +187,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$fetchAiSummaryOnLoadAtom =
+      Atom(name: '_SettingsStore.fetchAiSummaryOnLoad', context: context);
+
+  @override
+  bool get fetchAiSummaryOnLoad {
+    _$fetchAiSummaryOnLoadAtom.reportRead();
+    return super.fetchAiSummaryOnLoad;
+  }
+
+  @override
+  set fetchAiSummaryOnLoad(bool value) {
+    _$fetchAiSummaryOnLoadAtom.reportWrite(value, super.fetchAiSummaryOnLoad,
+        () {
+      super.fetchAiSummaryOnLoad = value;
+    });
+  }
+
   late final _$loadingAtom =
       Atom(name: '_SettingsStore.loading', context: context);
 
@@ -309,6 +328,17 @@ mixin _$SettingsStore on _SettingsStore, Store {
   }
 
   @override
+  void setFetchAiSummaryOnLoad(bool value) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setFetchAiSummaryOnLoad');
+    try {
+      return super.setFetchAiSummaryOnLoad(value);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 darkMode: ${darkMode},
@@ -319,6 +349,7 @@ sortFeedGroup: ${sortFeedGroup},
 sortFeedGroupName: ${sortFeedGroupName},
 useReaderModeByDefault: ${useReaderModeByDefault},
 showAiSummaryOnLoad: ${showAiSummaryOnLoad},
+fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
 userInterests: ${userInterests}
     ''';

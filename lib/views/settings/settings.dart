@@ -142,15 +142,28 @@ class _GeneralSettingsState extends State<GeneralSettings> {
             ),
           ),
 
-          // SHOW AI SUMMARY ON WEB PAGE LOAD
+          // SHOW AI SUMMARY ON STORY PAGE LOAD
           ListTile(
             title: const Text(
-              "Show AI Summary on Web Page Load",
+              "Show AI Summary on Page Load (Premium)",
             ),
             trailing: Switch(
               value: settingsStore.showAiSummaryOnLoad,
               onChanged: (value) {
                 settingsStore.setShowAiSummaryOnLoad(value);
+              },
+            ),
+          ),
+
+          // FETCH AI SUMMARY ON STORY PAGE LOAD
+          ListTile(
+            title: const Text(
+              "Fetch AI Summary on Page Load (Premium)",
+            ),
+            trailing: Switch(
+              value: settingsStore.fetchAiSummaryOnLoad,
+              onChanged: (value) {
+                settingsStore.setFetchAiSummaryOnLoad(value);
               },
             ),
           ),
@@ -195,21 +208,28 @@ class _ImportExportSectionState extends State<ImportExportSection> {
             settingsStore.loading = true;
 
             // open file picker
-            final FilePickerResult? result = await FilePicker.platform.pickFiles(
+            final FilePickerResult? result =
+                await FilePicker.platform.pickFiles(
               type: FileType.custom,
               allowedExtensions: ["opml", "xml"],
             );
             if (result != null && result.files.isNotEmpty) {
-              String fileContent = await result.files.first.xFile.readAsString();
+              String fileContent =
+                  await result.files.first.xFile.readAsString();
               // get feeds from opml file
-              var (List<Feed> feeds, List<FeedGroup> feedGroups) = await OpmlUtils().getFeedsFromOpmlFile(fileContent);
+              var (List<Feed> feeds, List<FeedGroup> feedGroups) =
+                  await OpmlUtils().getFeedsFromOpmlFile(fileContent);
 
               settingsStore.loading = false;
               if (kDebugMode) {
                 print("Importing feeds: ${feeds.map((el) => el.name)}");
               }
 
-              List<Feed> loneFeeds = feeds.where((Feed feed) => feedGroups.every((FeedGroup feedGroup) => !feedGroup.feedNames.contains(feed.name))).toList();
+              List<Feed> loneFeeds = feeds
+                  .where((Feed feed) => feedGroups.every(
+                      (FeedGroup feedGroup) =>
+                          !feedGroup.feedNames.contains(feed.name)))
+                  .toList();
 
               // show dialog to confirm import, add the selected feeds to the db
               showDialog(
@@ -226,16 +246,20 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Do you want to import ${feeds.length} feeds?"),
+                              Text(
+                                  "Do you want to import ${feeds.length} feeds?"),
                               const SizedBox(height: 5),
                               ...feedGroups.map(
                                 (feedGroup) => ListTile(
                                   title: Text("Group: ${feedGroup.name}"),
-                                  subtitle: Text(feedGroup.feedNames.join(", ")),
-                                  selected: selectedFeedGroups.contains(feedGroup),
+                                  subtitle:
+                                      Text(feedGroup.feedNames.join(", ")),
+                                  selected:
+                                      selectedFeedGroups.contains(feedGroup),
                                   onTap: () {
                                     dialogSetState(() {
-                                      if (selectedFeedGroups.contains(feedGroup)) {
+                                      if (selectedFeedGroups
+                                          .contains(feedGroup)) {
                                         selectedFeedGroups.remove(feedGroup);
                                       } else {
                                         selectedFeedGroups.add(feedGroup);
@@ -243,7 +267,8 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                                     });
                                   },
                                   trailing: Checkbox(
-                                    value: selectedFeedGroups.contains(feedGroup),
+                                    value:
+                                        selectedFeedGroups.contains(feedGroup),
                                     onChanged: (value) {
                                       dialogSetState(() {
                                         if (value!) {
@@ -303,7 +328,8 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                               for (FeedGroup feedGroup in selectedFeedGroups) {
                                 // add the feeds for the feedGroup
                                 for (String feedName in feedGroup.feedNames) {
-                                  Feed feed = feeds.firstWhere((feed) => feed.name == feedName);
+                                  Feed feed = feeds.firstWhere(
+                                      (feed) => feed.name == feedName);
                                   await dbUtils.addFeed(feed);
                                 }
 
@@ -314,7 +340,8 @@ class _ImportExportSectionState extends State<ImportExportSection> {
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("Imported feeds from OPML file"),
+                                  content:
+                                      Text("Imported feeds from OPML file"),
                                 ),
                               );
                             },
@@ -337,10 +364,12 @@ class _ImportExportSectionState extends State<ImportExportSection> {
             String xml = await OpmlUtils().exportToFile();
 
             if (!await FlutterFileDialog.isPickDirectorySupported()) {
-              throw Exception("Pick directory is not supported on this platform");
+              throw Exception(
+                  "Pick directory is not supported on this platform");
             }
 
-            final DirectoryLocation? pickedDirectory = await FlutterFileDialog.pickDirectory();
+            final DirectoryLocation? pickedDirectory =
+                await FlutterFileDialog.pickDirectory();
 
             if (pickedDirectory != null) {
               final filePath = await FlutterFileDialog.saveFileToDirectory(
@@ -390,7 +419,8 @@ class _AboutSectionState extends State<AboutSection> {
                 title: const Text(
                   "Bytesized News",
                 ),
-                subtitle: Text("Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
+                subtitle: Text(
+                    "Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
               ),
               ListTile(
                 title: const Text(
@@ -399,7 +429,8 @@ class _AboutSectionState extends State<AboutSection> {
                 subtitle: const Wrap(
                   children: [
                     Text("If you like this app, you can support me at "),
-                    Text("paypal.me/zeykafx", style: TextStyle(color: Colors.blue)),
+                    Text("paypal.me/zeykafx",
+                        style: TextStyle(color: Colors.blue)),
                   ],
                 ),
                 onTap: () {
