@@ -89,6 +89,22 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$suggestedFeedItemsAtom =
+      Atom(name: '_FeedStore.suggestedFeedItems', context: context);
+
+  @override
+  ObservableList<FeedItem> get suggestedFeedItems {
+    _$suggestedFeedItemsAtom.reportRead();
+    return super.suggestedFeedItems;
+  }
+
+  @override
+  set suggestedFeedItems(ObservableList<FeedItem> value) {
+    _$suggestedFeedItemsAtom.reportWrite(value, super.suggestedFeedItems, () {
+      super.suggestedFeedItems = value;
+    });
+  }
+
   late final _$initializedAtom =
       Atom(name: '_FeedStore.initialized', context: context);
 
@@ -151,6 +167,21 @@ mixin _$FeedStore on _FeedStore, Store {
         .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
       super.dbUtils = value;
       _dbUtilsIsInitialized = true;
+    });
+  }
+
+  late final _$aiUtilsAtom = Atom(name: '_FeedStore.aiUtils', context: context);
+
+  @override
+  AiUtils get aiUtils {
+    _$aiUtilsAtom.reportRead();
+    return super.aiUtils;
+  }
+
+  @override
+  set aiUtils(AiUtils value) {
+    _$aiUtilsAtom.reportWrite(value, super.aiUtils, () {
+      super.aiUtils = value;
     });
   }
 
@@ -323,6 +354,23 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$hasCreatedNewSuggestionAtom =
+      Atom(name: '_FeedStore.hasCreatedNewSuggestion', context: context);
+
+  @override
+  bool get hasCreatedNewSuggestion {
+    _$hasCreatedNewSuggestionAtom.reportRead();
+    return super.hasCreatedNewSuggestion;
+  }
+
+  @override
+  set hasCreatedNewSuggestion(bool value) {
+    _$hasCreatedNewSuggestionAtom
+        .reportWrite(value, super.hasCreatedNewSuggestion, () {
+      super.hasCreatedNewSuggestion = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedStore.init', context: context);
 
@@ -418,6 +466,15 @@ mixin _$FeedStore on _FeedStore, Store {
         .run(() => super.searchFeedItems(searchTerm));
   }
 
+  late final _$createNewsSuggestionAsyncAction =
+      AsyncAction('_FeedStore.createNewsSuggestion', context: context);
+
+  @override
+  Future<void> createNewsSuggestion() {
+    return _$createNewsSuggestionAsyncAction
+        .run(() => super.createNewsSuggestion());
+  }
+
   late final _$_FeedStoreActionController =
       ActionController(name: '_FeedStore', context: context);
 
@@ -451,10 +508,12 @@ pinnedFeedsOrFeedGroups: ${pinnedFeedsOrFeedGroups},
 feedGroups: ${feedGroups},
 feedItems: ${feedItems},
 searchResults: ${searchResults},
+suggestedFeedItems: ${suggestedFeedItems},
 initialized: ${initialized},
 loading: ${loading},
 isar: ${isar},
 dbUtils: ${dbUtils},
+aiUtils: ${aiUtils},
 auth: ${auth},
 user: ${user},
 settingsStore: ${settingsStore},
@@ -464,7 +523,8 @@ isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
 bsbController: ${bsbController},
 scrollController: ${scrollController},
-showScrollToTop: ${showScrollToTop}
+showScrollToTop: ${showScrollToTop},
+hasCreatedNewSuggestion: ${hasCreatedNewSuggestion}
     ''';
   }
 }

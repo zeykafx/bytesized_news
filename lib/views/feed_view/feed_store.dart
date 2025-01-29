@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+import 'package:bytesized_news/AI/ai_util.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -41,6 +42,9 @@ abstract class _FeedStore with Store {
   ObservableList<FeedItem> searchResults = <FeedItem>[].asObservable();
 
   @observable
+  ObservableList<FeedItem> suggestedFeedItems = <FeedItem>[].asObservable();
+
+  @observable
   bool initialized = false;
 
   @observable
@@ -51,6 +55,9 @@ abstract class _FeedStore with Store {
 
   @observable
   late DbUtils dbUtils;
+
+  @observable
+  AiUtils aiUtils = AiUtils();
 
   @observable
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -82,6 +89,9 @@ abstract class _FeedStore with Store {
   @observable
   bool showScrollToTop = false;
 
+  @observable
+  bool hasCreatedNewSuggestion = false;
+
   @action
   Future<bool> init(
       {required SettingsStore setStore, required AuthStore authStore}) async {
@@ -96,17 +106,6 @@ abstract class _FeedStore with Store {
     if (kDebugMode) {
       print("Fetched ${feeds.length} feeds from Isar");
     }
-
-    // if (feeds.isEmpty) {
-    //   await isar.writeTxn(
-    //     () => isar.feeds.putAll([
-    //       Feed("The Verge", "http://www.theverge.com/rss/frontpage"),
-    //       Feed("Vox", "https://www.vox.com/rss/index.xml"),
-    //     ]),
-    //   );
-    //
-    //   feeds = await dbUtils.getFeeds();
-    // }
 
     feedGroups = (await dbUtils.getFeedGroups(feeds)).asObservable();
     if (kDebugMode) {
@@ -253,6 +252,10 @@ abstract class _FeedStore with Store {
     }
 
     loading = false;
+
+    // if (!hasCreatedNewSuggestion) {
+    await createNewsSuggestion();
+    // }
   }
 
   @action
@@ -263,9 +266,9 @@ abstract class _FeedStore with Store {
   }
 
   @action
-  Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) async {
-    item.bookmarked =
-        toggle ? !item.bookmarked : true;
+  Future<void> toggleItemBookmarked(FeedItem item,
+      {bool toggle = false}) async {
+    item.bookmarked = toggle ? !item.bookmarked : true;
 
     await dbUtils.updateItemInDb(item);
   }
@@ -357,5 +360,31 @@ abstract class _FeedStore with Store {
   Future<void> searchFeedItems(String searchTerm) async {
     searchResults.clear();
     searchResults.addAll(await dbUtils.getSearchItems(feeds, searchTerm));
+  }
+
+  @action
+  Future<void> createNewsSuggestion() async {
+    if (kDebugMode) {
+      print("Will fetch unread items to get news suggestions");
+    }
+
+    List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
+      ..take(20);
+    if (todaysUnreadItems.isEmpty) {
+      return;
+    }
+    List<String> userInterest = [
+      "Technology",
+      "News",
+      "Development",
+    ];
+
+    List<FeedItem> suggestedArticles =
+        await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest);
+
+    suggestedFeedItems.clear();
+    suggestedFeedItems.addAll(suggestedArticles);
+
+    // hasCreatedNewSuggestion = true;
   }
 }

@@ -389,8 +389,8 @@ abstract class _StoryStore with Store {
     dom.Document document = parse(htmlValue);
     String docText = document.body!.text;
 
-    if (docText.length > 20000) {
-      docText = docText.substring(0, 20000);
+    if (docText.length > 15000) {
+      docText = docText.substring(0, 15000);
       print(docText);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

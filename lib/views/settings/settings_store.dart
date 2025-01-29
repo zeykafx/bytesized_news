@@ -46,7 +46,8 @@ String feedListSortToString(FeedListSort sort) {
 class SettingsStore extends _SettingsStore with _$SettingsStore {
   SettingsStore();
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
+      _$SettingsStoreFromJson(json);
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 }

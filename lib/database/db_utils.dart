@@ -57,6 +57,14 @@ class DbUtils {
     }
     return feedItems;
   }
+  
+  Future<List<FeedItem>> getTodaysUnreadItems(List<Feed> feeds) async {
+    List<FeedItem> feedItems = await isar.feedItems.filter().readEqualTo(false).publishedDateGreaterThan(DateTime.now().subtract(Duration(days: 1))).sortByPublishedDateDesc().findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
+  }
 
   Future<List<FeedItem>> getReadItems(List<Feed> feeds) async {
     // return await isar.feedItems.filter().readEqualTo(true).sortByPublishedDateDesc().findAll();
