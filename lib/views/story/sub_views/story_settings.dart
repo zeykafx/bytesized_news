@@ -47,20 +47,36 @@ class _StorySettingsState extends State<StorySettings> {
                       trailing: Switch(
                         value: storyStore.settingsStore.useReaderModeByDefault,
                         onChanged: (value) {
-                          storyStore.settingsStore.setUseReaderModeByDefault(value);
+                          storyStore.settingsStore
+                              .setUseReaderModeByDefault(value);
                         },
                       ),
                     ),
 
-                    // SHOW AI SUMMARY ON WEB PAGE LOAD
+                    // SHOW AI SUMMARY ON STORY PAGE LOAD
                     ListTile(
                       title: const Text(
-                        "Show AI Summary on Web Page Load",
+                        "Show AI Summary on Page Load (Premium)",
                       ),
                       trailing: Switch(
                         value: storyStore.settingsStore.showAiSummaryOnLoad,
                         onChanged: (value) {
-                          storyStore.settingsStore.setShowAiSummaryOnLoad(value);
+                          storyStore.settingsStore
+                              .setShowAiSummaryOnLoad(value);
+                        },
+                      ),
+                    ),
+
+                    // FETCH AI SUMMARY ON STORY PAGE LOAD
+                    ListTile(
+                      title: const Text(
+                        "Fetch AI Summary on Page Load (Premium)",
+                      ),
+                      trailing: Switch(
+                        value: storyStore.settingsStore.fetchAiSummaryOnLoad,
+                        onChanged: (value) {
+                          storyStore.settingsStore
+                              .setFetchAiSummaryOnLoad(value);
                         },
                       ),
                     ),

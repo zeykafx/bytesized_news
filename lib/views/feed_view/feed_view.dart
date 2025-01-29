@@ -483,11 +483,11 @@ class _FeedViewState extends State<FeedView> {
                             icon: const Icon(Icons.all_inbox_rounded),
                           ),
                         ),
-
+                  
                         ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
                           if (elem.runtimeType == Feed) {
                             Feed feed = elem;
-
+                  
                             bool isCurrentSortFeed =
                                 settingsStore.sort == FeedListSort.feed &&
                                     settingsStore.sortFeed != null &&
@@ -532,7 +532,7 @@ class _FeedViewState extends State<FeedView> {
                             );
                           } else {
                             FeedGroup feedGroup = elem;
-
+                  
                             bool isCurrentSortFeedGroup =
                                 settingsStore.sort == FeedListSort.feedGroup &&
                                     settingsStore.sortFeedGroup != null &&

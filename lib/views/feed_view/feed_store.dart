@@ -364,6 +364,25 @@ abstract class _FeedStore with Store {
 
   @action
   Future<void> createNewsSuggestion() async {
+    if (settingsStore.sort != FeedListSort.byDate) {
+      return;
+    }
+
+    if (settingsStore.lastSuggestionDate != null &&
+        settingsStore.lastSuggestionDate!.difference(DateTime.now()).inDays ==
+            0) {
+      if (kDebugMode) {
+        print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
+      }
+      if (settingsStore.suggestionsLeftToday <= 0) {
+        return;
+      }
+      settingsStore.suggestionsLeftToday--;
+    } else {
+      settingsStore.lastSuggestionDate = DateTime.now();
+      settingsStore.suggestionsLeftToday = 9;
+    }
+
     if (kDebugMode) {
       print("Will fetch unread items to get news suggestions");
     }

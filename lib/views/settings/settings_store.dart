@@ -149,4 +149,14 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultUserInterests)
   @observable
   List<String> userInterests = defaultUserInterests;
+
+  static const defaultSuggestionsLeft = 10;
+
+  @JsonKey(defaultValue: defaultSuggestionsLeft)
+  @observable
+  int suggestionsLeftToday = defaultSuggestionsLeft;
+
+  @JsonKey(defaultValue: null)
+  @observable
+  DateTime? lastSuggestionDate;
 }

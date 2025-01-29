@@ -22,7 +22,12 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..userInterests = (json['userInterests'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
-          ['Technology', 'Politics'];
+          ['Technology', 'Politics']
+      ..suggestionsLeftToday =
+          (json['suggestionsLeftToday'] as num?)?.toInt() ?? 10
+      ..lastSuggestionDate = json['lastSuggestionDate'] == null
+          ? null
+          : DateTime.parse(json['lastSuggestionDate'] as String);
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -34,6 +39,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
       'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
       'userInterests': instance.userInterests,
+      'suggestionsLeftToday': instance.suggestionsLeftToday,
+      'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
     };
 
 const _$DarkModeEnumMap = {
@@ -236,6 +243,39 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$suggestionsLeftTodayAtom =
+      Atom(name: '_SettingsStore.suggestionsLeftToday', context: context);
+
+  @override
+  int get suggestionsLeftToday {
+    _$suggestionsLeftTodayAtom.reportRead();
+    return super.suggestionsLeftToday;
+  }
+
+  @override
+  set suggestionsLeftToday(int value) {
+    _$suggestionsLeftTodayAtom.reportWrite(value, super.suggestionsLeftToday,
+        () {
+      super.suggestionsLeftToday = value;
+    });
+  }
+
+  late final _$lastSuggestionDateAtom =
+      Atom(name: '_SettingsStore.lastSuggestionDate', context: context);
+
+  @override
+  DateTime? get lastSuggestionDate {
+    _$lastSuggestionDateAtom.reportRead();
+    return super.lastSuggestionDate;
+  }
+
+  @override
+  set lastSuggestionDate(DateTime? value) {
+    _$lastSuggestionDateAtom.reportWrite(value, super.lastSuggestionDate, () {
+      super.lastSuggestionDate = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -351,7 +391,9 @@ useReaderModeByDefault: ${useReaderModeByDefault},
 showAiSummaryOnLoad: ${showAiSummaryOnLoad},
 fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
-userInterests: ${userInterests}
+userInterests: ${userInterests},
+suggestionsLeftToday: ${suggestionsLeftToday},
+lastSuggestionDate: ${lastSuggestionDate}
     ''';
   }
 }
