@@ -199,7 +199,7 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
-    if ((doc.body!.innerHtml.length / htmlContent.length) > 80) {
+    if ((doc.body!.innerHtml.length / htmlContent.length) > 100) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("The reader view seems to have a much shorter article than the web page's full length, switching to the web page now.")));
       showReaderMode = false;
@@ -232,7 +232,7 @@ abstract class _StoryStore with Store {
         'box-shadow': '0 0 8px 0 rgba(0,0,0,0.1)',
         'margin-top': '8px',
         'margin-bottom': '8px',
-        "text-align": "justify",
+        // "text-align": "justify",
       };
     }
 
@@ -365,13 +365,14 @@ abstract class _StoryStore with Store {
     String docText = document.body!.text;
 
     if (docText.length > 10000) {
+      docText = docText.substring(0, 10000);
+      print(docText);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("This webpage is too long to be summarized..."),
+          content: Text("This webpage was too long to be summarized in full."),
           duration: Duration(seconds: 5),
         ),
       );
-      return;
     }
 
     if (kDebugMode) {
@@ -380,6 +381,7 @@ abstract class _StoryStore with Store {
 
     aiLoading = true;
     try {
+      // feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem, docText);
       feedItem.aiSummary = await aiUtils.summarize(docText, feedItem);
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
@@ -423,8 +425,8 @@ abstract class _StoryStore with Store {
 
   @action
   void hideAiSummary() {
-    hideSummary = !hideSummary;
     animationController.toggle();
+    hideSummary = !hideSummary;
   }
 
   @action

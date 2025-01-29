@@ -9,7 +9,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 class AiUtils {
   int maxSummaryLength = 3;
 
-  OpenAIClient client = OpenAIClient(apiKey: dotenv.env['DEEPSEEK_API_KEY']!, baseUrl: "https://api.deepseek.com");
+  OpenAIClient client = OpenAIClient(apiKey: dotenv.env['GROQ_API_KEY']!, baseUrl: "https://api.groq.com/openai/v1");
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
@@ -47,10 +47,16 @@ class AiUtils {
     // get the summary of the article using OpenAI's API
     CreateChatCompletionResponse res = await client.createChatCompletion(
       request: CreateChatCompletionRequest(
-        model: const ChatCompletionModel.modelId('deepseek-chat'),
+        model: const ChatCompletionModel.modelId(
+          // 'gpt-4o-mini',
+          "llama-3.2-1b-preview",
+        ),
         messages: [
           ChatCompletionMessage.system(
-            content: 'Summarize the article in $maxSummaryLength sentences. Stick to the information in the article. Do not add any new information.',
+            content: "Summarize the article in $maxSummaryLength sentences, NOT MORE! Stick to the information in the article. " +
+                "Do not add any new information, if an article refers to Twitter as 'X' do not do the same," +
+                " instead refer to it as 'Twitter. Always provide a translation of the units of measurements " +
+                "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!",
           ),
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(text),

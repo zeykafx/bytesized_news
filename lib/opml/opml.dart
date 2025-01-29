@@ -35,7 +35,11 @@ class OpmlUtils {
               feed = existingFeeds.firstWhere((element) => element.link == child.xmlUrl);
             } else {
               // if the feed does not exist, create a new feed
-              feed = await Feed.createFeed(child.xmlUrl!, feedName: child.text ?? "");
+              try {
+                feed = await Feed.createFeed(child.xmlUrl!, feedName: child.text ?? "");
+              } catch (e) {
+                continue;
+              }
             }
 
             feeds.add(feed);

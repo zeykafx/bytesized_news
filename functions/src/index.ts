@@ -9,7 +9,8 @@ import {defineString} from "firebase-functions/params";
 
 initializeApp();
 const db = getFirestore();
-const openaiKey = defineString("OPENAI_API_KEY");
+// const openaiKey = defineString("OPENAI_API_KEY");
+const groqKey = defineString("GROQ_API_KEY");
 
 
 export const summarize = onCall({region: "europe-west1"}, async (request) => {
@@ -26,7 +27,7 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
     return {error: "Error: You need to upgrade to premium to use this feature"};
   }
 
-  const openai: OpenAI = new OpenAI({apiKey: openaiKey.value()});
+  const openai: OpenAI = new OpenAI({apiKey: groqKey.value(), baseURL: "https://api.groq.com/openai/v1"});
 
   // check that the summary doesn't already exist in firestore
   const existingSummary = await db.collection("summaries")
@@ -49,14 +50,15 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
 
   // create the summary with openai
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    // model: "gpt-4o-mini",
+    model: "llama-3.2-1b-preview",
     messages: [
       {
         role: "system",
-        content: "Summarize the article in 3 sentences. Stick to the information in the article. " +
+        content: "Summarize the article in 3 sentences, NOT MORE. Stick to the information in the article. " +
           "Do not add any new information, if an article refers to Twitter as 'X' do not do the same," +
           " instead refer to it as 'Twitter. Always provide a translation of the units of measurements " +
-          "used in the article (do so in parentheses).",
+          "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!",
       },
       {
         role: "user",

@@ -191,16 +191,21 @@ abstract class _FeedStore with Store {
         print("Fetching feed items for ${feed.name}");
       }
       List<FeedItem> items = [];
-      Response res = await dio.get(feed.link);
+      Response res;
+      try {
+        res = await dio.get(feed.link);
+      } catch (e) {
+        continue;
+      }
 
       bool usingRssFeed = true;
 
       late RssFeed rssFeed;
       late AtomFeed atomFeed;
       try {
-        rssFeed = await Isolate.run(() => RssFeed.parse(res.data));
+        rssFeed = RssFeed.parse(res.data);
       } catch (e) {
-        atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
+        atomFeed = AtomFeed.parse(res.data);
         usingRssFeed = false;
       }
 
@@ -229,18 +234,12 @@ abstract class _FeedStore with Store {
       if (items.isEmpty) {
         continue;
       }
+      items.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
       feedItems.addAll(await dbUtils.addNewItems(items));
       feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
       addedItems = true;
     }
 
-    if (!addedItems) {
-      loading = false;
-      return;
-    }
-
-    // sort feed items by published date
-    // feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     loading = false;
   }
 

@@ -146,7 +146,7 @@ class _StoryState extends State<Story> {
                                          ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                           <h2>Summary</h2>
                                           <p>${storyStore.feedItem.aiSummary}</p>
-                                          <p class="tiny">Summarized by DeepSeek v3</p>
+                                          <p class="tiny">Summarized by GPT 4o Mini</p>
                                           </div>''' : ""}
                                     
                                        ${storyStore.htmlContent}
@@ -184,56 +184,64 @@ class _StoryState extends State<Story> {
                                           ],
                                         )
                                       : const SizedBox(),
-                                  storyStore.feedItemSummarized && storyStore.hideSummary && !storyStore.showReaderMode
-                                      ? Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                            ),
-                                            color: Theme.of(context).colorScheme.surface,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Card(
-                                              elevation: 0,
-                                              shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(20),
-                                                ),
+                                  storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                      ? GestureDetector(
+                                          onVerticalDragEnd: (dragDetails) {
+                                            if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
+                                              storyStore.hideAiSummary();
+                                            }
+                                          },
+                                          child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: const BorderRadius.only(
+                                                      topLeft: Radius.circular(20),
+                                                      topRight: Radius.circular(20),
+                                                    ),
+                                                    color: Theme.of(context).colorScheme.surface,
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Card(
+                                                      elevation: 0,
+                                                      shape: const RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(
+                                                          Radius.circular(20),
+                                                        ),
+                                                      ),
+                                                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(15),
+                                                        child: SelectableText(
+                                                          storyStore.feedItem.aiSummary,
+                                                          style: mediaQuery.size.width > 600
+                                                              ? Theme.of(context).textTheme.bodyMedium
+                                                              : Theme.of(context).textTheme.bodySmall,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                  //     .animate().fadeIn().then().shimmer(
+                                                  //   duration: const Duration(milliseconds: 1200),
+                                                  //   curve: Curves.easeInOutSine,
+                                                  //   colors: [
+                                                  //     const Color(0x00FFFF00),
+                                                  //     const Color(0xBFFFFF00),
+                                                  //     const Color(0xBF00FF00),
+                                                  //     const Color(0xBF00FFFF),
+                                                  //     const Color(0xBF0033FF),
+                                                  //     const Color(0xBFFF00FF),
+                                                  //     const Color(0xBFFF0000),
+                                                  //     const Color(0xBFFFFF00),
+                                                  //     // const Color(0xFFFF00),
+                                                  //   ],
+                                                  // ),
+                                                  ).animate(controller: storyStore.animationController).slideY(
+                                                begin: 2,
+                                                end: 0,
+                                                curve: Curves.easeInOutSine,
+                                                duration: const Duration(milliseconds: 500),
                                               ),
-                                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(15),
-                                                child: SelectableText(
-                                                  storyStore.feedItem.aiSummary,
-                                                  style: mediaQuery.size.width > 600
-                                                      ? Theme.of(context).textTheme.bodyMedium
-                                                      : Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ),
-                                            ),
-                                          ).animate().fadeIn().then().shimmer(
-                                            duration: const Duration(milliseconds: 1200),
-                                            curve: Curves.easeInOutSine,
-                                            colors: [
-                                              const Color(0x00FFFF00),
-                                              const Color(0xBFFFFF00),
-                                              const Color(0xBF00FF00),
-                                              const Color(0xBF00FFFF),
-                                              const Color(0xBF0033FF),
-                                              const Color(0xBFFF00FF),
-                                              const Color(0xBFFF0000),
-                                              const Color(0xBFFFFF00),
-                                              // const Color(0xFFFF00),
-                                            ],
-                                          ),
-                                        ).animate(controller: storyStore.animationController).slideY(
-                                            begin: 2,
-                                            end: 0,
-                                            curve: Curves.easeInOutSine,
-                                            duration: const Duration(milliseconds: 500),
-                                          )
+                                        )
                                       : const SizedBox(),
                                 ],
                               ),

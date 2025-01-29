@@ -55,6 +55,12 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
+        debug {
+            // fix Failed to transform firebase-auth-22.3.1.aar
+            minifyEnabled true
+            signingConfig signingConfigs.debug
+        }
+
     }
 }
 

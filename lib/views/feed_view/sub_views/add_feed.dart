@@ -50,7 +50,7 @@ class _AddFeedState extends State<AddFeed> {
               elevation: 0,
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25))),
               clipBehavior: Clip.hardEdge,
-              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
