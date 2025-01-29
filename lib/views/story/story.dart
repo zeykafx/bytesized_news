@@ -63,7 +63,8 @@ class _StoryState extends State<Story> {
       child: Scaffold(
         appBar: AppBar(
           title: Observer(builder: (_) {
-            return Text("${storyStore.feedItem.title} - ${storyStore.feedItem.feedName}");
+            return Text(
+                "${storyStore.feedItem.title} - ${storyStore.feedItem.feedName}");
           }),
           actions: [
             IconButton(
@@ -90,7 +91,10 @@ class _StoryState extends State<Story> {
               child: Stack(
                 children: [
                   if (!storyStore.showReaderMode) ...[
-                    storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
+                    storyStore.loading
+                        ? LinearProgressIndicator(
+                            value: storyStore.progress / 100)
+                        : const SizedBox(),
                   ],
                   storyStore.initialized
                       ? Stack(
@@ -98,18 +102,31 @@ class _StoryState extends State<Story> {
                             if (!storyStore.showReaderMode) ...[
                               InAppWebView(
                                 key: webViewKey,
-                                initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
+                                initialUrlRequest: URLRequest(
+                                    url: WebUri(storyStore.feedItem.url)),
                                 initialSettings: storyStore.settings,
                                 onWebViewCreated: (controller) {
                                   storyStore.controller = controller;
                                 },
-                                onPermissionRequest: (controller, request) async {
-                                  return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+                                onPermissionRequest:
+                                    (controller, request) async {
+                                  return PermissionResponse(
+                                      resources: request.resources,
+                                      action: PermissionResponseAction.GRANT);
                                 },
-                                shouldOverrideUrlLoading: (controller, navigationAction) async {
+                                shouldOverrideUrlLoading:
+                                    (controller, navigationAction) async {
                                   var uri = navigationAction.request.url!;
 
-                                  if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                                  if (![
+                                    "http",
+                                    "https",
+                                    "file",
+                                    "chrome",
+                                    "data",
+                                    "javascript",
+                                    "about"
+                                  ].contains(uri.scheme)) {
                                     if (await canLaunchUrl(uri)) {
                                       // Launch the App
                                       await launchUrl(
@@ -129,34 +146,41 @@ class _StoryState extends State<Story> {
                             ],
                             if (storyStore.showReaderMode) ...[
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: SelectableRegion(
                                   focusNode: FocusNode(),
-                                  selectionControls: MaterialTextSelectionControls(),
+                                  selectionControls:
+                                      MaterialTextSelectionControls(),
                                   child: Container(
-                                    constraints: const BoxConstraints(maxWidth: 800),
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 800),
                                     child: HtmlWidget(
                                       '''
                                   <div class="bytesized_news_html_content">
                                      ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
                                        ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                     
+
                                        ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(100).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
-                                    
+
                                          ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                           <h2>Summary</h2>
                                           <p>${storyStore.feedItem.aiSummary}</p>
-                                          <p class="tiny">Summarized by GPT 4o Mini</p>
+                                          <p class="tiny">Summarized by LLama 3.1</p>
                                           </div>''' : ""}
-                                    
+
                                        ${storyStore.htmlContent}
                                        <a href="${storyStore.feedItem.url}">Source</a>
                                     </div>
                                                                     ''',
                                       renderMode: RenderMode.listView,
-                                      customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                      customStylesBuilder: (element) =>
+                                          storyStore.buildStyle(
+                                              context, element),
                                       onTapImage: (ImageMetadata imageData) {
-                                        storyStore.showImage(imageData.sources.firstOrNull!.url, context);
+                                        storyStore.showImage(
+                                            imageData.sources.firstOrNull!.url,
+                                            context);
                                       },
                                     ),
                                   ),
@@ -171,8 +195,15 @@ class _StoryState extends State<Story> {
                               child: Column(
                                 children: [
                                   storyStore.aiLoading
-                                      ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
-                                          duration: const Duration(milliseconds: 1500),
+                                      ? const LinearProgressIndicator()
+                                          .animate()
+                                          .fadeIn()
+                                          .animate(
+                                              onPlay: (controller) =>
+                                                  controller.repeat())
+                                          .shimmer(
+                                          duration: const Duration(
+                                              milliseconds: 1500),
                                           colors: [
                                             const Color(0xBFFFFF00),
                                             const Color(0xBF00FF00),
@@ -184,38 +215,64 @@ class _StoryState extends State<Story> {
                                           ],
                                         )
                                       : const SizedBox(),
-                                  storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                  storyStore.feedItemSummarized &&
+                                          !storyStore.showReaderMode
                                       ? GestureDetector(
                                           onVerticalDragEnd: (dragDetails) {
-                                            if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
+                                            if (dragDetails.velocity
+                                                    .pixelsPerSecond.dy >
+                                                100) {
                                               storyStore.hideAiSummary();
                                             }
                                           },
                                           child: Container(
                                                   decoration: BoxDecoration(
-                                                    borderRadius: const BorderRadius.only(
-                                                      topLeft: Radius.circular(20),
-                                                      topRight: Radius.circular(20),
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(20),
+                                                      topRight:
+                                                          Radius.circular(20),
                                                     ),
-                                                    color: Theme.of(context).colorScheme.surface,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface,
                                                   ),
                                                   child: Padding(
-                                                    padding: const EdgeInsets.all(8.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: Card(
                                                       elevation: 0,
-                                                      shape: const RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.all(
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
                                                           Radius.circular(20),
                                                         ),
                                                       ),
-                                                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondaryContainer
+                                                          .withOpacity(0.5),
                                                       child: Padding(
-                                                        padding: const EdgeInsets.all(15),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(15),
                                                         child: SelectableText(
-                                                          storyStore.feedItem.aiSummary,
-                                                          style: mediaQuery.size.width > 600
-                                                              ? Theme.of(context).textTheme.bodyMedium
-                                                              : Theme.of(context).textTheme.bodySmall,
+                                                          storyStore.feedItem
+                                                              .aiSummary,
+                                                          style: mediaQuery.size
+                                                                      .width >
+                                                                  600
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                              : Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodySmall,
                                                         ),
                                                       ),
                                                     ),
@@ -235,11 +292,16 @@ class _StoryState extends State<Story> {
                                                   //     // const Color(0xFFFF00),
                                                   //   ],
                                                   // ),
-                                                  ).animate(controller: storyStore.animationController).slideY(
+                                                  )
+                                              .animate(
+                                                  controller: storyStore
+                                                      .animationController)
+                                              .slideY(
                                                 begin: 2,
                                                 end: 0,
                                                 curve: Curves.easeInOutSine,
-                                                duration: const Duration(milliseconds: 500),
+                                                duration: const Duration(
+                                                    milliseconds: 500),
                                               ),
                                         )
                                       : const SizedBox(),
@@ -283,7 +345,9 @@ class _StoryState extends State<Story> {
                     tooltip: "Go back",
                     icon: Icon(
                       Icons.arrow_back_ios,
-                      color: storyStore.canGoBack ? null : Colors.grey.withOpacity(0.5),
+                      color: storyStore.canGoBack
+                          ? null
+                          : Colors.grey.withOpacity(0.5),
                     ),
                   ),
 
@@ -297,7 +361,9 @@ class _StoryState extends State<Story> {
                     tooltip: "Go forward",
                     icon: Icon(
                       Icons.arrow_forward_ios,
-                      color: storyStore.canGoForward ? null : Colors.grey.withOpacity(0.5),
+                      color: storyStore.canGoForward
+                          ? null
+                          : Colors.grey.withOpacity(0.5),
                     ),
                   ),
                 ],
@@ -307,8 +373,12 @@ class _StoryState extends State<Story> {
                   onPressed: () {
                     storyStore.toggleReaderMode();
                   },
-                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                  icon: Icon(storyStore.showReaderMode ? Icons.chrome_reader_mode : Icons.chrome_reader_mode_outlined),
+                  tooltip: storyStore.showReaderMode
+                      ? "Disable reader mode"
+                      : "Enable reader mode",
+                  icon: Icon(storyStore.showReaderMode
+                      ? Icons.chrome_reader_mode
+                      : Icons.chrome_reader_mode_outlined),
                 ),
 
                 storyStore.feedItemSummarized
@@ -323,10 +393,14 @@ class _StoryState extends State<Story> {
                               heightFactor: 3,
                               child: Icon(LucideIcons.sparkles, size: 14),
                             ),
-                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                            Icon(storyStore.hideSummary
+                                ? Icons.visibility
+                                : Icons.visibility_off),
                           ],
                         ),
-                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                        tooltip: storyStore.hideSummary
+                            ? "Show AI Summary"
+                            : "Hide AI Summary",
                       )
                     : IconButton(
                         onPressed: () {
@@ -348,7 +422,10 @@ class _StoryState extends State<Story> {
                         left: 0,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -361,7 +438,9 @@ class _StoryState extends State<Story> {
                         storyStore.bookmarkItem();
                         widget.feedItem.bookmarked = storyStore.isBookmarked;
                       },
-                      icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                      icon: Icon(storyStore.isBookmarked
+                          ? Icons.bookmark_added
+                          : Icons.bookmark_add),
                     ),
                   ],
                 ),

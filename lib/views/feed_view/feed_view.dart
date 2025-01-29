@@ -13,6 +13,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -299,6 +301,12 @@ class _FeedViewState extends State<FeedView> {
                                     addAutomaticKeepAlives: false,
                                     itemBuilder: (context, idx) {
                                       FeedItem item = feedStore.feedItems[idx];
+
+                                      dom.Document doc = parse(item.title);
+                                      String parsedTitle = parse(doc.body!.text)
+                                          .documentElement!
+                                          .text;
+
                                       return Card(
                                         shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.all(
@@ -331,7 +339,7 @@ class _FeedViewState extends State<FeedView> {
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    item.title,
+                                                    parsedTitle,
                                                     style: const TextStyle(
                                                         fontSize: 15),
                                                   ),
@@ -386,7 +394,8 @@ class _FeedViewState extends State<FeedView> {
                                                                   .iconUrl,
                                                               width: 15,
                                                               height: 15,
-                                                            )
+                                                              fit: BoxFit
+                                                                  .contain)
                                                           : const Icon(
                                                               LucideIcons.rss),
                                                       elevation: 0,
@@ -978,158 +987,165 @@ class _FeedViewState extends State<FeedView> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // all feeds button
-                      Card.outlined(
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            color: settingsStore.sort != FeedListSort.feed &&
-                                    settingsStore.sort != FeedListSort.feedGroup
-                                ? Theme.of(context).colorScheme.primaryFixedDim
-                                : Theme.of(context)
-                                    .dividerColor
-                                    .withValues(alpha: 0.5),
-                            width: settingsStore.sort != FeedListSort.feed &&
-                                    settingsStore.sort != FeedListSort.feedGroup
-                                ? 3
-                                : 1,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                        ),
-                        child: IconButton(
-                          onPressed: () async {
-                            await feedStore.changeSort(FeedListSort.byDate);
-                            await feedStore.fetchItems();
-                          },
-                          icon: const Icon(Icons.all_inbox_rounded),
-                        ),
-                      ),
-
-                      ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
-                        if (elem.runtimeType == Feed) {
-                          Feed feed = elem;
-
-                          bool isCurrentSortFeed =
-                              settingsStore.sort == FeedListSort.feed &&
-                                  settingsStore.sortFeed != null &&
-                                  settingsStore.sortFeed?.name == feed.name;
-                          return Card.outlined(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                color: isCurrentSortFeed
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryFixedDim
-                                    : Theme.of(context)
-                                        .dividerColor
-                                        .withValues(alpha: 0.5),
-                                width: isCurrentSortFeed ? 3 : 1,
-                              ),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10),
-                              ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // all feeds button
+                        Card.outlined(
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: settingsStore.sort != FeedListSort.feed &&
+                                      settingsStore.sort !=
+                                          FeedListSort.feedGroup
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .primaryFixedDim
+                                  : Theme.of(context)
+                                      .dividerColor
+                                      .withValues(alpha: 0.5),
+                              width: settingsStore.sort != FeedListSort.feed &&
+                                      settingsStore.sort !=
+                                          FeedListSort.feedGroup
+                                  ? 3
+                                  : 1,
                             ),
-                            child: IconButton(
-                              onPressed: () async {
-                                // sort for this feed
-                                settingsStore.setSortFeed(feed);
-                                settingsStore.setSortFeedName(feed.name);
-                                await feedStore.changeSort(FeedListSort.feed);
-                                await feedStore.fetchItems();
-                              },
-                              icon: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () async {
+                              await feedStore.changeSort(FeedListSort.byDate);
+                              await feedStore.fetchItems();
+                            },
+                            icon: const Icon(Icons.all_inbox_rounded),
+                          ),
+                        ),
+
+                        ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
+                          if (elem.runtimeType == Feed) {
+                            Feed feed = elem;
+
+                            bool isCurrentSortFeed =
+                                settingsStore.sort == FeedListSort.feed &&
+                                    settingsStore.sortFeed != null &&
+                                    settingsStore.sortFeed?.name == feed.name;
+                            return Card.outlined(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: isCurrentSortFeed
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .primaryFixedDim
+                                      : Theme.of(context)
+                                          .dividerColor
+                                          .withValues(alpha: 0.5),
+                                  width: isCurrentSortFeed ? 3 : 1,
                                 ),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 1),
-                                clipBehavior: Clip.antiAlias,
-                                child: CachedNetworkImage(
-                                    imageUrl: feed.iconUrl,
-                                    width: 25,
-                                    height: 25),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                            ),
-                          );
-                        } else {
-                          FeedGroup feedGroup = elem;
+                              child: IconButton(
+                                onPressed: () async {
+                                  // sort for this feed
+                                  settingsStore.setSortFeed(feed);
+                                  settingsStore.setSortFeedName(feed.name);
+                                  await feedStore.changeSort(FeedListSort.feed);
+                                  await feedStore.fetchItems();
+                                },
+                                icon: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 1),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: CachedNetworkImage(
+                                      imageUrl: feed.iconUrl,
+                                      width: 25,
+                                      height: 25),
+                                ),
+                              ),
+                            );
+                          } else {
+                            FeedGroup feedGroup = elem;
 
-                          bool isCurrentSortFeedGroup =
-                              settingsStore.sort == FeedListSort.feedGroup &&
-                                  settingsStore.sortFeedGroup != null &&
-                                  settingsStore.sortFeedGroup?.name ==
-                                      feedGroup.name;
-                          return Card.outlined(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                color: isCurrentSortFeedGroup
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryFixedDim
-                                    : Theme.of(context)
-                                        .dividerColor
-                                        .withValues(alpha: 0.5),
-                                width: isCurrentSortFeedGroup ? 3 : 1,
+                            bool isCurrentSortFeedGroup =
+                                settingsStore.sort == FeedListSort.feedGroup &&
+                                    settingsStore.sortFeedGroup != null &&
+                                    settingsStore.sortFeedGroup?.name ==
+                                        feedGroup.name;
+                            return Card.outlined(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: isCurrentSortFeedGroup
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .primaryFixedDim
+                                      : Theme.of(context)
+                                          .dividerColor
+                                          .withValues(alpha: 0.5),
+                                  width: isCurrentSortFeedGroup ? 3 : 1,
+                                ),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            child: IconButton(
-                              onPressed: () async {
-                                // sort for this feed group
-                                settingsStore.setSortFeedGroup(feedGroup);
-                                settingsStore
-                                    .setSortFeedGroupName(feedGroup.name);
-                                await feedStore
-                                    .changeSort(FeedListSort.feedGroup);
-                                await feedStore.fetchItems();
-                              },
-                              icon: feedGroup.feeds.isEmpty
-                                  ? const Icon(
-                                      LucideIcons.folder,
-                                      size: 15,
-                                    )
-                                  : Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ...feedGroup.feeds.take(2).map(
-                                              (feed) => Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
+                              child: IconButton(
+                                onPressed: () async {
+                                  // sort for this feed group
+                                  settingsStore.setSortFeedGroup(feedGroup);
+                                  settingsStore
+                                      .setSortFeedGroupName(feedGroup.name);
+                                  await feedStore
+                                      .changeSort(FeedListSort.feedGroup);
+                                  await feedStore.fetchItems();
+                                },
+                                icon: feedGroup.feeds.isEmpty
+                                    ? const Icon(
+                                        LucideIcons.folder,
+                                        size: 15,
+                                      )
+                                    : Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ...feedGroup.feeds.take(2).map(
+                                                (feed) => Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  margin: const EdgeInsets
+                                                      .symmetric(horizontal: 1),
+                                                  clipBehavior: Clip.antiAlias,
+                                                  child: CachedNetworkImage(
+                                                      imageUrl: feed.iconUrl,
+                                                      width: 17,
+                                                      height: 17),
                                                 ),
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 1),
-                                                clipBehavior: Clip.antiAlias,
-                                                child: CachedNetworkImage(
-                                                    imageUrl: feed.iconUrl,
-                                                    width: 17,
-                                                    height: 17),
                                               ),
+                                          if (feedGroup.feeds.length > 2) ...[
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              "+${feedGroup.feeds.length - 2}",
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .dividerColor),
                                             ),
-                                        if (feedGroup.feeds.length > 2) ...[
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            "+${feedGroup.feeds.length - 2}",
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .dividerColor),
-                                          ),
+                                          ],
                                         ],
-                                      ],
-                                    ),
-                            ),
-                          );
-                        }
-                      }),
-                    ],
+                                      ),
+                              ),
+                            );
+                          }
+                        }),
+                      ],
+                    ),
                   ),
                 ),
               ],

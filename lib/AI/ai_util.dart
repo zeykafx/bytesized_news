@@ -9,13 +9,17 @@ import 'package:cloud_functions/cloud_functions.dart';
 class AiUtils {
   int maxSummaryLength = 3;
 
-  OpenAIClient client = OpenAIClient(apiKey: dotenv.env['GROQ_API_KEY']!, baseUrl: "https://api.groq.com/openai/v1");
+  OpenAIClient client = OpenAIClient(
+      apiKey: dotenv.env['GROQ_API_KEY']!,
+      baseUrl: "https://api.groq.com/openai/v1");
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
+  FirebaseFunctions functions =
+      FirebaseFunctions.instanceFor(region: "europe-west1");
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<String> summarizeWithFirebase(FeedItem feedItem, String content) async {
+  Future<String> summarizeWithFirebase(
+      FeedItem feedItem, String content) async {
     final result = await functions.httpsCallable('summarize').call(
       {
         "text": feedItem.url,
@@ -32,7 +36,10 @@ class AiUtils {
 
   Future<String> summarize(String text, FeedItem feedItem) async {
     // check firestore for existing summary
-    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    var existingSummary = await firestore
+        .collection("summaries")
+        .where("url", isEqualTo: feedItem.url)
+        .get();
 
     if (existingSummary.docs.isNotEmpty) {
       if (kDebugMode) {
@@ -42,18 +49,19 @@ class AiUtils {
     }
 
     if (kDebugMode) {
-      print("Calling OpenAI API...");
+      print("Calling AI API...");
     }
     // get the summary of the article using OpenAI's API
     CreateChatCompletionResponse res = await client.createChatCompletion(
       request: CreateChatCompletionRequest(
         model: const ChatCompletionModel.modelId(
           // 'gpt-4o-mini',
-          "llama-3.2-1b-preview",
+          // "llama-3.2-1b-preview",
+          "llama-3.1-8b-instant",
         ),
         messages: [
           ChatCompletionMessage.system(
-            content: "Summarize the article in $maxSummaryLength sentences, NOT MORE! Stick to the information in the article. " +
+            content: "Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER THAN $maxSummaryLength SENTENCES!! Stick to the information in the article. " +
                 "Do not add any new information, if an article refers to Twitter as 'X' do not do the same," +
                 " instead refer to it as 'Twitter. Always provide a translation of the units of measurements " +
                 "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!",
