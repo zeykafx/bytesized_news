@@ -8,10 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_js/flutter_js.dart';
-import 'package:flutter_js/javascript_runtime.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
@@ -181,7 +178,7 @@ abstract class _StoryStore with Store {
 
     initialized = true;
 
-    if (settingsStore.fetchAiSummaryOnLoad) {
+    if (settingsStore.fetchAiSummaryOnLoad && !showReaderMode) {
       await summarizeArticle(context);
     }
   }
@@ -213,7 +210,9 @@ abstract class _StoryStore with Store {
             "The reader view seems to have a much shorter article than the web page's full length, switching to the web page now."),
       ));
       showReaderMode = false;
+      return;
     }
+    return;
   }
 
   @action
@@ -366,7 +365,7 @@ abstract class _StoryStore with Store {
       );
       return;
     }
-    
+
     if (aiLoading || feedItem.summarized) {
       return;
     }

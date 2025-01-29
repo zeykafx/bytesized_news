@@ -376,12 +376,11 @@ class _FeedViewState extends State<FeedView> {
                                               ),
                                             ],
                                           ),
-                                        ).animate(
-                                            delay: Duration(
-                                                milliseconds:
-                                                    idx *
-                                                        100))
-                                        .fadeIn();
+                                        )
+                                            .animate(
+                                                delay: Duration(
+                                                    milliseconds: idx * 100))
+                                            .fadeIn();
                                       }
 
                                       int index = feedStore
@@ -456,20 +455,22 @@ class _FeedViewState extends State<FeedView> {
                         Card.outlined(
                           shape: RoundedRectangleBorder(
                             side: BorderSide(
-                              color: settingsStore.sort != FeedListSort.feed &&
-                                      settingsStore.sort !=
-                                          FeedListSort.feedGroup
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .primaryFixedDim
-                                  : Theme.of(context)
-                                      .dividerColor
-                                      .withValues(alpha: 0.5),
-                              width: settingsStore.sort != FeedListSort.feed &&
-                                      settingsStore.sort !=
-                                          FeedListSort.feedGroup
-                                  ? 3
-                                  : 1,
+                              color:
+                                  settingsStore.sort != FeedListSort.feed &&
+                                          settingsStore.sort !=
+                                              FeedListSort.feedGroup
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .primaryFixedDim
+                                      : Theme.of(context)
+                                          .dividerColor
+                                          .withValues(alpha: 0.5),
+                              width:
+                                  settingsStore.sort != FeedListSort.feed &&
+                                          settingsStore.sort !=
+                                              FeedListSort.feedGroup
+                                      ? 3
+                                      : 1,
                             ),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(10),
@@ -483,11 +484,11 @@ class _FeedViewState extends State<FeedView> {
                             icon: const Icon(Icons.all_inbox_rounded),
                           ),
                         ),
-                  
+                    
                         ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
                           if (elem.runtimeType == Feed) {
                             Feed feed = elem;
-                  
+                    
                             bool isCurrentSortFeed =
                                 settingsStore.sort == FeedListSort.feed &&
                                     settingsStore.sortFeed != null &&
@@ -513,15 +514,16 @@ class _FeedViewState extends State<FeedView> {
                                   // sort for this feed
                                   settingsStore.setSortFeed(feed);
                                   settingsStore.setSortFeedName(feed.name);
-                                  await feedStore.changeSort(FeedListSort.feed);
+                                  await feedStore
+                                      .changeSort(FeedListSort.feed);
                                   await feedStore.fetchItems();
                                 },
                                 icon: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 1),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 1),
                                   clipBehavior: Clip.antiAlias,
                                   child: CachedNetworkImage(
                                       imageUrl: feed.iconUrl,
@@ -532,9 +534,10 @@ class _FeedViewState extends State<FeedView> {
                             );
                           } else {
                             FeedGroup feedGroup = elem;
-                  
+                    
                             bool isCurrentSortFeedGroup =
-                                settingsStore.sort == FeedListSort.feedGroup &&
+                                settingsStore.sort ==
+                                        FeedListSort.feedGroup &&
                                     settingsStore.sortFeedGroup != null &&
                                     settingsStore.sortFeedGroup?.name ==
                                         feedGroup.name;
@@ -580,8 +583,10 @@ class _FeedViewState extends State<FeedView> {
                                                             5),
                                                   ),
                                                   margin: const EdgeInsets
-                                                      .symmetric(horizontal: 1),
-                                                  clipBehavior: Clip.antiAlias,
+                                                      .symmetric(
+                                                      horizontal: 1),
+                                                  clipBehavior:
+                                                      Clip.antiAlias,
                                                   child: CachedNetworkImage(
                                                       imageUrl: feed.iconUrl,
                                                       width: 17,

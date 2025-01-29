@@ -370,7 +370,7 @@ abstract class _FeedStore with Store {
 
     if (settingsStore.lastSuggestionDate != null &&
         settingsStore.lastSuggestionDate!.difference(DateTime.now()).inDays ==
-            0) {
+            0 && settingsStore.lastSuggestionDate!.day == DateTime.now().day) {
       if (kDebugMode) {
         print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
       }
@@ -379,6 +379,9 @@ abstract class _FeedStore with Store {
       }
       settingsStore.suggestionsLeftToday--;
     } else {
+      if (kDebugMode) {
+        print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
+      }
       settingsStore.lastSuggestionDate = DateTime.now();
       settingsStore.suggestionsLeftToday = 9;
     }
