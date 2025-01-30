@@ -346,6 +346,24 @@ abstract class _FeedStore with Store {
             (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!))
                 .asObservable();
     }
+
+    filterArticlesMutedKeywords(feedItems);
+  }
+
+  void filterArticlesMutedKeywords(List<FeedItem> items) {
+    List<FeedItem> toRemove = [];
+    for (FeedItem feedItem in items) {
+      // Check if the item's title contains any muted keywords
+      for (String mutedKeyword in settingsStore.mutedKeywords) {
+        if (feedItem.title.toLowerCase().contains(mutedKeyword.toLowerCase())) {
+          toRemove.add(feedItem);
+        }
+      }
+    }
+
+    for (FeedItem item in toRemove) {
+      items.remove(item);
+    }
   }
 
   Future<void> markAllAsRead(bool read, {List<FeedItem>? unreadItems}) async {
@@ -392,7 +410,10 @@ abstract class _FeedStore with Store {
   @action
   Future<void> searchFeedItems(String searchTerm) async {
     searchResults.clear();
-    searchResults.addAll(await dbUtils.getSearchItems(feeds, searchTerm));
+    List<FeedItem> searchItems =
+        await dbUtils.getSearchItems(feeds, searchTerm);
+    filterArticlesMutedKeywords(searchItems);
+    searchResults.addAll(searchItems);
   }
 
   @action
@@ -419,7 +440,9 @@ abstract class _FeedStore with Store {
           print("Fetching stored suggestions");
         }
         suggestedFeedItems.clear();
-        suggestedFeedItems.addAll(await dbUtils.getSuggestedItems(feeds));
+        List<FeedItem> suggested = await dbUtils.getSuggestedItems(feeds);
+        filterArticlesMutedKeywords(suggested);
+        suggestedFeedItems.addAll(suggested);
         return;
       }
       settingsStore.lastSuggestionDate = DateTime.now();
@@ -438,6 +461,7 @@ abstract class _FeedStore with Store {
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
       ..take(20);
+    filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;
     }

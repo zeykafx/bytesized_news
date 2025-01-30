@@ -19,6 +19,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
       ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
       ..fetchAiSummaryOnLoad = json['fetchAiSummaryOnLoad'] as bool? ?? false
+      ..mutedKeywords = (json['mutedKeywords'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          []
       ..suggestionsLeftToday =
           (json['suggestionsLeftToday'] as num?)?.toInt() ?? 10
       ..lastSuggestionDate = json['lastSuggestionDate'] == null
@@ -34,6 +38,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'useReaderModeByDefault': instance.useReaderModeByDefault,
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
       'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
+      'mutedKeywords': instance.mutedKeywords,
       'suggestionsLeftToday': instance.suggestionsLeftToday,
       'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
     };
@@ -222,6 +227,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$mutedKeywordsAtom =
+      Atom(name: '_SettingsStore.mutedKeywords', context: context);
+
+  @override
+  List<String> get mutedKeywords {
+    _$mutedKeywordsAtom.reportRead();
+    return super.mutedKeywords;
+  }
+
+  @override
+  set mutedKeywords(List<String> value) {
+    _$mutedKeywordsAtom.reportWrite(value, super.mutedKeywords, () {
+      super.mutedKeywords = value;
+    });
+  }
+
   late final _$suggestionsLeftTodayAtom =
       Atom(name: '_SettingsStore.suggestionsLeftToday', context: context);
 
@@ -370,6 +391,7 @@ useReaderModeByDefault: ${useReaderModeByDefault},
 showAiSummaryOnLoad: ${showAiSummaryOnLoad},
 fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
+mutedKeywords: ${mutedKeywords},
 suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate}
     ''';

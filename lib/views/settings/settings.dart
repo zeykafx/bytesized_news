@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/opml/opml.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -167,6 +165,23 @@ class _GeneralSettingsState extends State<GeneralSettings> {
               },
             ),
           ),
+
+          // Muted keywords
+          KeywordsBottomSheet(
+            title: "Mute title keywords from feed",
+            getKeywords: () => settingsStore.mutedKeywords,
+            additionCallback: (String text) {
+              settingsStore.mutedKeywords = [
+                ...settingsStore.mutedKeywords,
+                text,
+              ];
+            },
+            removalCallback: (int index) {
+              settingsStore.mutedKeywords = [
+                ...settingsStore.mutedKeywords..removeAt(index),
+              ];
+            }
+          )
         ],
       );
     });

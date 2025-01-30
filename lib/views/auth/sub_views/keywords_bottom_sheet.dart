@@ -4,14 +4,12 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 
 // Code taken from https://github.com/tommyxchow/frosty/ (originally written by ZeykaFX)
 class KeywordsBottomSheet extends StatefulWidget {
-  // final SettingsStore settingsStore;
   final List<String> Function() getKeywords;
   final String title;
   final Function(String) additionCallback;
   final Function(int) removalCallback;
   const KeywordsBottomSheet({
     super.key,
-    // required this.settingsStore,
     required this.getKeywords,
     required this.title,
     required this.additionCallback,
@@ -23,21 +21,15 @@ class KeywordsBottomSheet extends StatefulWidget {
 }
 
 class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
-  // late final SettingsStore settingsStore;
   final TextEditingController textController = TextEditingController();
   final FocusNode textFieldFocusNode = FocusNode();
 
   @override
   void initState() {
-    // settingsStore = widget.settingsStore;
     super.initState();
   }
 
   void addKeyword(String text) {
-    // settingsStore.userInterests = [
-    //   ...settingsStore.userInterests,
-    //   text,
-    // ];
     widget.additionCallback(text);
 
     textController.clear();
@@ -45,16 +37,12 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
   }
 
   void removeKeyword(int index) {
-    // settingsStore.userInterests = [
-    //   ...settingsStore.userInterests..removeAt(index),
-    // ];
     widget.removalCallback(index);
   }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 6.0),
       trailing: const Icon(Icons.edit),
       title: Text(widget.title),
       onTap: () => showModalBottomSheet(
@@ -119,8 +107,7 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
                         itemCount: widget.getKeywords().length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(
-                                widget.getKeywords().elementAt(index)),
+                            title: Text(widget.getKeywords().elementAt(index)),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
