@@ -156,4 +156,12 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: null)
   @observable
   DateTime? lastSuggestionDate;
+  
+  @JsonKey(defaultValue: null)
+  @observable
+  DateTime? builtUserProfileDate;
+  
+  
+  // @observable
+  // int keepArticles
 }

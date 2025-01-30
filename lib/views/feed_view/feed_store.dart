@@ -7,6 +7,7 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -350,10 +351,11 @@ abstract class _FeedStore with Store {
     filterArticlesMutedKeywords(feedItems);
   }
 
-  void filterArticlesMutedKeywords(List<FeedItem> items) {  
+  void filterArticlesMutedKeywords(List<FeedItem> items) {
     items.removeWhere((item) {
       final lowerTitle = item.title.toLowerCase();
-      return settingsStore.mutedKeywords.any((keyword) => lowerTitle.contains(keyword));
+      return settingsStore.mutedKeywords
+          .any((keyword) => lowerTitle.contains(keyword));
     });
   }
 
@@ -413,27 +415,60 @@ abstract class _FeedStore with Store {
       return;
     }
 
+    // if the user profile hasn't been built for at least a week, do that before getting suggestions
+    if (settingsStore.builtUserProfileDate == null ||
+        DateTime.now().difference(settingsStore.builtUserProfileDate!).inDays >=
+            7) {
+      List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+      List<String> interests = await aiUtils.buildUserInterests(
+        mostReadFeeds,
+        authStore.userInterests,
+      );
+      if (kDebugMode) {
+        print("Adding new interests: $interests");
+      }
+      authStore.userInterests.addAll(interests);
+
+      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
+        "interests": authStore.userInterests,
+      });
+      settingsStore.builtUserProfileDate = DateTime.now();
+    }
+
     if (settingsStore.lastSuggestionDate != null &&
         settingsStore.lastSuggestionDate!.difference(DateTime.now()).inDays ==
             0 &&
         settingsStore.lastSuggestionDate!.day == DateTime.now().day) {
       if (kDebugMode) {
         print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
+        print(
+            "Last suggestion difference in minutes: ${DateTime.now().difference(settingsStore.lastSuggestionDate!).inMinutes}");
       }
 
       if (settingsStore.suggestionsLeftToday <= 0 ||
           // Only fetch suggestions every 10 minutes max
-          settingsStore.lastSuggestionDate!
-                  .difference(DateTime.now())
+          DateTime.now()
+                  .difference(settingsStore.lastSuggestionDate!)
                   .inMinutes <
               10) {
         if (kDebugMode) {
           print("Fetching stored suggestions");
         }
+
         suggestedFeedItems.clear();
+        // Fetch the suggestions from the db and filter out muted keywords (shouldn't be needed)
         List<FeedItem> suggested = await dbUtils.getSuggestedItems(feeds);
         filterArticlesMutedKeywords(suggested);
         suggestedFeedItems.addAll(suggested);
+
+        // scroll back to the start of the suggestions
+        if (suggestionsScrollController.hasClients) {
+          suggestionsScrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
         return;
       }
       settingsStore.lastSuggestionDate = DateTime.now();
@@ -456,8 +491,9 @@ abstract class _FeedStore with Store {
     if (todaysUnreadItems.isEmpty) {
       return;
     }
-    List<String> userInterest = authStore.userInterests;
 
+    // Get the user interests and feed interests
+    List<String> userInterest = authStore.userInterests;
     List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
 
     List<FeedItem> suggestedArticles = await aiUtils.getNewsSuggestions(
@@ -479,9 +515,11 @@ abstract class _FeedStore with Store {
       }
     }
 
+    // clear the suggestions then add all of the new ones
     suggestedFeedItems.clear();
     suggestedFeedItems.addAll(suggestedArticles);
 
+    // scroll back to the start of the suggestions
     if (suggestionsScrollController.hasClients) {
       suggestionsScrollController.animateTo(
         0,

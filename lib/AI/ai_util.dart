@@ -88,8 +88,10 @@ class AiUtils {
 
     var ret = await firestore.collection("summaries").add({
       "url": feedItem.url,
+      "title": feedItem.title,
       "summary": summary,
       "generatedAt": DateTime.now().millisecondsSinceEpoch,
+      "expirationTimestamp": DateTime.now().add(Duration(days: 30)),
     });
 
     if (kDebugMode) {
@@ -115,7 +117,7 @@ class AiUtils {
 
     String mostReadFeedsString = mostReadFeeds
         .map((Feed feed) =>
-            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}")
+            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
         .join(",");
 
     if (kDebugMode) {
@@ -170,5 +172,87 @@ class AiUtils {
     suggestedArticles = suggestedArticles.toSet().toList();
 
     return suggestedArticles;
+  }
+
+  Future<List<String>> getFeedCategories(Feed feed) async {
+    if (kDebugMode) {
+      print("Calling AI API to get feed summaries.");
+    }
+
+    CreateChatCompletionResponse res = await client.createChatCompletion(
+      request: CreateChatCompletionRequest(
+        responseFormat: ResponseFormat.jsonObject(),
+        model: const ChatCompletionModel.modelId(
+          "llama-3.1-8b-instant",
+        ),
+        messages: [
+          ChatCompletionMessage.system(
+            content: """
+                Analyze the following RSS Feed name and URL to infer relevant content categories. Consider keywords in both the name and URL path/domain. Return a JSON array of 3-5 most relevant categories under a "categories" key. Only output JSON.
+                Example response for "TechCrunch": {"categories": ["Technology", "Startups", "Business", "Innovation"]}
+                """,
+          ),
+          ChatCompletionMessage.user(
+            content: ChatCompletionUserMessageContent.string(
+              "Name: ${feed.name}, Link: ${feed.link}",
+            ),
+          ),
+        ],
+        temperature: 0.6,
+      ),
+    );
+
+    String jsonOutput = res.choices.first.message.content ?? "[]";
+    var jsonData = jsonDecode(jsonOutput);
+    List<String> categories = [];
+    for (var category in jsonData['categories']) {
+      categories.add(category);
+    }
+    return categories;
+  }
+
+  Future<List<String>> buildUserInterests(
+    List<Feed> feeds,
+    List<String> userInterests,
+  ) async {
+    if (kDebugMode) {
+      print("Calling AI API to build user interests.");
+    }
+
+    String mostReadFeedsString = feeds
+        .map((Feed feed) =>
+            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
+        .join(",");
+
+    CreateChatCompletionResponse res = await client.createChatCompletion(
+      request: CreateChatCompletionRequest(
+        responseFormat: ResponseFormat.jsonObject(),
+        model: const ChatCompletionModel.modelId(
+          "llama-3.1-8b-instant",
+        ),
+        messages: [
+          ChatCompletionMessage.system(
+            content: """
+                Analyze the following RSS Feeds names, categories, and the number of articles read from that feed to infer the user's categories of interest. Return a JSON array of 3-5 most relevant categories under a "categories" key. Only output JSON.
+                Example response: {"categories": ["Technology", "Politics", "Android", "Mobile Phones"]}
+                """,
+          ),
+          ChatCompletionMessage.user(
+            content: ChatCompletionUserMessageContent.string(
+              mostReadFeedsString,
+            ),
+          ),
+        ],
+        temperature: 0.6,
+      ),
+    );
+
+    String jsonOutput = res.choices.first.message.content ?? "[]";
+    var jsonData = jsonDecode(jsonOutput);
+    List<String> categories = [];
+    for (var category in jsonData['categories']) {
+      categories.add(category);
+    }
+    return categories;
   }
 }

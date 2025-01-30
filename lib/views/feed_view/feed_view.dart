@@ -327,16 +327,21 @@ class _FeedViewState extends State<FeedView> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 8.0,
-                                                  vertical: 5.0,
-                                                ),
-                                                child: Text(
-                                                  "Suggested Articles:",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
+                                              Tooltip(
+                                                message:
+                                                    "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes max 10 times a day.",
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 8.0,
+                                                    vertical: 5.0,
+                                                  ),
+                                                  child: Text(
+                                                    "Suggested Articles:",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                                   ),
                                                 ),
                                               ),

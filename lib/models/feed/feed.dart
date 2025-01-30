@@ -16,6 +16,8 @@ class Feed {
   int pinnedPosition = -1;
   int articlesRead = 0;
 
+  List<String> categories = [];
+
   Feed(this.name, this.link, this.iconUrl);
 
   static Future<Feed> createFeed(String url, {String feedName = ""}) async {

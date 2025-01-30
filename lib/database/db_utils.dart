@@ -13,7 +13,7 @@ class DbUtils {
   }
   
   Future<List<Feed>> getFeedsSortedByInterest() async {
-    return await isar.feeds.where().sortByArticlesRead().findAll();
+    return await isar.feeds.filter().articlesReadGreaterThan(0).sortByArticlesRead().findAll();
   }
 
   Future<void> addFeed(Feed feed) async {

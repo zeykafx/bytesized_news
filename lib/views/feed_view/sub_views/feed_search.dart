@@ -1,14 +1,8 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_story_tile.dart';
-import 'package:bytesized_news/views/story/story.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart';
-import 'package:time_formatter/time_formatter.dart';
 
 class FeedSearch extends StatefulWidget {
   final FeedStore feedStore;
@@ -68,13 +62,35 @@ class _FeedSearchState extends State<FeedSearch> {
         builder: (context) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: widget.feedStore.searchResults.length,
-              addAutomaticKeepAlives: false,
-              itemBuilder: (context, idx) {
-                FeedItem item = widget.feedStore.searchResults.elementAt(idx);
-                return FeedStoryTile(feedStore: widget.feedStore, item: item);
-              },
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 5.0,
+                  ),
+                  child: Text(
+                    "${widget.feedStore.searchResults.length} results",
+                    style: TextStyle(
+                      color: Theme.of(context).dividerColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.feedStore.searchResults.length,
+                    addAutomaticKeepAlives: false,
+                    itemBuilder: (context, idx) {
+                      FeedItem item =
+                          widget.feedStore.searchResults.elementAt(idx);
+                      return FeedStoryTile(
+                          feedStore: widget.feedStore, item: item);
+                    },
+                  ),
+                ),
+              ],
             ),
           );
         },

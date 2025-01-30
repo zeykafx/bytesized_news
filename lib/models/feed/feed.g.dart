@@ -22,28 +22,33 @@ const FeedSchema = CollectionSchema(
       name: r'articlesRead',
       type: IsarType.long,
     ),
-    r'iconUrl': PropertySchema(
+    r'categories': PropertySchema(
       id: 1,
+      name: r'categories',
+      type: IsarType.stringList,
+    ),
+    r'iconUrl': PropertySchema(
+      id: 2,
       name: r'iconUrl',
       type: IsarType.string,
     ),
     r'isPinned': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'isPinned',
       type: IsarType.bool,
     ),
     r'link': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'link',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'name',
       type: IsarType.string,
     ),
     r'pinnedPosition': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'pinnedPosition',
       type: IsarType.long,
     )
@@ -68,6 +73,13 @@ int _feedEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.categories.length * 3;
+  {
+    for (var i = 0; i < object.categories.length; i++) {
+      final value = object.categories[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.iconUrl.length * 3;
   bytesCount += 3 + object.link.length * 3;
   bytesCount += 3 + object.name.length * 3;
@@ -81,11 +93,12 @@ void _feedSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.articlesRead);
-  writer.writeString(offsets[1], object.iconUrl);
-  writer.writeBool(offsets[2], object.isPinned);
-  writer.writeString(offsets[3], object.link);
-  writer.writeString(offsets[4], object.name);
-  writer.writeLong(offsets[5], object.pinnedPosition);
+  writer.writeStringList(offsets[1], object.categories);
+  writer.writeString(offsets[2], object.iconUrl);
+  writer.writeBool(offsets[3], object.isPinned);
+  writer.writeString(offsets[4], object.link);
+  writer.writeString(offsets[5], object.name);
+  writer.writeLong(offsets[6], object.pinnedPosition);
 }
 
 Feed _feedDeserialize(
@@ -95,14 +108,15 @@ Feed _feedDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Feed(
+    reader.readString(offsets[5]),
     reader.readString(offsets[4]),
-    reader.readString(offsets[3]),
-    reader.readString(offsets[1]),
+    reader.readString(offsets[2]),
   );
   object.articlesRead = reader.readLong(offsets[0]);
+  object.categories = reader.readStringList(offsets[1]) ?? [];
   object.id = id;
-  object.isPinned = reader.readBool(offsets[2]);
-  object.pinnedPosition = reader.readLong(offsets[5]);
+  object.isPinned = reader.readBool(offsets[3]);
+  object.pinnedPosition = reader.readLong(offsets[6]);
   return object;
 }
 
@@ -116,14 +130,16 @@ P _feedDeserializeProp<P>(
     case 0:
       return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 2:
-      return (reader.readBool(offset)) as P;
-    case 3:
       return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readBool(offset)) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
+      return (reader.readString(offset)) as P;
+    case 6:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -268,6 +284,221 @@ extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'categories',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'categories',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'categories',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'categories',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition>
+      categoriesElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'categories',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> categoriesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'categories',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -941,6 +1172,12 @@ extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QDistinct> distinctByCategories() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'categories');
+    });
+  }
+
   QueryBuilder<Feed, Feed, QDistinct> distinctByIconUrl(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -985,6 +1222,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
   QueryBuilder<Feed, int, QQueryOperations> articlesReadProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'articlesRead');
+    });
+  }
+
+  QueryBuilder<Feed, List<String>, QQueryOperations> categoriesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'categories');
     });
   }
 

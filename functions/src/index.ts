@@ -97,6 +97,7 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
       "Technology",
       "Politics",
     ],
+    feeds: [],
   });
   logger.info("Document created: " + res.writeTime);
   return res;

@@ -1,3 +1,4 @@
+import 'package:bytesized_news/AI/ai_util.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:dio/dio.dart';
@@ -20,6 +21,7 @@ class AddFeed extends StatefulWidget {
 class _AddFeedState extends State<AddFeed> {
   late Isar isar;
   late DbUtils dbUtils;
+  AiUtils aiUtils = AiUtils();
   TextEditingController feedLinkController = TextEditingController();
   TextEditingController feedNameController = TextEditingController();
 
@@ -31,6 +33,8 @@ class _AddFeedState extends State<AddFeed> {
   }
 
   Future<void> addFeedToDb(Feed feed) async {
+    List<String> categories = await aiUtils.getFeedCategories(feed);
+    feed.categories = categories;
     await dbUtils.addFeed(feed);
   }
 
@@ -48,9 +52,13 @@ class _AddFeedState extends State<AddFeed> {
             child: Card(
               margin: EdgeInsets.zero,
               elevation: 0,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25))),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25))),
               clipBehavior: Clip.hardEdge,
-              color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2),
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withValues(alpha: 0.2),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -125,7 +133,8 @@ class _AddFeedState extends State<AddFeed> {
                           try {
                             res = await dio.get(feedLink);
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid link")));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Invalid link")));
                             return;
                           }
 
@@ -137,7 +146,9 @@ class _AddFeedState extends State<AddFeed> {
                             try {
                               rssFeed = RssFeed.parse(res.data);
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid RSS/ATOM feed")));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("Invalid RSS/ATOM feed")));
                               return;
                             }
                           }
@@ -145,13 +156,16 @@ class _AddFeedState extends State<AddFeed> {
                           if (feedName.isEmpty) {
                             await addFeedToDb(await Feed.createFeed(feedLink));
                           } else {
-                            await addFeedToDb(await Feed.createFeed(feedLink, feedName: feedName));
+                            await addFeedToDb(await Feed.createFeed(feedLink,
+                                feedName: feedName));
                           }
                           if (kDebugMode) {
                             print("Adding feed to db: $feedLink");
                           }
                           Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Successfully added feed!")));
 
                           await widget.getFeeds();
                           await widget.getItems();

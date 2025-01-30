@@ -27,7 +27,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           (json['suggestionsLeftToday'] as num?)?.toInt() ?? 10
       ..lastSuggestionDate = json['lastSuggestionDate'] == null
           ? null
-          : DateTime.parse(json['lastSuggestionDate'] as String);
+          : DateTime.parse(json['lastSuggestionDate'] as String)
+      ..builtUserProfileDate = json['builtUserProfileDate'] == null
+          ? null
+          : DateTime.parse(json['builtUserProfileDate'] as String);
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -41,6 +44,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'mutedKeywords': instance.mutedKeywords,
       'suggestionsLeftToday': instance.suggestionsLeftToday,
       'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
+      'builtUserProfileDate': instance.builtUserProfileDate?.toIso8601String(),
     };
 
 const _$DarkModeEnumMap = {
@@ -276,6 +280,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$builtUserProfileDateAtom =
+      Atom(name: '_SettingsStore.builtUserProfileDate', context: context);
+
+  @override
+  DateTime? get builtUserProfileDate {
+    _$builtUserProfileDateAtom.reportRead();
+    return super.builtUserProfileDate;
+  }
+
+  @override
+  set builtUserProfileDate(DateTime? value) {
+    _$builtUserProfileDateAtom.reportWrite(value, super.builtUserProfileDate,
+        () {
+      super.builtUserProfileDate = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -393,7 +414,8 @@ fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
 mutedKeywords: ${mutedKeywords},
 suggestionsLeftToday: ${suggestionsLeftToday},
-lastSuggestionDate: ${lastSuggestionDate}
+lastSuggestionDate: ${lastSuggestionDate},
+builtUserProfileDate: ${builtUserProfileDate}
     ''';
   }
 }
