@@ -350,20 +350,11 @@ abstract class _FeedStore with Store {
     filterArticlesMutedKeywords(feedItems);
   }
 
-  void filterArticlesMutedKeywords(List<FeedItem> items) {
-    List<FeedItem> toRemove = [];
-    for (FeedItem feedItem in items) {
-      // Check if the item's title contains any muted keywords
-      for (String mutedKeyword in settingsStore.mutedKeywords) {
-        if (feedItem.title.toLowerCase().contains(mutedKeyword.toLowerCase())) {
-          toRemove.add(feedItem);
-        }
-      }
-    }
-
-    for (FeedItem item in toRemove) {
-      items.remove(item);
-    }
+  void filterArticlesMutedKeywords(List<FeedItem> items) {  
+    items.removeWhere((item) {
+      final lowerTitle = item.title.toLowerCase();
+      return settingsStore.mutedKeywords.any((keyword) => lowerTitle.contains(keyword));
+    });
   }
 
   Future<void> markAllAsRead(bool read, {List<FeedItem>? unreadItems}) async {

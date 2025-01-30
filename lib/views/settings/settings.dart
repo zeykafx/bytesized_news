@@ -173,7 +173,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
             additionCallback: (String text) {
               settingsStore.mutedKeywords = [
                 ...settingsStore.mutedKeywords,
-                text,
+                text.toLowerCase(),
               ];
             },
             removalCallback: (int index) {
