@@ -1,42 +1,54 @@
 import 'package:bytesized_news/views/auth/sub_views/alert_message.dart';
-import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 // Code taken from https://github.com/tommyxchow/frosty/ (originally written by ZeykaFX)
-class SettingUserInterest extends StatefulWidget {
-  final SettingsStore settingsStore;
-  const SettingUserInterest({super.key, required this.settingsStore});
+class KeywordsBottomSheet extends StatefulWidget {
+  // final SettingsStore settingsStore;
+  final List<String> Function() getKeywords;
+  final String title;
+  final Function(String) additionCallback;
+  final Function(int) removalCallback;
+  const KeywordsBottomSheet({
+    super.key,
+    // required this.settingsStore,
+    required this.getKeywords,
+    required this.title,
+    required this.additionCallback,
+    required this.removalCallback,
+  });
 
   @override
-  State<SettingUserInterest> createState() => _SettingUserInterestState();
+  State<KeywordsBottomSheet> createState() => _KeywordsBottomSheetState();
 }
 
-class _SettingUserInterestState extends State<SettingUserInterest> {
-  late final SettingsStore settingsStore;
+class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
+  // late final SettingsStore settingsStore;
   final TextEditingController textController = TextEditingController();
   final FocusNode textFieldFocusNode = FocusNode();
 
   @override
   void initState() {
-    settingsStore = widget.settingsStore;
+    // settingsStore = widget.settingsStore;
     super.initState();
   }
 
-  void addUserInterest(String text) {
-    settingsStore.userInterests = [
-      ...settingsStore.userInterests,
-      text,
-    ];
+  void addKeyword(String text) {
+    // settingsStore.userInterests = [
+    //   ...settingsStore.userInterests,
+    //   text,
+    // ];
+    widget.additionCallback(text);
 
     textController.clear();
     textFieldFocusNode.unfocus();
   }
 
-  void removeUserInterest(int index) {
-    settingsStore.userInterests = [
-      ...settingsStore.userInterests..removeAt(index),
-    ];
+  void removeKeyword(int index) {
+    // settingsStore.userInterests = [
+    //   ...settingsStore.userInterests..removeAt(index),
+    // ];
+    widget.removalCallback(index);
   }
 
   @override
@@ -44,7 +56,7 @@ class _SettingUserInterestState extends State<SettingUserInterest> {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 6.0),
       trailing: const Icon(Icons.edit),
-      title: const Text('News Interests for Suggestions'),
+      title: Text(widget.title),
       onTap: () => showModalBottomSheet(
         showDragHandle: true,
         isScrollControlled: true,
@@ -66,7 +78,7 @@ class _SettingUserInterestState extends State<SettingUserInterest> {
                           textController.text = value;
                         },
                         onSubmitted: (value) {
-                          addUserInterest(value);
+                          addKeyword(value);
                         },
                         autocorrect: false,
                         decoration: InputDecoration(
@@ -86,7 +98,7 @@ class _SettingUserInterestState extends State<SettingUserInterest> {
                               if (textController.text.isEmpty) {
                                 textFieldFocusNode.unfocus();
                               } else {
-                                addUserInterest(
+                                addKeyword(
                                   textController.text,
                                 );
                               }
@@ -96,19 +108,19 @@ class _SettingUserInterestState extends State<SettingUserInterest> {
                         ),
                       ),
                     ),
-                    if (settingsStore.userInterests.isEmpty)
+                    if (widget.getKeywords().isEmpty)
                       const Expanded(
                         child: AlertMessage(
-                          message: 'No muted keywords',
+                          message: 'Nothing here...',
                         ),
                       ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: settingsStore.userInterests.length,
+                        itemCount: widget.getKeywords().length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(
-                                settingsStore.userInterests.elementAt(index)),
+                                widget.getKeywords().elementAt(index)),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
@@ -129,7 +141,7 @@ class _SettingUserInterestState extends State<SettingUserInterest> {
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          removeUserInterest(index);
+                                          removeKeyword(index);
                                           Navigator.of(context).pop();
                                         },
                                         child: const Text('Delete'),

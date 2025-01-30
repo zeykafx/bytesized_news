@@ -178,7 +178,7 @@ abstract class _StoryStore with Store {
 
     initialized = true;
 
-    if (settingsStore.fetchAiSummaryOnLoad && !showReaderMode) {
+    if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
       await summarizeArticle(context);
     }
   }
@@ -204,7 +204,7 @@ abstract class _StoryStore with Store {
       print(
           "Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
-    if ((doc.body!.innerHtml.length / htmlContent.length) > 100) {
+    if ((doc.body!.innerHtml.length / htmlContent.length) > 150) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(
             "The reader view seems to have a much shorter article than the web page's full length, switching to the web page now."),
@@ -387,14 +387,11 @@ abstract class _StoryStore with Store {
       htmlValue = htmlContent;
     }
 
-    // String htmlValue = htmlContent;
-
     dom.Document document = parse(htmlValue);
     String docText = document.body!.text;
 
     if (docText.length > 15000) {
       docText = docText.substring(0, 15000);
-      print(docText);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("This webpage was too long to be summarized in full."),

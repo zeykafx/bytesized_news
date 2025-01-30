@@ -19,10 +19,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
       ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
       ..fetchAiSummaryOnLoad = json['fetchAiSummaryOnLoad'] as bool? ?? false
-      ..userInterests = (json['userInterests'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          ['Technology', 'Politics']
       ..suggestionsLeftToday =
           (json['suggestionsLeftToday'] as num?)?.toInt() ?? 10
       ..lastSuggestionDate = json['lastSuggestionDate'] == null
@@ -38,7 +34,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'useReaderModeByDefault': instance.useReaderModeByDefault,
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
       'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
-      'userInterests': instance.userInterests,
       'suggestionsLeftToday': instance.suggestionsLeftToday,
       'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
     };
@@ -227,22 +222,6 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$userInterestsAtom =
-      Atom(name: '_SettingsStore.userInterests', context: context);
-
-  @override
-  List<String> get userInterests {
-    _$userInterestsAtom.reportRead();
-    return super.userInterests;
-  }
-
-  @override
-  set userInterests(List<String> value) {
-    _$userInterestsAtom.reportWrite(value, super.userInterests, () {
-      super.userInterests = value;
-    });
-  }
-
   late final _$suggestionsLeftTodayAtom =
       Atom(name: '_SettingsStore.suggestionsLeftToday', context: context);
 
@@ -391,7 +370,6 @@ useReaderModeByDefault: ${useReaderModeByDefault},
 showAiSummaryOnLoad: ${showAiSummaryOnLoad},
 fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
-userInterests: ${userInterests},
 suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate}
     ''';

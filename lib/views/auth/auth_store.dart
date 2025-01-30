@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobx/mobx.dart';
@@ -21,6 +23,9 @@ abstract class _AuthStore with Store {
   @observable
   Tier userTier = Tier.free;
 
+  @observable
+  List<String> userInterests = defaultUserInterests;
+
   _AuthStore() {
     user = auth.currentUser;
   }
@@ -38,6 +43,19 @@ abstract class _AuthStore with Store {
       }
     }
 
+    if (userData["interests"] != null) {
+      List<String> interests = [];
+      for (String interest in userData["interests"]) {
+        interests.add(interest);
+      }
+      userInterests = interests;
+    }
+
     initialized = true;
   }
+
+  static const defaultUserInterests = [
+    "Technology",
+    "Politics",
+  ];
 }

@@ -141,14 +141,14 @@ abstract class _SettingsStore with Store {
   @observable
   bool loading = false;
 
-  static const defaultUserInterests = [
-    "Technology",
-    "Politics",
-  ];
+  // static const defaultUserInterests = [
+  //   "Technology",
+  //   "Politics",
+  // ];
 
-  @JsonKey(defaultValue: defaultUserInterests)
-  @observable
-  List<String> userInterests = defaultUserInterests;
+  // @JsonKey(defaultValue: defaultUserInterests)
+  // @observable
+  // List<String> userInterests = defaultUserInterests;
 
   static const defaultSuggestionsLeft = 10;
 

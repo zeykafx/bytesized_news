@@ -58,7 +58,8 @@ export const summarize = onCall({region: "europe-west1"}, async (request) => {
         content: "Summarize the article in 3 sentences, NOT MORE. Stick to the information in the article. " +
           "Do not add any new information, if an article refers to Twitter as 'X' do not do the same," +
           " instead refer to it as 'Twitter. Always provide a translation of the units of measurements " +
-          "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!",
+          "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY" +
+          "NO INTRODUCTION LIKE \"Here is a summary...\"!",
       },
       {
         role: "user",
@@ -92,7 +93,10 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
     email: user.email,
     created: new Date().getTime(),
     tier: "free",
-    feeds: [],
+    interests: [
+      "Technology",
+      "Politics",
+    ],
   });
   logger.info("Document created: " + res.writeTime);
   return res;

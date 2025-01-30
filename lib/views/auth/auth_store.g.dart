@@ -71,13 +71,30 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$userInterestsAtom =
+      Atom(name: '_AuthStore.userInterests', context: context);
+
+  @override
+  List<String> get userInterests {
+    _$userInterestsAtom.reportRead();
+    return super.userInterests;
+  }
+
+  @override
+  set userInterests(List<String> value) {
+    _$userInterestsAtom.reportWrite(value, super.userInterests, () {
+      super.userInterests = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
 auth: ${auth},
 initialized: ${initialized},
 user: ${user},
-userTier: ${userTier}
+userTier: ${userTier},
+userInterests: ${userInterests}
     ''';
   }
 }

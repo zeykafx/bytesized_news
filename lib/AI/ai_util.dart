@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -74,7 +75,7 @@ class AiUtils {
             content: ChatCompletionUserMessageContent.string(text),
           ),
         ],
-        temperature: 0,
+        temperature: 0.3,
       ),
     );
 
@@ -99,7 +100,10 @@ class AiUtils {
   }
 
   Future<List<FeedItem>> getNewsSuggestions(
-      List<FeedItem> feedItems, List<String> userInterests) async {
+    List<FeedItem> feedItems,
+    List<String> userInterests,
+    List<Feed> mostReadFeeds,
+  ) async {
     if (kDebugMode) {
       print("Calling AI API to get suggested news");
     }
@@ -108,6 +112,11 @@ class AiUtils {
         .map((item) =>
             "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feedName}")
         .join(", ");
+
+    String mostReadFeedsString = mostReadFeeds
+        .map((Feed feed) =>
+            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}")
+        .join(",");
 
     if (kDebugMode) {
       print("today's articles: $todaysArticles");
@@ -120,24 +129,30 @@ class AiUtils {
         model: const ChatCompletionModel.modelId(
           // "llama-3.1-8b-instant",
           "llama-3.2-3b-preview",
+          // "llama-3.3-70b-versatile",
+          // "deepseek-r1-distill-llama-70b",
         ),
         messages: [
           ChatCompletionMessage.system(
             content:
-                "You are a helpful news suggestion AI, you will receive a list of titles of today's news articles for a user as well as their general interests (Ignore any article advertising a deal or a podcast!)"
-                "You must return a list of the top 5 most interesting articles (in json format) for this user based on their interests as well as the importance of the articles, the article's IDs must not be changed."
+                "You are a helpful news suggestion AI, you will receive a list of categories that the user is interested in, the feeds that the user reads the most, and today's unread articles"
+                "You must return a list of the top 5 most interesting articles (in json format) for this user based on their interests while considering which articles would get the most clicks online and their interest in that feed. the article's IDs must not be changed (Ignore any article advertising deals/coupons or podcasts!)"
                 "The format must be the following: A json object with the key 'articles' which is an array of json object, each object has an ID (number), a title (string) and the feed name (string)",
           ),
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(
-                "Here are my general news interests: ${userInterests.join(',')}"),
+                "News interests: ${userInterests.join(',')}"),
           ),
           ChatCompletionMessage.user(
             content: ChatCompletionUserMessageContent.string(
-                "Here are today's articles: $todaysArticles"),
+                "Most Read Feeds: $mostReadFeedsString"),
+          ),
+          ChatCompletionMessage.user(
+            content: ChatCompletionUserMessageContent.string(
+                "Today's articles: $todaysArticles"),
           ),
         ],
-        temperature: 0,
+        temperature: 0.6,
       ),
     );
 
@@ -150,7 +165,7 @@ class AiUtils {
           orElse: () => feedItems[0]);
       suggestedArticles.add(feedItem);
     }
-    
+
     // Filter out duplicates
     suggestedArticles = suggestedArticles.toSet().toList();
 

@@ -1,9 +1,5 @@
-import 'dart:isolate';
-
 import 'package:any_date/any_date.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/views/auth/auth_store.dart';
-import 'package:cloud_firestore/cloud_firestore.dart' as fb;
 import 'package:html/dom.dart' as dom;
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -31,6 +27,7 @@ class FeedItem {
 
   String aiSummary = "";
   bool summarized = false;
+  bool suggested = false;
 
   @ignore
   Feed? feed;
@@ -38,7 +35,6 @@ class FeedItem {
   static Future<FeedItem> fromAtomItem({
     required AtomItem item,
     required Feed feed,
-    required Tier userTier,
   }) async {
     FeedItem feedItem = FeedItem();
 
@@ -74,22 +70,12 @@ class FeedItem {
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
 
-    // if (userTier == Tier.premium) {
-    //   fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-    //   var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-    //   if (existingSummary.docs.isNotEmpty) {
-    //     feedItem.aiSummary = existingSummary.docs.first.get("summary");
-    //     feedItem.summarized = true;
-    //   }
-    // }
-
     return feedItem;
   }
 
   static Future<FeedItem> fromRssItem({
     required RssItem item,
     required Feed feed,
-    required Tier userTier,
   }) async {
     FeedItem feedItem = FeedItem();
 
@@ -131,15 +117,6 @@ class FeedItem {
     feedItem.timeFetched = DateTime.now();
     feedItem.feedName = feed.name;
     feedItem.feed = feed;
-
-    // if (userTier == Tier.premium) {
-    //   fb.FirebaseFirestore firestore = fb.FirebaseFirestore.instance;
-    //   var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-    //   if (existingSummary.docs.isNotEmpty) {
-    //     feedItem.aiSummary = existingSummary.docs.first.get("summary");
-    //     feedItem.summarized = true;
-    //   }
-    // }
 
     return feedItem;
   }

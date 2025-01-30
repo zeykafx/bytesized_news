@@ -338,6 +338,23 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$suggestionsScrollControllerAtom =
+      Atom(name: '_FeedStore.suggestionsScrollController', context: context);
+
+  @override
+  ScrollController get suggestionsScrollController {
+    _$suggestionsScrollControllerAtom.reportRead();
+    return super.suggestionsScrollController;
+  }
+
+  @override
+  set suggestionsScrollController(ScrollController value) {
+    _$suggestionsScrollControllerAtom
+        .reportWrite(value, super.suggestionsScrollController, () {
+      super.suggestionsScrollController = value;
+    });
+  }
+
   late final _$showScrollToTopAtom =
       Atom(name: '_FeedStore.showScrollToTop', context: context);
 
@@ -368,6 +385,23 @@ mixin _$FeedStore on _FeedStore, Store {
     _$hasCreatedNewSuggestionAtom
         .reportWrite(value, super.hasCreatedNewSuggestion, () {
       super.hasCreatedNewSuggestion = value;
+    });
+  }
+
+  late final _$hasCleanedArticlesTodayAtom =
+      Atom(name: '_FeedStore.hasCleanedArticlesToday', context: context);
+
+  @override
+  bool get hasCleanedArticlesToday {
+    _$hasCleanedArticlesTodayAtom.reportRead();
+    return super.hasCleanedArticlesToday;
+  }
+
+  @override
+  set hasCleanedArticlesToday(bool value) {
+    _$hasCleanedArticlesTodayAtom
+        .reportWrite(value, super.hasCleanedArticlesToday, () {
+      super.hasCleanedArticlesToday = value;
     });
   }
 
@@ -523,8 +557,10 @@ isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
 bsbController: ${bsbController},
 scrollController: ${scrollController},
+suggestionsScrollController: ${suggestionsScrollController},
 showScrollToTop: ${showScrollToTop},
-hasCreatedNewSuggestion: ${hasCreatedNewSuggestion}
+hasCreatedNewSuggestion: ${hasCreatedNewSuggestion},
+hasCleanedArticlesToday: ${hasCleanedArticlesToday}
     ''';
   }
 }

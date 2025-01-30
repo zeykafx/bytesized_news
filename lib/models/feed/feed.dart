@@ -14,6 +14,7 @@ class Feed {
 
   bool isPinned = false;
   int pinnedPosition = -1;
+  int articlesRead = 0;
 
   Feed(this.name, this.link, this.iconUrl);
 
@@ -49,6 +50,7 @@ class Feed {
       'iconUrl': iconUrl,
       'isPinned': isPinned,
       'pinnedPosition': pinnedPosition,
+      'articlesRead': 0,
     };
   }
 
@@ -59,5 +61,6 @@ class Feed {
         link = json['link'],
         iconUrl = json['iconUrl'],
         isPinned = json['isPinned'],
-        pinnedPosition = json['pinnedPosition'];
+        pinnedPosition = json['pinnedPosition'],
+        articlesRead = json["articlesRead"];
 }

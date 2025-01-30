@@ -62,23 +62,28 @@ const FeedItemSchema = CollectionSchema(
       name: r'read',
       type: IsarType.bool,
     ),
-    r'summarized': PropertySchema(
+    r'suggested': PropertySchema(
       id: 9,
+      name: r'suggested',
+      type: IsarType.bool,
+    ),
+    r'summarized': PropertySchema(
+      id: 10,
       name: r'summarized',
       type: IsarType.bool,
     ),
     r'timeFetched': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'timeFetched',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'url',
       type: IsarType.string,
     )
@@ -148,10 +153,11 @@ void _feedItemSerialize(
   writer.writeString(offsets[6], object.imageUrl);
   writer.writeDateTime(offsets[7], object.publishedDate);
   writer.writeBool(offsets[8], object.read);
-  writer.writeBool(offsets[9], object.summarized);
-  writer.writeDateTime(offsets[10], object.timeFetched);
-  writer.writeString(offsets[11], object.title);
-  writer.writeString(offsets[12], object.url);
+  writer.writeBool(offsets[9], object.suggested);
+  writer.writeBool(offsets[10], object.summarized);
+  writer.writeDateTime(offsets[11], object.timeFetched);
+  writer.writeString(offsets[12], object.title);
+  writer.writeString(offsets[13], object.url);
 }
 
 FeedItem _feedItemDeserialize(
@@ -170,10 +176,11 @@ FeedItem _feedItemDeserialize(
   object.imageUrl = reader.readString(offsets[6]);
   object.publishedDate = reader.readDateTime(offsets[7]);
   object.read = reader.readBool(offsets[8]);
-  object.summarized = reader.readBool(offsets[9]);
-  object.timeFetched = reader.readDateTime(offsets[10]);
-  object.title = reader.readString(offsets[11]);
-  object.url = reader.readString(offsets[12]);
+  object.suggested = reader.readBool(offsets[9]);
+  object.summarized = reader.readBool(offsets[10]);
+  object.timeFetched = reader.readDateTime(offsets[11]);
+  object.title = reader.readString(offsets[12]);
+  object.url = reader.readString(offsets[13]);
   return object;
 }
 
@@ -205,10 +212,12 @@ P _feedItemDeserializeProp<P>(
     case 9:
       return (reader.readBool(offset)) as P;
     case 10:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 11:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 12:
+      return (reader.readString(offset)) as P;
+    case 13:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1270,6 +1279,16 @@ extension FeedItemQueryFilter
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> suggestedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'suggested',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> summarizedEqualTo(
       bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -1698,6 +1717,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortBySuggested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'suggested', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortBySuggestedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'suggested', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortBySummarized() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'summarized', Sort.asc);
@@ -1857,6 +1888,18 @@ extension FeedItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenBySuggested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'suggested', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenBySuggestedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'suggested', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenBySummarized() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'summarized', Sort.asc);
@@ -1966,6 +2009,12 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctBySuggested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'suggested');
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctBySummarized() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'summarized');
@@ -2052,6 +2101,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, bool, QQueryOperations> readProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'read');
+    });
+  }
+
+  QueryBuilder<FeedItem, bool, QQueryOperations> suggestedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'suggested');
     });
   }
 

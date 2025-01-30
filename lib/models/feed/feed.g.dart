@@ -17,28 +17,33 @@ const FeedSchema = CollectionSchema(
   name: r'Feed',
   id: 8879644747771893978,
   properties: {
-    r'iconUrl': PropertySchema(
+    r'articlesRead': PropertySchema(
       id: 0,
+      name: r'articlesRead',
+      type: IsarType.long,
+    ),
+    r'iconUrl': PropertySchema(
+      id: 1,
       name: r'iconUrl',
       type: IsarType.string,
     ),
     r'isPinned': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'isPinned',
       type: IsarType.bool,
     ),
     r'link': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'link',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'pinnedPosition': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'pinnedPosition',
       type: IsarType.long,
     )
@@ -75,11 +80,12 @@ void _feedSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.iconUrl);
-  writer.writeBool(offsets[1], object.isPinned);
-  writer.writeString(offsets[2], object.link);
-  writer.writeString(offsets[3], object.name);
-  writer.writeLong(offsets[4], object.pinnedPosition);
+  writer.writeLong(offsets[0], object.articlesRead);
+  writer.writeString(offsets[1], object.iconUrl);
+  writer.writeBool(offsets[2], object.isPinned);
+  writer.writeString(offsets[3], object.link);
+  writer.writeString(offsets[4], object.name);
+  writer.writeLong(offsets[5], object.pinnedPosition);
 }
 
 Feed _feedDeserialize(
@@ -89,13 +95,14 @@ Feed _feedDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Feed(
+    reader.readString(offsets[4]),
     reader.readString(offsets[3]),
-    reader.readString(offsets[2]),
-    reader.readString(offsets[0]),
+    reader.readString(offsets[1]),
   );
+  object.articlesRead = reader.readLong(offsets[0]);
   object.id = id;
-  object.isPinned = reader.readBool(offsets[1]);
-  object.pinnedPosition = reader.readLong(offsets[4]);
+  object.isPinned = reader.readBool(offsets[2]);
+  object.pinnedPosition = reader.readLong(offsets[5]);
   return object;
 }
 
@@ -107,14 +114,16 @@ P _feedDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readBool(offset)) as P;
-    case 2:
       return (reader.readString(offset)) as P;
+    case 2:
+      return (reader.readBool(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
+      return (reader.readString(offset)) as P;
+    case 5:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -209,6 +218,59 @@ extension FeedQueryWhere on QueryBuilder<Feed, Feed, QWhereClause> {
 }
 
 extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> articlesReadEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'articlesRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> articlesReadGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'articlesRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> articlesReadLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'articlesRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> articlesReadBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'articlesRead',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterFilterCondition> iconUrlEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -713,6 +775,18 @@ extension FeedQueryObject on QueryBuilder<Feed, Feed, QFilterCondition> {}
 extension FeedQueryLinks on QueryBuilder<Feed, Feed, QFilterCondition> {}
 
 extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByArticlesRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'articlesRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByArticlesReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'articlesRead', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> sortByIconUrl() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iconUrl', Sort.asc);
@@ -775,6 +849,18 @@ extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
 }
 
 extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByArticlesRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'articlesRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByArticlesReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'articlesRead', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> thenByIconUrl() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iconUrl', Sort.asc);
@@ -849,6 +935,12 @@ extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
 }
 
 extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
+  QueryBuilder<Feed, Feed, QDistinct> distinctByArticlesRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'articlesRead');
+    });
+  }
+
   QueryBuilder<Feed, Feed, QDistinct> distinctByIconUrl(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -887,6 +979,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
   QueryBuilder<Feed, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Feed, int, QQueryOperations> articlesReadProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'articlesRead');
     });
   }
 

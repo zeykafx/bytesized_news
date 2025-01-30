@@ -11,6 +11,10 @@ class DbUtils {
   Future<List<Feed>> getFeeds() async {
     return await isar.feeds.where().findAll();
   }
+  
+  Future<List<Feed>> getFeedsSortedByInterest() async {
+    return await isar.feeds.where().sortByArticlesRead().findAll();
+  }
 
   Future<void> addFeed(Feed feed) async {
     await isar.writeTxn(() => isar.feeds.put(feed));
@@ -33,6 +37,17 @@ class DbUtils {
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
     List<FeedItem> feedItems =
         await isar.feedItems.where().sortByPublishedDateDesc().findAll();
+
+    // find the corresponding feeds for each feed item
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
+  }
+  
+  Future<List<FeedItem>> getSuggestedItems(List<Feed> feeds) async {
+    List<FeedItem> feedItems =
+        await isar.feedItems.filter().suggestedEqualTo(true).sortByPublishedDateDesc().findAll();
 
     // find the corresponding feeds for each feed item
     for (FeedItem item in feedItems) {

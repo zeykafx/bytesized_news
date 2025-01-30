@@ -2,6 +2,7 @@ import 'dart:isolate';
 
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:bytesized_news/AI/ai_util.dart';
+import 'package:bytesized_news/database/db_isolate_cleaner.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -10,9 +11,11 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
@@ -87,10 +90,16 @@ abstract class _FeedStore with Store {
   ScrollController scrollController = ScrollController();
 
   @observable
+  ScrollController suggestionsScrollController = ScrollController();
+
+  @observable
   bool showScrollToTop = false;
 
   @observable
   bool hasCreatedNewSuggestion = false;
+
+  @observable
+  bool hasCleanedArticlesToday = false;
 
   @action
   Future<bool> init(
@@ -123,6 +132,24 @@ abstract class _FeedStore with Store {
         showScrollToTop = false;
       }
     });
+
+    if (!hasCleanedArticlesToday) {
+      RootIsolateToken? rootIsolateToken = RootIsolateToken.instance;
+      if (rootIsolateToken == null) {
+        if (kDebugMode) {
+          print("Couldn't get root isolate token");
+        }
+        initialized = true;
+        return true;
+      }
+
+      compute(DbIsolateCleaner.cleanOldArticles, rootIsolateToken).then((_) {
+        if (kDebugMode) {
+          print("Cleaned old articles");
+        }
+        hasCleanedArticlesToday = true;
+      });
+    }
 
     initialized = true;
     return true;
@@ -211,9 +238,9 @@ abstract class _FeedStore with Store {
       late RssFeed rssFeed;
       late AtomFeed atomFeed;
       try {
-        rssFeed = RssFeed.parse(res.data);
+        rssFeed = await Isolate.run(() => RssFeed.parse(res.data));
       } catch (e) {
-        atomFeed = AtomFeed.parse(res.data);
+        atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
         usingRssFeed = false;
       }
 
@@ -225,7 +252,9 @@ abstract class _FeedStore with Store {
           }
 
           FeedItem feedItem = await FeedItem.fromRssItem(
-              item: item, feed: feed, userTier: authStore.userTier);
+            item: item,
+            feed: feed,
+          );
           items.add(feedItem);
         }
       } else {
@@ -237,7 +266,9 @@ abstract class _FeedStore with Store {
           }
 
           FeedItem feedItem = await FeedItem.fromAtomItem(
-              item: item, feed: feed, userTier: authStore.userTier);
+            item: item,
+            feed: feed,
+          );
           items.add(feedItem);
         }
       }
@@ -246,7 +277,6 @@ abstract class _FeedStore with Store {
         continue;
       }
 
-      // items.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
       feedItems.addAll(await dbUtils.addNewItems(items));
       feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     }
@@ -262,7 +292,10 @@ abstract class _FeedStore with Store {
   Future<void> toggleItemRead(FeedItem item, {bool toggle = false}) async {
     item.read = toggle ? !item.read : true;
 
+    item.feed?.articlesRead += 1;
+
     await dbUtils.updateItemInDb(item);
+    await dbUtils.addFeed(item.feed!);
   }
 
   @action
@@ -370,13 +403,26 @@ abstract class _FeedStore with Store {
 
     if (settingsStore.lastSuggestionDate != null &&
         settingsStore.lastSuggestionDate!.difference(DateTime.now()).inDays ==
-            0 && settingsStore.lastSuggestionDate!.day == DateTime.now().day) {
+            0 &&
+        settingsStore.lastSuggestionDate!.day == DateTime.now().day) {
       if (kDebugMode) {
         print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
       }
-      if (settingsStore.suggestionsLeftToday <= 0) {
+
+      if (settingsStore.suggestionsLeftToday <= 0 ||
+          // Only fetch suggestions every 10 minutes max
+          settingsStore.lastSuggestionDate!
+                  .difference(DateTime.now())
+                  .inMinutes <
+              10) {
+        if (kDebugMode) {
+          print("Fetching stored suggestions");
+        }
+        suggestedFeedItems.clear();
+        suggestedFeedItems.addAll(await dbUtils.getSuggestedItems(feeds));
         return;
       }
+      settingsStore.lastSuggestionDate = DateTime.now();
       settingsStore.suggestionsLeftToday--;
     } else {
       if (kDebugMode) {
@@ -391,18 +437,50 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(25);
+      ..take(20);
     if (todaysUnreadItems.isEmpty) {
       return;
     }
-    List<String> userInterest = settingsStore.userInterests;
+    List<String> userInterest = authStore.userInterests;
 
-    List<FeedItem> suggestedArticles =
-        await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest);
+    List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+
+    List<FeedItem> suggestedArticles = await aiUtils.getNewsSuggestions(
+      todaysUnreadItems,
+      userInterest,
+      mostReadFeeds,
+    );
+
+    if (kDebugMode) {
+      print(
+          "Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
+    }
+
+    // Unset the suggested property for this article if it won't be suggested again
+    for (FeedItem feedItem in suggestedFeedItems) {
+      if (!suggestedArticles.contains(feedItem)) {
+        feedItem.suggested = false;
+        await dbUtils.updateItemInDb(feedItem);
+      }
+    }
 
     suggestedFeedItems.clear();
     suggestedFeedItems.addAll(suggestedArticles);
 
-    // hasCreatedNewSuggestion = true;
+    if (suggestionsScrollController.hasClients) {
+      suggestionsScrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+
+    // Mark all the suggested articles as such (except the ones that already were suggested before)
+    for (FeedItem feedItem in suggestedArticles) {
+      if (!feedItem.suggested) {
+        feedItem.suggested = true;
+        await dbUtils.updateItemInDb(feedItem);
+      }
+    }
   }
 }

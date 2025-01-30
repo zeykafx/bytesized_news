@@ -67,8 +67,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
               children: [
                 Flexible(
                   child: Text(
-                    widget.isSuggestion && parsedTitle.length > 90
-                        ? "${parsedTitle.substring(0, 90)}..."
+                    widget.isSuggestion && parsedTitle.length > 80
+                        ? "${parsedTitle.substring(0, 80)}..."
                         : parsedTitle,
                     style: TextStyle(fontSize: widget.isSuggestion ? 13 : 15),
                   ),
@@ -120,7 +120,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                             )
                           : const Icon(LucideIcons.rss),
                       elevation: 0,
-                      side: const BorderSide(width: 0, color: Colors.transparent),
+                      side:
+                          const BorderSide(width: 0, color: Colors.transparent),
                       padding: const EdgeInsets.all(0),
                       labelPadding: const EdgeInsets.symmetric(horizontal: 5),
                       visualDensity: VisualDensity.compact,
@@ -133,7 +134,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
-        
+
                     if (widget.item.bookmarked) ...[
                       const SizedBox(width: 10),
                       Icon(
@@ -142,7 +143,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         size: 15,
                       )
                     ],
-        
+
                     // star icon to show if the item has been summarized by AI or not
                     if (widget.item.summarized) ...[
                       const SizedBox(width: 10),
@@ -168,8 +169,9 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                         side: BorderSide(
-                            color:
-                                Theme.of(context).colorScheme.secondaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer,
                             width: 0.3),
                       ),
                       onSelected: (int index) {
@@ -251,7 +253,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
               widget.feedStore.toggleItemRead(widget.item);
               // force update the state to change the list tile's color to gray
               setState(() {});
-        
+
               Navigator.of(context)
                   .push(
                 MaterialPageRoute(
@@ -263,12 +265,13 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   .then((_) async {
                 // update the sort after the story view is popped,
                 // this is done so that the story that was just viewed is removed if we are in the unread sort
-                widget.feedStore.changeSort(widget.feedStore.settingsStore.sort);
-        
+                widget.feedStore
+                    .changeSort(widget.feedStore.settingsStore.sort);
+
                 // update the state of the list items after the story view is popped
                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list
                 setState(() {});
-        
+
                 // await feedStore.fetchItems();
               });
             },
