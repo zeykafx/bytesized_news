@@ -79,7 +79,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        clipBehavior: Clip.hardEdge,
+                        clipBehavior: Clip.antiAlias,
                         child: CachedNetworkImage(
                           imageUrl: widget.item.imageUrl,
                           fit: BoxFit.cover,
