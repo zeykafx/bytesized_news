@@ -144,10 +144,13 @@ abstract class _FeedStore with Store {
         return true;
       }
 
-      compute(DbIsolateCleaner.cleanOldArticles, rootIsolateToken).then((_) {
-        if (kDebugMode) {
-          print("Cleaned old articles");
-        }
+      compute(
+        DbIsolateCleaner.cleanOldArticles,
+        [
+          settingsStore.keepArticles.value,
+          rootIsolateToken,
+        ],
+      ).then((_) {
         hasCleanedArticlesToday = true;
       });
     }

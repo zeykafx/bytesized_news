@@ -168,20 +168,35 @@ class _GeneralSettingsState extends State<GeneralSettings> {
 
           // Muted keywords
           KeywordsBottomSheet(
-            title: "Mute title keywords from feed",
-            getKeywords: () => settingsStore.mutedKeywords,
-            additionCallback: (String text) {
-              settingsStore.mutedKeywords = [
-                ...settingsStore.mutedKeywords,
-                text.toLowerCase(),
-              ];
-            },
-            removalCallback: (int index) {
-              settingsStore.mutedKeywords = [
-                ...settingsStore.mutedKeywords..removeAt(index),
-              ];
-            }
-          )
+              title: "Mute title keywords from feed",
+              getKeywords: () => settingsStore.mutedKeywords,
+              additionCallback: (String text) {
+                settingsStore.mutedKeywords = [
+                  ...settingsStore.mutedKeywords,
+                  text.toLowerCase(),
+                ];
+              },
+              removalCallback: (int index) {
+                settingsStore.mutedKeywords = [
+                  ...settingsStore.mutedKeywords..removeAt(index),
+                ];
+              }),
+
+          ListTile(
+            title: Text("Delete articles older than"),
+            trailing: DropdownButton(
+                items: KeepArticlesLength.values.map((arLen) {
+                  return DropdownMenuItem<String>(
+                    value: keepArticlesLengthString(arLen),
+                    child: Text(keepArticlesLengthString(arLen)),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  settingsStore.keepArticles = KeepArticlesLength
+                      .values[keepArticlesLengthValues.indexOf(value!)];
+                },
+                value: keepArticlesLengthString(settingsStore.keepArticles)),
+          ),
         ],
       );
     });

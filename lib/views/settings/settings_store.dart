@@ -21,7 +21,45 @@ String darkModeString(DarkMode darkMode) {
 
 const darkModeNames = ["System", "Dark", "Light"];
 
-enum FeedListSort { byDate, today, unread, read, bookmarked, feed, feedGroup }
+enum FeedListSort {
+  byDate,
+  today,
+  unread,
+  read,
+  bookmarked,
+  feed,
+  feedGroup,
+}
+
+enum KeepArticlesLength {
+  oneWeek(7),
+  oneMonth(30),
+  threeMonths(90),
+  sixMonths(180),
+  oneYear(365);
+
+  const KeepArticlesLength(this.value);
+  final int value;
+}
+
+String keepArticlesLengthString(KeepArticlesLength keepArticlesLength) {
+  return switch (keepArticlesLength) {
+    KeepArticlesLength.oneWeek => "1 Week",
+    KeepArticlesLength.oneMonth => "1 Month",
+    KeepArticlesLength.threeMonths => "3 Months",
+    KeepArticlesLength.sixMonths => "6 Months",
+    KeepArticlesLength.oneYear => "1 Year",
+  };
+}
+
+const keepArticlesLengthValues = [
+  "1 Week",
+  "1 Month",
+  "3 Months",
+  "6 Months",
+  "6 Months",
+  "1 Year"
+];
 
 String feedListSortToString(FeedListSort sort) {
   switch (sort) {
@@ -156,12 +194,12 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: null)
   @observable
   DateTime? lastSuggestionDate;
-  
+
   @JsonKey(defaultValue: null)
   @observable
   DateTime? builtUserProfileDate;
-  
-  
-  // @observable
-  // int keepArticles
+
+  @JsonKey(defaultValue: KeepArticlesLength.threeMonths)
+  @observable
+  KeepArticlesLength keepArticles = KeepArticlesLength.threeMonths;
 }

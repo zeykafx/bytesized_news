@@ -30,7 +30,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['lastSuggestionDate'] as String)
       ..builtUserProfileDate = json['builtUserProfileDate'] == null
           ? null
-          : DateTime.parse(json['builtUserProfileDate'] as String);
+          : DateTime.parse(json['builtUserProfileDate'] as String)
+      ..keepArticles = $enumDecodeNullable(
+              _$KeepArticlesLengthEnumMap, json['keepArticles']) ??
+          KeepArticlesLength.threeMonths;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -45,6 +48,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'suggestionsLeftToday': instance.suggestionsLeftToday,
       'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
       'builtUserProfileDate': instance.builtUserProfileDate?.toIso8601String(),
+      'keepArticles': _$KeepArticlesLengthEnumMap[instance.keepArticles]!,
     };
 
 const _$DarkModeEnumMap = {
@@ -61,6 +65,14 @@ const _$FeedListSortEnumMap = {
   FeedListSort.bookmarked: 'bookmarked',
   FeedListSort.feed: 'feed',
   FeedListSort.feedGroup: 'feedGroup',
+};
+
+const _$KeepArticlesLengthEnumMap = {
+  KeepArticlesLength.oneWeek: 'oneWeek',
+  KeepArticlesLength.oneMonth: 'oneMonth',
+  KeepArticlesLength.threeMonths: 'threeMonths',
+  KeepArticlesLength.sixMonths: 'sixMonths',
+  KeepArticlesLength.oneYear: 'oneYear',
 };
 
 // **************************************************************************
@@ -297,6 +309,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$keepArticlesAtom =
+      Atom(name: '_SettingsStore.keepArticles', context: context);
+
+  @override
+  KeepArticlesLength get keepArticles {
+    _$keepArticlesAtom.reportRead();
+    return super.keepArticles;
+  }
+
+  @override
+  set keepArticles(KeepArticlesLength value) {
+    _$keepArticlesAtom.reportWrite(value, super.keepArticles, () {
+      super.keepArticles = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -415,7 +443,8 @@ loading: ${loading},
 mutedKeywords: ${mutedKeywords},
 suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate},
-builtUserProfileDate: ${builtUserProfileDate}
+builtUserProfileDate: ${builtUserProfileDate},
+keepArticles: ${keepArticles}
     ''';
   }
 }
