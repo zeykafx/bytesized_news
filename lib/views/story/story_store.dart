@@ -5,6 +5,7 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,9 @@ abstract class _StoryStore with Store {
 
   @observable
   late AnimationController animationController;
+
+  @observable
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore,
@@ -379,6 +383,76 @@ abstract class _StoryStore with Store {
       );
       return;
     }
+
+    // check firestore for existing summary (This doesn't count towards the user's summaries)
+    var existingSummary = await firestore
+        .collection("summaries")
+        .where("url", isEqualTo: feedItem.url)
+        .get();
+
+    if (existingSummary.docs.isNotEmpty) {
+      if (kDebugMode) {
+        print("Summary found in Firestore");
+      }
+      feedItem.aiSummary = existingSummary.docs.first.get("summary");
+      feedItem.summarized = true;
+      await dbUtils.updateItemInDb(feedItem);
+      feedItemSummarized = true;
+      return;
+    }
+
+    // If the last time an article was summarized was today:
+    if (authStore.lastSummaryDate != null &&
+        DateTime.now().difference(authStore.lastSummaryDate!).inDays == 0 &&
+        authStore.lastSummaryDate!.day == DateTime.now().day) {
+      if (kDebugMode) {
+        print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
+        print(
+            "Last summary difference in minutes: ${DateTime.now().difference(authStore.lastSummaryDate!).inMinutes}");
+      }
+
+      // Only create summary every 1 minutes max
+      if (DateTime.now().difference(authStore.lastSummaryDate!).inMinutes < 1) {
+        if (kDebugMode) {
+          print("Fetching summaries too fast");
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "You can only request a summary once a minute, slow down (or disable auto summary creation in the settings.)",
+            ),
+            duration: const Duration(seconds: 10),
+          ),
+        );
+        return;
+      }
+
+      if (authStore.summariesLeftToday <= 0) {
+        if (kDebugMode) {
+          print("User is out of summaries");
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "You are out of summaries for today.",
+            ),
+            duration: const Duration(seconds: 10),
+          ),
+        );
+        return;
+      }
+
+      authStore.summariesLeftToday--;
+      authStore.lastSummaryDate = DateTime.now();
+    } else {
+      // If the last summary done was not today, reset the number of summaries
+      if (kDebugMode) {
+        print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
+      }
+      authStore.lastSummaryDate = DateTime.now();
+      authStore.summariesLeftToday = defaultNumberOfSummariesDaily - 1;
+    }
+
     String? htmlValue;
     if (!showReaderMode) {
       htmlValue = await controller?.evaluateJavascript(

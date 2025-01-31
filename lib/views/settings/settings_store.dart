@@ -91,9 +91,12 @@ class SettingsStore extends _SettingsStore with _$SettingsStore {
 }
 
 abstract class _SettingsStore with Store {
+  // Defaults
   static const defaultDarkMode = DarkMode.system;
   static const defaultSort = FeedListSort.byDate;
+  static const defaultMutedKeywords = <String>[];
 
+  // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
   @observable
   DarkMode darkMode = DarkMode.system;
@@ -179,25 +182,21 @@ abstract class _SettingsStore with Store {
   @observable
   bool loading = false;
 
-  static const defaultMutedKeywords = <String>[];
-
   @JsonKey(defaultValue: defaultMutedKeywords)
   @observable
   List<String> mutedKeywords = defaultMutedKeywords;
 
-  static const defaultSuggestionsLeft = 10;
+  // @JsonKey(defaultValue: defaultSuggestionsLeft)
+  // @observable
+  // int suggestionsLeftToday = defaultSuggestionsLeft;
 
-  @JsonKey(defaultValue: defaultSuggestionsLeft)
-  @observable
-  int suggestionsLeftToday = defaultSuggestionsLeft;
+  // @JsonKey(defaultValue: null)
+  // @observable
+  // DateTime? lastSuggestionDate;
 
-  @JsonKey(defaultValue: null)
-  @observable
-  DateTime? lastSuggestionDate;
-
-  @JsonKey(defaultValue: null)
-  @observable
-  DateTime? builtUserProfileDate;
+  // @JsonKey(defaultValue: null)
+  // @observable
+  // DateTime? builtUserProfileDate;
 
   @JsonKey(defaultValue: KeepArticlesLength.threeMonths)
   @observable

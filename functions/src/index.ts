@@ -98,6 +98,11 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
       "Politics",
     ],
     feeds: [],
+    builtUserProfileDate: null,
+    suggestionsLeftToday: 10,
+    lastSuggestionDate: null,
+    summariesLeftToday: 50,
+    lastSummaryDate: null,
   });
   logger.info("Document created: " + res.writeTime);
   return res;

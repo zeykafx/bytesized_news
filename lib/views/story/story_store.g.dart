@@ -406,6 +406,22 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$firestoreAtom =
+      Atom(name: '_StoryStore.firestore', context: context);
+
+  @override
+  FirebaseFirestore get firestore {
+    _$firestoreAtom.reportRead();
+    return super.firestore;
+  }
+
+  @override
+  set firestore(FirebaseFirestore value) {
+    _$firestoreAtom.reportWrite(value, super.firestore, () {
+      super.firestore = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -563,7 +579,8 @@ aiUtils: ${aiUtils},
 feedItemSummarized: ${feedItemSummarized},
 aiLoading: ${aiLoading},
 hideSummary: ${hideSummary},
-animationController: ${animationController}
+animationController: ${animationController},
+firestore: ${firestore}
     ''';
   }
 }

@@ -1,4 +1,3 @@
-import 'package:bytesized_news/main.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
@@ -9,7 +8,6 @@ import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manag
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_tile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 

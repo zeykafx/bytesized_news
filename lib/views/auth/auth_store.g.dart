@@ -87,6 +87,88 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$builtUserProfileDateAtom =
+      Atom(name: '_AuthStore.builtUserProfileDate', context: context);
+
+  @override
+  DateTime? get builtUserProfileDate {
+    _$builtUserProfileDateAtom.reportRead();
+    return super.builtUserProfileDate;
+  }
+
+  @override
+  set builtUserProfileDate(DateTime? value) {
+    _$builtUserProfileDateAtom.reportWrite(value, super.builtUserProfileDate,
+        () {
+      super.builtUserProfileDate = value;
+    });
+  }
+
+  late final _$suggestionsLeftTodayAtom =
+      Atom(name: '_AuthStore.suggestionsLeftToday', context: context);
+
+  @override
+  int get suggestionsLeftToday {
+    _$suggestionsLeftTodayAtom.reportRead();
+    return super.suggestionsLeftToday;
+  }
+
+  @override
+  set suggestionsLeftToday(int value) {
+    _$suggestionsLeftTodayAtom.reportWrite(value, super.suggestionsLeftToday,
+        () {
+      super.suggestionsLeftToday = value;
+    });
+  }
+
+  late final _$lastSuggestionDateAtom =
+      Atom(name: '_AuthStore.lastSuggestionDate', context: context);
+
+  @override
+  DateTime? get lastSuggestionDate {
+    _$lastSuggestionDateAtom.reportRead();
+    return super.lastSuggestionDate;
+  }
+
+  @override
+  set lastSuggestionDate(DateTime? value) {
+    _$lastSuggestionDateAtom.reportWrite(value, super.lastSuggestionDate, () {
+      super.lastSuggestionDate = value;
+    });
+  }
+
+  late final _$summariesLeftTodayAtom =
+      Atom(name: '_AuthStore.summariesLeftToday', context: context);
+
+  @override
+  int get summariesLeftToday {
+    _$summariesLeftTodayAtom.reportRead();
+    return super.summariesLeftToday;
+  }
+
+  @override
+  set summariesLeftToday(int value) {
+    _$summariesLeftTodayAtom.reportWrite(value, super.summariesLeftToday, () {
+      super.summariesLeftToday = value;
+    });
+  }
+
+  late final _$lastSummaryDateAtom =
+      Atom(name: '_AuthStore.lastSummaryDate', context: context);
+
+  @override
+  DateTime? get lastSummaryDate {
+    _$lastSummaryDateAtom.reportRead();
+    return super.lastSummaryDate;
+  }
+
+  @override
+  set lastSummaryDate(DateTime? value) {
+    _$lastSummaryDateAtom.reportWrite(value, super.lastSummaryDate, () {
+      super.lastSummaryDate = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -94,7 +176,12 @@ auth: ${auth},
 initialized: ${initialized},
 user: ${user},
 userTier: ${userTier},
-userInterests: ${userInterests}
+userInterests: ${userInterests},
+builtUserProfileDate: ${builtUserProfileDate},
+suggestionsLeftToday: ${suggestionsLeftToday},
+lastSuggestionDate: ${lastSuggestionDate},
+summariesLeftToday: ${summariesLeftToday},
+lastSummaryDate: ${lastSummaryDate}
     ''';
   }
 }

@@ -38,18 +38,18 @@ class AiUtils {
   }
 
   Future<String> summarize(String text, FeedItem feedItem) async {
-    // check firestore for existing summary
-    var existingSummary = await firestore
-        .collection("summaries")
-        .where("url", isEqualTo: feedItem.url)
-        .get();
+    // // check firestore for existing summary
+    // var existingSummary = await firestore
+    //     .collection("summaries")
+    //     .where("url", isEqualTo: feedItem.url)
+    //     .get();
 
-    if (existingSummary.docs.isNotEmpty) {
-      if (kDebugMode) {
-        print("Summary found in Firestore");
-      }
-      return existingSummary.docs.first.get("summary");
-    }
+    // if (existingSummary.docs.isNotEmpty) {
+    //   if (kDebugMode) {
+    //     print("Summary found in Firestore");
+    //   }
+    //   return existingSummary.docs.first.get("summary");
+    // }
 
     if (kDebugMode) {
       print("Calling AI API...");

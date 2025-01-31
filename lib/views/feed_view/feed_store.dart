@@ -16,7 +16,6 @@ import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';
 import 'package:rss_dart/domain/rss_feed.dart';
@@ -413,16 +412,16 @@ abstract class _FeedStore with Store {
   }
 
   @action
-  Future<void> createNewsSuggestion() async {
-    if (settingsStore.sort != FeedListSort.byDate) {
-      return;
-    }
-
+  Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
-    if (settingsStore.builtUserProfileDate == null ||
-        DateTime.now().difference(settingsStore.builtUserProfileDate!).inDays >=
+    if (authStore.builtUserProfileDate == null ||
+        DateTime.now().difference(authStore.builtUserProfileDate!).inDays >=
             7) {
       List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+      if (mostReadFeeds.isEmpty) {
+        return;
+      }
+
       List<String> interests = await aiUtils.buildUserInterests(
         mostReadFeeds,
         authStore.userInterests,
@@ -430,29 +429,33 @@ abstract class _FeedStore with Store {
       if (kDebugMode) {
         print("Adding new interests: $interests");
       }
-      authStore.userInterests.addAll(interests);
 
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "interests": authStore.userInterests,
-      });
-      settingsStore.builtUserProfileDate = DateTime.now();
+      // These mutations trigger firebase updates
+      authStore.userInterests.addAll(interests);
+      authStore.builtUserProfileDate = DateTime.now();
+    }
+  }
+
+  @action
+  Future<void> createNewsSuggestion() async {
+    if (settingsStore.sort != FeedListSort.byDate) {
+      return;
     }
 
-    if (settingsStore.lastSuggestionDate != null &&
-        settingsStore.lastSuggestionDate!.difference(DateTime.now()).inDays ==
-            0 &&
-        settingsStore.lastSuggestionDate!.day == DateTime.now().day) {
+    buildUserTasteProfile();
+
+    if (authStore.lastSuggestionDate != null &&
+        authStore.lastSuggestionDate!.difference(DateTime.now()).inDays == 0 &&
+        authStore.lastSuggestionDate!.day == DateTime.now().day) {
       if (kDebugMode) {
-        print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
+        print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
         print(
-            "Last suggestion difference in minutes: ${DateTime.now().difference(settingsStore.lastSuggestionDate!).inMinutes}");
+            "Last suggestion difference in minutes: ${DateTime.now().difference(authStore.lastSuggestionDate!).inMinutes}");
       }
 
-      if (settingsStore.suggestionsLeftToday <= 0 ||
+      if (authStore.suggestionsLeftToday <= 0 ||
           // Only fetch suggestions every 10 minutes max
-          DateTime.now()
-                  .difference(settingsStore.lastSuggestionDate!)
-                  .inMinutes <
+          DateTime.now().difference(authStore.lastSuggestionDate!).inMinutes <
               10) {
         if (kDebugMode) {
           print("Fetching stored suggestions");
@@ -474,14 +477,15 @@ abstract class _FeedStore with Store {
         }
         return;
       }
-      settingsStore.lastSuggestionDate = DateTime.now();
-      settingsStore.suggestionsLeftToday--;
+      authStore.lastSuggestionDate = DateTime.now();
+      authStore.suggestionsLeftToday--;
     } else {
+      // If the last suggestion fetched was not today, reset the number of suggestions
       if (kDebugMode) {
-        print("SUGGESTIONS LEFT: ${settingsStore.suggestionsLeftToday}");
+        print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
       }
-      settingsStore.lastSuggestionDate = DateTime.now();
-      settingsStore.suggestionsLeftToday = 9;
+      authStore.lastSuggestionDate = DateTime.now();
+      authStore.suggestionsLeftToday = defaultNumberOfSuggestionsDaily - 1;
     }
 
     if (kDebugMode) {

@@ -23,14 +23,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           []
-      ..suggestionsLeftToday =
-          (json['suggestionsLeftToday'] as num?)?.toInt() ?? 10
-      ..lastSuggestionDate = json['lastSuggestionDate'] == null
-          ? null
-          : DateTime.parse(json['lastSuggestionDate'] as String)
-      ..builtUserProfileDate = json['builtUserProfileDate'] == null
-          ? null
-          : DateTime.parse(json['builtUserProfileDate'] as String)
       ..keepArticles = $enumDecodeNullable(
               _$KeepArticlesLengthEnumMap, json['keepArticles']) ??
           KeepArticlesLength.threeMonths;
@@ -45,9 +37,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showAiSummaryOnLoad': instance.showAiSummaryOnLoad,
       'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
       'mutedKeywords': instance.mutedKeywords,
-      'suggestionsLeftToday': instance.suggestionsLeftToday,
-      'lastSuggestionDate': instance.lastSuggestionDate?.toIso8601String(),
-      'builtUserProfileDate': instance.builtUserProfileDate?.toIso8601String(),
       'keepArticles': _$KeepArticlesLengthEnumMap[instance.keepArticles]!,
     };
 
@@ -259,56 +248,6 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$suggestionsLeftTodayAtom =
-      Atom(name: '_SettingsStore.suggestionsLeftToday', context: context);
-
-  @override
-  int get suggestionsLeftToday {
-    _$suggestionsLeftTodayAtom.reportRead();
-    return super.suggestionsLeftToday;
-  }
-
-  @override
-  set suggestionsLeftToday(int value) {
-    _$suggestionsLeftTodayAtom.reportWrite(value, super.suggestionsLeftToday,
-        () {
-      super.suggestionsLeftToday = value;
-    });
-  }
-
-  late final _$lastSuggestionDateAtom =
-      Atom(name: '_SettingsStore.lastSuggestionDate', context: context);
-
-  @override
-  DateTime? get lastSuggestionDate {
-    _$lastSuggestionDateAtom.reportRead();
-    return super.lastSuggestionDate;
-  }
-
-  @override
-  set lastSuggestionDate(DateTime? value) {
-    _$lastSuggestionDateAtom.reportWrite(value, super.lastSuggestionDate, () {
-      super.lastSuggestionDate = value;
-    });
-  }
-
-  late final _$builtUserProfileDateAtom =
-      Atom(name: '_SettingsStore.builtUserProfileDate', context: context);
-
-  @override
-  DateTime? get builtUserProfileDate {
-    _$builtUserProfileDateAtom.reportRead();
-    return super.builtUserProfileDate;
-  }
-
-  @override
-  set builtUserProfileDate(DateTime? value) {
-    _$builtUserProfileDateAtom.reportWrite(value, super.builtUserProfileDate,
-        () {
-      super.builtUserProfileDate = value;
-    });
-  }
-
   late final _$keepArticlesAtom =
       Atom(name: '_SettingsStore.keepArticles', context: context);
 
@@ -441,9 +380,6 @@ showAiSummaryOnLoad: ${showAiSummaryOnLoad},
 fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
 mutedKeywords: ${mutedKeywords},
-suggestionsLeftToday: ${suggestionsLeftToday},
-lastSuggestionDate: ${lastSuggestionDate},
-builtUserProfileDate: ${builtUserProfileDate},
 keepArticles: ${keepArticles}
     ''';
   }

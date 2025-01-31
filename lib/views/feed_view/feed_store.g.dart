@@ -500,6 +500,15 @@ mixin _$FeedStore on _FeedStore, Store {
         .run(() => super.searchFeedItems(searchTerm));
   }
 
+  late final _$buildUserTasteProfileAsyncAction =
+      AsyncAction('_FeedStore.buildUserTasteProfile', context: context);
+
+  @override
+  Future<void> buildUserTasteProfile() {
+    return _$buildUserTasteProfileAsyncAction
+        .run(() => super.buildUserTasteProfile());
+  }
+
   late final _$createNewsSuggestionAsyncAction =
       AsyncAction('_FeedStore.createNewsSuggestion', context: context);
 
