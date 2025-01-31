@@ -8,12 +8,14 @@ class KeywordsBottomSheet extends StatefulWidget {
   final String title;
   final Function(String) additionCallback;
   final Function(int) removalCallback;
+  final bool removePadding;
   const KeywordsBottomSheet({
     super.key,
     required this.getKeywords,
     required this.title,
     required this.additionCallback,
     required this.removalCallback,
+    this.removePadding = false,
   });
 
   @override
@@ -43,6 +45,7 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: widget.removePadding ? EdgeInsets.zero : null,
       trailing: const Icon(Icons.edit),
       title: Text(widget.title),
       onTap: () => showModalBottomSheet(

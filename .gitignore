@@ -48,3 +48,4 @@ app.*.map.json
 
 .env
 /functions/.env.bytesized-news
+/android/key.properties
