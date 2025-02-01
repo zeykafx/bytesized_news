@@ -7,7 +7,6 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -454,9 +453,9 @@ abstract class _FeedStore with Store {
       }
 
       if (authStore.suggestionsLeftToday <= 0 ||
-          // Only fetch suggestions every 10 minutes max
+          // Only fetch suggestions every suggestionsIntervalMinutes minutes max
           DateTime.now().difference(authStore.lastSuggestionDate!).inMinutes <
-              10) {
+          suggestionsIntervalMinutes) {
         if (kDebugMode) {
           print("Fetching stored suggestions");
         }

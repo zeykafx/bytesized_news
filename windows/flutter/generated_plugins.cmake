@@ -9,7 +9,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_auth
   firebase_core
   flutter_inappwebview_windows
-  flutter_js
   isar_flutter_libs
   url_launcher_windows
 )

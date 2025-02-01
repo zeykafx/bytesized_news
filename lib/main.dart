@@ -49,7 +49,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Initialize AppCheck
   await FirebaseAppCheck.instance.activate(
     // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
@@ -57,16 +57,16 @@ void main() async {
     // 1. Debug provider
     // 2. Safety Net provider
     // 3. Play Integrity provider
-    androidProvider: AndroidProvider.playIntegrity,
+    androidProvider: AndroidProvider.debug,
     // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
-        // your preferred provider. Choose from:
-        // 1. Debug provider
-        // 2. Device Check provider
-        // 3. App Attest provider
-        // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
+    // your preferred provider. Choose from:
+    // 1. Debug provider
+    // 2. Device Check provider
+    // 3. App Attest provider
+    // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
     appleProvider: AppleProvider.debug,
   );
-  
+
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   FirebaseUIAuth.configureProviders([
     EmailAuthProvider(),
@@ -92,7 +92,11 @@ void main() async {
   await authStore.init();
 
   if (settingsStore.sortFeedName != null) {
-    settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();
+    settingsStore.sortFeed = await isar.feeds
+        .where()
+        .filter()
+        .nameEqualTo(settingsStore.sortFeedName!)
+        .findFirst();
 
     if (settingsStore.sortFeed == null) {
       settingsStore.sortFeedName = null;
@@ -102,7 +106,11 @@ void main() async {
   }
 
   if (settingsStore.sortFeedGroupName != null) {
-    settingsStore.sortFeedGroup = await isar.feedGroups.where().filter().nameEqualTo(settingsStore.sortFeedGroupName!).findFirst();
+    settingsStore.sortFeedGroup = await isar.feedGroups
+        .where()
+        .filter()
+        .nameEqualTo(settingsStore.sortFeedGroupName!)
+        .findFirst();
     if (settingsStore.sortFeedGroup == null) {
       settingsStore.sortFeedGroupName = null;
       settingsStore.sortFeedGroup = null;

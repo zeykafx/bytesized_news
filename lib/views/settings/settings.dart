@@ -402,7 +402,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                 await FlutterFileDialog.pickDirectory();
 
             if (pickedDirectory != null) {
-              final filePath = await FlutterFileDialog.saveFileToDirectory(
+              await FlutterFileDialog.saveFileToDirectory(
                 directory: pickedDirectory,
                 data: Uint8List.fromList(xml.codeUnits),
                 mimeType: "text/xml",

@@ -408,18 +408,18 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
         print(
-            "Last summary difference in minutes: ${DateTime.now().difference(authStore.lastSummaryDate!).inMinutes}");
+            "Last summary difference in seconds: ${DateTime.now().difference(authStore.lastSummaryDate!).inSeconds}");
       }
 
-      // Only create summary every 30 seconds max
-      if (DateTime.now().difference(authStore.lastSummaryDate!).inSeconds <= 30) {
+      // Only create summary every summariesIntervalSeconds seconds max
+      if (DateTime.now().difference(authStore.lastSummaryDate!).inSeconds <= summariesIntervalSeconds) {
         if (kDebugMode) {
           print("Fetching summaries too fast");
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "You can only request a summary every 30 seconds, slow down (or disable auto summary creation in the settings.)",
+              "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)",
             ),
             duration: const Duration(seconds: 10),
           ),

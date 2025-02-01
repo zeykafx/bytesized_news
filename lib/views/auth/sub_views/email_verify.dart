@@ -1,5 +1,4 @@
 import 'package:bytesized_news/views/auth/auth.dart';
-import 'package:bytesized_news/views/auth/sub_views/profile.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';

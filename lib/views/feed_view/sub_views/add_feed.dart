@@ -138,13 +138,12 @@ class _AddFeedState extends State<AddFeed> {
                             return;
                           }
 
-                          RssFeed rssFeed;
-                          AtomFeed atomFeed;
+                         
                           try {
-                            atomFeed = AtomFeed.parse(res.data);
+                            AtomFeed.parse(res.data);
                           } catch (e) {
                             try {
-                              rssFeed = RssFeed.parse(res.data);
+                              RssFeed.parse(res.data);
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

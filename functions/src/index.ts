@@ -40,7 +40,8 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
 
   // get the user's tier
   // const user = await db.doc(`users/${uid}`).get();
-  // const tier = user.data()?.tier;
+  // const userData = user.data();
+  // const tier = userData?.tier;
   // if (tier !== "premium") {
   //   return { error: "Error: You need to upgrade to premium to use this feature" };
   // }

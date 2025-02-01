@@ -32,6 +32,6 @@ class FeedGroup {
         feedNames = List<String>.from(json['feedNames']),
         isPinned = json['isPinned'],
         pinnedPosition = json['pinnedPosition'] {
-    for (String feedName in feedNames) {}
+    // for (String feedName in feedNames) {}
   }
 }
