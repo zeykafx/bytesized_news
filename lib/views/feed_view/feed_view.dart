@@ -299,6 +299,36 @@ class _FeedViewState extends State<FeedView> {
                                   !feedStore.loading) ...[
                                 const Center(child: Text("No stories loaded")),
                               ],
+                              if (feedStore.suggestionsLoading) ...[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: Opacity(
+                                      opacity: 0.5,
+                                      child: Text("Fetching suggestions")
+                                          .animate()
+                                          .fadeIn()
+                                          .animate(
+                                              onPlay: (controller) =>
+                                                  controller.repeat())
+                                          .shimmer(
+                                        duration:
+                                            const Duration(milliseconds: 1500),
+                                        colors: [
+                                          const Color(0xBFFFFF00),
+                                          const Color(0xBF00FF00),
+                                          const Color(0xBF00FFFF),
+                                          const Color(0xBF0033FF),
+                                          const Color(0xBFFF00FF),
+                                          const Color(0xBFFF0000),
+                                          const Color(0xBFFFFF00),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                               Expanded(
                                 child: ListView.builder(
                                     itemCount: feedStore.feedItems.length +

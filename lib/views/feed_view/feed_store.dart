@@ -53,6 +53,9 @@ abstract class _FeedStore with Store {
   bool loading = false;
 
   @observable
+  bool suggestionsLoading = false;
+
+  @observable
   Isar isar = Isar.getInstance()!;
 
   @observable
@@ -414,7 +417,10 @@ abstract class _FeedStore with Store {
   Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
     if (authStore.builtUserProfileDate == null ||
-        DateTime.now().difference(authStore.builtUserProfileDate!).inDays >=
+        DateTime.now()
+                .toUtc()
+                .difference(authStore.builtUserProfileDate!)
+                .inDays >=
             7) {
       List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
       if (mostReadFeeds.isEmpty) {
@@ -443,49 +449,48 @@ abstract class _FeedStore with Store {
 
     buildUserTasteProfile();
 
-    if (authStore.lastSuggestionDate != null &&
-        authStore.lastSuggestionDate!.difference(DateTime.now()).inDays == 0 &&
-        authStore.lastSuggestionDate!.day == DateTime.now().day) {
-      if (kDebugMode) {
-        print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
-        print(
-            "Last suggestion difference in minutes: ${DateTime.now().difference(authStore.lastSuggestionDate!).inMinutes}");
-      }
-
-      if (authStore.suggestionsLeftToday <= 0 ||
-          // Only fetch suggestions every suggestionsIntervalMinutes minutes max
-          DateTime.now().difference(authStore.lastSuggestionDate!).inMinutes <
-          suggestionsIntervalMinutes) {
-        if (kDebugMode) {
-          print("Fetching stored suggestions");
-        }
-
-        suggestedFeedItems.clear();
-        // Fetch the suggestions from the db and filter out muted keywords (shouldn't be needed)
-        List<FeedItem> suggested = await dbUtils.getSuggestedItems(feeds);
-        filterArticlesMutedKeywords(suggested);
-        suggestedFeedItems.addAll(suggested);
-
-        // scroll back to the start of the suggestions
-        if (suggestionsScrollController.hasClients) {
-          suggestionsScrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-        return;
-      }
-      authStore.lastSuggestionDate = DateTime.now();
-      authStore.suggestionsLeftToday--;
-    } else {
-      // If the last suggestion fetched was not today, reset the number of suggestions
-      if (kDebugMode) {
-        print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
-      }
-      authStore.lastSuggestionDate = DateTime.now();
-      authStore.suggestionsLeftToday = defaultNumberOfSuggestionsDaily - 1;
+    // if (authStore.lastSuggestionDate != null &&
+    //     authStore.lastSuggestionDate!
+    //             .difference(DateTime.now().toUtc())
+    //             .inDays ==
+    //         0 &&
+    //     authStore.lastSuggestionDate!.day == DateTime.now().toUtc().day) {
+    if (kDebugMode) {
+      print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
+      print(
+          "Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
     }
+
+    if (authStore.suggestionsLeftToday <= 0 ||
+        // Only fetch suggestions every suggestionsIntervalMinutes minutes max
+        DateTime.now()
+                .toUtc()
+                .difference(authStore.lastSuggestionDate!)
+                .inMinutes <
+            suggestionsIntervalMinutes) {
+      if (kDebugMode) {
+        print("Fetching stored suggestions");
+      }
+
+      suggestedFeedItems.clear();
+      // Fetch the suggestions from the db and filter out muted keywords (shouldn't be needed)
+      List<FeedItem> suggested = await dbUtils.getSuggestedItems(feeds);
+      filterArticlesMutedKeywords(suggested);
+      suggestedFeedItems.addAll(suggested);
+
+      // scroll back to the start of the suggestions
+      if (suggestionsScrollController.hasClients) {
+        suggestionsScrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+      return;
+    }
+    // authStore.lastSuggestionDate = DateTime.now().toUtc();
+    // authStore.suggestionsLeftToday--;
+    // }
 
     if (kDebugMode) {
       print("Will fetch unread items to get news suggestions");
@@ -502,11 +507,16 @@ abstract class _FeedStore with Store {
     List<String> userInterest = authStore.userInterests;
     List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
 
-    List<FeedItem> suggestedArticles = await aiUtils.getNewsSuggestions(
+    suggestionsLoading = true;
+
+    var (List<FeedItem> suggestedArticles, int suggestionsLeft) =
+        await aiUtils.getNewsSuggestions(
       todaysUnreadItems,
       userInterest,
       mostReadFeeds,
     );
+    authStore.suggestionsLeftToday = suggestionsLeft;
+    authStore.lastSuggestionDate = DateTime.now().toUtc();
 
     if (kDebugMode) {
       print(
@@ -514,16 +524,19 @@ abstract class _FeedStore with Store {
     }
 
     // Unset the suggested property for this article if it won't be suggested again
-    for (FeedItem feedItem in suggestedFeedItems) {
-      if (!suggestedArticles.contains(feedItem)) {
-        feedItem.suggested = false;
-        await dbUtils.updateItemInDb(feedItem);
-      }
+    List<FeedItem> prevSuggested = await dbUtils.getSuggestedItems(feeds);
+    for (FeedItem feedItem in prevSuggested) {
+      // if (!suggestedArticles.contains(feedItem)) {
+      feedItem.suggested = false;
+      await dbUtils.updateItemInDb(feedItem);
+      // }
     }
 
     // clear the suggestions then add all of the new ones
     suggestedFeedItems.clear();
     suggestedFeedItems.addAll(suggestedArticles);
+
+    suggestionsLoading = false;
 
     // scroll back to the start of the suggestions
     if (suggestionsScrollController.hasClients) {

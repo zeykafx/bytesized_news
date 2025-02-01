@@ -114,65 +114,19 @@ abstract class _AuthStore with Store {
       userInterests = interests;
     }
 
-    if (userData["builtUserProfileDate"] != null) {
-      builtUserProfileDate =
-          DateTime.fromMillisecondsSinceEpoch(userData["builtUserProfileDate"]);
-    }
+    builtUserProfileDate = DateTime.fromMillisecondsSinceEpoch(
+        userData["builtUserProfileDate"] ?? 0);
 
-    if (userData["suggestionsLeftToday"] != null &&
-        userData["lastSuggestionDate"] != null) {
+    if (userData["suggestionsLeftToday"] != null) {
       suggestionsLeftToday = userData["suggestionsLeftToday"];
-      lastSuggestionDate =
-          DateTime.fromMillisecondsSinceEpoch(userData["lastSuggestionDate"]);
-
-      // If the last suggestion date is not today, then reset the number of suggestions
-      // Or if the day is not the same (i.e., at midnight, replenish the suggestions)
-      if (DateTime.now().difference(lastSuggestionDate!).inDays > 0 ||
-          DateTime.now().day != lastSuggestionDate!.day) {
-        Future.delayed(Duration(milliseconds: 400), () {
-          // Delay the update a bit so that it is caught by the mobx reaction and the new number is written to firebase
-          suggestionsLeftToday = defaultNumberOfSuggestionsDaily;
-          if (kDebugMode) {
-            print(
-                "Last suggestion was yesterday, updating the number of suggestions");
-          }
-        });
-      }
+      lastSuggestionDate = DateTime.fromMillisecondsSinceEpoch(
+          userData["lastSuggestionDate"] ?? 0);
     }
 
-    if (userData["summariesLeftToday"] != null &&
-        userData["lastSummaryDate"] != null) {
+    if (userData["summariesLeftToday"] != null) {
       summariesLeftToday = userData["summariesLeftToday"];
       lastSummaryDate =
-          DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"]);
-
-      // If the last summary date is not today, then reset the number of summaries
-      // Or if the day is not the same (i.e., at midnight, replenish the summaries)
-      if (DateTime.now().difference(lastSummaryDate!).inDays > 0 ||
-          DateTime.now().day != lastSummaryDate!.day) {
-        Future.delayed(Duration(milliseconds: 400), () {
-          // Delay the update a bit so that it is caught by the mobx reaction and the new number is written to firebase
-          summariesLeftToday = defaultNumberOfSummariesDaily;
-          if (kDebugMode) {
-            print(
-                "Last summary was yesterday, updating the number of summaries");
-          }
-        });
-      }
-    }
-
-    // If the limits have been lowered, drop down to those limits
-    // The delay is used so that this is written to firestore
-    if (summariesLeftToday > defaultNumberOfSummariesDaily) {
-      Future.delayed(Duration(milliseconds: 400), () {
-        summariesLeftToday = defaultNumberOfSummariesDaily;
-      });
-    }
-
-    if (suggestionsLeftToday > defaultNumberOfSuggestionsDaily) {
-      Future.delayed(Duration(milliseconds: 400), () {
-        suggestionsLeftToday = defaultNumberOfSuggestionsDaily;
-      });
+          DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"] ?? 0);
     }
 
     // Setup auto run reactions for each of these fields
@@ -191,43 +145,6 @@ abstract class _AuthStore with Store {
 
       FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
         "builtUserProfileDate": builtUserProfileDate!.millisecondsSinceEpoch,
-      });
-    });
-    reaction((_) => suggestionsLeftToday, (_) {
-      if (kDebugMode) {
-        print("Updating suggestionsLeftToday");
-      }
-
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "suggestionsLeftToday": suggestionsLeftToday,
-      });
-    });
-
-    reaction((_) => lastSuggestionDate, (_) {
-      if (kDebugMode) {
-        print("Updating lastSuggestionDate");
-      }
-
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "lastSuggestionDate": lastSuggestionDate!.millisecondsSinceEpoch,
-      });
-    });
-    reaction((_) => summariesLeftToday, (_) {
-      if (kDebugMode) {
-        print("Updating summariesLeftToday");
-      }
-
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "summariesLeftToday": summariesLeftToday,
-      });
-    });
-    reaction((_) => lastSummaryDate, (_) {
-      if (kDebugMode) {
-        print("Updating lastSummaryDate");
-      }
-
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "lastSummaryDate": lastSummaryDate!.millisecondsSinceEpoch,
       });
     });
 

@@ -2,6 +2,7 @@ import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/edit_feed.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +85,8 @@ abstract class _FeedManagerStore with Store {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          TextEditingController feedGroupNameController = TextEditingController();
+          TextEditingController feedGroupNameController =
+              TextEditingController();
 
           return AlertDialog(
             title: const Text("Create Feed Group"),
@@ -107,7 +109,8 @@ abstract class _FeedManagerStore with Store {
               ),
               TextButton(
                 onPressed: () {
-                  feedStore.createFeedGroup(feedGroupNameController.text, context);
+                  feedStore.createFeedGroup(
+                      feedGroupNameController.text, context);
                   Navigator.of(context).pop();
                 },
                 child: const Text("Create"),
@@ -118,7 +121,8 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  Future<void> addSelectedFeedsToAFeedGroup(List<Feed> feeds, FeedGroup feedGroup) async {
+  Future<void> addSelectedFeedsToAFeedGroup(
+      List<Feed> feeds, FeedGroup feedGroup) async {
     for (Feed feed in feeds) {
       if (kDebugMode) {
         print("Adding ${feed.name} to ${feedGroup.name}");
@@ -133,16 +137,21 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  Future<void> addFeedsToFeedGroup(List<FeedGroup> feedGroupsToAddFeedsTo) async {
+  Future<void> addFeedsToFeedGroup(
+      List<FeedGroup> feedGroupsToAddFeedsTo) async {
     for (FeedGroup feedGroup in feedGroupsToAddFeedsTo) {
       if (kDebugMode) {
-        print("Adding ${selectedFeeds.map((feed) => feed.name).toList()} to feed group: ${feedGroup.name}");
+        print(
+            "Adding ${selectedFeeds.map((feed) => feed.name).toList()} to feed group: ${feedGroup.name}");
       }
       // remove the selected feeds that are already in the feedGroup
-      List<Feed> localSelectedFeeds = selectedFeeds.where((feed) => !feedGroup.feedNames.contains(feed.name)).toList();
+      List<Feed> localSelectedFeeds = selectedFeeds
+          .where((feed) => !feedGroup.feedNames.contains(feed.name))
+          .toList();
 
       feedGroup.feeds.addAll(localSelectedFeeds);
-      feedGroup.feedNames = feedGroup.feedNames + localSelectedFeeds.map((feed) => feed.name).toList();
+      feedGroup.feedNames = feedGroup.feedNames +
+          localSelectedFeeds.map((feed) => feed.name).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
     }
   }
@@ -205,12 +214,17 @@ abstract class _FeedManagerStore with Store {
   Future<void> handleDelete({bool toggleSelection = true}) async {
     if (areFeedGroupsSelected) {
       // remove from the pinned list
-      feedStore.pinnedFeedsOrFeedGroups.removeWhere(
-          (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedNames == feedGroup.feedNames).isNotEmpty);
+      feedStore.pinnedFeedsOrFeedGroups.removeWhere((feedGroup) =>
+          selectedFeedGroups
+              .where((FeedGroup group) =>
+                  group.name == feedGroup.name &&
+                  group.feedNames == feedGroup.feedNames)
+              .isNotEmpty);
 
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
-      feedStore.feedGroups.removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
+      feedStore.feedGroups
+          .removeWhere((feedGroup) => selectedFeedGroups.contains(feedGroup));
 
       // if this group was the current sort, remove it
       if (feedStore.settingsStore.sort == FeedListSort.feedGroup &&
@@ -228,7 +242,8 @@ abstract class _FeedManagerStore with Store {
       feedStore.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
 
       // also remove from the pinned list
-      feedStore.pinnedFeedsOrFeedGroups.removeWhere((feed) => selectedFeeds.contains(feed));
+      feedStore.pinnedFeedsOrFeedGroups
+          .removeWhere((feed) => selectedFeeds.contains(feed));
 
       // also remove feedItems from the feed in the db
       for (Feed feed in selectedFeeds) {
@@ -236,7 +251,9 @@ abstract class _FeedManagerStore with Store {
         await dbUtils.deleteFeedItems(feed);
 
         // if this group was the current sort, remove it
-        if (feedStore.settingsStore.sort == FeedListSort.feed && feedStore.settingsStore.sortFeed != null && feedStore.settingsStore.sortFeed == feed) {
+        if (feedStore.settingsStore.sort == FeedListSort.feed &&
+            feedStore.settingsStore.sortFeed != null &&
+            feedStore.settingsStore.sortFeed == feed) {
           feedStore.settingsStore.sortFeed = null;
           feedStore.settingsStore.sortFeedName = null;
           feedStore.changeSort(FeedListSort.byDate);
@@ -245,7 +262,8 @@ abstract class _FeedManagerStore with Store {
         // also remove the feed from any feedGroups that it might be in
         for (FeedGroup feedGroup in feedStore.feedGroups) {
           if (feedGroup.feedNames.contains(feed.name)) {
-            feedGroup.feedNames = feedGroup.feedNames.where((name) => name != feed.name).toList();
+            feedGroup.feedNames =
+                feedGroup.feedNames.where((name) => name != feed.name).toList();
             // feedGroup.feedNames.remove(feed.name);
             feedGroup.feeds.removeWhere((f) => f.name == feed.name);
             await dbUtils.addFeedsToFeedGroup(feedGroup);
@@ -262,7 +280,8 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin, {bool toggleSelection = true}) async {
+  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin,
+      {bool toggleSelection = true}) async {
     if (feedOrFeedGroup.runtimeType == Feed) {
       Feed feed = feedOrFeedGroup;
       feed.isPinned = pin;
@@ -282,7 +301,8 @@ abstract class _FeedManagerStore with Store {
       feedGroup.isPinned = pin;
       if (pin) {
         feedStore.pinnedFeedsOrFeedGroups.add(feedGroup);
-        feedGroup.pinnedPosition = feedStore.pinnedFeedsOrFeedGroups.indexOf(feedGroup);
+        feedGroup.pinnedPosition =
+            feedStore.pinnedFeedsOrFeedGroups.indexOf(feedGroup);
       } else {
         feedStore.pinnedFeedsOrFeedGroups.remove(feedGroup);
         feedGroup.pinnedPosition = -1;
@@ -299,7 +319,8 @@ abstract class _FeedManagerStore with Store {
   }
 
   @action
-  Future<void> reorderPinnedFeedsOrFeedGroups(int oldIndex, int newIndex) async {
+  Future<void> reorderPinnedFeedsOrFeedGroups(
+      int oldIndex, int newIndex) async {
     // check the index bounds
     if (newIndex >= feedStore.pinnedFeedsOrFeedGroups.length) {
       newIndex = feedStore.pinnedFeedsOrFeedGroups.length - 1;

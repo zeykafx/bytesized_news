@@ -374,15 +374,15 @@ abstract class _StoryStore with Store {
       return;
     }
 
-    if (authStore.userTier == Tier.free) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("This feature is only available to premium users"),
-          duration: Duration(seconds: 5),
-        ),
-      );
-      return;
-    }
+    // if (authStore.userTier == Tier.free) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text("This feature is only available to premium users"),
+    //       duration: Duration(seconds: 5),
+    //     ),
+    //   );
+    //   return;
+    // }
 
     // check firestore for existing summary (This doesn't count towards the user's summaries)
     var existingSummary = await firestore
@@ -401,57 +401,55 @@ abstract class _StoryStore with Store {
       return;
     }
 
-    // If the last time an article was summarized was today:
-    if (authStore.lastSummaryDate != null &&
-        DateTime.now().difference(authStore.lastSummaryDate!).inDays == 0 &&
-        authStore.lastSummaryDate!.day == DateTime.now().day) {
-      if (kDebugMode) {
-        print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
-        print(
-            "Last summary difference in seconds: ${DateTime.now().difference(authStore.lastSummaryDate!).inSeconds}");
-      }
-
-      // Only create summary every summariesIntervalSeconds seconds max
-      if (DateTime.now().difference(authStore.lastSummaryDate!).inSeconds <= summariesIntervalSeconds) {
-        if (kDebugMode) {
-          print("Fetching summaries too fast");
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)",
-            ),
-            duration: const Duration(seconds: 10),
-          ),
-        );
-        return;
-      }
-
-      if (authStore.summariesLeftToday <= 0) {
-        if (kDebugMode) {
-          print("User is out of summaries");
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "You are out of summaries for today.",
-            ),
-            duration: const Duration(seconds: 10),
-          ),
-        );
-        return;
-      }
-
-      authStore.summariesLeftToday--;
-      authStore.lastSummaryDate = DateTime.now();
-    } else {
-      // If the last summary done was not today, reset the number of summaries
-      if (kDebugMode) {
-        print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
-      }
-      authStore.lastSummaryDate = DateTime.now();
-      authStore.summariesLeftToday = defaultNumberOfSummariesDaily - 1;
+    // // If the last time an article was summarized was today:
+    // if (authStore.lastSummaryDate != null &&
+    //     DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inDays ==
+    //         0 &&
+    //     authStore.lastSummaryDate!.day == DateTime.now().toUtc().day) {
+    if (kDebugMode) {
+      print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
+      print(
+          "Last summary difference in seconds: ${DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inSeconds}");
     }
+
+    // Only create summary every summariesIntervalSeconds seconds max
+    if (DateTime.now()
+            .toUtc()
+            .difference(authStore.lastSummaryDate!)
+            .inSeconds <=
+        summariesIntervalSeconds) {
+      if (kDebugMode) {
+        print("Fetching summaries too fast");
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)",
+          ),
+          duration: const Duration(seconds: 10),
+        ),
+      );
+      return;
+    }
+
+    // if (authStore.summariesLeftToday <= 0) {
+    //   if (kDebugMode) {
+    //     print("User is out of summaries");
+    //   }
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(
+    //         "You are out of summaries for today.",
+    //       ),
+    //       duration: const Duration(seconds: 10),
+    //     ),
+    //   );
+    //   return;
+    // }
+
+    // authStore.summariesLeftToday--;
+    // authStore.lastSummaryDate = DateTime.now().toUtc();
+    // }
 
     String? htmlValue;
     if (!showReaderMode) {
@@ -480,8 +478,11 @@ abstract class _StoryStore with Store {
 
     aiLoading = true;
     try {
-      // feedItem.aiSummary = await aiUtils.summarizeWithFirebase(feedItem, docText);
-      feedItem.aiSummary = await aiUtils.summarize(docText, feedItem);
+      var (String summary, int summariesLeft) =
+          await aiUtils.summarize(docText, feedItem);
+      feedItem.aiSummary = summary;
+      authStore.summariesLeftToday = summariesLeft;
+      authStore.lastSummaryDate = DateTime.now().toUtc();
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
@@ -494,11 +495,14 @@ abstract class _StoryStore with Store {
           content: Text(
             e.toString().replaceAll("Exception: ", ""),
           ),
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 10),
         ),
       );
     }
 
+    if (kDebugMode) {
+      print("Received summary from cloud function");
+    }
     aiLoading = false;
   }
 

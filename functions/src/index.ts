@@ -1,7 +1,7 @@
 import { onCall } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import * as functions from "firebase-functions";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { initializeApp } from "firebase-admin/app";
 import { OpenAI } from "openai";
 import { defineString } from "firebase-functions/params";
@@ -14,6 +14,11 @@ const openai: OpenAI = new OpenAI({ apiKey: groqKey.value(), baseURL: "https://a
 
 export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   logger.info("User created: " + user.uid);
+
+  const limits = await db.collection("flags").doc("limits").get();
+  const suggestionsLimit = limits.data()?.suggestions || 20;
+  const summariesLimit = limits.data()?.summaries || 100;
+
   // create a firestore document for the user
   const res = await db.doc(`users/${user.uid}`).set({
     email: user.email,
@@ -22,13 +27,50 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
     interests: ["Technology", "Politics"],
     feeds: [],
     builtUserProfileDate: null,
-    suggestionsLeftToday: 10,
+    suggestionsLeftToday: suggestionsLimit,
     lastSuggestionDate: null,
-    summariesLeftToday: 50,
+    summariesLeftToday: summariesLimit,
     lastSummaryDate: null,
   });
   logger.info("Document created: " + res.writeTime);
   return res;
+});
+
+export const onUserDelete = functions.auth.user().onDelete(async (user) => {
+  logger.info("User deleted: " + user.uid);
+
+  // delete the user's document
+  const res = await db.doc(`users/${user.uid}`).delete();
+  logger.info("Document deleted: " + res.writeTime);
+  return res;
+});
+
+// Reset quotas daily via Cloud Scheduler
+exports.resetQuotas = functions.pubsub.schedule("0 0 * * *").onRun(async (_) => {
+  // Get all user documents
+  const usersSnapshot = await db.collection("users").get();
+  const limits = await db.collection("flags").doc("limits").get();
+  const suggestionsLimit = limits.data()?.suggestions || 20;
+  const summariesLimit = limits.data()?.summaries || 100;
+
+  const batchSize = 500; // Firestore batch limit
+  const userDocs = usersSnapshot.docs;
+
+  // Process in batches to avoid Firestore limits
+  for (let i = 0; i < userDocs.length; i += batchSize) {
+    const batch = db.batch();
+    const chunk = userDocs.slice(i, i + batchSize);
+
+    chunk.forEach((userDoc) => {
+      batch.update(userDoc.ref, {
+        suggestionsLeftToday: suggestionsLimit,
+        summariesLeftToday: summariesLimit,
+      });
+    });
+
+    await batch.commit();
+    logger.info(`Processed batch ${i / batchSize + 1}`);
+  }
 });
 
 export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
@@ -38,13 +80,20 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
   const uid = request.auth?.uid;
   logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
 
-  // get the user's tier
-  // const user = await db.doc(`users/${uid}`).get();
-  // const userData = user.data();
-  // const tier = userData?.tier;
-  // if (tier !== "premium") {
-  //   return { error: "Error: You need to upgrade to premium to use this feature" };
-  // }
+  const userRef = db.doc(`users/${uid}`);
+  const user = await userRef.get();
+  const userData = user.data();
+  // check if the user has any summaries left today
+  const summariesLeftToday = userData?.summariesLeftToday;
+  if (summariesLeftToday <= 0) {
+    return { error: "Error: You have reached the daily limit of summaries" };
+  }
+
+  // update the user's summary count
+  await userRef.update({
+    lastSummaryDate: new Date().getTime(),
+    summariesLeftToday: FieldValue.increment(-1),
+  });
 
   // check the length of the article
   if (content.length > 15000) {
@@ -84,13 +133,13 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
     url: articleUrl,
     title: title,
     summary: summary,
-    generatedAt: new Date().getTime(),
+    generatedAt: new Date().getUTCMilliseconds(),
     // expires in a month
-    expirationTimestamp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000,
+    expirationTimestamp: new Date().getUTCMilliseconds() + 30 * 24 * 60 * 60 * 1000,
   });
 
   logger.info("Summary created: " + res.id);
-  return { summary: summary, id: res.id };
+  return { summary: summary, id: res.id, summariesLeftToday: summariesLeftToday - 1 };
 });
 
 /**
@@ -112,12 +161,20 @@ export const getNewsSuggestions = onCall({ region: "europe-west1", enforceAppChe
   const uid = request.auth?.uid;
   logger.info("Request to get news suggestions for user ID: " + uid);
 
-  // get the user's tier
-  const user = await db.doc(`users/${uid}`).get();
-  const tier = user.data()?.tier;
-  if (tier !== "premium") {
-    return { error: "Error: You need to upgrade to premium to use this feature" };
+  const userRef = db.doc(`users/${uid}`);
+  const user = await userRef.get();
+  const userData = user.data();
+  // check if the user has any summaries left today
+  const suggestionsLeftToday = userData?.suggestionsLeftToday;
+  if (suggestionsLeftToday <= 0) {
+    return { error: "Error: You have reached the daily limit of suggestions" };
   }
+
+  // update the user's summary count
+  await userRef.update({
+    lastSuggestionDate: new Date().getTime(),
+    suggestionsLeftToday: FieldValue.increment(-1),
+  });
 
   // create the summary with openai
   const completion = await openai.chat.completions.create({
@@ -157,7 +214,7 @@ export const getNewsSuggestions = onCall({ region: "europe-west1", enforceAppChe
   const output = completion.choices[0].message.content || "";
 
   logger.info("Created suggestion for user " + uid);
-  return { suggestions: output };
+  return { suggestions: output, suggestionsLeftToday: suggestionsLeftToday - 1 };
 });
 
 /**

@@ -76,7 +76,29 @@ class _FeedTileState extends State<FeedTile> {
               Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
           onLongPress: () =>
               feedManagerStore.handleFeedTileLongPress(widget.feed),
-          onTap: () => feedManagerStore.handleFeedTileTap(widget.feed),
+          onTap: () {
+            // Read the selection more BEFORE handling the selection logic (if we tap while selectionMode is on...)
+            // We don't want to enter the edit feed page when tapping on the last selected item
+            // (which turns off selection mode)
+            bool selectionMode = feedManagerStore.selectionMode;
+
+            feedManagerStore.handleFeedTileTap(widget.feed);
+
+            if (!selectionMode) {
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (context) => EditFeed(
+                    feed: widget.feed,
+                    feedManagerStore: feedManagerStore,
+                  ),
+                ),
+              )
+                  .then((_) {
+                setState(() {});
+              });
+            }
+          },
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

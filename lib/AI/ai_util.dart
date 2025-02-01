@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -39,57 +40,57 @@ class AiUtils {
     return response["summary"];
   }
 
-  Future<String> summarize(String text, FeedItem feedItem) async {
+  Future<(String, int)> summarize(String text, FeedItem feedItem) async {
     if (kDebugMode) {
       print("Calling AI API...");
     }
 
-    if (kDebugMode) {
-      // get the summary of the article using OpenAI's API
-      CreateChatCompletionResponse res = await client.createChatCompletion(
-        request: CreateChatCompletionRequest(
-          model: const ChatCompletionModel.modelId(
-            // 'gpt-4o-mini',
-            // "llama-3.1-8b-instant",
-            "llama-3.2-3b-preview",
-          ),
-          messages: [
-            ChatCompletionMessage.system(
-              content:
-                  "Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER THAN $maxSummaryLength SENTENCES!! Stick to the information in the article. "
-                  "Do not add any new information, if an article refers to Twitter as 'X' do not do the same,"
-                  " instead refer to it as 'Twitter. Always provide a translation of the units of measurements "
-                  "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!"
-                  "If you can, use bullet points with proper formatting such that each bullet point starts on its own line.",
-            ),
-            ChatCompletionMessage.user(
-              content: ChatCompletionUserMessageContent.string(text),
-            ),
-          ],
-          temperature: 0.3,
-        ),
-      );
+    // if (kDebugMode) {
+    //   // get the summary of the article using OpenAI's API
+    //   CreateChatCompletionResponse res = await client.createChatCompletion(
+    //     request: CreateChatCompletionRequest(
+    //       model: const ChatCompletionModel.modelId(
+    //         // 'gpt-4o-mini',
+    //         // "llama-3.1-8b-instant",
+    //         "llama-3.2-3b-preview",
+    //       ),
+    //       messages: [
+    //         ChatCompletionMessage.system(
+    //           content:
+    //               "Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER THAN $maxSummaryLength SENTENCES!! Stick to the information in the article. "
+    //               "Do not add any new information, if an article refers to Twitter as 'X' do not do the same,"
+    //               " instead refer to it as 'Twitter. Always provide a translation of the units of measurements "
+    //               "used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE \"Here is a summary...\"!"
+    //               "If you can, use bullet points with proper formatting such that each bullet point starts on its own line.",
+    //         ),
+    //         ChatCompletionMessage.user(
+    //           content: ChatCompletionUserMessageContent.string(text),
+    //         ),
+    //       ],
+    //       temperature: 0.3,
+    //     ),
+    //   );
 
-      String summary =
-          res.choices.first.message.content ?? "No summary was received...";
+    //   String summary =
+    //       res.choices.first.message.content ?? "No summary was received...";
 
-      if (kDebugMode) {
-        print("Response: $summary");
-      }
+    //   if (kDebugMode) {
+    //     print("Response: $summary");
+    //   }
 
-      var ret = await firestore.collection("summaries").add({
-        "url": feedItem.url,
-        "title": feedItem.title,
-        "summary": summary,
-        "generatedAt": DateTime.now().millisecondsSinceEpoch,
-        "expirationTimestamp": DateTime.now().add(Duration(days: 30)),
-      });
+    //   var ret = await firestore.collection("summaries").add({
+    //     "url": feedItem.url,
+    //     "title": feedItem.title,
+    //     "summary": summary,
+    //     "generatedAt": DateTime.now().toUtc().millisecondsSinceEpoch,
+    //     "expirationTimestamp": DateTime.now().toUtc().add(Duration(days: 30)),
+    //   });
 
-      if (kDebugMode) {
-        print("Summary added to Firestore: ${ret.id}");
-      }
-      return summary;
-    } else {
+    //   if (kDebugMode) {
+    //     print("Summary added to Firestore: ${ret.id}");
+    //   }
+    //   return summary;
+    // } else {
       final result = await functions.httpsCallable('summarize').call(
         {
           "text": feedItem.url,
@@ -101,11 +102,13 @@ class AiUtils {
       if (response["error"] != null) {
         throw Exception(response["error"]);
       }
-      return response["summary"];
-    }
+      String summary = response["summary"];
+      int summariesLeftToday = response["summariesLeftToday"];
+      return (summary, summariesLeftToday);
+    // }
   }
 
-  Future<List<FeedItem>> getNewsSuggestions(
+  Future<(List<FeedItem>, int)> getNewsSuggestions(
     List<FeedItem> feedItems,
     List<String> userInterests,
     List<Feed> mostReadFeeds,
@@ -192,7 +195,8 @@ class AiUtils {
     // Filter out duplicates
     suggestedArticles = suggestedArticles.toSet().toList();
 
-    return suggestedArticles;
+    int suggestionsLeftToday = response["suggestionsLeftToday"];
+    return (suggestedArticles, suggestionsLeftToday);
   }
 
   Future<List<String>> getFeedCategories(Feed feed) async {

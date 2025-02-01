@@ -9,7 +9,8 @@ class EditFeedGroup extends StatefulWidget {
   final FeedManagerStore feedManagerStore;
   final FeedGroup feedGroup;
 
-  const EditFeedGroup({super.key, required this.feedGroup, required this.feedManagerStore});
+  const EditFeedGroup(
+      {super.key, required this.feedGroup, required this.feedManagerStore});
 
   @override
   State<EditFeedGroup> createState() => _EditFeedGroupState();
@@ -28,7 +29,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
     super.initState();
     feedManagerStore = widget.feedManagerStore;
 
-    feedGroupNameController = TextEditingController(text: widget.feedGroup.name);
+    feedGroupNameController =
+        TextEditingController(text: widget.feedGroup.name);
   }
 
   @override
@@ -70,10 +72,10 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                             ),
                           ),
                         ),
-                        const Divider(),
+                        // const Divider(),
 
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 5, 0, 8),
+                          padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -89,10 +91,16 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                         // all feeds
                         ...widget.feedGroup.feeds.map((feed) {
                           return Card.outlined(
-                            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer
+                                .withOpacity(0.3),
                             clipBehavior: Clip.hardEdge,
                             child: ListTile(
-                              leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
+                              leading: CachedNetworkImage(
+                                  imageUrl: feed.iconUrl,
+                                  width: 20,
+                                  height: 20),
                               title: Text(feed.name),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -105,7 +113,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                               value: "remove",
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.remove_circle_outline),
+                                                  Icon(Icons
+                                                      .remove_circle_outline),
                                                   SizedBox(width: 5),
                                                   Text("Remove from Group"),
                                                 ],
@@ -117,34 +126,57 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                               // show dialog to confirm deletion
                                               showDialog(
                                                 context: context,
-                                                builder: (BuildContext context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return AlertDialog(
-                                                    title: const Text("Remove from Group?"),
-                                                    content: const Text("Are you sure you want to remove the selected items from this group?"),
+                                                    title: const Text(
+                                                        "Remove from Group?"),
+                                                    content: const Text(
+                                                        "Are you sure you want to remove the selected items from this group?"),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {
-                                                          Navigator.of(context).pop();
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
-                                                        child: const Text("Cancel"),
+                                                        child: const Text(
+                                                            "Cancel"),
                                                       ),
                                                       TextButton(
                                                         onPressed: () async {
-                                                          widget.feedGroup.feeds.remove(feed);
-                                                          widget.feedGroup.feedNames =
-                                                              widget.feedGroup.feedNames.where((feedName) => feed.name != feedName).toList();
+                                                          widget.feedGroup.feeds
+                                                              .remove(feed);
+                                                          widget.feedGroup
+                                                                  .feedNames =
+                                                              widget.feedGroup
+                                                                  .feedNames
+                                                                  .where((feedName) =>
+                                                                      feed.name !=
+                                                                      feedName)
+                                                                  .toList();
                                                           // used as an update method for the feed group in the db
-                                                          await feedManagerStore.dbUtils.addFeedGroup(widget.feedGroup);
+                                                          await feedManagerStore
+                                                              .dbUtils
+                                                              .addFeedGroup(widget
+                                                                  .feedGroup);
                                                           setState(() {
-                                                            selectionMode = false;
-                                                            selectedFeeds.clear();
+                                                            selectionMode =
+                                                                false;
+                                                            selectedFeeds
+                                                                .clear();
                                                           });
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            const SnackBar(content: Text("Successfully removed feeds from Feed Group!")),
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text(
+                                                                    "Successfully removed feeds from Feed Group!")),
                                                           );
-                                                          Navigator.of(context).pop();
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
-                                                        child: const Text("Remove"),
+                                                        child: const Text(
+                                                            "Remove"),
                                                       )
                                                     ],
                                                   );
@@ -156,12 +188,18 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                       : const SizedBox(),
                                   Visibility(
                                     visible: selectionMode,
-                                    child: selectedFeeds.contains(feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
+                                    child: selectedFeeds.contains(feed)
+                                        ? const Icon(Icons.check_circle_rounded)
+                                        : const Icon(Icons.circle_outlined),
                                   )
                                 ],
                               ),
-                              selected: selectionMode && selectedFeeds.contains(feed),
-                              selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
+                              selected:
+                                  selectionMode && selectedFeeds.contains(feed),
+                              selectedTileColor: Theme.of(context)
+                                  .colorScheme
+                                  .secondaryContainer
+                                  .withOpacity(0.8),
                               onLongPress: () {
                                 if (!selectionMode) {
                                   setState(() {
@@ -189,7 +227,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                     selectionMode = true;
                                   });
                                 }
-                                if (selectionMode && !selectedFeeds.contains(feed)) {
+                                if (selectionMode &&
+                                    !selectedFeeds.contains(feed)) {
                                   // addSelectedFeed(feed);
                                   setState(() {
                                     selectedFeeds.add(feed);
@@ -217,7 +256,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 70, left: 20, right: 20, top: 10),
+                    padding: const EdgeInsets.only(
+                        bottom: 70, left: 20, right: 20, top: 10),
                     child: Card.outlined(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -252,7 +292,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                     builder: (BuildContext context) {
                                       return AlertDialog(
                                         title: const Text("Remove from Group?"),
-                                        content: const Text("Are you sure you want to remove the selected items from this group?"),
+                                        content: const Text(
+                                            "Are you sure you want to remove the selected items from this group?"),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -262,18 +303,32 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                           ),
                                           TextButton(
                                             onPressed: () async {
-                                              widget.feedGroup.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
-                                              widget.feedGroup.feedNames = widget.feedGroup.feedNames
-                                                  .where((feedName) => !selectedFeeds.map((feed) => feed.name).contains(feedName))
-                                                  .toList();
+                                              widget.feedGroup.feeds
+                                                  .removeWhere((feed) =>
+                                                      selectedFeeds
+                                                          .contains(feed));
+                                              widget.feedGroup.feedNames =
+                                                  widget.feedGroup.feedNames
+                                                      .where((feedName) =>
+                                                          !selectedFeeds
+                                                              .map((feed) =>
+                                                                  feed.name)
+                                                              .contains(
+                                                                  feedName))
+                                                      .toList();
                                               // used as an update method for the feed group in the db
-                                              await feedManagerStore.dbUtils.addFeedGroup(widget.feedGroup);
+                                              await feedManagerStore.dbUtils
+                                                  .addFeedGroup(
+                                                      widget.feedGroup);
                                               setState(() {
                                                 selectionMode = false;
                                                 selectedFeeds.clear();
                                               });
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(content: Text("Successfully removed feeds from Feed Group!")),
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        "Successfully removed feeds from Feed Group!")),
                                               );
                                               Navigator.of(context).pop();
                                             },
@@ -295,18 +350,26 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                               child: TextButton.icon(
                                 onPressed: () async {
                                   if (feedGroupNameController.text.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Feed Group Name cannot be empty")));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Feed Group Name cannot be empty")));
                                     return;
                                   }
-                                  widget.feedGroup.name = feedGroupNameController.text;
+                                  widget.feedGroup.name =
+                                      feedGroupNameController.text;
 
                                   // feedGroup.feedNames.remove(feed.name);
                                   // feedGroup.feeds.removeWhere((f) => f.name == feed.name);
                                   // await dbUtils.addFeedsToFeedGroup(feedGroup);
 
                                   // used as an update method for the feed group in the db
-                                  await feedManagerStore.dbUtils.addFeedGroup(widget.feedGroup);
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully updated Feed Group!")));
+                                  await feedManagerStore.dbUtils
+                                      .addFeedGroup(widget.feedGroup);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Successfully updated Feed Group!")));
                                   Navigator.of(context).pop();
                                 },
                                 icon: const Icon(Icons.save_outlined),

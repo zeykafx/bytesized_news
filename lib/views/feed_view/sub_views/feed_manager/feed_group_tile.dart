@@ -49,7 +49,8 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
       return Card.filled(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        color:
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
         margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         clipBehavior: Clip.hardEdge,
         child: Center(
@@ -72,14 +73,19 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                               ),
                               margin: const EdgeInsets.symmetric(horizontal: 1),
                               clipBehavior: Clip.antiAlias,
-                              child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
+                              child: CachedNetworkImage(
+                                  imageUrl: feed.iconUrl,
+                                  width: 17,
+                                  height: 17),
                             ),
                           ),
                       if (widget.feedGroup.feeds.length > 2) ...[
                         const SizedBox(width: 5),
                         Text(
                           "+${widget.feedGroup.feeds.length - 2}",
-                          style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 11),
+                          style: TextStyle(
+                              color: Theme.of(context).dividerColor,
+                              fontSize: 11),
                         ),
                       ],
                     ],
@@ -98,10 +104,40 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                 ),
               ],
             ),
-            selected: feedManagerStore.selectionMode && feedManagerStore.selectedFeedGroups.contains(widget.feedGroup),
-            selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
-            onLongPress: () => feedManagerStore.handleFeedGroupLongPress(widget.feedGroup),
-            onTap: () => feedManagerStore.handleFeedGroupTap(widget.feedGroup),
+            selected: feedManagerStore.selectionMode &&
+                feedManagerStore.selectedFeedGroups.contains(widget.feedGroup),
+            selectedTileColor: Theme.of(context)
+                .colorScheme
+                .secondaryContainer
+                .withOpacity(0.8),
+            onLongPress: () =>
+                feedManagerStore.handleFeedGroupLongPress(widget.feedGroup),
+            onTap: () {
+              // Read the selection more BEFORE handling the selection logic (if we tap while selectionMode is on...)
+              // We don't want to enter the edit feed group page when tapping on the last selected item
+              // (which turns off selection mode)
+              bool selectionMode = feedManagerStore.selectionMode;
+              
+              feedManagerStore.handleFeedGroupTap(widget.feedGroup);
+              
+              if (!selectionMode) {
+                Navigator.of(context)
+                    .push(
+                  MaterialPageRoute(
+                    builder: (context) => EditFeedGroup(
+                      feedGroup: widget.feedGroup,
+                      feedManagerStore: feedManagerStore,
+                    ),
+                  ),
+                )
+                    .then((_) async {
+                  await widget.wrappedGetFeedGroups();
+                  await widget.wrappedGetPinnedFeedsOrFeedGroups();
+
+                  setState(() {});
+                });
+              }
+            },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -135,9 +171,13 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                             value: "pin",
                             child: Row(
                               children: [
-                                widget.feedGroup.isPinned ? const Icon(Icons.push_pin) : const Icon(Icons.push_pin_outlined),
+                                widget.feedGroup.isPinned
+                                    ? const Icon(Icons.push_pin)
+                                    : const Icon(Icons.push_pin_outlined),
                                 const SizedBox(width: 5),
-                                Text(widget.feedGroup.isPinned ? "Unpin Feed Group" : "Pin Feed Group"),
+                                Text(widget.feedGroup.isPinned
+                                    ? "Unpin Feed Group"
+                                    : "Pin Feed Group"),
                               ],
                             ),
                           ),
@@ -175,12 +215,16 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                         onSelected: (value) async {
                           if (value == "up") {
                             int newIndex = widget.feedGroup.pinnedPosition - 1;
-                            await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feedGroup.pinnedPosition, newIndex);
+                            await feedManagerStore
+                                .reorderPinnedFeedsOrFeedGroups(
+                                    widget.feedGroup.pinnedPosition, newIndex);
                             await widget.wrappedGetPinnedFeedsOrFeedGroups();
                             setState(() {});
                           } else if (value == "down") {
                             int newIndex = widget.feedGroup.pinnedPosition + 1;
-                            await feedManagerStore.reorderPinnedFeedsOrFeedGroups(widget.feedGroup.pinnedPosition, newIndex);
+                            await feedManagerStore
+                                .reorderPinnedFeedsOrFeedGroups(
+                                    widget.feedGroup.pinnedPosition, newIndex);
                             await widget.wrappedGetPinnedFeedsOrFeedGroups();
                             setState(() {});
                           } else if (value == "pin") {
@@ -223,9 +267,11 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   List<Feed> selectedFeeds = [];
-                                  return StatefulBuilder(builder: (context, Function dialogSetState) {
+                                  return StatefulBuilder(builder:
+                                      (context, Function dialogSetState) {
                                     return AlertDialog(
-                                      title: const Text("Add Feeds to this Feed Group"),
+                                      title: const Text(
+                                          "Add Feeds to this Feed Group"),
                                       content: SingleChildScrollView(
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -237,17 +283,29 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                             // SELECTABLE FEED GROUPS
                                             ...feedStore.feeds.map(
                                               (Feed feed) => Card.outlined(
-                                                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryContainer
+                                                    .withOpacity(0.1),
                                                 clipBehavior: Clip.hardEdge,
                                                 child: ListTile(
-                                                  leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
+                                                  leading: CachedNetworkImage(
+                                                      imageUrl: feed.iconUrl,
+                                                      width: 20,
+                                                      height: 20),
                                                   title: Text(feed.name),
-                                                  trailing:
-                                                      selectedFeeds.contains(feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
+                                                  trailing: selectedFeeds
+                                                          .contains(feed)
+                                                      ? const Icon(Icons
+                                                          .check_circle_rounded)
+                                                      : const Icon(Icons
+                                                          .circle_outlined),
                                                   onTap: () {
-                                                    if (selectedFeeds.contains(feed)) {
+                                                    if (selectedFeeds
+                                                        .contains(feed)) {
                                                       dialogSetState(() {
-                                                        selectedFeeds.remove(feed);
+                                                        selectedFeeds
+                                                            .remove(feed);
                                                       });
                                                     } else {
                                                       dialogSetState(() {
@@ -255,8 +313,13 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                                       });
                                                     }
                                                   },
-                                                  selected: selectedFeeds.contains(feed),
-                                                  selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                                                  selected: selectedFeeds
+                                                      .contains(feed),
+                                                  selectedTileColor:
+                                                      Theme.of(context)
+                                                          .colorScheme
+                                                          .secondaryContainer
+                                                          .withOpacity(0.5),
                                                 ),
                                               ),
                                             )
@@ -272,7 +335,10 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                         ),
                                         TextButton(
                                           onPressed: () async {
-                                            await feedManagerStore.addSelectedFeedsToAFeedGroup(selectedFeeds, widget.feedGroup);
+                                            await feedManagerStore
+                                                .addSelectedFeedsToAFeedGroup(
+                                                    selectedFeeds,
+                                                    widget.feedGroup);
                                             Navigator.of(context).pop();
                                             // // update the ui to update the feed groups
                                             setState(() {});
@@ -290,7 +356,8 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: const Text("Confirm Delete?"),
-                                  content: const Text("Are you sure you want to delete the selected items?"),
+                                  content: const Text(
+                                      "Are you sure you want to delete the selected items?"),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -300,11 +367,14 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                     ),
                                     TextButton(
                                       onPressed: () async {
-                                        feedManagerStore.selectedFeedGroups.add(widget.feedGroup);
-                                        await feedManagerStore.handleDelete(toggleSelection: false);
+                                        feedManagerStore.selectedFeedGroups
+                                            .add(widget.feedGroup);
+                                        await feedManagerStore.handleDelete(
+                                            toggleSelection: false);
                                         // await widget.wrappedGetFeeds();
                                         // await widget.wrappedGetFeedGroups();
-                                        await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                        await widget
+                                            .wrappedGetPinnedFeedsOrFeedGroups();
                                         widget.updateParentState();
                                         // setState(() {});
                                         Navigator.of(context).pop();
@@ -321,7 +391,8 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                     : const SizedBox(),
                 Visibility(
                   visible: feedManagerStore.selectionMode,
-                  child: feedManagerStore.selectedFeedGroups.contains(widget.feedGroup)
+                  child: feedManagerStore.selectedFeedGroups
+                          .contains(widget.feedGroup)
                       ? const Icon(Icons.check_circle_rounded)
                       : const Icon(Icons.circle_outlined),
                 ),

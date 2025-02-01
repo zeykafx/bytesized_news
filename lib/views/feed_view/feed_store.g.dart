@@ -136,6 +136,22 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$suggestionsLoadingAtom =
+      Atom(name: '_FeedStore.suggestionsLoading', context: context);
+
+  @override
+  bool get suggestionsLoading {
+    _$suggestionsLoadingAtom.reportRead();
+    return super.suggestionsLoading;
+  }
+
+  @override
+  set suggestionsLoading(bool value) {
+    _$suggestionsLoadingAtom.reportWrite(value, super.suggestionsLoading, () {
+      super.suggestionsLoading = value;
+    });
+  }
+
   late final _$isarAtom = Atom(name: '_FeedStore.isar', context: context);
 
   @override
@@ -554,6 +570,7 @@ searchResults: ${searchResults},
 suggestedFeedItems: ${suggestedFeedItems},
 initialized: ${initialized},
 loading: ${loading},
+suggestionsLoading: ${suggestionsLoading},
 isar: ${isar},
 dbUtils: ${dbUtils},
 aiUtils: ${aiUtils},

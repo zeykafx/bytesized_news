@@ -112,7 +112,7 @@ class _ProfileState extends State<Profile> {
             ),
             const SizedBox(height: 3),
             Text(
-              "Limits are reset everyday at midnight.",
+              "Limits are reset daily.",
               style: TextStyle(
                 color: Theme.of(context).dividerColor,
               ),
