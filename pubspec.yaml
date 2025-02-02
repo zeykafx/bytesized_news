@@ -78,6 +78,8 @@ dependencies:
   file_picker: ^8.1.7
   flutter_file_dialog: ^3.0.2
   firebase_app_check: ^0.3.2+1
+  device_info_plus: ^11.2.2
+  android_id: ^0.4.0
 
 dev_dependencies:
   flutter_test:

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -40,7 +39,10 @@ class AiUtils {
     return response["summary"];
   }
 
-  Future<(String, int)> summarize(String text, FeedItem feedItem) async {
+  Future<(String, int)> summarize(
+    String text,
+    FeedItem feedItem,
+  ) async {
     if (kDebugMode) {
       print("Calling AI API...");
     }
@@ -91,20 +93,20 @@ class AiUtils {
     //   }
     //   return summary;
     // } else {
-      final result = await functions.httpsCallable('summarize').call(
-        {
-          "text": feedItem.url,
-          "title": feedItem.title,
-          "content": text,
-        },
-      );
-      var response = result.data as Map<String, dynamic>;
-      if (response["error"] != null) {
-        throw Exception(response["error"]);
-      }
-      String summary = response["summary"];
-      int summariesLeftToday = response["summariesLeftToday"];
-      return (summary, summariesLeftToday);
+    final result = await functions.httpsCallable('summarize').call(
+      {
+        "text": feedItem.url,
+        "title": feedItem.title,
+        "content": text,
+      },
+    );
+    var response = result.data as Map<String, dynamic>;
+    if (response["error"] != null) {
+      throw Exception(response["error"]);
+    }
+    String summary = response["summary"];
+    int summariesLeftToday = response["summariesLeftToday"];
+    return (summary, summariesLeftToday);
     // }
   }
 

@@ -1,6 +1,7 @@
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/email_verify.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:provider/provider.dart';
@@ -31,20 +32,23 @@ class _AuthState extends State<Auth> {
         showPasswordVisibilityToggle: true,
         showAuthActionSwitch: true,
         actions: [
-          AuthStateChangeAction<UserCreated>((context, state) {
+          AuthStateChangeAction<UserCreated>((context, state) async {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text("Account created, please verify your email"),
               ),
             );
+
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const EmailVerify(),
+                builder: (context) => EmailVerify(authStore: authStore),
               ),
             );
           }),
-          AuthStateChangeAction<SigningUp>((context, SigningUp state) {
-            print("Signing up");
+          AuthStateChangeAction<SigningUp>((context, SigningUp state) async {
+            if (kDebugMode) {
+              print("Signing up");
+            }
             // ScaffoldMessenger.of(context).showSnackBar(
             //   const SnackBar(
             //     content: Text("Signing up..."),
@@ -53,13 +57,22 @@ class _AuthState extends State<Auth> {
           }),
           AuthStateChangeAction<SignedIn>((context, state) async {
             authStore.user = authStore.auth.currentUser;
-            await authStore.init();
+            bool res = await authStore.init(context);
+
+            if (!res) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const Auth(),
+                ),
+              );
+              return;
+            }
 
             if (!state.user!.emailVerified) {
               // Navigator.pushNamed(context, '/verify-email');
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const EmailVerify(),
+                  builder: (context) => EmailVerify(authStore: authStore),
                 ),
               );
             } else {

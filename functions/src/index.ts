@@ -31,6 +31,7 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
     lastSuggestionDate: null,
     summariesLeftToday: summariesLimit,
     lastSummaryDate: null,
+    deviceIds: null,
   });
   logger.info("Document created: " + res.writeTime);
   return res;
@@ -73,6 +74,29 @@ exports.resetQuotas = functions.pubsub.schedule("0 0 * * *").onRun(async (_) => 
   }
 });
 
+export const onDeviceIdAdded = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
+  const newDeviceId: string = request.data.deviceId;
+  const uid = request.auth?.uid;
+  logger.info(`User ${uid} added deviceId ${newDeviceId}`);
+
+  // Check if that id is used by another user
+  // If so, return an error
+  const deviceRef = db.collection("users").where("deviceIds", "array-contains", newDeviceId);
+  const deviceSnapshot = await deviceRef.get();
+  if (!deviceSnapshot.empty) {
+    const otherUser = deviceSnapshot.docs[0].id;
+    logger.info(`Device ID ${newDeviceId} is already in use by user ${otherUser}`);
+    return { error: "Device ID already in use" };
+  }
+
+  // Add the device ID to the user's document
+  const userRef = db.doc(`users/${uid}`);
+  await userRef.update({
+    deviceIds: FieldValue.arrayUnion(newDeviceId),
+  });
+  return { success: true };
+});
+
 export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
   const articleUrl: string = request.data.text;
   const title: string = request.data.title;
@@ -83,6 +107,7 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
   const userRef = db.doc(`users/${uid}`);
   const user = await userRef.get();
   const userData = user.data();
+
   // check if the user has any summaries left today
   const summariesLeftToday = userData?.summariesLeftToday;
   if (summariesLeftToday <= 0) {
@@ -164,6 +189,7 @@ export const getNewsSuggestions = onCall({ region: "europe-west1", enforceAppChe
   const userRef = db.doc(`users/${uid}`);
   const user = await userRef.get();
   const userData = user.data();
+
   // check if the user has any summaries left today
   const suggestionsLeftToday = userData?.suggestionsLeftToday;
   if (suggestionsLeftToday <= 0) {

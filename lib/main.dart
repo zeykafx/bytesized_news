@@ -5,7 +5,6 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -89,7 +88,7 @@ void main() async {
   );
 
   final AuthStore authStore = AuthStore();
-  await authStore.init();
+  await authStore.init(null);
 
   if (settingsStore.sortFeedName != null) {
     settingsStore.sortFeed = await isar.feeds

@@ -43,6 +43,7 @@ class _ProfileState extends State<Profile> {
           Text(user?.email ?? "No Email", style: const TextStyle(fontSize: 16)),
         ],
       ),
+      
       showDeleteConfirmationDialog: true,
       actions: [
         SignedOutAction((context) {

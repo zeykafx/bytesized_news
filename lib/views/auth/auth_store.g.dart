@@ -24,6 +24,22 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$functionsAtom =
+      Atom(name: '_AuthStore.functions', context: context);
+
+  @override
+  FirebaseFunctions get functions {
+    _$functionsAtom.reportRead();
+    return super.functions;
+  }
+
+  @override
+  set functions(FirebaseFunctions value) {
+    _$functionsAtom.reportWrite(value, super.functions, () {
+      super.functions = value;
+    });
+  }
+
   late final _$initializedAtom =
       Atom(name: '_AuthStore.initialized', context: context);
 
@@ -169,10 +185,35 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$deviceIdAtom =
+      Atom(name: '_AuthStore.deviceId', context: context);
+
+  @override
+  String? get deviceId {
+    _$deviceIdAtom.reportRead();
+    return super.deviceId;
+  }
+
+  @override
+  set deviceId(String? value) {
+    _$deviceIdAtom.reportWrite(value, super.deviceId, () {
+      super.deviceId = value;
+    });
+  }
+
+  late final _$_getIdAsyncAction =
+      AsyncAction('_AuthStore._getId', context: context);
+
+  @override
+  Future<String?> _getId() {
+    return _$_getIdAsyncAction.run(() => super._getId());
+  }
+
   @override
   String toString() {
     return '''
 auth: ${auth},
+functions: ${functions},
 initialized: ${initialized},
 user: ${user},
 userTier: ${userTier},
@@ -181,7 +222,8 @@ builtUserProfileDate: ${builtUserProfileDate},
 suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate},
 summariesLeftToday: ${summariesLeftToday},
-lastSummaryDate: ${lastSummaryDate}
+lastSummaryDate: ${lastSummaryDate},
+deviceId: ${deviceId}
     ''';
   }
 }
