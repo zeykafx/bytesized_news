@@ -1,5 +1,5 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
-import 'package:bytesized_news/AI/ai_util.dart';
+import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';

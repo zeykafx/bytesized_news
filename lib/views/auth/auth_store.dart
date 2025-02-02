@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -226,5 +225,7 @@ abstract class _AuthStore with Store {
       // var androidDeviceInfo = await deviceInfo.androidInfo;
       return AndroidId().getId(); // unique ID on Android
     }
+
+    return "No Device Id";
   }
 }

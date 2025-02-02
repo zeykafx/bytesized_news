@@ -1,7 +1,7 @@
 import 'dart:isolate';
 
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
-import 'package:bytesized_news/AI/ai_util.dart';
+import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/database/db_isolate_cleaner.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
