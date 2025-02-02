@@ -121,9 +121,13 @@ class _FeedViewState extends State<FeedView> {
         return BottomSheetBar(
           controller: feedStore.bsbController,
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
           borderRadiusExpanded: const BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+            topLeft: Radius.circular(0),
+            topRight: Radius.circular(0),
+          ),
           color: Theme.of(context)
               .colorScheme
               .surfaceContainerLow

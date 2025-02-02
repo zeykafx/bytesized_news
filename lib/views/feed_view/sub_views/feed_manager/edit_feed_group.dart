@@ -39,17 +39,6 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
       appBar: AppBar(
         title: const Text("Edit Feed Group"),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     setState(() {
-      //       selectionMode = !selectionMode;
-      //       if (!selectionMode) {
-      //         selectedFeeds.clear();
-      //       }
-      //     });
-      //   },
-      //   child: selectionMode ? const Icon(Icons.edit) : const Icon(Icons.edit_outlined),
-      // ),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 700),
@@ -257,7 +246,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        bottom: 70, left: 20, right: 20, top: 10),
+                        bottom: 70, left: 0, right: 0, top: 10),
                     child: Card.outlined(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -266,14 +255,14 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                             // CANCEL SELECTION
                             Expanded(
                               child: TextButton.icon(
+                                icon: const Icon(Icons.cancel_outlined),
+                                label: const Text("Cancel"),
                                 onPressed: () {
                                   setState(() {
                                     selectionMode = false;
                                     selectedFeeds.clear();
                                   });
                                 },
-                                icon: const Icon(Icons.cancel_outlined),
-                                label: const Text("Cancel"),
                               ),
                             ),
 
@@ -285,6 +274,11 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                             // DELETE FEED/FEED GROUP
                             Expanded(
                               child: TextButton.icon(
+                                icon: const Icon(Icons.remove_circle_outline),
+                                label: const Text(
+                                  "Remove from Group",
+                                  textAlign: TextAlign.center,
+                                ),
                                 onPressed: () async {
                                   // show dialog to confirm deletion
                                   showDialog(
@@ -339,8 +333,6 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                     },
                                   );
                                 },
-                                icon: const Icon(Icons.remove_circle_outline),
-                                label: const Text("Remove from Group"),
                               ),
                             ),
                           ],
@@ -348,6 +340,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                             // SAVE CHANGES
                             Expanded(
                               child: TextButton.icon(
+                                icon: const Icon(Icons.save_outlined),
+                                label: const Text("Save Changes"),
                                 onPressed: () async {
                                   if (feedGroupNameController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -372,8 +366,6 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                               "Successfully updated Feed Group!")));
                                   Navigator.of(context).pop();
                                 },
-                                icon: const Icon(Icons.save_outlined),
-                                label: const Text("Save Changes"),
                               ),
                             ),
                           ]

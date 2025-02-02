@@ -47,10 +47,12 @@ class _FeedTileState extends State<FeedTile> {
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
       return Card.filled(
-        color:
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 0.5),
         clipBehavior: Clip.hardEdge,
-        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
         child: ListTile(
           leading: Container(
             decoration: BoxDecoration(
@@ -59,21 +61,23 @@ class _FeedTileState extends State<FeedTile> {
             margin: const EdgeInsets.symmetric(horizontal: 1),
             clipBehavior: Clip.antiAlias,
             child: CachedNetworkImage(
-                imageUrl: widget.feed.iconUrl, width: 17, height: 17),
+              imageUrl: widget.feed.iconUrl,
+              fit: BoxFit.contain,
+              width: 30,
+              height: 30,
+            ),
           ),
-          // leading: Image.network(
-          //   widget.feed.iconUrl,
-          //   width: 20,
-          //   height: 20,
-          // ),
           title: Text(widget.feed.name),
           dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           visualDensity: VisualDensity.compact,
           selected: feedManagerStore.selectionMode &&
               feedManagerStore.selectedFeeds.contains(widget.feed),
-          selectedTileColor:
-              Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
+          selectedTileColor: Theme.of(context)
+              .colorScheme
+              .secondaryContainer
+              .withValues(alpha: 0.8),
           onLongPress: () =>
               feedManagerStore.handleFeedTileLongPress(widget.feed),
           onTap: () {
@@ -249,7 +253,7 @@ class _FeedTileState extends State<FeedTile> {
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .secondaryContainer
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                               clipBehavior: Clip.hardEdge,
                                               child: ListTile(
                                                 leading: feedGroup.feeds.isEmpty
@@ -299,7 +303,7 @@ class _FeedTileState extends State<FeedTile> {
                                                     Theme.of(context)
                                                         .colorScheme
                                                         .secondaryContainer
-                                                        .withOpacity(0.5),
+                                                        .withValues(alpha: 0.5),
                                               ),
                                             ),
                                           )
@@ -332,10 +336,7 @@ class _FeedTileState extends State<FeedTile> {
                                       ],
                                     );
                                   });
-                                }).then((_) {
-                              // widget.wrappedGetFeedGroups();
-                              // setState(() {});
-                            });
+                                }).then((_) {});
                           }
                         } else if (value == "delete") {
                           // show dialog to confirm deletion

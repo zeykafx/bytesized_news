@@ -49,13 +49,16 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
       return Card.filled(
-        color:
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 0.5),
         margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         clipBehavior: Clip.hardEdge,
         child: Center(
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             visualDensity: VisualDensity.compact,
             dense: true,
             leading: widget.feedGroup.feeds.isEmpty
@@ -74,9 +77,11 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                               margin: const EdgeInsets.symmetric(horizontal: 1),
                               clipBehavior: Clip.antiAlias,
                               child: CachedNetworkImage(
-                                  imageUrl: feed.iconUrl,
-                                  width: 17,
-                                  height: 17),
+                                imageUrl: feed.iconUrl,
+                                fit: BoxFit.contain,
+                                width: 17,
+                                height: 17,
+                              ),
                             ),
                           ),
                       if (widget.feedGroup.feeds.length > 2) ...[
@@ -84,8 +89,9 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                         Text(
                           "+${widget.feedGroup.feeds.length - 2}",
                           style: TextStyle(
-                              color: Theme.of(context).dividerColor,
-                              fontSize: 11),
+                            color: Theme.of(context).dividerColor,
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ],
@@ -109,7 +115,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
             selectedTileColor: Theme.of(context)
                 .colorScheme
                 .secondaryContainer
-                .withOpacity(0.8),
+                .withValues(alpha: 0.8),
             onLongPress: () =>
                 feedManagerStore.handleFeedGroupLongPress(widget.feedGroup),
             onTap: () {
@@ -117,9 +123,9 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
               // We don't want to enter the edit feed group page when tapping on the last selected item
               // (which turns off selection mode)
               bool selectionMode = feedManagerStore.selectionMode;
-              
+
               feedManagerStore.handleFeedGroupTap(widget.feedGroup);
-              
+
               if (!selectionMode) {
                 Navigator.of(context)
                     .push(
@@ -140,6 +146,8 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
             },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 !feedManagerStore.selectionMode
                     ? PopupMenuButton(
@@ -286,7 +294,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .secondaryContainer
-                                                    .withOpacity(0.1),
+                                                    .withValues(alpha: 0.1),
                                                 clipBehavior: Clip.hardEdge,
                                                 child: ListTile(
                                                   leading: CachedNetworkImage(
@@ -319,7 +327,8 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                                       Theme.of(context)
                                                           .colorScheme
                                                           .secondaryContainer
-                                                          .withOpacity(0.5),
+                                                          .withValues(
+                                                              alpha: 0.5),
                                                 ),
                                               ),
                                             )

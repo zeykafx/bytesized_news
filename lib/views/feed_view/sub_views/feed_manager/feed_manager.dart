@@ -8,6 +8,7 @@ import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manag
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_tile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -70,7 +71,7 @@ class _FeedManagerState extends State<FeedManager> {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Stack(
                 children: [
                   // main content
@@ -84,7 +85,7 @@ class _FeedManagerState extends State<FeedManager> {
                         children: [
                           // little handle
                           Padding(
-                            padding: const EdgeInsets.only(top: 5, bottom: 3),
+                            padding: const EdgeInsets.only(top: 10, bottom: 3),
                             child: Container(
                               width: 50,
                               height: 5,
@@ -98,7 +99,7 @@ class _FeedManagerState extends State<FeedManager> {
                           ),
 
                           const SizedBox(
-                            height: 20,
+                            height: 10,
                           ),
 
                           // add feed button, new feed group button
@@ -125,8 +126,6 @@ class _FeedManagerState extends State<FeedManager> {
                                         ),
                                       )
                                           .then((_) async {
-                                        // await widget.wrappedGetFeeds();
-                                        // await widget.wrappedGetItems();
                                         setState(() {});
                                       });
                                     },
@@ -250,7 +249,7 @@ class _FeedManagerState extends State<FeedManager> {
                               ),
 
                               const SizedBox(
-                                height: 10,
+                                height: 5,
                               ),
 
                               // Feeds
@@ -279,16 +278,28 @@ class _FeedManagerState extends State<FeedManager> {
                   ),
 
                   // floating button bar at the bottom of the screen
-                  Visibility(
-                    visible: feedManagerStore.selectionMode,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            bottom: mediaQuery.size.width > 600 ? 30 : 15),
-                        child: Card.outlined(
-                          color:
-                              Theme.of(context).colorScheme.secondaryContainer,
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          bottom: mediaQuery.size.width > 600 ? 30 : 15),
+                      child: Card.outlined(
+                        elevation: 20,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.5),
+                            width: 1,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(25),
+                          ),
+                        ),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -605,10 +616,7 @@ class _FeedManagerState extends State<FeedManager> {
                                                   ],
                                                 );
                                               });
-                                            }).then((_) {
-                                          // widget.wrappedGetFeedGroups();
-                                          // setState(() {});
-                                        });
+                                            }).then((_) {});
                                       }
                                     },
                                     icon: Icon(
@@ -703,18 +711,17 @@ class _FeedManagerState extends State<FeedManager> {
                         ),
                       ),
                     ),
-                  ),
-
-                  // Align(
-                  //   alignment: Alignment.bottomCenter,
-                  //   child: Text(
-                  //     "Logos by Brandfetch.com",
-                  //     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  //         color: Theme.of(context)
-                  //             .dividerColor
-                  //             .withValues(alpha: 0.1)),
-                  //   ),
-                  // ),
+                  )
+                      .animate(target: feedManagerStore.selectionMode ? 1 : 0)
+                      .slideY(
+                        duration: 150.ms,
+                        curve: Curves.easeInOut,
+                        begin: 0.9,
+                      )
+                      .fade(
+                        duration: 300.ms,
+                        curve: Curves.easeInOut,
+                      ),
                 ],
               ),
             ),
