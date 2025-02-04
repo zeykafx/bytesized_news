@@ -48,6 +48,22 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
+  late final _$pinnedListExpandedAtom =
+      Atom(name: '_FeedManagerStore.pinnedListExpanded', context: context);
+
+  @override
+  bool get pinnedListExpanded {
+    _$pinnedListExpandedAtom.reportRead();
+    return super.pinnedListExpanded;
+  }
+
+  @override
+  set pinnedListExpanded(bool value) {
+    _$pinnedListExpandedAtom.reportWrite(value, super.pinnedListExpanded, () {
+      super.pinnedListExpanded = value;
+    });
+  }
+
   late final _$selectedFeedsAtom =
       Atom(name: '_FeedManagerStore.selectedFeeds', context: context);
 
@@ -113,6 +129,22 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
         .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
       super.dbUtils = value;
       _dbUtilsIsInitialized = true;
+    });
+  }
+
+  late final _$isReorderingAtom =
+      Atom(name: '_FeedManagerStore.isReordering', context: context);
+
+  @override
+  bool get isReordering {
+    _$isReorderingAtom.reportRead();
+    return super.isReordering;
+  }
+
+  @override
+  set isReordering(bool value) {
+    _$isReorderingAtom.reportWrite(value, super.isReordering, () {
+      super.isReordering = value;
     });
   }
 
@@ -310,13 +342,26 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   }
 
   @override
+  void handlePinnedExpandedButtonTap() {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.handlePinnedExpandedButtonTap');
+    try {
+      return super.handlePinnedExpandedButtonTap();
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 selectionMode: ${selectionMode},
+pinnedListExpanded: ${pinnedListExpanded},
 selectedFeeds: ${selectedFeeds},
 selectedFeedGroups: ${selectedFeedGroups},
 isar: ${isar},
 dbUtils: ${dbUtils},
+isReordering: ${isReordering},
 areFeedGroupsSelected: ${areFeedGroupsSelected},
 areFeedsSelected: ${areFeedsSelected},
 areMoreThanOneFeedGroupsSelected: ${areMoreThanOneFeedGroupsSelected}

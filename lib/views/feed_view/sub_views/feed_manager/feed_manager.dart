@@ -7,6 +7,7 @@ import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_group
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_tile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
@@ -79,7 +80,9 @@ class _FeedManagerState extends State<FeedManager> {
                     alignment: Alignment.topCenter,
                     child: SingleChildScrollView(
                       controller: widget.scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      physics: feedManagerStore.isReordering
+                          ? const NeverScrollableScrollPhysics()
+                          : const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -153,6 +156,8 @@ class _FeedManagerState extends State<FeedManager> {
                               padding: const EdgeInsets.only(
                                   left: 8, top: 15, right: 8, bottom: 5),
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Pinned: ${feedStore.pinnedFeedsOrFeedGroups.length.toString()}",
@@ -162,49 +167,109 @@ class _FeedManagerState extends State<FeedManager> {
                                       fontSize: 16,
                                     ),
                                   ),
+                                  IconButton(
+                                    icon: Icon(
+                                      feedManagerStore.pinnedListExpanded
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down,
+                                    ),
+                                    onPressed: feedManagerStore
+                                        .handlePinnedExpandedButtonTap,
+                                  ),
                                 ],
                               ),
                             ),
-                            ...feedStore.pinnedFeedsOrFeedGroups.map((element) {
-                              if (element.runtimeType == Feed) {
-                                Feed feed = element;
-
-                                return FeedTile(
-                                  key: ValueKey(feed.id),
-                                  feedManagerStore: feedManagerStore,
-                                  feedStore: feedStore,
-                                  feed: feed,
-                                  wrappedGetFeedGroups:
-                                      widget.wrappedGetFeedGroups,
-                                  wrappedGetFeeds: widget.wrappedGetFeeds,
-                                  wrappedGetPinnedFeedsOrFeedGroups:
-                                      widget.wrappedGetPinnedFeedsOrFeedGroups,
-                                  isInPinnedList: true,
+                            AnimatedSwitcher(
+                              duration: Duration(milliseconds: 200),
+                              switchInCurve: Curves.easeOutQuad,
+                              switchOutCurve: Curves.easeInQuad,
+                              transitionBuilder: (child, animation) {
+                                return SizeTransition(
+                                  sizeFactor: animation,
+                                  child: child,
                                 );
-                              } else {
-                                FeedGroup feedGroup = element;
+                              },
+                              child: feedManagerStore.pinnedListExpanded
+                                  ? ReorderableListView(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      dragStartBehavior: DragStartBehavior.down,
+                                      onReorderStart: (_) {
+                                        widget.feedStore.scrollController
+                                            .jumpTo(0);
+                                        feedStore.bsbController.expand();
 
-                                return FeedGroupTile(
-                                  key: ValueKey(feedGroup.id + 1000),
-                                  feedManagerStore: feedManagerStore,
-                                  feedStore: feedStore,
-                                  feedGroup: feedGroup,
-                                  wrappedGetPinnedFeedsOrFeedGroups:
-                                      widget.wrappedGetPinnedFeedsOrFeedGroups,
-                                  wrappedGetFeedGroups:
-                                      widget.wrappedGetFeedGroups,
-                                  wrappedGetFeeds: widget.wrappedGetFeeds,
-                                  updateParentState: updateState,
-                                  isInPinnedList: true,
-                                );
-                              }
-                            }),
+                                        feedStore.isLocked = true;
+                                        feedManagerStore.isReordering = true;
+                                      },
+                                      onReorderEnd: (_) {
+                                        feedManagerStore.isReordering = false;
+                                        feedStore.isLocked = false;
+                                        feedStore.bsbController.expand();
+                                        widget.feedStore.scrollController
+                                            .jumpTo(0);
+                                      },
+                                      onReorder: feedManagerStore
+                                          .reorderPinnedFeedsOrFeedGroups,
+                                      buildDefaultDragHandles: true,
+                                      children: [
+                                        ...feedStore.pinnedFeedsOrFeedGroups
+                                            .map((element) {
+                                          if (element.runtimeType == Feed) {
+                                            Feed feed = element;
+
+                                            return FeedTile(
+                                              key: ValueKey(feed.id),
+                                              feedManagerStore:
+                                                  feedManagerStore,
+                                              feedStore: feedStore,
+                                              feed: feed,
+                                              wrappedGetFeedGroups:
+                                                  widget.wrappedGetFeedGroups,
+                                              wrappedGetFeeds:
+                                                  widget.wrappedGetFeeds,
+                                              wrappedGetPinnedFeedsOrFeedGroups:
+                                                  widget
+                                                      .wrappedGetPinnedFeedsOrFeedGroups,
+                                              isInPinnedList: true,
+                                            );
+                                          } else {
+                                            FeedGroup feedGroup = element;
+
+                                            return FeedGroupTile(
+                                              key:
+                                                  ValueKey(feedGroup.id + 1000),
+                                              feedManagerStore:
+                                                  feedManagerStore,
+                                              feedStore: feedStore,
+                                              feedGroup: feedGroup,
+                                              wrappedGetPinnedFeedsOrFeedGroups:
+                                                  widget
+                                                      .wrappedGetPinnedFeedsOrFeedGroups,
+                                              wrappedGetFeedGroups:
+                                                  widget.wrappedGetFeedGroups,
+                                              wrappedGetFeeds:
+                                                  widget.wrappedGetFeeds,
+                                              updateParentState: updateState,
+                                              isInPinnedList: true,
+                                            );
+                                          }
+                                        }),
+                                      ],
+                                    )
+                                  : null,
+                            ),
                           ],
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: const Divider(thickness: 0.1),
+                          ),
 
                           // all feeds and feed groups
                           Padding(
                             padding: const EdgeInsets.only(
-                                left: 8, top: 15, right: 8, bottom: 5),
+                                left: 8, top: 0, right: 8, bottom: 5),
                             child: Row(
                               children: [
                                 Text(
@@ -306,15 +371,19 @@ class _FeedManagerState extends State<FeedManager> {
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 // CANCEL SELECTION
-                                TextButton.icon(
+                                IconButton(
                                   onPressed: () {
                                     feedManagerStore.selectionMode = false;
                                     feedManagerStore.selectedFeeds.clear();
                                     feedManagerStore.selectedFeedGroups.clear();
                                   },
-                                  icon: const Icon(Icons.cancel_outlined,
-                                      size: 15),
-                                  label: const Text("Cancel"),
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    size: 25,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  // label: const Text("Cancel"),
                                 ),
 
                                 // PIN FEED

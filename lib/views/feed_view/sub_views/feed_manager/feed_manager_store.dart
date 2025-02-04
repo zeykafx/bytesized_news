@@ -5,6 +5,7 @@ import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 
@@ -16,6 +17,9 @@ abstract class _FeedManagerStore with Store {
   late FeedStore feedStore;
   @observable
   bool selectionMode = false;
+
+  @observable
+  bool pinnedListExpanded = true;
 
   @observable
   ObservableList<Feed> selectedFeeds = <Feed>[].asObservable();
@@ -38,6 +42,9 @@ abstract class _FeedManagerStore with Store {
   @observable
   late DbUtils dbUtils;
 
+  @observable
+  bool isReordering = false;
+
   @action
   Future<void> init({required FeedStore feedStore}) async {
     dbUtils = DbUtils(isar: isar);
@@ -47,6 +54,7 @@ abstract class _FeedManagerStore with Store {
   @action
   void toggleSelectionMode() {
     selectionMode = !selectionMode;
+    HapticFeedback.lightImpact();
   }
 
   @action
@@ -341,5 +349,10 @@ abstract class _FeedManagerStore with Store {
         await dbUtils.addFeedGroup(feedStore.pinnedFeedsOrFeedGroups[i]);
       }
     }
+  }
+
+  @action
+  void handlePinnedExpandedButtonTap() {
+    pinnedListExpanded = !pinnedListExpanded;
   }
 }

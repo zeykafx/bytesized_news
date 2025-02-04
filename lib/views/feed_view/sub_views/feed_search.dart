@@ -2,6 +2,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_story_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class FeedSearch extends StatefulWidget {
@@ -86,7 +87,9 @@ class _FeedSearchState extends State<FeedSearch> {
                       FeedItem item =
                           widget.feedStore.searchResults.elementAt(idx);
                       return FeedStoryTile(
-                          feedStore: widget.feedStore, item: item);
+                        feedStore: widget.feedStore,
+                        item: item,
+                      ).animate().fade();
                     },
                   ),
                 ),

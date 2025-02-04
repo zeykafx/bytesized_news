@@ -101,8 +101,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Chip(
                       label: Text(
-                        widget.item.feedName.length > 15
-                            ? "${widget.item.feedName.substring(0, 15)}..."
+                        widget.item.feedName.length > 12
+                            ? "${widget.item.feedName.substring(0, 12)}..."
                             : widget.item.feedName,
                         style: const TextStyle(fontSize: 10),
                       ),

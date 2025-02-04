@@ -108,15 +108,6 @@ class _FeedViewState extends State<FeedView> {
           ),
         ],
       ),
-      floatingActionButton: Observer(builder: (context) {
-        return Visibility(
-          visible: feedStore.showScrollToTop && !feedStore.isExpanded,
-          child: FloatingActionButton.small(
-            onPressed: feedStore.scrollToTop,
-            child: const Icon(Icons.arrow_upward),
-          ),
-        );
-      }),
       body: Observer(builder: (context) {
         return BottomSheetBar(
           controller: feedStore.bsbController,
@@ -334,114 +325,162 @@ class _FeedViewState extends State<FeedView> {
                                 ),
                               ],
                               Expanded(
-                                child: ListView.builder(
-                                    itemCount: feedStore.feedItems.length +
-                                        (feedStore.settingsStore.sort ==
+                                child: Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topCenter,
+                                      child: ListView.builder(
+                                          itemCount: feedStore
+                                                  .feedItems.length +
+                                              (feedStore.settingsStore.sort ==
+                                                          FeedListSort.byDate &&
+                                                      feedStore
+                                                          .suggestedFeedItems
+                                                          .isNotEmpty
+                                                  ? 1
+                                                  : 0),
+                                          cacheExtent: 300,
+                                          controller:
+                                              feedStore.scrollController,
+                                          addRepaintBoundaries: false,
+                                          addAutomaticKeepAlives: false,
+                                          itemBuilder: (context, idx) {
+                                            if (feedStore.suggestedFeedItems
+                                                    .isNotEmpty &&
+                                                feedStore.settingsStore.sort ==
                                                     FeedListSort.byDate &&
-                                                feedStore.suggestedFeedItems
-                                                    .isNotEmpty
-                                            ? 1
-                                            : 0),
-                                    cacheExtent: 300,
-                                    controller: feedStore.scrollController,
-                                    addRepaintBoundaries: false,
-                                    addAutomaticKeepAlives: false,
-                                    itemBuilder: (context, idx) {
-                                      if (feedStore
-                                              .suggestedFeedItems.isNotEmpty &&
-                                          feedStore.settingsStore.sort ==
-                                              FeedListSort.byDate &&
-                                          idx == 0) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 0.0,
-                                            vertical: 10.0,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Tooltip(
-                                                message:
-                                                    "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes max 10 times a day.",
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 8.0,
-                                                    vertical: 5.0,
-                                                  ),
-                                                  child: Text(
-                                                    "Suggested Articles:",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
+                                                idx == 0) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 0.0,
+                                                  vertical: 10.0,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                height: 150,
-                                                child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    controller: feedStore
-                                                        .suggestionsScrollController,
-                                                    itemCount: feedStore
-                                                        .suggestedFeedItems
-                                                        .length,
-                                                    cacheExtent: 300,
-                                                    addRepaintBoundaries: false,
-                                                    addAutomaticKeepAlives:
-                                                        false,
-                                                    itemBuilder:
-                                                        (context, idx) {
-                                                      FeedItem item = feedStore
-                                                              .suggestedFeedItems[
-                                                          idx];
-
-                                                      return SizedBox(
-                                                        width: 350,
-                                                        child: FeedStoryTile(
-                                                          feedStore: feedStore,
-                                                          item: item,
-                                                          isSuggestion: true,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Tooltip(
+                                                      message:
+                                                          "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes max 10 times a day.",
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 8.0,
+                                                          vertical: 5.0,
                                                         ),
-                                                      )
-                                                          .animate(
-                                                              delay: Duration(
-                                                                  milliseconds:
-                                                                      idx *
-                                                                          100))
-                                                          .fadeIn();
-                                                    }),
-                                              ),
-                                            ],
+                                                        child: Text(
+                                                          "Suggested Articles:",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 150,
+                                                      child: ListView.builder(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          controller: feedStore
+                                                              .suggestionsScrollController,
+                                                          itemCount: feedStore
+                                                              .suggestedFeedItems
+                                                              .length,
+                                                          cacheExtent: 300,
+                                                          addRepaintBoundaries:
+                                                              false,
+                                                          addAutomaticKeepAlives:
+                                                              false,
+                                                          itemBuilder:
+                                                              (context, idx) {
+                                                            FeedItem item =
+                                                                feedStore
+                                                                        .suggestedFeedItems[
+                                                                    idx];
+
+                                                            return SizedBox(
+                                                              width: 350,
+                                                              child:
+                                                                  FeedStoryTile(
+                                                                feedStore:
+                                                                    feedStore,
+                                                                item: item,
+                                                                isSuggestion:
+                                                                    true,
+                                                              ),
+                                                            )
+                                                                .animate(
+                                                                  delay:
+                                                                      (200).ms,
+                                                                )
+                                                                .slide(
+                                                                    begin:
+                                                                        Offset(
+                                                                      -0.1,
+                                                                      0,
+                                                                    ),
+                                                                    end: Offset(
+                                                                        0, 0),
+                                                                    curve: Curves
+                                                                        .easeOut)
+                                                                .fadeIn();
+                                                          }),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                                  .animate(
+                                                      delay: Duration(
+                                                          milliseconds:
+                                                              idx * 100))
+                                                  .fadeIn();
+                                            }
+
+                                            int index = feedStore
+                                                        .suggestedFeedItems
+                                                        .isNotEmpty &&
+                                                    settingsStore.sort ==
+                                                        FeedListSort.byDate
+                                                ? idx - 1
+                                                : idx;
+                                            FeedItem item =
+                                                feedStore.feedItems[index];
+
+                                            return FeedStoryTile(
+                                              feedStore: feedStore,
+                                              item: item,
+                                            )
+                                                .animate(
+                                                  delay: 200.ms,
+                                                )
+                                                .slide(
+                                                    begin: Offset(0, -0.1),
+                                                    end: Offset(0, 0),
+                                                    curve: Curves.easeOut)
+                                                .fadeIn();
+                                          }),
+                                    ),
+                                    // SCROLL TO TOP BUTTON
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Visibility(
+                                        visible: feedStore.showScrollToTop &&
+                                            !feedStore.isExpanded,
+                                        child: FilledButton.tonalIcon(
+                                          onPressed: feedStore.scrollToTop,
+                                          icon: Icon(Icons.arrow_upward),
+                                          label: Text(
+                                            "Scroll To Top",
+                                            style: TextStyle(fontSize: 12),
                                           ),
-                                        )
-                                            .animate(
-                                                delay: Duration(
-                                                    milliseconds: idx * 100))
-                                            .fadeIn();
-                                      }
-
-                                      int index = feedStore.suggestedFeedItems
-                                                  .isNotEmpty &&
-                                              settingsStore.sort ==
-                                                  FeedListSort.byDate
-                                          ? idx - 1
-                                          : idx;
-                                      FeedItem item =
-                                          feedStore.feedItems[index];
-
-                                      return FeedStoryTile(
-                                        feedStore: feedStore,
-                                        item: item,
-                                      );
-                                      // .animate(
-                                      //     delay: Duration(
-                                      //         milliseconds: idx * 100))
-                                      // .fadeIn();
-                                    }),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
                           ),

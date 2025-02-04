@@ -381,6 +381,12 @@ class _FeedTileState extends State<FeedTile> {
                     ? const Icon(Icons.check_circle_rounded)
                     : const Icon(Icons.circle_outlined),
               ),
+              if (widget.isInPinnedList) ...[
+                ReorderableDragStartListener(
+                    index:
+                        feedStore.pinnedFeedsOrFeedGroups.indexOf(widget.feed),
+                    child: Icon(Icons.drag_indicator))
+              ],
             ],
           ),
         ),

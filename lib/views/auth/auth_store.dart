@@ -158,9 +158,7 @@ abstract class _AuthStore with Store {
         print("Updating firebase device ID to add local device ID");
       }
       // fbDeviceIds.add(localDeviceId);
-      // FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-      //   "deviceIds": fbDeviceIds,
-      // });
+
       final result = await functions.httpsCallable('onDeviceIdAdded').call(
         {
           "deviceId": localDeviceId,
