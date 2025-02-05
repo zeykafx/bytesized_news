@@ -34,26 +34,17 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
 
     Color cardColor;
     if (widget.isSuggestion) {
-      cardColor =
-          Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3);
+      cardColor = Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3);
     } else if (!widget.item.bookmarked) {
-      cardColor = Theme.of(context)
-          .colorScheme
-          .secondaryContainer
-          .withValues(alpha: 0.2);
+      cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2);
     } else if (Theme.of(context).brightness == Brightness.dark) {
-      cardColor =
-          Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4);
+      cardColor = Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4);
     } else {
-      cardColor = Theme.of(context)
-          .colorScheme
-          .secondaryContainer
-          .withValues(alpha: 0.8);
+      cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.8);
     }
 
     return Card(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
       elevation: 0,
       color: cardColor,
       child: Center(
@@ -67,10 +58,10 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
               children: [
                 Flexible(
                   child: Text(
-                    widget.isSuggestion && parsedTitle.length > 80
-                        ? "${parsedTitle.substring(0, 80)}..."
-                        : parsedTitle,
-                    style: TextStyle(fontSize: widget.isSuggestion ? 13 : 15),
+                    parsedTitle,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: widget.isSuggestion ? 4 : 5,
+                    style: TextStyle(fontSize: widget.isSuggestion ? 12 : 15),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -101,9 +92,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Chip(
                       label: Text(
-                        widget.item.feedName.length > 12
-                            ? "${widget.item.feedName.substring(0, 12)}..."
-                            : widget.item.feedName,
+                        widget.item.feedName.length > 12 ? "${widget.item.feedName.substring(0, 12)}..." : widget.item.feedName,
                         style: const TextStyle(fontSize: 10),
                       ),
                       avatar: widget.item.feed!.iconUrl.isNotEmpty
@@ -112,23 +101,15 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                 borderRadius: BorderRadius.circular(3),
                               ),
                               clipBehavior: Clip.hardEdge,
-                              child: CachedNetworkImage(
-                                  imageUrl: widget.item.feed!.iconUrl,
-                                  width: 15,
-                                  height: 15,
-                                  fit: BoxFit.cover),
+                              child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, width: 15, height: 15, fit: BoxFit.cover),
                             )
                           : const Icon(LucideIcons.rss),
                       elevation: 0,
-                      side:
-                          const BorderSide(width: 0, color: Colors.transparent),
+                      side: const BorderSide(width: 0, color: Colors.transparent),
                       padding: const EdgeInsets.all(0),
                       labelPadding: const EdgeInsets.symmetric(horizontal: 5),
                       visualDensity: VisualDensity.compact,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.2),
+                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       shape: const RoundedRectangleBorder(
                         side: BorderSide(width: 0, color: Colors.transparent),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -159,8 +140,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      formatTime(
-                          widget.item.publishedDate.millisecondsSinceEpoch),
+                      formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
                       style: TextStyle(color: Theme.of(context).dividerColor),
                     ),
                     PopupMenuButton(
@@ -168,26 +148,20 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                       icon: const Icon(Icons.more_vert),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer,
-                            width: 0.3),
+                        side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
                       ),
                       onSelected: (int index) {
                         switch (index) {
                           case 0:
                             {
-                              widget.feedStore
-                                  .toggleItemRead(widget.item, toggle: true);
+                              widget.feedStore.toggleItemRead(widget.item, toggle: true);
                               // have to use setState because mobx doesn't detect changes in complex objects (at least the way I set things up)
                               setState(() {});
                               break;
                             }
                           case 1:
                             {
-                              widget.feedStore.toggleItemBookmarked(widget.item,
-                                  toggle: true);
+                              widget.feedStore.toggleItemBookmarked(widget.item, toggle: true);
                               setState(() {});
                               break;
                             }
@@ -209,9 +183,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 20),
-                                  child: Text(widget.item.read
-                                      ? "Mark as Unread"
-                                      : "Mark as Read"),
+                                  child: Text(widget.item.read ? "Mark as Unread" : "Mark as Read"),
                                 ),
                               ],
                             ),
@@ -224,17 +196,13 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                 Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Icon(
-                                    widget.item.bookmarked
-                                        ? Icons.bookmark_added
-                                        : Icons.bookmark_add,
+                                    widget.item.bookmarked ? Icons.bookmark_added : Icons.bookmark_add,
                                     size: 19,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 20),
-                                  child: Text(widget.item.bookmarked
-                                      ? "Remove from bookmarks"
-                                      : "Add to bookmarks"),
+                                  child: Text(widget.item.bookmarked ? "Remove from bookmarks" : "Add to bookmarks"),
                                 ),
                               ],
                             ),
@@ -246,9 +214,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                 ),
               ],
             ),
-            textColor: widget.item.read
-                ? Theme.of(context).dividerColor
-                : Theme.of(context).textTheme.bodyMedium?.color,
+            textColor: widget.item.read ? Theme.of(context).dividerColor : Theme.of(context).textTheme.bodyMedium?.color,
             onTap: () {
               widget.feedStore.toggleItemRead(widget.item);
               // force update the state to change the list tile's color to gray
@@ -265,8 +231,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   .then((_) async {
                 // update the sort after the story view is popped,
                 // this is done so that the story that was just viewed is removed if we are in the unread sort
-                widget.feedStore
-                    .changeSort(widget.feedStore.settingsStore.sort);
+                widget.feedStore.changeSort(widget.feedStore.settingsStore.sort);
 
                 // update the state of the list items after the story view is popped
                 // this is done because if the item was bookmarked while in the story view, we want to show that in the list

@@ -148,6 +148,22 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
+  late final _$isListAtom =
+      Atom(name: '_FeedManagerStore.isList', context: context);
+
+  @override
+  bool get isList {
+    _$isListAtom.reportRead();
+    return super.isList;
+  }
+
+  @override
+  set isList(bool value) {
+    _$isListAtom.reportWrite(value, super.isList, () {
+      super.isList = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedManagerStore.init', context: context);
 
@@ -362,6 +378,7 @@ selectedFeedGroups: ${selectedFeedGroups},
 isar: ${isar},
 dbUtils: ${dbUtils},
 isReordering: ${isReordering},
+isList: ${isList},
 areFeedGroupsSelected: ${areFeedGroupsSelected},
 areFeedsSelected: ${areFeedsSelected},
 areMoreThanOneFeedGroupsSelected: ${areMoreThanOneFeedGroupsSelected}

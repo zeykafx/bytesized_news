@@ -149,18 +149,34 @@ class _FeedManagerState extends State<FeedManager> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "Pinned: ${feedStore.pinnedFeedsOrFeedGroups.length.toString()}",
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontSize: 16,
-                                    ),
+                                  Row(
+                                    spacing: 5,
+                                    children: [
+                                      Text(
+                                        "Pinned:",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        feedStore.pinnedFeedsOrFeedGroups.length.toString(),
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: Icon(
-                                      feedManagerStore.pinnedListExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  Tooltip(
+                                    message: feedManagerStore.pinnedListExpanded ? "Hide the pinned feeds" : "Expand the pinned feeds",
+                                    child: IconButton(
+                                      icon: Icon(
+                                        feedManagerStore.pinnedListExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                        size: 25,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                      onPressed: feedManagerStore.handlePinnedExpandedButtonTap,
                                     ),
-                                    onPressed: feedManagerStore.handlePinnedExpandedButtonTap,
                                   ),
                                 ],
                               ),
@@ -241,14 +257,38 @@ class _FeedManagerState extends State<FeedManager> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8, top: 0, right: 8, bottom: 5),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Feeds: ${feedStore.feeds.length.toString()}",
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    fontSize: 16,
-                                  ),
+                                Row(
+                                  spacing: 5,
+                                  children: [
+                                    Text(
+                                      "Feeds:",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      feedStore.feeds.length.toString(),
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                Tooltip(
+                                  message: "Swap between list and grid mode",
+                                  child: IconButton(
+                                      icon: Icon(
+                                        feedManagerStore.isList ? LucideIcons.layout_grid : LucideIcons.layout_list,
+                                        size: 18,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                      onPressed: () {
+                                        feedManagerStore.isList = !feedManagerStore.isList;
+                                      }),
+                                )
                               ],
                             ),
                           ),
@@ -260,6 +300,8 @@ class _FeedManagerState extends State<FeedManager> {
                               GridView.count(
                                 crossAxisCount: 2,
                                 childAspectRatio: mediaQuery.size.width > 500 ? 3.5 : 3,
+                                mainAxisSpacing: 3,
+                                crossAxisSpacing: 3,
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 children: [
@@ -282,18 +324,33 @@ class _FeedManagerState extends State<FeedManager> {
                                 height: 5,
                               ),
 
-                              // Feeds
-                              ...feedStore.feeds.map((feed) {
-                                return FeedTile(
-                                  feedManagerStore: feedManagerStore,
-                                  feedStore: feedStore,
-                                  feed: feed,
-                                  wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
-                                  wrappedGetFeeds: widget.wrappedGetFeeds,
-                                  wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
-                                  isInPinnedList: false,
-                                );
-                              }),
+                              // TODO: use animated fractionally sized thingy
+                              GridView.count(
+                                crossAxisCount: feedManagerStore.isList ? 1 : 2,
+                                childAspectRatio: feedManagerStore.isList ? 8 : 4.3,
+                                mainAxisSpacing: 3,
+                                crossAxisSpacing: 3,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: [
+                                  // Feeds
+                                  ...feedStore.feeds.map((feed) {
+                                    return FeedTile(
+                                      feedManagerStore: feedManagerStore,
+                                      feedStore: feedStore,
+                                      feed: feed,
+                                      wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
+                                      wrappedGetFeeds: widget.wrappedGetFeeds,
+                                      wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
+                                      isInPinnedList: false,
+                                    )
+                                        .animate(value: feedManagerStore.isList ? 1 : 0)
+                                        .fade(curve: Curves.easeInOutQuad)
+                                        .animate(value: feedManagerStore.isList ? 0 : 1)
+                                        .fade(curve: Curves.easeInOutQuad);
+                                  }),
+                                ],
+                              ),
 
                               const SizedBox(
                                 height: 100,

@@ -8,7 +8,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
+import 'package:html/dom.dart' as dom;
+
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -42,6 +45,9 @@ class _StoryState extends State<Story> {
 
   @override
   Widget build(BuildContext context) {
+    dom.Document doc = parse(storyStore.feedItem.title);
+    String parsedTitle = parse(doc.body!.text).documentElement!.text;
+
     MediaQueryData mediaQuery = MediaQuery.of(context);
     return PopScope(
       // cannot pop this page by default, but if we popped from some way (such as the navigator), we can pop this page
@@ -62,8 +68,7 @@ class _StoryState extends State<Story> {
       child: Scaffold(
         appBar: AppBar(
           title: Observer(builder: (_) {
-            return Text(
-                "${storyStore.feedItem.title} - ${storyStore.feedItem.feedName}");
+            return Text("$parsedTitle - ${storyStore.feedItem.feedName}");
           }),
           actions: [
             IconButton(
@@ -90,10 +95,7 @@ class _StoryState extends State<Story> {
               child: Stack(
                 children: [
                   if (!storyStore.showReaderMode) ...[
-                    storyStore.loading
-                        ? LinearProgressIndicator(
-                            value: storyStore.progress / 100)
-                        : const SizedBox(),
+                    storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
                   ],
                   storyStore.initialized
                       ? Stack(
@@ -101,31 +103,18 @@ class _StoryState extends State<Story> {
                             if (!storyStore.showReaderMode) ...[
                               InAppWebView(
                                 key: webViewKey,
-                                initialUrlRequest: URLRequest(
-                                    url: WebUri(storyStore.feedItem.url)),
+                                initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
                                 initialSettings: storyStore.settings,
                                 onWebViewCreated: (controller) {
                                   storyStore.controller = controller;
                                 },
-                                onPermissionRequest:
-                                    (controller, request) async {
-                                  return PermissionResponse(
-                                      resources: request.resources,
-                                      action: PermissionResponseAction.GRANT);
+                                onPermissionRequest: (controller, request) async {
+                                  return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
                                 },
-                                shouldOverrideUrlLoading:
-                                    (controller, navigationAction) async {
+                                shouldOverrideUrlLoading: (controller, navigationAction) async {
                                   var uri = navigationAction.request.url!;
 
-                                  if (![
-                                    "http",
-                                    "https",
-                                    "file",
-                                    "chrome",
-                                    "data",
-                                    "javascript",
-                                    "about"
-                                  ].contains(uri.scheme)) {
+                                  if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
                                     if (await canLaunchUrl(uri)) {
                                       // Launch the App
                                       await launchUrl(
@@ -145,15 +134,12 @@ class _StoryState extends State<Story> {
                             ],
                             if (storyStore.showReaderMode) ...[
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: SelectableRegion(
                                   focusNode: FocusNode(),
-                                  selectionControls:
-                                      MaterialTextSelectionControls(),
+                                  selectionControls: MaterialTextSelectionControls(),
                                   child: Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 800),
+                                    constraints: const BoxConstraints(maxWidth: 800),
                                     child: HtmlWidget(
                                       '''
                                     <div class="bytesized_news_html_content">
@@ -177,13 +163,9 @@ class _StoryState extends State<Story> {
                                       </div>
                                                                       ''',
                                       renderMode: RenderMode.listView,
-                                      customStylesBuilder: (element) =>
-                                          storyStore.buildStyle(
-                                              context, element),
+                                      customStylesBuilder: (element) => storyStore.buildStyle(context, element),
                                       onTapImage: (ImageMetadata imageData) {
-                                        storyStore.showImage(
-                                            imageData.sources.firstOrNull!.url,
-                                            context);
+                                        storyStore.showImage(imageData.sources.firstOrNull!.url, context);
                                       },
                                     ),
                                   ),
@@ -198,15 +180,8 @@ class _StoryState extends State<Story> {
                               child: Column(
                                 children: [
                                   storyStore.aiLoading
-                                      ? const LinearProgressIndicator()
-                                          .animate()
-                                          .fadeIn()
-                                          .animate(
-                                              onPlay: (controller) =>
-                                                  controller.repeat())
-                                          .shimmer(
-                                          duration: const Duration(
-                                              milliseconds: 1500),
+                                      ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                                          duration: const Duration(milliseconds: 1500),
                                           colors: [
                                             const Color(0xBFFFFF00),
                                             const Color(0xBF00FF00),
@@ -218,65 +193,38 @@ class _StoryState extends State<Story> {
                                           ],
                                         )
                                       : const SizedBox(),
-                                  storyStore.feedItemSummarized &&
-                                          !storyStore.showReaderMode
+                                  storyStore.feedItemSummarized && !storyStore.showReaderMode
                                       ? GestureDetector(
                                           onVerticalDragEnd: (dragDetails) {
-                                            if (dragDetails.velocity
-                                                    .pixelsPerSecond.dy >
-                                                100) {
+                                            if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
                                               storyStore.hideAiSummary();
                                             }
                                           },
                                           child: Container(
                                                   decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(20),
-                                                      topRight:
-                                                          Radius.circular(20),
+                                                    borderRadius: const BorderRadius.only(
+                                                      topLeft: Radius.circular(20),
+                                                      topRight: Radius.circular(20),
                                                     ),
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .surface,
+                                                    color: Theme.of(context).colorScheme.surface,
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: const EdgeInsets.all(8.0),
                                                     child: Card(
                                                       elevation: 0,
-                                                      shape:
-                                                          const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
+                                                      shape: const RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(
                                                           Radius.circular(20),
                                                         ),
                                                       ),
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondaryContainer
-                                                          .withValues(
-                                                              alpha: 0.5),
+                                                      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
                                                       child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(15),
+                                                        padding: const EdgeInsets.all(15),
                                                         child: SelectableText(
-                                                          storyStore.feedItem
-                                                              .aiSummary,
-                                                          style: mediaQuery.size
-                                                                      .width >
-                                                                  600
-                                                              ? Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodyMedium
-                                                              : Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodySmall,
+                                                          storyStore.feedItem.aiSummary,
+                                                          style: mediaQuery.size.width > 600
+                                                              ? Theme.of(context).textTheme.bodyMedium
+                                                              : Theme.of(context).textTheme.bodySmall,
                                                         ),
                                                       ),
                                                     ),
@@ -296,16 +244,11 @@ class _StoryState extends State<Story> {
                                                   //     // const Color(0xFFFF00),
                                                   //   ],
                                                   // ),
-                                                  )
-                                              .animate(
-                                                  controller: storyStore
-                                                      .animationController)
-                                              .slideY(
+                                                  ).animate(controller: storyStore.animationController).slideY(
                                                 begin: 2,
                                                 end: 0,
                                                 curve: Curves.easeInOutSine,
-                                                duration: const Duration(
-                                                    milliseconds: 500),
+                                                duration: const Duration(milliseconds: 500),
                                               ),
                                         )
                                       : const SizedBox(),
@@ -350,9 +293,7 @@ class _StoryState extends State<Story> {
                     tooltip: "Go back",
                     icon: Icon(
                       Icons.arrow_back_ios,
-                      color: storyStore.canGoBack
-                          ? null
-                          : Colors.grey.withValues(alpha: 0.5),
+                      color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
 
@@ -366,9 +307,7 @@ class _StoryState extends State<Story> {
                     tooltip: "Go forward",
                     icon: Icon(
                       Icons.arrow_forward_ios,
-                      color: storyStore.canGoForward
-                          ? null
-                          : Colors.grey.withValues(alpha: 0.5),
+                      color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -378,12 +317,8 @@ class _StoryState extends State<Story> {
                   onPressed: () {
                     storyStore.toggleReaderMode();
                   },
-                  tooltip: storyStore.showReaderMode
-                      ? "Disable reader mode"
-                      : "Enable reader mode",
-                  icon: Icon(storyStore.showReaderMode
-                      ? Icons.chrome_reader_mode
-                      : Icons.chrome_reader_mode_outlined),
+                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
+                  icon: Icon(storyStore.showReaderMode ? Icons.chrome_reader_mode : Icons.chrome_reader_mode_outlined),
                 ),
 
                 storyStore.feedItemSummarized
@@ -398,14 +333,10 @@ class _StoryState extends State<Story> {
                               heightFactor: 3,
                               child: Icon(LucideIcons.sparkles, size: 14),
                             ),
-                            Icon(storyStore.hideSummary
-                                ? Icons.visibility
-                                : Icons.visibility_off),
+                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
                           ],
                         ),
-                        tooltip: storyStore.hideSummary
-                            ? "Show AI Summary"
-                            : "Hide AI Summary",
+                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
                       )
                     : IconButton(
                         onPressed: () {
@@ -427,10 +358,7 @@ class _StoryState extends State<Story> {
                         left: 0,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .secondary
-                                .withValues(alpha: 0.1),
+                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -443,9 +371,7 @@ class _StoryState extends State<Story> {
                         storyStore.bookmarkItem();
                         widget.feedItem.bookmarked = storyStore.isBookmarked;
                       },
-                      icon: Icon(storyStore.isBookmarked
-                          ? Icons.bookmark_added
-                          : Icons.bookmark_add),
+                      icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
                     ),
                   ],
                 ),

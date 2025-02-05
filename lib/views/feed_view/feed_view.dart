@@ -347,7 +347,7 @@ class _FeedViewState extends State<FeedView> {
                                                               ),
                                                             )
                                                                 .animate(
-                                                                  delay: (200).ms,
+                                                                  delay: 200.ms,
                                                                 )
                                                                 .slide(
                                                                   begin: Offset(
@@ -362,7 +362,7 @@ class _FeedViewState extends State<FeedView> {
                                                     ),
                                                   ],
                                                 ),
-                                              ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn();
+                                              ).animate(delay: Duration(milliseconds: 100)).fadeIn();
                                             }
 
                                             int index = feedStore.suggestedFeedItems.isNotEmpty && settingsStore.sort == FeedListSort.byDate ? idx - 1 : idx;
@@ -373,9 +373,10 @@ class _FeedViewState extends State<FeedView> {
                                               item: item,
                                             )
                                                 .animate(
-                                                  delay: 200.ms,
+                                                  delay: 250.ms,
                                                 )
                                                 .slide(
+                                                  duration: 300.ms,
                                                   begin: Offset(0, -0.1),
                                                   end: Offset(0, 0),
                                                   curve: Curves.easeOut,
