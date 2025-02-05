@@ -32,8 +32,7 @@ abstract class _AuthStore with Store {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   @observable
-  FirebaseFunctions functions =
-      FirebaseFunctions.instanceFor(region: "europe-west1");
+  FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
 
   @observable
   bool initialized = false;
@@ -111,8 +110,7 @@ abstract class _AuthStore with Store {
     //   onError: (error) => print("Listen failed: $error"),
     // );
 
-    var userData =
-        await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
+    var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
     if (userData["tier"] != null) {
       if (userData["tier"] == "premium") {
         userTier = Tier.premium;
@@ -127,19 +125,16 @@ abstract class _AuthStore with Store {
       userInterests = interests;
     }
 
-    builtUserProfileDate = DateTime.fromMillisecondsSinceEpoch(
-        userData["builtUserProfileDate"] ?? 0);
+    builtUserProfileDate = DateTime.fromMillisecondsSinceEpoch(userData["builtUserProfileDate"] ?? 0);
 
     if (userData["suggestionsLeftToday"] != null) {
       suggestionsLeftToday = userData["suggestionsLeftToday"];
-      lastSuggestionDate = DateTime.fromMillisecondsSinceEpoch(
-          userData["lastSuggestionDate"] ?? 0);
+      lastSuggestionDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSuggestionDate"] ?? 0);
     }
 
     if (userData["summariesLeftToday"] != null) {
       summariesLeftToday = userData["summariesLeftToday"];
-      lastSummaryDate =
-          DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"] ?? 0);
+      lastSummaryDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"] ?? 0);
     }
 
     // Get the current device's id and store that in firebase if it is different
@@ -171,8 +166,7 @@ abstract class _AuthStore with Store {
         if (buildContext != null) {
           ScaffoldMessenger.of(buildContext).showSnackBar(
             SnackBar(
-              content: Text(
-                  "You have been logged out, Another account has already registered this device."),
+              content: Text("You have been logged out, Another account has already registered this device."),
             ),
           );
           Navigator.of(buildContext).push(
@@ -191,23 +185,34 @@ abstract class _AuthStore with Store {
     }
 
     // Setup auto run reactions for each of these fields
-    reaction((_) => userInterests, (_) {
+    reaction((_) => userInterests, (_) async {
       if (kDebugMode) {
         print("Updating userInterests");
       }
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "interests": userInterests,
-      });
-    });
-    reaction((_) => builtUserProfileDate, (_) {
-      if (kDebugMode) {
-        print("Updating builtUserProfileDate");
+      // Call the addUserInterests function
+      final result = await FirebaseFunctions.instanceFor(region: "europe-west1").httpsCallable('addUserInterests').call(
+        {
+          "interests": userInterests,
+        },
+      );
+      var response = result.data as Map<String, dynamic>;
+      if (response["error"] != null) {
+        throw Exception(response["error"]);
       }
 
-      FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-        "builtUserProfileDate": builtUserProfileDate!.millisecondsSinceEpoch,
-      });
+      // FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
+      //   "interests": userInterests,
+      // });
     });
+    // reaction((_) => builtUserProfileDate, (_) {
+    //   if (kDebugMode) {
+    //     print("Updating builtUserProfileDate");
+    //   }
+
+    //   FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
+    //     "builtUserProfileDate": builtUserProfileDate!.millisecondsSinceEpoch,
+    //   });
+    // });
 
     initialized = true;
     return true;

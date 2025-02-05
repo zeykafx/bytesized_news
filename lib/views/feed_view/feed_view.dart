@@ -119,10 +119,7 @@ class _FeedViewState extends State<FeedView> {
             topLeft: Radius.circular(0),
             topRight: Radius.circular(0),
           ),
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerLow
-              .withValues(alpha: 1),
+          color: Theme.of(context).colorScheme.surfaceContainerLow.withValues(alpha: 1),
           locked: feedStore.isLocked,
           body: RefreshIndicator(
             onRefresh: () async {
@@ -133,13 +130,9 @@ class _FeedViewState extends State<FeedView> {
               child: Card(
                 margin: EdgeInsets.zero,
                 elevation: 0,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25))),
                 clipBehavior: Clip.hardEdge,
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondaryContainer
-                    .withValues(alpha: 0.2),
+                color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
@@ -159,36 +152,28 @@ class _FeedViewState extends State<FeedView> {
                                   onPressed: null,
                                   icon: Icon(
                                     Icons.keyboard_arrow_down_rounded,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .color,
+                                    color: Theme.of(context).textTheme.bodyLarge!.color,
                                   ),
                                   label: Text(
-                                    feedListSortToString(
-                                        feedStore.settingsStore.sort),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
+                                    feedListSortToString(feedStore.settingsStore.sort),
+                                    style: Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 onSelected: (int value) {
                                   switch (value) {
                                     case 0:
                                       {
-                                        feedStore
-                                            .changeSort(FeedListSort.byDate);
+                                        feedStore.changeSort(FeedListSort.byDate);
                                         break;
                                       }
                                     case 1:
                                       {
-                                        feedStore
-                                            .changeSort(FeedListSort.today);
+                                        feedStore.changeSort(FeedListSort.today);
                                         break;
                                       }
                                     case 2:
                                       {
-                                        feedStore
-                                            .changeSort(FeedListSort.unread);
+                                        feedStore.changeSort(FeedListSort.unread);
                                         break;
                                       }
                                     case 3:
@@ -198,8 +183,7 @@ class _FeedViewState extends State<FeedView> {
                                       }
                                     case 4:
                                       {
-                                        feedStore.changeSort(
-                                            FeedListSort.bookmarked);
+                                        feedStore.changeSort(FeedListSort.bookmarked);
                                         break;
                                       }
                                   }
@@ -231,15 +215,12 @@ class _FeedViewState extends State<FeedView> {
                                 }),
                             TextButton.icon(
                               onPressed: () {
-                                bool allRead = feedStore.feedItems
-                                    .every((item) => item.read);
+                                bool allRead = feedStore.feedItems.every((item) => item.read);
                                 if (allRead) {
                                   feedStore.markAllAsRead(false);
                                   setState(() {});
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content:
-                                        const Text("Marked all as unread!"),
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: const Text("Marked all as unread!"),
                                     action: SnackBarAction(
                                         label: "Undo",
                                         onPressed: () {
@@ -248,21 +229,16 @@ class _FeedViewState extends State<FeedView> {
                                         }),
                                   ));
                                 } else {
-                                  List<FeedItem> unreadItems = feedStore
-                                      .feedItems
-                                      .where((item) => !item.read)
-                                      .toList();
+                                  List<FeedItem> unreadItems = feedStore.feedItems.where((item) => !item.read).toList();
                                   feedStore.markAllAsRead(true);
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content:
-                                          const Text("Marked all as read!"),
+                                      content: const Text("Marked all as read!"),
                                       action: SnackBarAction(
                                         label: "Undo",
                                         onPressed: () {
-                                          feedStore.markAllAsRead(false,
-                                              unreadItems: unreadItems);
+                                          feedStore.markAllAsRead(false, unreadItems: unreadItems);
                                           setState(() {});
                                         },
                                       ),
@@ -270,12 +246,8 @@ class _FeedViewState extends State<FeedView> {
                                   );
                                 }
                               },
-                              label: Text(
-                                  feedStore.feedItems.any((item) => !item.read)
-                                      ? "Mark all as read"
-                                      : "Mark as unread"),
-                              icon:
-                                  const Icon(Icons.playlist_add_check_rounded),
+                              label: Text(feedStore.feedItems.any((item) => !item.read) ? "Mark all as read" : "Mark as unread"),
+                              icon: const Icon(Icons.playlist_add_check_rounded),
                             ),
                           ],
                         ),
@@ -290,8 +262,7 @@ class _FeedViewState extends State<FeedView> {
                               if (feedStore.loading) ...[
                                 const Center(child: LinearProgressIndicator()),
                               ],
-                              if (feedStore.feedItems.isEmpty &&
-                                  !feedStore.loading) ...[
+                              if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
                                 const Center(child: Text("No stories loaded")),
                               ],
                               if (feedStore.suggestionsLoading) ...[
@@ -301,15 +272,8 @@ class _FeedViewState extends State<FeedView> {
                                     padding: const EdgeInsets.all(5),
                                     child: Opacity(
                                       opacity: 0.5,
-                                      child: Text("Fetching suggestions")
-                                          .animate()
-                                          .fadeIn()
-                                          .animate(
-                                              onPlay: (controller) =>
-                                                  controller.repeat())
-                                          .shimmer(
-                                        duration:
-                                            const Duration(milliseconds: 1500),
+                                      child: Text("Fetching suggestions").animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                                        duration: const Duration(milliseconds: 1500),
                                         colors: [
                                           const Color(0xBFFFFF00),
                                           const Color(0xBF00FF00),
@@ -330,51 +294,34 @@ class _FeedViewState extends State<FeedView> {
                                     Align(
                                       alignment: Alignment.topCenter,
                                       child: ListView.builder(
-                                          itemCount: feedStore
-                                                  .feedItems.length +
-                                              (feedStore.settingsStore.sort ==
-                                                          FeedListSort.byDate &&
-                                                      feedStore
-                                                          .suggestedFeedItems
-                                                          .isNotEmpty
-                                                  ? 1
-                                                  : 0),
+                                          itemCount: feedStore.feedItems.length +
+                                              (feedStore.settingsStore.sort == FeedListSort.byDate && feedStore.suggestedFeedItems.isNotEmpty ? 1 : 0),
                                           cacheExtent: 300,
-                                          controller:
-                                              feedStore.scrollController,
+                                          controller: feedStore.scrollController,
                                           addRepaintBoundaries: false,
                                           addAutomaticKeepAlives: false,
                                           itemBuilder: (context, idx) {
-                                            if (feedStore.suggestedFeedItems
-                                                    .isNotEmpty &&
-                                                feedStore.settingsStore.sort ==
-                                                    FeedListSort.byDate &&
-                                                idx == 0) {
+                                            if (feedStore.suggestedFeedItems.isNotEmpty && feedStore.settingsStore.sort == FeedListSort.byDate && idx == 0) {
                                               return Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
+                                                padding: const EdgeInsets.symmetric(
                                                   horizontal: 0.0,
                                                   vertical: 10.0,
                                                 ),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Tooltip(
                                                       message:
                                                           "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes max 10 times a day.",
                                                       child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
+                                                        padding: const EdgeInsets.symmetric(
                                                           horizontal: 8.0,
                                                           vertical: 5.0,
                                                         ),
                                                         child: Text(
                                                           "Suggested Articles:",
                                                           style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w500,
+                                                            fontWeight: FontWeight.w500,
                                                           ),
                                                         ),
                                                       ),
@@ -382,72 +329,44 @@ class _FeedViewState extends State<FeedView> {
                                                     SizedBox(
                                                       height: 150,
                                                       child: ListView.builder(
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          controller: feedStore
-                                                              .suggestionsScrollController,
-                                                          itemCount: feedStore
-                                                              .suggestedFeedItems
-                                                              .length,
+                                                          scrollDirection: Axis.horizontal,
+                                                          controller: feedStore.suggestionsScrollController,
+                                                          itemCount: feedStore.suggestedFeedItems.length,
                                                           cacheExtent: 300,
-                                                          addRepaintBoundaries:
-                                                              false,
-                                                          addAutomaticKeepAlives:
-                                                              false,
-                                                          itemBuilder:
-                                                              (context, idx) {
-                                                            FeedItem item =
-                                                                feedStore
-                                                                        .suggestedFeedItems[
-                                                                    idx];
+                                                          addRepaintBoundaries: false,
+                                                          addAutomaticKeepAlives: false,
+                                                          itemBuilder: (context, idx) {
+                                                            FeedItem item = feedStore.suggestedFeedItems[idx];
 
                                                             return SizedBox(
                                                               width: 350,
-                                                              child:
-                                                                  FeedStoryTile(
-                                                                feedStore:
-                                                                    feedStore,
+                                                              child: FeedStoryTile(
+                                                                feedStore: feedStore,
                                                                 item: item,
-                                                                isSuggestion:
-                                                                    true,
+                                                                isSuggestion: true,
                                                               ),
                                                             )
                                                                 .animate(
-                                                                  delay:
-                                                                      (200).ms,
+                                                                  delay: (200).ms,
                                                                 )
                                                                 .slide(
-                                                                    begin:
-                                                                        Offset(
-                                                                      -0.1,
-                                                                      0,
-                                                                    ),
-                                                                    end: Offset(
-                                                                        0, 0),
-                                                                    curve: Curves
-                                                                        .easeOut)
+                                                                  begin: Offset(
+                                                                    -0.1,
+                                                                    0,
+                                                                  ),
+                                                                  end: Offset(0, 0),
+                                                                  curve: Curves.easeOut,
+                                                                )
                                                                 .fadeIn();
                                                           }),
                                                     ),
                                                   ],
                                                 ),
-                                              )
-                                                  .animate(
-                                                      delay: Duration(
-                                                          milliseconds:
-                                                              idx * 100))
-                                                  .fadeIn();
+                                              ).animate(delay: Duration(milliseconds: idx * 100)).fadeIn();
                                             }
 
-                                            int index = feedStore
-                                                        .suggestedFeedItems
-                                                        .isNotEmpty &&
-                                                    settingsStore.sort ==
-                                                        FeedListSort.byDate
-                                                ? idx - 1
-                                                : idx;
-                                            FeedItem item =
-                                                feedStore.feedItems[index];
+                                            int index = feedStore.suggestedFeedItems.isNotEmpty && settingsStore.sort == FeedListSort.byDate ? idx - 1 : idx;
+                                            FeedItem item = feedStore.feedItems[index];
 
                                             return FeedStoryTile(
                                               feedStore: feedStore,
@@ -457,9 +376,10 @@ class _FeedViewState extends State<FeedView> {
                                                   delay: 200.ms,
                                                 )
                                                 .slide(
-                                                    begin: Offset(0, -0.1),
-                                                    end: Offset(0, 0),
-                                                    curve: Curves.easeOut)
+                                                  begin: Offset(0, -0.1),
+                                                  end: Offset(0, 0),
+                                                  curve: Curves.easeOut,
+                                                )
                                                 .fadeIn();
                                           }),
                                     ),
@@ -467,8 +387,7 @@ class _FeedViewState extends State<FeedView> {
                                     Align(
                                       alignment: Alignment.bottomRight,
                                       child: Visibility(
-                                        visible: feedStore.showScrollToTop &&
-                                            !feedStore.isExpanded,
+                                        visible: feedStore.showScrollToTop && !feedStore.isExpanded,
                                         child: FilledButton.tonalIcon(
                                           onPressed: feedStore.scrollToTop,
                                           icon: Icon(Icons.arrow_upward),
@@ -498,8 +417,7 @@ class _FeedViewState extends State<FeedView> {
               wrappedGetFeeds: wrappedGetFeeds,
               wrappedGetFeedGroups: wrappedGetFeedGroups,
               wrappedGetItems: wrappedGetItems,
-              wrappedGetPinnedFeedsOrFeedGroups:
-                  wrappedGetPinnedFeedsOrFeedGroups,
+              wrappedGetPinnedFeedsOrFeedGroups: wrappedGetPinnedFeedsOrFeedGroups,
               scrollController: controller,
             );
           },
@@ -517,15 +435,13 @@ class _FeedViewState extends State<FeedView> {
                     width: 50,
                     height: 5,
                     decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).dividerColor.withValues(alpha: 0.7),
+                      color: Theme.of(context).dividerColor.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -537,20 +453,10 @@ class _FeedViewState extends State<FeedView> {
                         Card.outlined(
                           shape: RoundedRectangleBorder(
                             side: BorderSide(
-                              color: settingsStore.sort != FeedListSort.feed &&
-                                      settingsStore.sort !=
-                                          FeedListSort.feedGroup
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .primaryFixedDim
-                                  : Theme.of(context)
-                                      .dividerColor
-                                      .withValues(alpha: 0.5),
-                              width: settingsStore.sort != FeedListSort.feed &&
-                                      settingsStore.sort !=
-                                          FeedListSort.feedGroup
-                                  ? 3
-                                  : 1,
+                              color: settingsStore.sort != FeedListSort.feed && settingsStore.sort != FeedListSort.feedGroup
+                                  ? Theme.of(context).colorScheme.primaryFixedDim
+                                  : Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                              width: settingsStore.sort != FeedListSort.feed && settingsStore.sort != FeedListSort.feedGroup ? 3 : 1,
                             ),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(10),
@@ -570,19 +476,12 @@ class _FeedViewState extends State<FeedView> {
                             Feed feed = elem;
 
                             bool isCurrentSortFeed =
-                                settingsStore.sort == FeedListSort.feed &&
-                                    settingsStore.sortFeed != null &&
-                                    settingsStore.sortFeed?.name == feed.name;
+                                settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && settingsStore.sortFeed?.name == feed.name;
                             return Card.outlined(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
-                                  color: isCurrentSortFeed
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .primaryFixedDim
-                                      : Theme.of(context)
-                                          .dividerColor
-                                          .withValues(alpha: 0.5),
+                                  color:
+                                      isCurrentSortFeed ? Theme.of(context).colorScheme.primaryFixedDim : Theme.of(context).dividerColor.withValues(alpha: 0.5),
                                   width: isCurrentSortFeed ? 3 : 1,
                                 ),
                                 borderRadius: const BorderRadius.all(
@@ -601,34 +500,24 @@ class _FeedViewState extends State<FeedView> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 1),
+                                  margin: const EdgeInsets.symmetric(horizontal: 1),
                                   clipBehavior: Clip.antiAlias,
-                                  child: CachedNetworkImage(
-                                      imageUrl: feed.iconUrl,
-                                      width: 25,
-                                      height: 25),
+                                  child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25),
                                 ),
                               ),
                             );
                           } else {
                             FeedGroup feedGroup = elem;
 
-                            bool isCurrentSortFeedGroup =
-                                settingsStore.sort == FeedListSort.feedGroup &&
-                                    settingsStore.sortFeedGroup != null &&
-                                    settingsStore.sortFeedGroup?.name ==
-                                        feedGroup.name;
+                            bool isCurrentSortFeedGroup = settingsStore.sort == FeedListSort.feedGroup &&
+                                settingsStore.sortFeedGroup != null &&
+                                settingsStore.sortFeedGroup?.name == feedGroup.name;
                             return Card.outlined(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   color: isCurrentSortFeedGroup
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .primaryFixedDim
-                                      : Theme.of(context)
-                                          .dividerColor
-                                          .withValues(alpha: 0.5),
+                                      ? Theme.of(context).colorScheme.primaryFixedDim
+                                      : Theme.of(context).dividerColor.withValues(alpha: 0.5),
                                   width: isCurrentSortFeedGroup ? 3 : 1,
                                 ),
                                 borderRadius: const BorderRadius.all(
@@ -639,10 +528,8 @@ class _FeedViewState extends State<FeedView> {
                                 onPressed: () async {
                                   // sort for this feed group
                                   settingsStore.setSortFeedGroup(feedGroup);
-                                  settingsStore
-                                      .setSortFeedGroupName(feedGroup.name);
-                                  await feedStore
-                                      .changeSort(FeedListSort.feedGroup);
+                                  settingsStore.setSortFeedGroupName(feedGroup.name);
+                                  await feedStore.changeSort(FeedListSort.feedGroup);
                                   await feedStore.fetchItems();
                                 },
                                 icon: feedGroup.feeds.isEmpty
@@ -656,26 +543,18 @@ class _FeedViewState extends State<FeedView> {
                                           ...feedGroup.feeds.take(2).map(
                                                 (feed) => Container(
                                                   decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                    borderRadius: BorderRadius.circular(5),
                                                   ),
-                                                  margin: const EdgeInsets
-                                                      .symmetric(horizontal: 1),
+                                                  margin: const EdgeInsets.symmetric(horizontal: 1),
                                                   clipBehavior: Clip.antiAlias,
-                                                  child: CachedNetworkImage(
-                                                      imageUrl: feed.iconUrl,
-                                                      width: 17,
-                                                      height: 17),
+                                                  child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
                                                 ),
                                               ),
                                           if (feedGroup.feeds.length > 2) ...[
                                             const SizedBox(width: 5),
                                             Text(
                                               "+${feedGroup.feeds.length - 2}",
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .dividerColor),
+                                              style: TextStyle(color: Theme.of(context).dividerColor),
                                             ),
                                           ],
                                         ],

@@ -47,32 +47,35 @@ export const onUserDelete = functions.auth.user().onDelete(async (user) => {
 });
 
 // Reset quotas daily via Cloud Scheduler
-exports.resetQuotas = functions.pubsub.schedule("0 0 * * *").onRun(async (_) => {
-  // Get all user documents
-  const usersSnapshot = await db.collection("users").get();
-  const limits = await db.collection("flags").doc("limits").get();
-  const suggestionsLimit = limits.data()?.suggestions || 20;
-  const summariesLimit = limits.data()?.summaries || 100;
+exports.resetQuotas = functions.pubsub
+  .schedule("0 0 * * *")
+  .timeZone("Europe/Brussels")
+  .onRun(async (_) => {
+    // Get all user documents
+    const usersSnapshot = await db.collection("users").get();
+    const limits = await db.collection("flags").doc("limits").get();
+    const suggestionsLimit = limits.data()?.suggestions || 20;
+    const summariesLimit = limits.data()?.summaries || 100;
 
-  const batchSize = 500; // Firestore batch limit
-  const userDocs = usersSnapshot.docs;
+    const batchSize = 500; // Firestore batch limit
+    const userDocs = usersSnapshot.docs;
 
-  // Process in batches to avoid Firestore limits
-  for (let i = 0; i < userDocs.length; i += batchSize) {
-    const batch = db.batch();
-    const chunk = userDocs.slice(i, i + batchSize);
+    // Process in batches to avoid Firestore limits
+    for (let i = 0; i < userDocs.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = userDocs.slice(i, i + batchSize);
 
-    chunk.forEach((userDoc) => {
-      batch.update(userDoc.ref, {
-        suggestionsLeftToday: suggestionsLimit,
-        summariesLeftToday: summariesLimit,
+      chunk.forEach((userDoc) => {
+        batch.update(userDoc.ref, {
+          suggestionsLeftToday: suggestionsLimit,
+          summariesLeftToday: summariesLimit,
+        });
       });
-    });
 
-    await batch.commit();
-    logger.info(`Processed batch ${i / batchSize + 1}`);
-  }
-});
+      await batch.commit();
+      logger.info(`Processed batch ${i / batchSize + 1}`);
+    }
+  });
 
 export const onDeviceIdAdded = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
   const newDeviceId: string = request.data.deviceId;
@@ -316,7 +319,27 @@ export const buildUserInterests = onCall({ region: "europe-west1", enforceAppChe
 
   const result = completion.choices[0]?.message?.content || "";
 
+  // Add the inferred interests to the user's document
+  const userRef = db.doc(`users/${request.auth?.uid}`);
+  await userRef.update({
+    builtUserProfileDate: new Date().getTime(),
+    interests: FieldValue.arrayUnion(result),
+  });
+
   // Return the raw JSON string (e.g., {"categories": [...]})
   // The client can parse it as needed
   return { categoriesJson: result };
+});
+
+export const addUserInterests = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
+  const interests: string[] = request.data.interests;
+  const uid = request.auth?.uid;
+  logger.info(`Adding interests ${interests} for user ID: ${uid}`);
+
+  const userRef = db.doc(`users/${uid}`);
+  await userRef.update({
+    interests: interests,
+  });
+
+  return { success: true };
 });

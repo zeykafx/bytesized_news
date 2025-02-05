@@ -110,28 +110,28 @@ class _FeedTileState extends State<FeedTile> {
                   ? PopupMenuButton(
                       icon: const Icon(Icons.more_vert),
                       itemBuilder: (context) => [
-                        if (widget.isInPinnedList) ...[
-                          const PopupMenuItem(
-                            value: "up",
-                            child: Row(
-                              children: [
-                                Icon(Icons.arrow_upward),
-                                SizedBox(width: 5),
-                                Text("Move Up"),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: "down",
-                            child: Row(
-                              children: [
-                                Icon(Icons.arrow_downward),
-                                SizedBox(width: 5),
-                                Text("Move Down"),
-                              ],
-                            ),
-                          ),
-                        ],
+                        // if (widget.isInPinnedList) ...[
+                        //   const PopupMenuItem(
+                        //     value: "up",
+                        //     child: Row(
+                        //       children: [
+                        //         Icon(Icons.arrow_upward),
+                        //         SizedBox(width: 5),
+                        //         Text("Move Up"),
+                        //       ],
+                        //     ),
+                        //   ),
+                        //   const PopupMenuItem(
+                        //     value: "down",
+                        //     child: Row(
+                        //       children: [
+                        //         Icon(Icons.arrow_downward),
+                        //         SizedBox(width: 5),
+                        //         Text("Move Down"),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ],
                         PopupMenuItem(
                           value: "pin",
                           child: Row(
