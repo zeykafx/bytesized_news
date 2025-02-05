@@ -386,8 +386,11 @@ class _FeedViewState extends State<FeedView> {
                                     // SCROLL TO TOP BUTTON
                                     Align(
                                       alignment: Alignment.bottomRight,
-                                      child: Visibility(
-                                        visible: feedStore.showScrollToTop && !feedStore.isExpanded,
+                                      child: AnimatedSlide(
+                                        duration: 250.ms,
+                                        curve: Curves.easeInOutQuad,
+                                        offset: feedStore.showScrollToTop && !feedStore.isExpanded ? Offset(-0.05, -0.1) : Offset(-0.05, 2),
+                                        // visible: feedStore.showScrollToTop && !feedStore.isExpanded,
                                         child: FilledButton.tonalIcon(
                                           onPressed: feedStore.scrollToTop,
                                           icon: Icon(Icons.arrow_upward),

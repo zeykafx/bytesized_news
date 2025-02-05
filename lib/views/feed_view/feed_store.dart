@@ -31,8 +31,7 @@ abstract class _FeedStore with Store {
   List<Feed> feeds = [];
 
   @observable
-  ObservableList<dynamic> pinnedFeedsOrFeedGroups =
-      <dynamic>[].asObservable(); // Feed or FeedGroup
+  ObservableList<dynamic> pinnedFeedsOrFeedGroups = <dynamic>[].asObservable(); // Feed or FeedGroup
 
   @observable
   ObservableList<FeedGroup> feedGroups = <FeedGroup>[].asObservable();
@@ -104,8 +103,7 @@ abstract class _FeedStore with Store {
   bool hasCleanedArticlesToday = false;
 
   @action
-  Future<bool> init(
-      {required SettingsStore setStore, required AuthStore authStore}) async {
+  Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
     this.authStore = authStore;
 
@@ -188,8 +186,7 @@ abstract class _FeedStore with Store {
     }
 
     // sort based on pinnedPosition
-    pinnedFeedsOrFeedGroups
-        .sort((a, b) => a.pinnedPosition.compareTo(b.pinnedPosition));
+    pinnedFeedsOrFeedGroups.sort((a, b) => a.pinnedPosition.compareTo(b.pinnedPosition));
   }
 
   @action
@@ -214,16 +211,12 @@ abstract class _FeedStore with Store {
     loading = true;
     for (Feed feed in feeds) {
       // if the sort is for feeds, and the current feed is not the same as the feed we are sorting for, continue
-      if (settingsStore.sort == FeedListSort.feed &&
-          settingsStore.sortFeed != null &&
-          feed.name != settingsStore.sortFeed!.name) {
+      if (settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && feed.name != settingsStore.sortFeed!.name) {
         continue;
       }
 
       // if the sort is for feed groups, and the current feed is not in the group, do not fetch items for it
-      if (settingsStore.sort == FeedListSort.feedGroup &&
-          settingsStore.sortFeedGroup != null &&
-          !settingsStore.sortFeedGroup!.feedNames.contains(feed.name)) {
+      if (settingsStore.sort == FeedListSort.feedGroup && settingsStore.sortFeedGroup != null && !settingsStore.sortFeedGroup!.feedNames.contains(feed.name)) {
         continue;
       }
 
@@ -265,8 +258,7 @@ abstract class _FeedStore with Store {
       } else {
         for (AtomItem item in atomFeed.items.take(20)) {
           // check if the item is already in the list of feed items
-          if (feedItems
-              .any((element) => element.url == item.links.first.href)) {
+          if (feedItems.any((element) => element.url == item.links.first.href)) {
             continue;
           }
 
@@ -304,8 +296,7 @@ abstract class _FeedStore with Store {
   }
 
   @action
-  Future<void> toggleItemBookmarked(FeedItem item,
-      {bool toggle = false}) async {
+  Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) async {
     item.bookmarked = toggle ? !item.bookmarked : true;
 
     await dbUtils.updateItemInDb(item);
@@ -337,19 +328,14 @@ abstract class _FeedStore with Store {
         break;
       case FeedListSort.feed:
         if (settingsStore.sortFeed == null) {
-          throw Exception(
-              "sortFeed cannot be null when changing sort to FeedListSort.Feed.");
+          throw Exception("sortFeed cannot be null when changing sort to FeedListSort.Feed.");
         }
-        feedItems = (await dbUtils.getItemsFromFeed(settingsStore.sortFeed!))
-            .asObservable();
+        feedItems = (await dbUtils.getItemsFromFeed(settingsStore.sortFeed!)).asObservable();
       case FeedListSort.feedGroup:
         if (settingsStore.sortFeedGroup == null) {
-          throw Exception(
-              "sortFeedGroup cannot be null when changing sort to FeedListSort.FeedGroup.");
+          throw Exception("sortFeedGroup cannot be null when changing sort to FeedListSort.FeedGroup.");
         }
-        feedItems =
-            (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!))
-                .asObservable();
+        feedItems = (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!)).asObservable();
     }
 
     filterArticlesMutedKeywords(feedItems);
@@ -358,8 +344,7 @@ abstract class _FeedStore with Store {
   void filterArticlesMutedKeywords(List<FeedItem> items) {
     items.removeWhere((item) {
       final lowerTitle = item.title.toLowerCase();
-      return settingsStore.mutedKeywords
-          .any((keyword) => lowerTitle.contains(keyword));
+      return settingsStore.mutedKeywords.any((keyword) => lowerTitle.contains(keyword));
     });
   }
 
@@ -383,14 +368,12 @@ abstract class _FeedStore with Store {
   }
 
   @action
-  Future<void> createFeedGroup(
-      String feedGroupName, BuildContext context) async {
+  Future<void> createFeedGroup(String feedGroupName, BuildContext context) async {
     FeedGroup feedGroup = FeedGroup(feedGroupName);
     try {
       await dbUtils.addFeedGroup(feedGroup);
       feedGroups.add(feedGroup);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Successfully created Feed Group!")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully created Feed Group!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Failed to create Feed Group: error: ${e.toString()}"),
@@ -400,15 +383,13 @@ abstract class _FeedStore with Store {
 
   @action
   void scrollToTop() {
-    scrollController.animateTo(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
   @action
   Future<void> searchFeedItems(String searchTerm) async {
     searchResults.clear();
-    List<FeedItem> searchItems =
-        await dbUtils.getSearchItems(feeds, searchTerm);
+    List<FeedItem> searchItems = await dbUtils.getSearchItems(feeds, searchTerm);
     filterArticlesMutedKeywords(searchItems);
     searchResults.addAll(searchItems);
   }
@@ -416,12 +397,7 @@ abstract class _FeedStore with Store {
   @action
   Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
-    if (authStore.builtUserProfileDate == null ||
-        DateTime.now()
-                .toUtc()
-                .difference(authStore.builtUserProfileDate!)
-                .inDays >=
-            7) {
+    if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
       List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
       if (mostReadFeeds.isEmpty) {
         return;
@@ -457,17 +433,12 @@ abstract class _FeedStore with Store {
     //     authStore.lastSuggestionDate!.day == DateTime.now().toUtc().day) {
     if (kDebugMode) {
       print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
-      print(
-          "Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
+      print("Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
     }
 
     if (authStore.suggestionsLeftToday <= 0 ||
         // Only fetch suggestions every suggestionsIntervalMinutes minutes max
-        DateTime.now()
-                .toUtc()
-                .difference(authStore.lastSuggestionDate!)
-                .inMinutes <
-            suggestionsIntervalMinutes) {
+        DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes < suggestionsIntervalMinutes) {
       if (kDebugMode) {
         print("Fetching stored suggestions");
       }
@@ -509,8 +480,7 @@ abstract class _FeedStore with Store {
 
     suggestionsLoading = true;
 
-    var (List<FeedItem> suggestedArticles, int suggestionsLeft) =
-        await aiUtils.getNewsSuggestions(
+    var (List<FeedItem> suggestedArticles, int suggestionsLeft) = await aiUtils.getNewsSuggestions(
       todaysUnreadItems,
       userInterest,
       mostReadFeeds,
@@ -519,8 +489,7 @@ abstract class _FeedStore with Store {
     authStore.lastSuggestionDate = DateTime.now().toUtc();
 
     if (kDebugMode) {
-      print(
-          "Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
+      print("Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
     }
 
     // Unset the suggested property for this article if it won't be suggested again
