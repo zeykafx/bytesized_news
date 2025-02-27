@@ -21,7 +21,15 @@ The app is built with Flutter and Mobx.
 
 <img alt="Home" src="./.images/home.png" width="300"/>
 
-<img alt="Reader" src="./.images/reader.png" width="300"/>
+### Reader Mode
+With AI summary:
+<img alt="Reader mode with AI summary" src="./.images/reader_ai.png" width="300"/>
+Without:
+<img alt="Reader mode" src="./.images/reader.png" width="300"/>
 
+### Feed Manager
 <img alt="Feed Manager" src="./.images/feed_mngr.png" width="300"/>
 <img alt="Feed Manager options" src="./.images/feed_mngr_2.png" width="300"/>
+
+### Settings
+<img alt="Settings" src="./.images/settings.png" width="300"/>
