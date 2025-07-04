@@ -32,8 +32,7 @@ class Feed {
       title = feedName;
     }
 
-    String iconUrl = document.querySelector("icon")?.innerHtml ??
-        "https://cdn.brandfetch.io/${Uri.parse(url).host}/fallback/lettermark?c=1ida5nT4eR28egqMeiL";
+    String iconUrl = document.querySelector("icon")?.innerHtml ?? "https://cdn.brandfetch.io/${Uri.parse(url).host}/fallback/lettermark?c=1ida5nT4eR28egqMeiL";
 
     return Feed(title, url, iconUrl);
   }

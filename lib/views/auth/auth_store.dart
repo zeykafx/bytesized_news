@@ -24,7 +24,7 @@ const defaultUserInterests = [
 int defaultNumberOfSuggestionsDaily = 20;
 int defaultNumberOfSummariesDaily = 100;
 int suggestionsIntervalMinutes = 10;
-int summariesIntervalSeconds = 30;
+int summariesIntervalSeconds = 10;
 
 abstract class _AuthStore with Store {
   // Fields
@@ -148,17 +148,32 @@ abstract class _AuthStore with Store {
     }
 
     String? localDeviceId = await _getId();
-    if (fbDeviceIds.isEmpty || !fbDeviceIds.contains(localDeviceId)) {
+    if (user != null && (fbDeviceIds.isEmpty || !fbDeviceIds.contains(localDeviceId))) {
       if (kDebugMode) {
         print("Updating firebase device ID to add local device ID");
       }
       // fbDeviceIds.add(localDeviceId);
 
-      final result = await functions.httpsCallable('onDeviceIdAdded').call(
-        {
-          "deviceId": localDeviceId,
-        },
-      );
+      HttpsCallableResult result;
+      try {
+        result = await functions.httpsCallable('onDeviceIdAdded').call(
+          {
+            "deviceId": localDeviceId,
+          },
+        );
+      } catch (err) {
+        if (kDebugMode) {
+          print(err);
+        }
+        auth.signOut();
+        Navigator.of(buildContext!).push(
+          MaterialPageRoute(
+            builder: (context) => const Auth(),
+          ),
+        );
+        return false;
+      }
+
       var response = result.data as Map<String, dynamic>;
       if (response["error"] != null) {
         // Show a snackbar and log out

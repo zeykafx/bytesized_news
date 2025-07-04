@@ -10,7 +10,11 @@ initializeApp();
 const db = getFirestore();
 // const openaiKey = defineString("OPENAI_API_KEY");
 const groqKey = defineString("GROQ_API_KEY");
-const openai: OpenAI = new OpenAI({ apiKey: groqKey.value(), baseURL: "https://api.groq.com/openai/v1" });
+const openai: OpenAI = new OpenAI({
+  apiKey: groqKey.value(),
+  baseURL: "https://api.groq.com/openai/v1",
+});
+const ENFORCE_APPCHECK = false; // TODO: change back
 
 export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   logger.info("User created: " + user.uid);
@@ -77,66 +81,78 @@ exports.resetQuotas = functions.pubsub
     }
   });
 
-export const onDeviceIdAdded = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const newDeviceId: string = request.data.deviceId;
-  const uid = request.auth?.uid;
-  logger.info(`User ${uid} added deviceId ${newDeviceId}`);
+export const onDeviceIdAdded = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const newDeviceId: string = request.data.deviceId;
+    const uid = request.auth?.uid;
+    logger.info(`User ${uid} added deviceId ${newDeviceId}`);
 
-  // Check if that id is used by another user
-  // If so, return an error
-  const deviceRef = db.collection("users").where("deviceIds", "array-contains", newDeviceId);
-  const deviceSnapshot = await deviceRef.get();
-  if (!deviceSnapshot.empty) {
-    const otherUser = deviceSnapshot.docs[0].id;
-    logger.info(`Device ID ${newDeviceId} is already in use by user ${otherUser}`);
-    return { error: "Device ID already in use" };
-  }
+    // Check if that id is used by another user
+    // If so, return an error
+    const deviceRef = db
+      .collection("users")
+      .where("deviceIds", "array-contains", newDeviceId);
+    const deviceSnapshot = await deviceRef.get();
+    if (!deviceSnapshot.empty) {
+      const otherUser = deviceSnapshot.docs[0].id;
+      logger.info(
+        `Device ID ${newDeviceId} is already in use by user ${otherUser}`,
+      );
+      return { error: "Device ID already in use" };
+    }
 
-  // Add the device ID to the user's document
-  const userRef = db.doc(`users/${uid}`);
-  await userRef.update({
-    deviceIds: FieldValue.arrayUnion(newDeviceId),
-  });
-  return { success: true };
-});
+    // Add the device ID to the user's document
+    const userRef = db.doc(`users/${uid}`);
+    await userRef.update({
+      deviceIds: FieldValue.arrayUnion(newDeviceId),
+    });
+    return { success: true };
+  },
+);
 
-export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const articleUrl: string = request.data.text;
-  const title: string = request.data.title;
-  const content = request.data.content;
-  const uid = request.auth?.uid;
-  logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
+export const summarize = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const articleUrl: string = request.data.text;
+    const title: string = request.data.title;
+    const content = request.data.content;
+    const uid = request.auth?.uid;
+    logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
 
-  const userRef = db.doc(`users/${uid}`);
-  const user = await userRef.get();
-  const userData = user.data();
+    const userRef = db.doc(`users/${uid}`);
+    const user = await userRef.get();
+    const userData = user.data();
 
-  // check if the user has any summaries left today
-  const summariesLeftToday = userData?.summariesLeftToday;
-  if (summariesLeftToday <= 0) {
-    return { error: "Error: You have reached the daily limit of summaries" };
-  }
+    // check if the user has any summaries left today
+    const summariesLeftToday = userData?.summariesLeftToday;
+    if (summariesLeftToday <= 0) {
+      return { error: "Error: You have reached the daily limit of summaries" };
+    }
 
-  // update the user's summary count
-  await userRef.update({
-    lastSummaryDate: new Date().getTime(),
-    summariesLeftToday: FieldValue.increment(-1),
-  });
+    // update the user's summary count
+    await userRef.update({
+      lastSummaryDate: new Date().getTime(),
+      summariesLeftToday: FieldValue.increment(-1),
+    });
 
-  // check the length of the article
-  if (content.length > 15000) {
-    logger.info("Article too long: " + content.length);
-    return { error: "Error: The article is too long. Please provide a shorter article." };
-  }
+    // check the length of the article
+    if (content.length > 15000) {
+      logger.info("Article too long: " + content.length);
+      return {
+        error:
+          "Error: The article is too long. Please provide a shorter article.",
+      };
+    }
 
-  // create the summary with openai
-  const completion = await openai.chat.completions.create({
-    // model: "gpt-4o-mini",
-    model: "llama-3.1-8b-instant",
-    messages: [
-      {
-        role: "system",
-        content: `
+    // create the summary with openai
+    const completion = await openai.chat.completions.create({
+      // model: "gpt-4o-mini",
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content: `
         Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER
         THAN 3 SENTENCES!!Stick to the information in the article.
         Do not add any new information, if an article refers to Twitter as 'X' do not do the same,
@@ -145,30 +161,36 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
         "Here is a summary..."!
         If you can, use bullet points with proper formatting such that each bullet point starts on its own line.
         `,
-      },
-      {
-        role: "user",
-        content: content,
-      },
-    ],
-    temperature: 0.3,
-  });
+        },
+        {
+          role: "user",
+          content: content,
+        },
+      ],
+      temperature: 0.3,
+    });
 
-  const summary = completion.choices[0].message.content;
+    const summary = completion.choices[0].message.content;
 
-  // save the summary in firestore
-  const res = await db.collection("summaries").add({
-    url: articleUrl,
-    title: title,
-    summary: summary,
-    generatedAt: new Date().getUTCMilliseconds(),
-    // expires in a month
-    expirationTimestamp: new Date().getUTCMilliseconds() + 30 * 24 * 60 * 60 * 1000,
-  });
+    // save the summary in firestore
+    const res = await db.collection("summaries").add({
+      url: articleUrl,
+      title: title,
+      summary: summary,
+      generatedAt: new Date().getUTCMilliseconds(),
+      // expires in a month
+      expirationTimestamp:
+        new Date().getUTCMilliseconds() + 30 * 24 * 60 * 60 * 1000,
+    });
 
-  logger.info("Summary created: " + res.id);
-  return { summary: summary, id: res.id, summariesLeftToday: summariesLeftToday - 1 };
-});
+    logger.info("Summary created: " + res.id);
+    return {
+      summary: summary,
+      id: res.id,
+      summariesLeftToday: summariesLeftToday - 1,
+    };
+  },
+);
 
 /**
  * Provides news suggestions based on a user's preferred categories, reading habits, and today's unread articles.
@@ -182,39 +204,43 @@ export const summarize = onCall({ region: "europe-west1", enforceAppCheck: true 
  * including today's articles and user preferences
  * @returns {Promise<object>} An object containing a JSON-formatted list of news suggestions or an error message
  */
-export const getNewsSuggestions = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const todaysArticles: string = request.data.todaysArticles;
-  const mostReadFeedsString: string = request.data.mostReadFeedsString;
-  const userInterests: string = request.data.userInterests;
-  const uid = request.auth?.uid;
-  logger.info("Request to get news suggestions for user ID: " + uid);
+export const getNewsSuggestions = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const todaysArticles: string = request.data.todaysArticles;
+    const mostReadFeedsString: string = request.data.mostReadFeedsString;
+    const userInterests: string = request.data.userInterests;
+    const uid = request.auth?.uid;
+    logger.info("Request to get news suggestions for user ID: " + uid);
 
-  const userRef = db.doc(`users/${uid}`);
-  const user = await userRef.get();
-  const userData = user.data();
+    const userRef = db.doc(`users/${uid}`);
+    const user = await userRef.get();
+    const userData = user.data();
 
-  // check if the user has any summaries left today
-  const suggestionsLeftToday = userData?.suggestionsLeftToday;
-  if (suggestionsLeftToday <= 0) {
-    return { error: "Error: You have reached the daily limit of suggestions" };
-  }
+    // check if the user has any summaries left today
+    const suggestionsLeftToday = userData?.suggestionsLeftToday;
+    if (suggestionsLeftToday <= 0) {
+      return {
+        error: "Error: You have reached the daily limit of suggestions",
+      };
+    }
 
-  // update the user's summary count
-  await userRef.update({
-    lastSuggestionDate: new Date().getTime(),
-    suggestionsLeftToday: FieldValue.increment(-1),
-  });
+    // update the user's summary count
+    await userRef.update({
+      lastSuggestionDate: new Date().getTime(),
+      suggestionsLeftToday: FieldValue.increment(-1),
+    });
 
-  // create the summary with openai
-  const completion = await openai.chat.completions.create({
-    model: "llama-3.2-3b-preview",
-    response_format: {
-      type: "json_object",
-    },
-    messages: [
-      {
-        role: "system",
-        content: `
+    // create the summary with openai
+    const completion = await openai.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      response_format: {
+        type: "json_object",
+      },
+      messages: [
+        {
+          role: "system",
+          content: `
         You are a helpful news suggestion AI, you will receive a list of categories that the user is interested in,
         the feeds that the user reads the most, and today's unread articles
         You must return a list of the top 5 most interesting articles (in json format) for this user based on their
@@ -223,123 +249,153 @@ export const getNewsSuggestions = onCall({ region: "europe-west1", enforceAppChe
         The format must be the following: A json object with the key 'articles' which is an array of json object, each
         object has an ID (number), a title (string) and the feed name (string)
         `,
-      },
-      {
-        role: "user",
-        content: `News Interests: ${userInterests}`,
-      },
-      {
-        role: "user",
-        content: `Most Read Feeds: ${mostReadFeedsString}`,
-      },
-      {
-        role: "user",
-        content: `Today's articles: ${todaysArticles}`,
-      },
-    ],
-    temperature: 0.6,
-  });
+        },
+        {
+          role: "user",
+          content: `News Interests: ${userInterests}`,
+        },
+        {
+          role: "user",
+          content: `Most Read Feeds: ${mostReadFeedsString}`,
+        },
+        {
+          role: "user",
+          content: `Today's articles: ${todaysArticles}`,
+        },
+      ],
+      temperature: 0.6,
+    });
 
-  const output = completion.choices[0].message.content || "";
+    const output = completion.choices[0].message.content || "";
 
-  logger.info("Created suggestion for user " + uid);
-  return { suggestions: output, suggestionsLeftToday: suggestionsLeftToday - 1 };
-});
+    logger.info("Created suggestion for user " + uid);
+    return {
+      suggestions: output,
+      suggestionsLeftToday: suggestionsLeftToday - 1,
+    };
+  },
+);
 
 /**
  * A Cloud Function (Callable) that, given a feed name and link,
  * returns a JSON string containing inferred content categories
  * under the "categories" key.
  */
-export const analyzeFeedCategories = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const feedName: string = request.data.feedName;
-  const feedLink: string = request.data.feedLink;
-  logger.info(`Analyzing categories for feed name: ${feedName}, link: ${feedLink}`);
+export const analyzeFeedCategories = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const feedName: string = request.data.feedName;
+    const feedLink: string = request.data.feedLink;
+    logger.info(
+      `Analyzing categories for feed name: ${feedName}, link: ${feedLink}`,
+    );
 
-  const completion = await openai.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    response_format: {
-      type: "json_object",
-    },
-    messages: [
-      {
-        role: "system",
-        content: `
+    const completion = await openai.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      response_format: {
+        type: "json_object",
+      },
+      messages: [
+        {
+          role: "system",
+          content: `
           Analyze the following RSS Feed name and URL to infer relevant content categories.
           Consider keywords in both the name and URL path/domain. Return a JSON array of 3-5
           most relevant categories under a "categories" key. Only output JSON.
           Example response for "TechCrunch": {"categories": ["Technology", "Startups", "Business", "Innovation"]}
         `,
-      },
-      {
-        role: "user",
-        content: `Name: ${feedName}, Link: ${feedLink}`,
-      },
-    ],
-    temperature: 0.6,
-  });
+        },
+        {
+          role: "user",
+          content: `Name: ${feedName}, Link: ${feedLink}`,
+        },
+      ],
+      temperature: 0.6,
+    });
 
-  const result = completion.choices[0]?.message?.content || "";
+    const result = completion.choices[0]?.message?.content || "";
 
-  // Return the raw JSON string (e.g., {"categories": [...]})
-  // The client can parse it as needed
-  return { categoriesJson: result };
-});
+    // Return the raw JSON string (e.g., {"categories": [...]})
+    // The client can parse it as needed
+    return { categoriesJson: result };
+  },
+);
 
 /**
  * A Cloud Function (Callable) that, given a list of most read feeds,
  * returns a JSON string containing inferred user interests
  * under the "interests" key.
  */
-export const buildUserInterests = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const mostReadFeedsString: string = request.data.mostReadFeedsString;
-  logger.info(`Building user interests based on most read feeds: ${mostReadFeedsString}`);
+export const buildUserInterests = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const mostReadFeedsString: string = request.data.mostReadFeedsString;
+    logger.info(
+      `Building user interests based on most read feeds: ${mostReadFeedsString}`,
+    );
 
-  const completion = await openai.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    response_format: {
-      type: "json_object",
-    },
-    messages: [
-      {
-        role: "system",
-        content: `
+    const completion = await openai.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      response_format: {
+        type: "json_object",
+      },
+      messages: [
+        {
+          role: "system",
+          content: `
         Analyze the following RSS Feeds names, categories, and the number of articles read from that feed to infer
         the user's categories of interest. Return a JSON array of 3-5 most relevant categories under a "categories" key. Only output JSON.
         Example response: {"categories": ["Technology", "Politics", "Android", "Mobile Phones"]}
         `,
-      },
-      {
-        role: "user",
-        content: `Most Read Feeds: ${mostReadFeedsString}`,
-      },
-    ],
-    temperature: 0.6,
-  });
+        },
+        {
+          role: "user",
+          content: `Most Read Feeds: ${mostReadFeedsString}`,
+        },
+      ],
+      temperature: 0.6,
+    });
 
-  const result = completion.choices[0]?.message?.content || "";
+    const result = completion.choices[0]?.message?.content || "";
 
-  // Add the inferred interests to the user's document
-  const userRef = db.doc(`users/${request.auth?.uid}`);
-  await userRef.update({
-    builtUserProfileDate: new Date().getTime(),
-    interests: FieldValue.arrayUnion(result),
-  });
+    // parse the json categories
+    let parsedCategories = [];
+    try {
+      const parsedResult = JSON.parse(result);
+      parsedCategories = parsedResult.categories || [];
+      logger.info(
+        `Parsed ${parsedCategories.length} categories: ${parsedCategories.join(", ")}`,
+      );
+    } catch (error) {
+      logger.error(`Error parsing categories JSON: ${error}`);
+      return { error: "Failed to parse categories" };
+    }
 
-  // Return the raw JSON string (e.g., {"categories": [...]})
-  // The client can parse it as needed
-  return { categoriesJson: result };
-});
+    // Add the inferred interests to the user's document
+    const userRef = db.doc(`users/${request.auth?.uid}`);
+    await userRef.update({
+      builtUserProfileDate: new Date().getTime(),
+      interests: FieldValue.arrayUnion(...parsedCategories),
+    });
 
-export const addUserInterests = onCall({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
-  const interests: string[] = request.data.interests;
-  const uid = request.auth?.uid;
-  logger.info(`Adding interests ${interests} for user ID: ${uid}`);
+    // Return the raw JSON string (e.g., {"categories": [...]})
+    // The client can parse it as needed
+    return { categoriesJson: result };
+  },
+);
 
-  const userRef = db.doc(`users/${uid}`);
-  await userRef.update({
-    interests: interests,
-  });
+export const addUserInterests = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const interests: string[] = request.data.interests;
+    const uid = request.auth?.uid;
+    logger.info(`Adding interests ${interests} for user ID: ${uid}`);
 
-  return { success: true };
-});
+    const userRef = db.doc(`users/${uid}`);
+    await userRef.update({
+      interests: interests,
+    });
+
+    return { success: true };
+  },
+);

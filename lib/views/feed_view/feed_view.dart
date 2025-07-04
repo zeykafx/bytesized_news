@@ -67,7 +67,7 @@ class _FeedViewState extends State<FeedView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("News"),
+        title: const Text("Bytesized News"),
         // profile button
         leading: IconButton(
           onPressed: () {
@@ -327,7 +327,7 @@ class _FeedViewState extends State<FeedView> {
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                      height: 150,
+                                                      height: 140,
                                                       child: ListView.builder(
                                                           scrollDirection: Axis.horizontal,
                                                           controller: feedStore.suggestionsScrollController,

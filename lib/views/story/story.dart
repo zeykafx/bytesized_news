@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:html/dom.dart' as dom;
@@ -163,6 +163,7 @@ class _StoryState extends State<Story> {
                                       </div>
                                                                       ''',
                                       renderMode: RenderMode.listView,
+                                      textStyle: TextStyle(fontSize: settingsStore.fontSize),
                                       customStylesBuilder: (element) => storyStore.buildStyle(context, element),
                                       onTapImage: (ImageMetadata imageData) {
                                         storyStore.showImage(imageData.sources.firstOrNull!.url, context);
@@ -318,7 +319,7 @@ class _StoryState extends State<Story> {
                     storyStore.toggleReaderMode();
                   },
                   tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                  icon: Icon(storyStore.showReaderMode ? Icons.chrome_reader_mode : Icons.chrome_reader_mode_outlined),
+                  icon: Icon(storyStore.showReaderMode ? Icons.web_asset : Icons.web_asset_off),
                 ),
 
                 storyStore.feedItemSummarized

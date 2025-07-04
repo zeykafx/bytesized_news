@@ -56,7 +56,7 @@ class _FeedManagerState extends State<FeedManager> {
   Widget build(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
     return PopScope(
-      canPop: false,
+      canPop: feedStore.isExpanded ? false : true,
       onPopInvokedWithResult: (bool popped, dynamic result) {
         // if we are currently selecting things, get out of the selection mode and reset the selected feeds, otherwise collapse the bsb
         if (feedManagerStore.selectionMode) {

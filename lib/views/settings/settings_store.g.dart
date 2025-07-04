@@ -25,7 +25,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           []
       ..keepArticles = $enumDecodeNullable(
               _$KeepArticlesLengthEnumMap, json['keepArticles']) ??
-          KeepArticlesLength.threeMonths;
+          KeepArticlesLength.threeMonths
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 16.0;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -38,6 +39,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'fetchAiSummaryOnLoad': instance.fetchAiSummaryOnLoad,
       'mutedKeywords': instance.mutedKeywords,
       'keepArticles': _$KeepArticlesLengthEnumMap[instance.keepArticles]!,
+      'fontSize': instance.fontSize,
     };
 
 const _$DarkModeEnumMap = {
@@ -264,6 +266,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$fontSizeAtom =
+      Atom(name: '_SettingsStore.fontSize', context: context);
+
+  @override
+  double? get fontSize {
+    _$fontSizeAtom.reportRead();
+    return super.fontSize;
+  }
+
+  @override
+  set fontSize(double? value) {
+    _$fontSizeAtom.reportWrite(value, super.fontSize, () {
+      super.fontSize = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -367,6 +385,17 @@ mixin _$SettingsStore on _SettingsStore, Store {
   }
 
   @override
+  void setFontSize(double newSize) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setFontSize');
+    try {
+      return super.setFontSize(newSize);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 darkMode: ${darkMode},
@@ -380,7 +409,8 @@ showAiSummaryOnLoad: ${showAiSummaryOnLoad},
 fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
 mutedKeywords: ${mutedKeywords},
-keepArticles: ${keepArticles}
+keepArticles: ${keepArticles},
+fontSize: ${fontSize}
     ''';
   }
 }

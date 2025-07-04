@@ -45,6 +45,7 @@ class _FeedSearchState extends State<FeedSearch> {
               ),
               Expanded(
                 child: TextField(
+                  autofocus: true,
                   controller: textEditingController,
                   decoration: InputDecoration(
                     labelText: 'Search Article',

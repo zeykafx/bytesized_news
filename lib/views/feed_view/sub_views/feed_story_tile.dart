@@ -52,6 +52,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
           focusNode: FocusNode(),
           selectionControls: MaterialTextSelectionControls(),
           child: ListTile(
+            // contentPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
             title: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,10 +63,10 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     parsedTitle,
                     overflow: TextOverflow.ellipsis,
                     maxLines: widget.isSuggestion ? 4 : 5,
-                    style: TextStyle(fontSize: widget.isSuggestion ? 12 : 15),
+                    style: TextStyle(fontSize: widget.isSuggestion ? 12 : 14),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 5),
                 widget.item.imageUrl.isNotEmpty
                     ? Container(
                         decoration: BoxDecoration(
@@ -79,20 +81,21 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         ),
                       )
                     : const SizedBox(),
+                const SizedBox(width: 5),
               ],
             ),
             subtitle: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 // widget.item.summarized ? Text("Summary: ${widget.item.aiSummary}") : Text(widget.item.description.split("\n").first),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Chip(
                       label: Text(
-                        widget.item.feedName.length > 12 ? "${widget.item.feedName.substring(0, 12)}..." : widget.item.feedName,
+                        widget.item.feedName.length > 15 ? "${widget.item.feedName.substring(0, 15)}..." : widget.item.feedName,
                         style: const TextStyle(fontSize: 10),
                       ),
                       avatar: widget.item.feed!.iconUrl.isNotEmpty
@@ -106,8 +109,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                           : const Icon(LucideIcons.rss),
                       elevation: 0,
                       side: const BorderSide(width: 0, color: Colors.transparent),
-                      padding: const EdgeInsets.all(0),
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 5),
+                      padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 0),
                       visualDensity: VisualDensity.compact,
                       backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       shape: const RoundedRectangleBorder(
@@ -137,7 +140,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   ],
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
                       formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
@@ -150,6 +153,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         borderRadius: BorderRadius.circular(10),
                         side: BorderSide(color: Theme.of(context).colorScheme.secondaryContainer, width: 0.3),
                       ),
+                      padding: EdgeInsets.zero,
                       onSelected: (int index) {
                         switch (index) {
                           case 0:

@@ -52,14 +52,7 @@ String keepArticlesLengthString(KeepArticlesLength keepArticlesLength) {
   };
 }
 
-const keepArticlesLengthValues = [
-  "1 Week",
-  "1 Month",
-  "3 Months",
-  "6 Months",
-  "6 Months",
-  "1 Year"
-];
+const keepArticlesLengthValues = ["1 Week", "1 Month", "3 Months", "6 Months", "6 Months", "1 Year"];
 
 String feedListSortToString(FeedListSort sort) {
   switch (sort) {
@@ -84,8 +77,7 @@ String feedListSortToString(FeedListSort sort) {
 class SettingsStore extends _SettingsStore with _$SettingsStore {
   SettingsStore();
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
-      _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 }
@@ -95,6 +87,7 @@ abstract class _SettingsStore with Store {
   static const defaultDarkMode = DarkMode.system;
   static const defaultSort = FeedListSort.byDate;
   static const defaultMutedKeywords = <String>[];
+  static const double defaultFontSize = 16.0;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -201,4 +194,13 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: KeepArticlesLength.threeMonths)
   @observable
   KeepArticlesLength keepArticles = KeepArticlesLength.threeMonths;
+
+  @JsonKey(defaultValue: defaultFontSize)
+  @observable
+  double? fontSize = defaultFontSize;
+
+  @action
+  void setFontSize(double newSize) {
+    fontSize = newSize;
+  }
 }

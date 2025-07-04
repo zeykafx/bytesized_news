@@ -73,18 +73,15 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
                         },
                         autocorrect: false,
                         decoration: InputDecoration(
-                          hintText: 'Enter keywords',
+                          hintText: 'Enter interest',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none,
                           ),
                           filled: true,
-                          fillColor:
-                              Theme.of(context).colorScheme.surfaceContainer,
+                          fillColor: Theme.of(context).colorScheme.surfaceContainer,
                           suffixIcon: IconButton(
-                            tooltip: textController.text.isEmpty
-                                ? 'Cancel'
-                                : 'Add keyword',
+                            tooltip: textController.text.isEmpty ? 'Cancel' : 'Add interest',
                             onPressed: () {
                               if (textController.text.isEmpty) {
                                 textFieldFocusNode.unfocus();
@@ -114,13 +111,13 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
-                                // show confirmation dialog before deleting a keyword
+                                // show confirmation dialog before deleting an entry
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    title: const Text('Delete keyword'),
+                                    title: const Text('Delete interest?'),
                                     content: const Text(
-                                      'Are you sure you want to delete this keyword?',
+                                      'Are you sure you want to delete this interest?',
                                     ),
                                     actions: [
                                       TextButton(
