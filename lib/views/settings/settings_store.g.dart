@@ -53,6 +53,7 @@ const _$FeedListSortEnumMap = {
   FeedListSort.today: 'today',
   FeedListSort.unread: 'unread',
   FeedListSort.read: 'read',
+  FeedListSort.summarized: 'summarized',
   FeedListSort.bookmarked: 'bookmarked',
   FeedListSort.feed: 'feed',
   FeedListSort.feedGroup: 'feedGroup',
@@ -297,7 +298,7 @@ mixin _$SettingsStore on _SettingsStore, Store {
   }
 
   @override
-  dynamic setSort(FeedListSort newSort) {
+  void setSort(FeedListSort newSort) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
         name: '_SettingsStore.setSort');
     try {

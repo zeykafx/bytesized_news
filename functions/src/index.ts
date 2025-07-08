@@ -157,8 +157,8 @@ export const summarize = onCall(
         THAN 3 SENTENCES!!Stick to the information in the article.
         Do not add any new information, if an article refers to Twitter as 'X' do not do the same,
         instead refer to it as 'Twitter. Always provide a translation of the units of measurements
-        used in the article (do so in parentheses). ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE
-        "Here is a summary..."!
+        used in the article (e.g., translate feets to meters and vice versa) (do so in parentheses).
+        ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE "Here is a summary..."!
         If you can, use bullet points with proper formatting such that each bullet point starts on its own line.
         `,
         },

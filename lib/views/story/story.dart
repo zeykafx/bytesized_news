@@ -161,13 +161,25 @@ class _StoryState extends State<Story> {
                                          ${storyStore.htmlContent}
                                          <a href="${storyStore.feedItem.url}">Source</a>
                                       </div>
-                                                                      ''',
+                                      ''',
                                       renderMode: RenderMode.listView,
                                       textStyle: TextStyle(fontSize: settingsStore.fontSize),
                                       customStylesBuilder: (element) => storyStore.buildStyle(context, element),
                                       onTapImage: (ImageMetadata imageData) {
                                         storyStore.showImage(imageData.sources.firstOrNull!.url, context);
                                       },
+                                      onTapUrl: (String? url) async {
+                                        if (url == null) {
+                                          return false;
+                                        }
+                                        Uri uri = Uri.parse(url);
+                                        if (!await launchUrl(uri)) {
+                                          throw Exception('Could not launch $url');
+                                        }
+                                        return true;
+                                      },
+                                      enableCaching: true,
+                                      buildAsync: true,
                                     ),
                                   ),
                                 ),

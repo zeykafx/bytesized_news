@@ -16,6 +16,7 @@ import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class FeedView extends StatefulWidget {
   const FeedView({super.key});
@@ -183,6 +184,11 @@ class _FeedViewState extends State<FeedView> {
                                       }
                                     case 4:
                                       {
+                                        feedStore.changeSort(FeedListSort.summarized);
+                                        break;
+                                      }
+                                    case 5:
+                                      {
                                         feedStore.changeSort(FeedListSort.bookmarked);
                                         break;
                                       }
@@ -206,6 +212,10 @@ class _FeedViewState extends State<FeedView> {
                                     const PopupMenuItem(
                                       value: 3,
                                       child: Text("Read"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 4,
+                                      child: Text("Summarized"),
                                     ),
                                     const PopupMenuItem(
                                       value: 4,
@@ -567,6 +577,10 @@ class _FeedViewState extends State<FeedView> {
                             );
                           }
                         }),
+                        // If nothing is pinned, show the n-th first feed groups and feeds
+                        if (feedStore.pinnedFeedsOrFeedGroups.isEmpty) ...[
+                          // ...feedStore.
+                        ]
                       ],
                     ),
                   ),

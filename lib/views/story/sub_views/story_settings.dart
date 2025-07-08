@@ -74,7 +74,7 @@ class _StorySettingsState extends State<StorySettings> {
                                   value: storyStore.settingsStore.fontSize ?? 16.0,
                                   min: 10.0,
                                   max: 30.0,
-                                  divisions: 20,
+                                  divisions: 40,
                                   onChanged: (newVal) {
                                     storyStore.settingsStore.setFontSize(newVal);
                                   },

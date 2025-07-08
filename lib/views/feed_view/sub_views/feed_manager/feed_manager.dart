@@ -409,22 +409,33 @@ class _FeedManagerState extends State<FeedManager> {
                                     ),
 
                                     // PIN FEED
-                                    if (feedManagerStore.areFeedsSelected &&
-                                        !feedManagerStore.areFeedGroupsSelected &&
-                                        feedManagerStore.selectedFeeds.length == 1) ...[
+                                    if (feedManagerStore.areFeedsSelected && !feedManagerStore.areFeedGroupsSelected
+                                        // && feedManagerStore.selectedFeeds.length == 1
+                                        ) ...[
                                       TextButton.icon(
                                         onPressed: () async {
-                                          if (feedManagerStore.selectedFeeds.first.isPinned) {
-                                            // UNPIN
-                                            await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeeds.first, false);
+                                          feedManagerStore.selectedFeeds.forEach((Feed selectedFeed) async {
+                                            // PIN OR UNPIN
+                                            await feedManagerStore.pinOrUnpinItem(selectedFeed, !selectedFeed.isPinned, toggleSelection: false);
                                             await widget.wrappedGetPinnedFeedsOrFeedGroups();
                                             setState(() {});
-                                          } else {
-                                            // PIN ITEM
-                                            await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeeds.first, true);
-                                            await widget.wrappedGetPinnedFeedsOrFeedGroups();
-                                            setState(() {});
-                                          }
+                                          });
+
+                                          feedManagerStore.selectedFeeds.clear();
+                                          feedManagerStore.selectedFeedGroups.clear();
+                                          feedManagerStore.toggleSelectionMode();
+
+                                          // if (feedManagerStore.selectedFeeds.first.isPinned) {
+                                          //   // UNPIN
+                                          //   await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeeds.first, false);
+                                          //   await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                          //   setState(() {});
+                                          // } else {
+                                          //   // PIN ITEM
+                                          //   await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeeds.first, true);
+                                          //   await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                          //   setState(() {});
+                                          // }
                                         },
                                         icon: feedManagerStore.selectedFeeds.first.isPinned
                                             ? const Icon(Icons.push_pin, size: 15)
@@ -434,22 +445,33 @@ class _FeedManagerState extends State<FeedManager> {
                                     ],
 
                                     // PIN FEED GROUP
-                                    if (!feedManagerStore.areFeedsSelected &&
-                                        feedManagerStore.areFeedGroupsSelected &&
-                                        feedManagerStore.selectedFeedGroups.length == 1) ...[
+                                    if (!feedManagerStore.areFeedsSelected && feedManagerStore.areFeedGroupsSelected
+                                        // && feedManagerStore.selectedFeedGroups.length == 1
+                                        ) ...[
                                       TextButton.icon(
                                         onPressed: () async {
-                                          if (feedManagerStore.selectedFeedGroups.first.isPinned) {
-                                            // UNPIN
-                                            await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeedGroups.first, false);
+                                          feedManagerStore.selectedFeedGroups.forEach((FeedGroup selectedFeedGroup) async {
+                                            // PIN OR UNPIN
+                                            await feedManagerStore.pinOrUnpinItem(selectedFeedGroup, !selectedFeedGroup.isPinned, toggleSelection: false);
                                             await widget.wrappedGetPinnedFeedsOrFeedGroups();
                                             setState(() {});
-                                          } else {
-                                            // PIN ITEM
-                                            await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeedGroups.first, true);
-                                            await widget.wrappedGetPinnedFeedsOrFeedGroups();
-                                            setState(() {});
-                                          }
+                                          });
+
+                                          feedManagerStore.selectedFeeds.clear();
+                                          feedManagerStore.selectedFeedGroups.clear();
+                                          feedManagerStore.toggleSelectionMode();
+
+                                          // if (feedManagerStore.selectedFeedGroups.first.isPinned) {
+                                          //   // UNPIN
+                                          //   await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeedGroups.first, false);
+                                          //   await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                          //   setState(() {});
+                                          // } else {
+                                          //   // PIN ITEM
+                                          //   await feedManagerStore.pinOrUnpinItem(feedManagerStore.selectedFeedGroups.first, true);
+                                          //   await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                          //   setState(() {});
+                                          // }
                                         },
                                         icon: feedManagerStore.selectedFeedGroups.first.isPinned
                                             ? const Icon(Icons.push_pin, size: 15)

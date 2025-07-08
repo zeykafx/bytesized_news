@@ -323,6 +323,9 @@ abstract class _FeedStore with Store {
       case FeedListSort.read:
         feedItems = (await dbUtils.getReadItems(feeds)).asObservable();
         break;
+      case FeedListSort.summarized:
+        feedItems = (await dbUtils.getSummarizedItems(feeds)).asObservable();
+        break;
       case FeedListSort.bookmarked:
         feedItems = (await dbUtils.getBookmarkedItems(feeds)).asObservable();
         break;

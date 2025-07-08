@@ -26,6 +26,7 @@ enum FeedListSort {
   today,
   unread,
   read,
+  summarized,
   bookmarked,
   feed,
   feedGroup,
@@ -64,6 +65,8 @@ String feedListSortToString(FeedListSort sort) {
       return "Unread";
     case FeedListSort.read:
       return "Read";
+    case FeedListSort.summarized:
+      return "Summarized";
     case FeedListSort.bookmarked:
       return "Bookmarked";
     case FeedListSort.feed:
@@ -104,7 +107,7 @@ abstract class _SettingsStore with Store {
   FeedListSort sort = FeedListSort.byDate;
 
   @action
-  setSort(FeedListSort newSort) {
+  void setSort(FeedListSort newSort) {
     sort = newSort;
   }
 

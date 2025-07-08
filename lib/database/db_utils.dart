@@ -119,6 +119,19 @@ class DbUtils {
     return feedItems;
   }
 
+  
+  Future<List<FeedItem>> getSummarizedItems(List<Feed> feeds) async {
+    List<FeedItem> feedItems = await isar.feedItems
+        .filter()
+        .summarizedEqualTo(true)
+        .sortByPublishedDateDesc()
+        .findAll();
+    for (FeedItem item in feedItems) {
+      item.feed = feeds.firstWhere((feed) => feed.name == item.feedName);
+    }
+    return feedItems;
+  }
+  
   Future<List<FeedItem>> getItemsFromFeed(Feed feed) async {
     List<FeedItem> feedItems = await isar.feedItems
         .filter()
