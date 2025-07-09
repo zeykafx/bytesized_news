@@ -246,12 +246,11 @@ class _FeedManagerState extends State<FeedManager> {
                                     )
                                   : null,
                             ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: const Divider(thickness: 0.1),
+                            ),
                           ],
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: const Divider(thickness: 0.1),
-                          ),
 
                           // all feeds and feed groups
                           Padding(

@@ -4,6 +4,7 @@ import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
+import 'package:bytesized_news/views/feed_view/bsb_feed_button.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_search.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_story_tile.dart';
@@ -486,100 +487,106 @@ class _FeedViewState extends State<FeedView> {
                         ),
 
                         ...feedStore.pinnedFeedsOrFeedGroups.map((elem) {
-                          if (elem.runtimeType == Feed) {
-                            Feed feed = elem;
+                          // if (elem.runtimeType == Feed) {
+                          //   Feed feed = elem;
 
-                            bool isCurrentSortFeed =
-                                settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && settingsStore.sortFeed?.name == feed.name;
-                            return Card.outlined(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color:
-                                      isCurrentSortFeed ? Theme.of(context).colorScheme.primaryFixedDim : Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                                  width: isCurrentSortFeed ? 3 : 1,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              child: IconButton(
-                                onPressed: () async {
-                                  // sort for this feed
-                                  settingsStore.setSortFeed(feed);
-                                  settingsStore.setSortFeedName(feed.name);
-                                  await feedStore.changeSort(FeedListSort.feed);
-                                  await feedStore.fetchItems();
-                                },
-                                icon: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25),
-                                ),
-                              ),
-                            );
-                          } else {
-                            FeedGroup feedGroup = elem;
+                          //   bool isCurrentSortFeed =
+                          //       settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && settingsStore.sortFeed?.name == feed.name;
+                          //   return Card.outlined(
+                          //     shape: RoundedRectangleBorder(
+                          //       side: BorderSide(
+                          //         color:
+                          //             isCurrentSortFeed ? Theme.of(context).colorScheme.primaryFixedDim : Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                          //         width: isCurrentSortFeed ? 3 : 1,
+                          //       ),
+                          //       borderRadius: const BorderRadius.all(
+                          //         Radius.circular(10),
+                          //       ),
+                          //     ),
+                          //     child: IconButton(
+                          //       onPressed: () async {
+                          //         // sort for this feed
+                          //         settingsStore.setSortFeed(feed);
+                          //         settingsStore.setSortFeedName(feed.name);
+                          //         await feedStore.changeSort(FeedListSort.feed);
+                          //         await feedStore.fetchItems();
+                          //       },
+                          //       icon: Container(
+                          //         decoration: BoxDecoration(
+                          //           borderRadius: BorderRadius.circular(5),
+                          //         ),
+                          //         margin: const EdgeInsets.symmetric(horizontal: 1),
+                          //         clipBehavior: Clip.antiAlias,
+                          //         child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25),
+                          //       ),
+                          //     ),
+                          //   );
+                          // } else {
+                          //   FeedGroup feedGroup = elem;
 
-                            bool isCurrentSortFeedGroup = settingsStore.sort == FeedListSort.feedGroup &&
-                                settingsStore.sortFeedGroup != null &&
-                                settingsStore.sortFeedGroup?.name == feedGroup.name;
-                            return Card.outlined(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: isCurrentSortFeedGroup
-                                      ? Theme.of(context).colorScheme.primaryFixedDim
-                                      : Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                                  width: isCurrentSortFeedGroup ? 3 : 1,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              child: IconButton(
-                                onPressed: () async {
-                                  // sort for this feed group
-                                  settingsStore.setSortFeedGroup(feedGroup);
-                                  settingsStore.setSortFeedGroupName(feedGroup.name);
-                                  await feedStore.changeSort(FeedListSort.feedGroup);
-                                  await feedStore.fetchItems();
-                                },
-                                icon: feedGroup.feeds.isEmpty
-                                    ? const Icon(
-                                        LucideIcons.folder,
-                                        size: 15,
-                                      )
-                                    : Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ...feedGroup.feeds.take(2).map(
-                                                (feed) => Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(5),
-                                                  ),
-                                                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                                                  clipBehavior: Clip.antiAlias,
-                                                  child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
-                                                ),
-                                              ),
-                                          if (feedGroup.feeds.length > 2) ...[
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              "+${feedGroup.feeds.length - 2}",
-                                              style: TextStyle(color: Theme.of(context).dividerColor),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                              ),
-                            );
-                          }
+                          //   bool isCurrentSortFeedGroup = settingsStore.sort == FeedListSort.feedGroup &&
+                          //       settingsStore.sortFeedGroup != null &&
+                          //       settingsStore.sortFeedGroup?.name == feedGroup.name;
+                          //   return Card.outlined(
+                          //     shape: RoundedRectangleBorder(
+                          //       side: BorderSide(
+                          //         color: isCurrentSortFeedGroup
+                          //             ? Theme.of(context).colorScheme.primaryFixedDim
+                          //             : Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                          //         width: isCurrentSortFeedGroup ? 3 : 1,
+                          //       ),
+                          //       borderRadius: const BorderRadius.all(
+                          //         Radius.circular(10),
+                          //       ),
+                          //     ),
+                          //     child: IconButton(
+                          //       onPressed: () async {
+                          //         // sort for this feed group
+                          //         settingsStore.setSortFeedGroup(feedGroup);
+                          //         settingsStore.setSortFeedGroupName(feedGroup.name);
+                          //         await feedStore.changeSort(FeedListSort.feedGroup);
+                          //         await feedStore.fetchItems();
+                          //       },
+                          //       icon: feedGroup.feeds.isEmpty
+                          //           ? const Icon(
+                          //               LucideIcons.folder,
+                          //               size: 15,
+                          //             )
+                          //           : Row(
+                          //               mainAxisSize: MainAxisSize.min,
+                          //               children: [
+                          //                 ...feedGroup.feeds.take(2).map(
+                          //                       (feed) => Container(
+                          //                         decoration: BoxDecoration(
+                          //                           borderRadius: BorderRadius.circular(5),
+                          //                         ),
+                          //                         margin: const EdgeInsets.symmetric(horizontal: 1),
+                          //                         clipBehavior: Clip.antiAlias,
+                          //                         child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 17, height: 17),
+                          //                       ),
+                          //                     ),
+                          //                 if (feedGroup.feeds.length > 2) ...[
+                          //                   const SizedBox(width: 5),
+                          //                   Text(
+                          //                     "+${feedGroup.feeds.length - 2}",
+                          //                     style: TextStyle(color: Theme.of(context).dividerColor),
+                          //                   ),
+                          //                 ],
+                          //               ],
+                          //             ),
+                          //     ),
+                          //   );
+                          // }
+                          return BsbFeedButton(elem: elem, feedStore: feedStore);
                         }),
                         // If nothing is pinned, show the n-th first feed groups and feeds
                         if (feedStore.pinnedFeedsOrFeedGroups.isEmpty) ...[
-                          // ...feedStore.
+                          ...feedStore.feedGroups.map((elem) {
+                            return BsbFeedButton(elem: elem, feedStore: feedStore);
+                          }),
+                          ...feedStore.feeds.map((elem) {
+                            return BsbFeedButton(elem: elem, feedStore: feedStore);
+                          }),
                         ]
                       ],
                     ),
