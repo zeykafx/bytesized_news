@@ -80,7 +80,19 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                           width: 128,
                         ),
                       )
-                    : const SizedBox(),
+                    : widget.item.feed!.iconUrl.isNotEmpty
+                        ? Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 72, width: 128, fit: BoxFit.fitWidth),
+                          )
+                    : SizedBox(
+                        height: 72,
+                        width: 128,
+                        child: const Icon(LucideIcons.rss),
+                      ),
                 const SizedBox(width: 5),
               ],
             ),
@@ -112,9 +124,9 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                       padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                       labelPadding: const EdgeInsets.symmetric(horizontal: 0),
                       visualDensity: VisualDensity.compact,
-                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                       shape: const RoundedRectangleBorder(
-                        side: BorderSide(width: 0, color: Colors.transparent),
+                        side: BorderSide(width: 0, color: Colors.black),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),

@@ -82,6 +82,7 @@ dependencies:
   android_id: ^0.4.0
   flutter_launcher_icons: ^0.14.4
   skeletonizer: ^2.1.0+1
+  google_fonts: ^6.2.1
 #  drift: ^2.27.0
 #  drift_flutter: ^0.2.4
 

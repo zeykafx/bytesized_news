@@ -88,6 +88,9 @@ abstract class _FeedStore with Store {
   BottomSheetBarController bsbController = BottomSheetBarController();
 
   @observable
+  double bsbHeight = 85;
+
+  @observable
   ScrollController scrollController = ScrollController();
 
   @observable
@@ -228,6 +231,7 @@ abstract class _FeedStore with Store {
       try {
         res = await dio.get(feed.link);
       } catch (e) {
+        print(e);
         continue;
       }
 

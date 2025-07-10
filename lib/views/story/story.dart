@@ -8,6 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:html/dom.dart' as dom;
@@ -134,13 +135,14 @@ class _StoryState extends State<Story> {
                             ],
                             if (storyStore.showReaderMode) ...[
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding: EdgeInsets.symmetric(horizontal: storyStore.settingsStore.horizontalPadding),
                                 child: SelectableRegion(
                                   focusNode: FocusNode(),
                                   selectionControls: MaterialTextSelectionControls(),
                                   child: Container(
                                     constraints: const BoxConstraints(maxWidth: 800),
                                     child: HtmlWidget(
+                                      key: storyStore.htmlWidgetKey,
                                       '''
                                     <div class="bytesized_news_html_content">
                                        ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
@@ -148,6 +150,7 @@ class _StoryState extends State<Story> {
 
                                          ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
+                                          <p class="grey">Reading Time: ${storyStore.estReadingTime.inMinutes} minutes</p>
                                            ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                             <h2>Summary</h2>
                                             <p>
@@ -163,7 +166,10 @@ class _StoryState extends State<Story> {
                                       </div>
                                       ''',
                                       renderMode: RenderMode.listView,
-                                      textStyle: TextStyle(fontSize: settingsStore.fontSize),
+                                      textStyle: fontFamilyToGoogleFontTextStyle(settingsStore.fontFamily).copyWith(
+                                        fontSize: settingsStore.fontSize,
+                                        fontWeight: widthToWeight(settingsStore.textWidth),
+                                      ),
                                       customStylesBuilder: (element) => storyStore.buildStyle(context, element),
                                       onTapImage: (ImageMetadata imageData) {
                                         storyStore.showImage(imageData.sources.firstOrNull!.url, context);
@@ -284,6 +290,15 @@ class _StoryState extends State<Story> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // READER MODE
+                IconButton(
+                  onPressed: () {
+                    storyStore.toggleReaderMode();
+                  },
+                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
+                  icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
+                ),
+
                 // RELOAD
                 if (!storyStore.showReaderMode) ...[
                   IconButton(
@@ -324,15 +339,6 @@ class _StoryState extends State<Story> {
                     ),
                   ),
                 ],
-
-                // READER MODE
-                IconButton(
-                  onPressed: () {
-                    storyStore.toggleReaderMode();
-                  },
-                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                  icon: Icon(storyStore.showReaderMode ? Icons.web_asset : Icons.web_asset_off),
-                ),
 
                 storyStore.feedItemSummarized
                     ? IconButton(

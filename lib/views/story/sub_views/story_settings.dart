@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bytesized_news/views/settings/settings.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -15,6 +18,8 @@ class StorySettings extends StatefulWidget {
 
 class _StorySettingsState extends State<StorySettings> {
   late StoryStore storyStore;
+
+  Timer? timer;
 
   @override
   void initState() {
@@ -84,6 +89,134 @@ class _StorySettingsState extends State<StorySettings> {
                           ),
                         ),
                       ),
+
+                      // Text aligment
+                      ListTile(
+                        title: Text("Text Alignment"),
+                        trailing: DropdownButton(
+                            items: TextAlign.values.map((alignment) {
+                              return DropdownMenuItem<String>(
+                                value: textAlignString(alignment),
+                                child: Text(textAlignString(alignment)),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              storyStore.settingsStore.textAlignment = TextAlign.values[textAlignmentValues.indexOf(value!)];
+
+                              storyStore.htmlWidgetKey =
+                                  UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
+                            },
+                            value: textAlignString(storyStore.settingsStore.textAlignment)),
+                      ),
+
+                      // font weight
+                      ListTile(
+                        title: Text("Font Weight (Boldness)"),
+                        trailing: DropdownButton(
+                            items: TextWidth.values.map((width) {
+                              return DropdownMenuItem<String>(
+                                value: textWidthToString(width),
+                                child: Text(textWidthToString(width)),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              storyStore.settingsStore.textWidth = TextWidth.values[textWidthValues.indexOf(value!)];
+                            },
+                            value: textWidthToString(storyStore.settingsStore.textWidth)),
+                      ),
+
+                      // Line height
+                      ListTile(
+                        title: const Text("Line Height"),
+                        subtitle: SizedBox(
+                          width: 150,
+                          child: Row(
+                            children: [
+                              Text(
+                                storyStore.settingsStore.lineHeight.toStringAsFixed(2),
+                              ),
+                              Expanded(
+                                child: Slider(
+                                  year2023: false, // todo: to fix (somehow)
+                                  label: storyStore.settingsStore.lineHeight.toStringAsFixed(2),
+                                  value: storyStore.settingsStore.lineHeight,
+                                  min: 0,
+                                  max: 2,
+                                  divisions: 40,
+                                  onChanged: (newVal) {
+                                    storyStore.settingsStore.lineHeight = newVal;
+
+                                    // debounce the key update (to avoid excessive rebuilds while the user moves the slider)
+                                    timer?.cancel();
+                                    timer = Timer.periodic(Duration(seconds: 1), (tmr) {
+                                      storyStore.htmlWidgetKey =
+                                          UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
+
+                                      timer?.cancel();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Viewer Horizontal padding
+                      ListTile(
+                        title: const Text("Horizontal padding"),
+                        subtitle: SizedBox(
+                          width: 150,
+                          child: Row(
+                            children: [
+                              Text(
+                                storyStore.settingsStore.horizontalPadding.toStringAsFixed(2),
+                              ),
+                              Expanded(
+                                child: Slider(
+                                  year2023: false, // todo: to fix (somehow)
+                                  label: storyStore.settingsStore.horizontalPadding.toStringAsFixed(2),
+                                  value: storyStore.settingsStore.horizontalPadding,
+                                  min: 0.0,
+                                  max: 20.0,
+                                  divisions: 40,
+                                  onChanged: (newVal) {
+                                    storyStore.settingsStore.horizontalPadding = newVal;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Font
+                      ListTile(
+                        title: Text("Font"),
+                        trailing: DropdownButton(
+                            items: FontFamily.values.map((font) {
+                              return DropdownMenuItem<String>(
+                                value: fontFamilyToString(font),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(fontFamilyToString(font),
+                                        style: TextStyle(fontWeight: storyStore.settingsStore.fontFamily == font ? FontWeight.w600 : FontWeight.normal)),
+                                    Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              storyStore.settingsStore.fontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
+
+                              storyStore.htmlWidgetKey =
+                                  UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
+                            },
+                            value: fontFamilyToString(storyStore.settingsStore.fontFamily)),
+                      ),
+
+                      // Other reader mode settings here
                     ],
                   ),
                   SettingsSection(
@@ -92,7 +225,7 @@ class _StorySettingsState extends State<StorySettings> {
                       // SHOW AI SUMMARY ON STORY PAGE LOAD
                       ListTile(
                         title: const Text(
-                          "Show AI Summary on Page Load (Premium)",
+                          "Show AI Summary on Page Load",
                         ),
                         onTap: () {
                           storyStore.settingsStore.setShowAiSummaryOnLoad(!storyStore.settingsStore.showAiSummaryOnLoad);
@@ -108,7 +241,7 @@ class _StorySettingsState extends State<StorySettings> {
                       // FETCH AI SUMMARY ON STORY PAGE LOAD
                       ListTile(
                         title: const Text(
-                          "Fetch AI Summary on Page Load (Premium)",
+                          "Fetch AI Summary on Page Load",
                         ),
                         onTap: () {
                           storyStore.settingsStore.setFetchAiSummaryOnLoad(!storyStore.settingsStore.fetchAiSummaryOnLoad);

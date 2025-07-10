@@ -422,6 +422,38 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$estReadingTimeAtom =
+      Atom(name: '_StoryStore.estReadingTime', context: context);
+
+  @override
+  Duration get estReadingTime {
+    _$estReadingTimeAtom.reportRead();
+    return super.estReadingTime;
+  }
+
+  @override
+  set estReadingTime(Duration value) {
+    _$estReadingTimeAtom.reportWrite(value, super.estReadingTime, () {
+      super.estReadingTime = value;
+    });
+  }
+
+  late final _$htmlWidgetKeyAtom =
+      Atom(name: '_StoryStore.htmlWidgetKey', context: context);
+
+  @override
+  UniqueKey get htmlWidgetKey {
+    _$htmlWidgetKeyAtom.reportRead();
+    return super.htmlWidgetKey;
+  }
+
+  @override
+  set htmlWidgetKey(UniqueKey value) {
+    _$htmlWidgetKeyAtom.reportWrite(value, super.htmlWidgetKey, () {
+      super.htmlWidgetKey = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -580,7 +612,9 @@ feedItemSummarized: ${feedItemSummarized},
 aiLoading: ${aiLoading},
 hideSummary: ${hideSummary},
 animationController: ${animationController},
-firestore: ${firestore}
+firestore: ${firestore},
+estReadingTime: ${estReadingTime},
+htmlWidgetKey: ${htmlWidgetKey}
     ''';
   }
 }

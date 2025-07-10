@@ -26,7 +26,19 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..keepArticles = $enumDecodeNullable(
               _$KeepArticlesLengthEnumMap, json['keepArticles']) ??
           KeepArticlesLength.threeMonths
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 16.0;
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 16.0
+      ..textAlignment =
+          $enumDecodeNullable(_$TextAlignEnumMap, json['textAlignment']) ??
+              TextAlign.left
+      ..textWidth =
+          $enumDecodeNullable(_$TextWidthEnumMap, json['textWidth']) ??
+              TextWidth.normal
+      ..lineHeight = (json['lineHeight'] as num?)?.toDouble() ?? 1.2
+      ..horizontalPadding =
+          (json['horizontalPadding'] as num?)?.toDouble() ?? 8.0
+      ..fontFamily =
+          $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
+              FontFamily.openSans;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -40,6 +52,11 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'mutedKeywords': instance.mutedKeywords,
       'keepArticles': _$KeepArticlesLengthEnumMap[instance.keepArticles]!,
       'fontSize': instance.fontSize,
+      'textAlignment': _$TextAlignEnumMap[instance.textAlignment]!,
+      'textWidth': _$TextWidthEnumMap[instance.textWidth]!,
+      'lineHeight': instance.lineHeight,
+      'horizontalPadding': instance.horizontalPadding,
+      'fontFamily': _$FontFamilyEnumMap[instance.fontFamily]!,
     };
 
 const _$DarkModeEnumMap = {
@@ -65,6 +82,36 @@ const _$KeepArticlesLengthEnumMap = {
   KeepArticlesLength.threeMonths: 'threeMonths',
   KeepArticlesLength.sixMonths: 'sixMonths',
   KeepArticlesLength.oneYear: 'oneYear',
+};
+
+const _$TextAlignEnumMap = {
+  TextAlign.left: 'left',
+  TextAlign.center: 'center',
+  TextAlign.right: 'right',
+  TextAlign.justify: 'justify',
+};
+
+const _$TextWidthEnumMap = {
+  TextWidth.extremelyThin: 'extremelyThin',
+  TextWidth.veryThin: 'veryThin',
+  TextWidth.thin: 'thin',
+  TextWidth.normal: 'normal',
+  TextWidth.bold: 'bold',
+  TextWidth.veryBold: 'veryBold',
+  TextWidth.extremelyBold: 'extremelyBold',
+};
+
+const _$FontFamilyEnumMap = {
+  FontFamily.roboto: 'roboto',
+  FontFamily.openSans: 'openSans',
+  FontFamily.lora: 'lora',
+  FontFamily.merriweather: 'merriweather',
+  FontFamily.inter: 'inter',
+  FontFamily.sourceSerif: 'sourceSerif',
+  FontFamily.playfairDisplay: 'playfairDisplay',
+  FontFamily.lato: 'lato',
+  FontFamily.firaSans: 'firaSans',
+  FontFamily.crimsonText: 'crimsonText',
 };
 
 // **************************************************************************
@@ -283,6 +330,86 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$textAlignmentAtom =
+      Atom(name: '_SettingsStore.textAlignment', context: context);
+
+  @override
+  TextAlign get textAlignment {
+    _$textAlignmentAtom.reportRead();
+    return super.textAlignment;
+  }
+
+  @override
+  set textAlignment(TextAlign value) {
+    _$textAlignmentAtom.reportWrite(value, super.textAlignment, () {
+      super.textAlignment = value;
+    });
+  }
+
+  late final _$textWidthAtom =
+      Atom(name: '_SettingsStore.textWidth', context: context);
+
+  @override
+  TextWidth get textWidth {
+    _$textWidthAtom.reportRead();
+    return super.textWidth;
+  }
+
+  @override
+  set textWidth(TextWidth value) {
+    _$textWidthAtom.reportWrite(value, super.textWidth, () {
+      super.textWidth = value;
+    });
+  }
+
+  late final _$lineHeightAtom =
+      Atom(name: '_SettingsStore.lineHeight', context: context);
+
+  @override
+  double get lineHeight {
+    _$lineHeightAtom.reportRead();
+    return super.lineHeight;
+  }
+
+  @override
+  set lineHeight(double value) {
+    _$lineHeightAtom.reportWrite(value, super.lineHeight, () {
+      super.lineHeight = value;
+    });
+  }
+
+  late final _$horizontalPaddingAtom =
+      Atom(name: '_SettingsStore.horizontalPadding', context: context);
+
+  @override
+  double get horizontalPadding {
+    _$horizontalPaddingAtom.reportRead();
+    return super.horizontalPadding;
+  }
+
+  @override
+  set horizontalPadding(double value) {
+    _$horizontalPaddingAtom.reportWrite(value, super.horizontalPadding, () {
+      super.horizontalPadding = value;
+    });
+  }
+
+  late final _$fontFamilyAtom =
+      Atom(name: '_SettingsStore.fontFamily', context: context);
+
+  @override
+  FontFamily get fontFamily {
+    _$fontFamilyAtom.reportRead();
+    return super.fontFamily;
+  }
+
+  @override
+  set fontFamily(FontFamily value) {
+    _$fontFamilyAtom.reportWrite(value, super.fontFamily, () {
+      super.fontFamily = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -397,6 +524,28 @@ mixin _$SettingsStore on _SettingsStore, Store {
   }
 
   @override
+  void setTextAlignment(TextAlign newAlignment) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setTextAlignment');
+    try {
+      return super.setTextAlignment(newAlignment);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setTextWidth(TextWidth newWidth) {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+        name: '_SettingsStore.setTextWidth');
+    try {
+      return super.setTextWidth(newWidth);
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 darkMode: ${darkMode},
@@ -411,7 +560,12 @@ fetchAiSummaryOnLoad: ${fetchAiSummaryOnLoad},
 loading: ${loading},
 mutedKeywords: ${mutedKeywords},
 keepArticles: ${keepArticles},
-fontSize: ${fontSize}
+fontSize: ${fontSize},
+textAlignment: ${textAlignment},
+textWidth: ${textWidth},
+lineHeight: ${lineHeight},
+horizontalPadding: ${horizontalPadding},
+fontFamily: ${fontFamily}
     ''';
   }
 }

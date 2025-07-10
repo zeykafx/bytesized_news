@@ -338,6 +338,22 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$bsbHeightAtom =
+      Atom(name: '_FeedStore.bsbHeight', context: context);
+
+  @override
+  double get bsbHeight {
+    _$bsbHeightAtom.reportRead();
+    return super.bsbHeight;
+  }
+
+  @override
+  set bsbHeight(double value) {
+    _$bsbHeightAtom.reportWrite(value, super.bsbHeight, () {
+      super.bsbHeight = value;
+    });
+  }
+
   late final _$scrollControllerAtom =
       Atom(name: '_FeedStore.scrollController', context: context);
 
@@ -582,6 +598,7 @@ isLocked: ${isLocked},
 isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
 bsbController: ${bsbController},
+bsbHeight: ${bsbHeight},
 scrollController: ${scrollController},
 suggestionsScrollController: ${suggestionsScrollController},
 showScrollToTop: ${showScrollToTop},

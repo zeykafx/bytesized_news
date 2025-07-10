@@ -28,7 +28,7 @@ class OpmlUtils {
 
         for (OpmlOutline child in outline.children!) {
           if (child.xmlUrl != null) {
-            Feed feed;
+            Feed? feed;
 
             if (existingFeeds.any((element) => element.link == child.xmlUrl)) {
               // if the feed already exists, use the existing feed
@@ -37,6 +37,9 @@ class OpmlUtils {
               // if the feed does not exist, create a new feed
               try {
                 feed = await Feed.createFeed(child.xmlUrl!, feedName: child.text ?? "");
+                if (feed == null) {
+                  continue;
+                }
               } catch (e) {
                 continue;
               }
@@ -57,7 +60,11 @@ class OpmlUtils {
       // handle feeds that are not in a group
       if (outline.xmlUrl != null) {
         if (!existingFeeds.any((element) => element.link == outline.xmlUrl)) {
-          Feed feed = await Feed.createFeed(outline.xmlUrl!, feedName: outline.text ?? "");
+          Feed? feed = await Feed.createFeed(outline.xmlUrl!, feedName: outline.text ?? "");
+          if (feed == null) {
+            continue;
+          }
+          
           feeds.add(feed);
         }
       }

@@ -20,9 +20,15 @@ class Feed {
 
   Feed(this.name, this.link, this.iconUrl);
 
-  static Future<Feed> createFeed(String url, {String feedName = ""}) async {
+  static Future<Feed?> createFeed(String url, {String feedName = ""}) async {
     Dio dio = Dio();
-    Response response = await dio.get(url);
+    Response response;
+    try {
+      response = await dio.get(url);
+    } catch (e) {
+      return null;
+    }
+
     Document document = parse(response.data);
 
     String title = "";

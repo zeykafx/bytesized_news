@@ -114,6 +114,14 @@ abstract class _StoryStore with Store {
   @observable
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  static const readingSpeed = 200;
+
+  @observable
+  Duration estReadingTime = Duration(minutes: 0);
+
+  @observable
+  UniqueKey htmlWidgetKey = UniqueKey();
+
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
@@ -189,6 +197,9 @@ abstract class _StoryStore with Store {
     final Article result = await readability.parseAsync(feedItem.url);
     // filter out duplicate lines
 
+    int wordCount = result.content!.split(" ").length;
+
+    estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
     return result.content!.split("\n").toSet().join("\n");
   }
 
@@ -220,15 +231,15 @@ abstract class _StoryStore with Store {
   Map<String, String>? buildStyle(BuildContext context, dom.Element element) {
     if (element.className == 'bytesized_news_html_content') {
       return {
-        'line-height': '1.5',
-        'background-color': '#${Theme.of(context).scaffoldBackgroundColor.value.toRadixString(16).substring(2)}',
+        'line-height': settingsStore.lineHeight.toString(),
+        'background-color': '#${Theme.of(context).scaffoldBackgroundColor.toARGB32().toRadixString(16).substring(2)}',
         'width': 'auto',
         'height': 'auto',
         'margin': '0',
         'word-wrap': 'break-word', // other values 'break-word', 'keep-all', 'normal'
-        'padding': '12px 18px !important',
-        "font-size": "1.1em"
-        // 'text-align': "justify" // other values: 'left', 'right', 'center'
+        'padding': '12px 8px !important',
+        "font-size": "1.1em",
+        'text-align': textAlignString(settingsStore.textAlignment).toLowerCase() // other values: 'left', 'right', 'center'
       };
     }
 
@@ -236,7 +247,7 @@ abstract class _StoryStore with Store {
       // card line container for the AI summary
       return {
         'background-color':
-            '#${Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.primaryContainer.value.toRadixString(16).substring(2) : Theme.of(context).colorScheme.secondaryContainer.value.toRadixString(16).substring(2)}',
+            '#${Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.primaryContainer.toARGB32().toRadixString(16).substring(2) : Theme.of(context).colorScheme.secondaryContainer.toARGB32().toRadixString(16).substring(2)}',
         'padding': '0px 10px 0px 10px !important',
         'margin': '0',
         'border-radius': '8px',
@@ -244,6 +255,13 @@ abstract class _StoryStore with Store {
         'margin-top': '8px',
         'margin-bottom': '8px',
         // "text-align": "justify",
+      };
+    }
+
+    if (element.className == "small") {
+      return {
+        // 'font-size': '14px',
+        'color': '#${Theme.of(context).dividerColor.toARGB32().toRadixString(16).substring(2)}',
       };
     }
 
@@ -257,9 +275,9 @@ abstract class _StoryStore with Store {
 
     switch (element.localName) {
       case 'h1':
-        return {'font-size': '1.5em', 'font-weight': '700'};
+        return {'font-size': '1.5em', 'font-weight': '700', 'text-align': "left"};
       case 'h2':
-        return {'font-size': '1.25em', 'font-weight': '700'};
+        return {'font-size': '1.25em', 'font-weight': '700', 'text-align': "left"};
       case 'h3':
       case 'h4':
       case 'h5':
@@ -309,18 +327,21 @@ abstract class _StoryStore with Store {
         return {
           'width': '100% !important',
           'table-layout': 'fixed',
-          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
           'border-collapse': 'collapse',
           'padding': '0 8px'
         };
       case 'td':
         return {
           'padding': '0 8px',
-          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
           'border-collapse': 'collapse'
         };
       case 'th':
-        return {'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}', 'border-collapse': 'collapse'};
+        return {
+          'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
+          'border-collapse': 'collapse'
+        };
       default:
     }
     return null;
@@ -354,16 +375,6 @@ abstract class _StoryStore with Store {
       return;
     }
 
-    // if (authStore.userTier == Tier.free) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       content: Text("This feature is only available to premium users"),
-    //       duration: Duration(seconds: 5),
-    //     ),
-    //   );
-    //   return;
-    // }
-
     // check firestore for existing summary (This doesn't count towards the user's summaries)
     var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
 
@@ -378,11 +389,6 @@ abstract class _StoryStore with Store {
       return;
     }
 
-    // // If the last time an article was summarized was today:
-    // if (authStore.lastSummaryDate != null &&
-    //     DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inDays ==
-    //         0 &&
-    //     authStore.lastSummaryDate!.day == DateTime.now().toUtc().day) {
     if (kDebugMode) {
       print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
       print("Last summary difference in seconds: ${DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inSeconds}");
@@ -403,25 +409,6 @@ abstract class _StoryStore with Store {
       );
       return;
     }
-
-    // if (authStore.summariesLeftToday <= 0) {
-    //   if (kDebugMode) {
-    //     print("User is out of summaries");
-    //   }
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text(
-    //         "You are out of summaries for today.",
-    //       ),
-    //       duration: const Duration(seconds: 10),
-    //     ),
-    //   );
-    //   return;
-    // }
-
-    // authStore.summariesLeftToday--;
-    // authStore.lastSummaryDate = DateTime.now().toUtc();
-    // }
 
     String? htmlValue;
     if (!showReaderMode) {

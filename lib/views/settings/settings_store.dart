@@ -1,7 +1,10 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:flutter/painting.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
+import 'package:rss_dart/domain/media/text.dart';
 
 part 'settings_store.g.dart';
 
@@ -76,6 +79,114 @@ String feedListSortToString(FeedListSort sort) {
   }
 }
 
+enum TextAlign { left, center, right, justify }
+
+String textAlignString(TextAlign textAlign) {
+  return switch (textAlign) {
+    TextAlign.left => "Left",
+    TextAlign.center => "Center",
+    TextAlign.right => "Right",
+    TextAlign.justify => "Justify",
+  };
+}
+
+const textAlignmentValues = ["Left", "Center", "Right", "Justify"];
+
+enum TextWidth {
+  extremelyThin,
+  veryThin,
+  thin,
+  normal,
+  bold,
+  veryBold,
+  extremelyBold,
+}
+
+const textWidthValues = ["Extremely Thin", "Very Thin", "Thin", "Normal", "Bold", "Very Bold", "Extremely Bold"];
+
+String textWidthToString(TextWidth width) {
+  return switch (width) {
+    TextWidth.extremelyThin => "Extremely Thin",
+    TextWidth.veryThin => "Very Thin",
+    TextWidth.thin => "Thin",
+    TextWidth.normal => "Normal",
+    TextWidth.bold => "Bold",
+    TextWidth.veryBold => "Very Bold",
+    TextWidth.extremelyBold => "Extremely Bold",
+  };
+}
+
+FontWeight widthToWeight(TextWidth width) {
+  return switch (width) {
+    TextWidth.extremelyThin => FontWeight.w100,
+    TextWidth.veryThin => FontWeight.w200,
+    TextWidth.thin => FontWeight.w300,
+    TextWidth.normal => FontWeight.normal,
+    TextWidth.bold => FontWeight.w600,
+    TextWidth.veryBold => FontWeight.w800,
+    TextWidth.extremelyBold => FontWeight.w900,
+  };
+}
+
+enum FontFamily {
+  roboto, // Current default
+  openSans, // Most popular alternative
+  lora, // Best serif for reading
+  merriweather, // Screen-optimized serif
+  inter, // Modern sans-serif
+  sourceSerif, // Clean serif
+  playfairDisplay, // Elegant serif
+  lato, // Friendly sans-serif
+  firaSans, // Humanist sans-serif
+  crimsonText, // Classic book feel
+}
+
+const fontFamilyValues = ["Roboto", "Open Sans", "Lora", "Merriweather", "Inter", "Source Serif Pro", "Playfair Display", "Lato", "Fira Sans", "Crimson Text"];
+
+String fontFamilyToString(FontFamily fontFamily) {
+  return switch (fontFamily) {
+    FontFamily.roboto => "Roboto",
+    FontFamily.openSans => "Open Sans",
+    FontFamily.lora => "Lora",
+    FontFamily.merriweather => "Merriweather",
+    FontFamily.inter => "Inter",
+    FontFamily.sourceSerif => "Source Serif Pro",
+    FontFamily.playfairDisplay => "Playfair Display",
+    FontFamily.lato => "Lato",
+    FontFamily.firaSans => "Fira Sans",
+    FontFamily.crimsonText => "Crimson Text",
+  };
+}
+String fontFamilyToExplanation(FontFamily fontFamily) {
+  return switch (fontFamily) {
+    FontFamily.roboto => "Popular default",
+    FontFamily.openSans => "Default font",
+    FontFamily.lora => "Best serif for reading",
+    FontFamily.merriweather => "Screen-optimized serif",
+    FontFamily.inter => "Modern sans-serif",
+    FontFamily.sourceSerif => "Clean serif",
+    FontFamily.playfairDisplay => "Elegant serif",
+    FontFamily.lato => "Friendly sans-serif",
+    FontFamily.firaSans => "Humanist sans-serif",
+    FontFamily.crimsonText => "Classic book feel",
+  };
+}
+
+TextStyle fontFamilyToGoogleFontTextStyle(FontFamily fontFamily) {
+  return switch (fontFamily) {
+    FontFamily.roboto => GoogleFonts.roboto(),
+    FontFamily.openSans => GoogleFonts.openSans(),
+    FontFamily.lora => GoogleFonts.lora(),
+    FontFamily.merriweather => GoogleFonts.merriweather(),
+    FontFamily.inter => GoogleFonts.inter(),
+    FontFamily.sourceSerif => GoogleFonts.sourceSerif4(),
+    FontFamily.playfairDisplay => GoogleFonts.playfairDisplay(),
+    FontFamily.lato => GoogleFonts.lato(),
+    FontFamily.firaSans => GoogleFonts.firaSans(),
+    FontFamily.crimsonText => GoogleFonts.crimsonText(),
+  };
+}
+
 @JsonSerializable()
 class SettingsStore extends _SettingsStore with _$SettingsStore {
   SettingsStore();
@@ -91,6 +202,10 @@ abstract class _SettingsStore with Store {
   static const defaultSort = FeedListSort.byDate;
   static const defaultMutedKeywords = <String>[];
   static const double defaultFontSize = 16.0;
+  static const defaultTextWidth = TextWidth.normal;
+  static const double defaultLineHeight = 1.2;
+  static const double defaultHorizontalPadding = 8.0;
+  static const defaultFontFamily = FontFamily.openSans;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -206,4 +321,34 @@ abstract class _SettingsStore with Store {
   void setFontSize(double newSize) {
     fontSize = newSize;
   }
+
+  @JsonKey(defaultValue: TextAlign.left)
+  @observable
+  TextAlign textAlignment = TextAlign.left;
+
+  @action
+  void setTextAlignment(TextAlign newAlignment) {
+    textAlignment = newAlignment;
+  }
+
+  @JsonKey(defaultValue: defaultTextWidth)
+  @observable
+  TextWidth textWidth = defaultTextWidth;
+
+  @action
+  void setTextWidth(TextWidth newWidth) {
+    textWidth = newWidth;
+  }
+
+  @JsonKey(defaultValue: defaultLineHeight)
+  @observable
+  double lineHeight = defaultLineHeight;
+
+  @JsonKey(defaultValue: defaultHorizontalPadding)
+  @observable
+  double horizontalPadding = defaultHorizontalPadding;
+
+  @JsonKey(defaultValue: defaultFontFamily)
+  @observable
+  FontFamily fontFamily = defaultFontFamily;
 }

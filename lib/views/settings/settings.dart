@@ -233,6 +233,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
             "Import OPML file",
           ),
           onTap: () async {
+            List<Feed> dbFeeds = await dbUtils.getFeeds();
             settingsStore.loading = true;
 
             // open file picker
@@ -248,6 +249,20 @@ class _ImportExportSectionState extends State<ImportExportSection> {
               settingsStore.loading = false;
               if (kDebugMode) {
                 print("Importing feeds: ${feeds.map((el) => el.name)}");
+              }
+
+              // filter out feeds that are already imported
+              feeds.removeWhere((Feed feed1) {
+                return dbFeeds.where((Feed feed2) => feed1.link == feed2.link).isNotEmpty;
+              });
+
+              if (feeds.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Nothing new to import!"),
+                  ),
+                );
+                return;
               }
 
               List<Feed> loneFeeds = feeds.where((Feed feed) => feedGroups.every((FeedGroup feedGroup) => !feedGroup.feedNames.contains(feed.name))).toList();
