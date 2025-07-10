@@ -27,8 +27,13 @@ With AI summary:
 Without:
 <img alt="Reader mode" src="./.images/reader.png" width="300"/>
 
+#### Reader mode customization
+<img alt="Reader mode customization" src="./.images/reader_customization.png" width="300"/>
+
+
 ### Feed Manager
 <img alt="Feed Manager" src="./.images/feed_mngr.png" width="300"/>
+
 <img alt="Feed Manager options" src="./.images/feed_mngr_2.png" width="300"/>
 
 ### Settings
