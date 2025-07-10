@@ -22,9 +22,11 @@ The app is built with Flutter and Mobx.
 <img alt="Home" src="./.images/home.png" width="300"/>
 
 ### Reader Mode
-With AI summary:
+#### With AI summary:
+
 <img alt="Reader mode with AI summary" src="./.images/reader_ai.png" width="300"/>
-Without:
+
+#### Without:
 <img alt="Reader mode" src="./.images/reader.png" width="300"/>
 
 #### Reader mode customization

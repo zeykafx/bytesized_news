@@ -454,6 +454,22 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$hideBarAtom =
+      Atom(name: '_StoryStore.hideBar', context: context);
+
+  @override
+  bool get hideBar {
+    _$hideBarAtom.reportRead();
+    return super.hideBar;
+  }
+
+  @override
+  set hideBar(bool value) {
+    _$hideBarAtom.reportWrite(value, super.hideBar, () {
+      super.hideBar = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -614,7 +630,8 @@ hideSummary: ${hideSummary},
 animationController: ${animationController},
 firestore: ${firestore},
 estReadingTime: ${estReadingTime},
-htmlWidgetKey: ${htmlWidgetKey}
+htmlWidgetKey: ${htmlWidgetKey},
+hideBar: ${hideBar}
     ''';
   }
 }

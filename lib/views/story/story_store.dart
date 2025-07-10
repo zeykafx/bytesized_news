@@ -122,6 +122,9 @@ abstract class _StoryStore with Store {
   @observable
   UniqueKey htmlWidgetKey = UniqueKey();
 
+  @observable
+  bool hideBar = false;
+
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
@@ -138,7 +141,7 @@ abstract class _StoryStore with Store {
 
     htmlContent = await fetchPageHtml();
 
-    bsbController.addListener(onBsbChanged);
+    // bsbController.addListener(onBsbChanged);
 
     animationController = AnimationController(
       vsync: Navigator.of(context),
