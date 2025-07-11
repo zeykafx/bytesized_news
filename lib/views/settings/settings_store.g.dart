@@ -38,7 +38,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           (json['horizontalPadding'] as num?)?.toDouble() ?? 8.0
       ..fontFamily =
           $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
-              FontFamily.openSans;
+              FontFamily.lora;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{

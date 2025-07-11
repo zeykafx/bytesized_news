@@ -250,7 +250,7 @@ class _StoryState extends State<Story> {
                           // ),
                         ],
                       )
-                    : const CircularProgressIndicator(),
+                    : const LinearProgressIndicator(),
 
                 // floating bar
                 Align(
@@ -414,7 +414,7 @@ class _StoryState extends State<Story> {
                                             width: 1,
                                           ),
                                           borderRadius: const BorderRadius.all(
-                                            Radius.circular(30),
+                                            Radius.circular(25), // slightly less radius to fit the radius of the container
                                           ),
                                         ),
                                         margin: EdgeInsets.only(bottom: 10),
@@ -422,40 +422,13 @@ class _StoryState extends State<Story> {
                                           padding: const EdgeInsets.all(12.0),
                                           child: SelectableText(
                                             storyStore.feedItem.aiSummary,
-                                            style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                            // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
                                           ),
                                         ),
                                       ),
                                     ),
                                     secondChild: const SizedBox.shrink(),
                                   ),
-
-                                  // storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                  //     ? Container(
-                                  //         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
-                                  //         child: Card.outlined(
-                                  //           shape: RoundedRectangleBorder(
-                                  //             side: BorderSide(
-                                  //               color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                                  //               width: 1,
-                                  //             ),
-                                  //             borderRadius: const BorderRadius.all(
-                                  //               Radius.circular(30),
-                                  //             ),
-                                  //           ),
-                                  //           margin: EdgeInsets.only(bottom: 10),
-                                  //           child: Padding(
-                                  //             padding: const EdgeInsets.all(12.0),
-                                  //             child: SelectableText(
-                                  //               storyStore.feedItem.aiSummary,
-                                  //               style: mediaQuery.size.width > 600
-                                  //                   ? Theme.of(context).textTheme.bodyMedium
-                                  //                   : Theme.of(context).textTheme.bodySmall,
-                                  //             ),
-                                  //           ),
-                                  //         ),
-                                  //       )
-                                  //     : const SizedBox.shrink(),
                                 ],
                               ),
                             ),
@@ -468,6 +441,20 @@ class _StoryState extends State<Story> {
                 if (!storyStore.showReaderMode) ...[
                   storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
                 ],
+                storyStore.aiLoading
+                    ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                        duration: const Duration(milliseconds: 1500),
+                        colors: [
+                          const Color(0xBFFFFF00),
+                          const Color(0xBF00FF00),
+                          const Color(0xBF00FFFF),
+                          const Color(0xBF0033FF),
+                          const Color(0xBFFF00FF),
+                          const Color(0xBFFF0000),
+                          const Color(0xBFFFFF00),
+                        ],
+                      )
+                    : const SizedBox(),
               ],
             ),
           );

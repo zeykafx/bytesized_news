@@ -431,10 +431,10 @@ abstract class _StoryStore with Store {
     String docText = document.body!.text;
 
     if (docText.length > 15000) {
-      docText = docText.substring(0, 15000);
+      // docText = docText.substring(0, 15000);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("This webpage was too long to be summarized in full."),
+          content: Text("This webpage is very long, sumarization will take more than 1 credit (according to the size)."),
           duration: Duration(seconds: 5),
         ),
       );

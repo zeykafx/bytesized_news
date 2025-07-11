@@ -395,6 +395,7 @@ class _FeedViewState extends State<FeedView> {
                                                 .fadeIn();
                                           }),
                                     ),
+
                                     // SCROLL TO TOP BUTTON
                                     Align(
                                       alignment: Alignment.bottomRight,
@@ -403,12 +404,48 @@ class _FeedViewState extends State<FeedView> {
                                         curve: Curves.easeInOutQuad,
                                         offset: feedStore.showScrollToTop && !feedStore.isExpanded ? Offset(-0.05, -0.1) : Offset(-0.05, 2),
                                         // visible: feedStore.showScrollToTop && !feedStore.isExpanded,
-                                        child: FilledButton.tonalIcon(
-                                          onPressed: feedStore.scrollToTop,
-                                          icon: Icon(Icons.arrow_upward),
-                                          label: Text(
-                                            "Scroll To Top",
-                                            style: TextStyle(fontSize: 12),
+                                        child: ClipRect(
+                                          child: AnimatedCrossFade(
+                                            crossFadeState: !feedStore.showSmallScrollToTop ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                                            alignment: Alignment.bottomRight,
+                                            firstCurve: Curves.easeInOutQuad,
+                                            secondCurve: Curves.easeInOutQuad,
+                                            sizeCurve: Curves.easeInOutQuad,
+                                            duration: 150.ms,
+                                            firstChild: FilledButton.tonalIcon(
+                                              onPressed: feedStore.scrollToTop,
+                                              icon: Icon(Icons.arrow_upward),
+                                              label: Text(
+                                                "Scroll To Top",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ),
+                                            secondChild: IconButton.filledTonal(
+                                              icon: Icon(Icons.arrow_upward),
+                                              onPressed: feedStore.scrollToTop,
+                                            ),
+                                            layoutBuilder: (
+                                              Widget topChild,
+                                              Key topChildKey,
+                                              Widget bottomChild,
+                                              Key bottomChildKey,
+                                            ) {
+                                              return Stack(
+                                                clipBehavior: Clip.none,
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  PositionedDirectional(
+                                                    key: bottomChildKey,
+                                                    top: 0,
+                                                    child: bottomChild,
+                                                  ),
+                                                  PositionedDirectional(
+                                                    key: topChildKey,
+                                                    child: topChild,
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),

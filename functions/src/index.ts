@@ -15,6 +15,8 @@ const openai: OpenAI = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1",
 });
 const ENFORCE_APPCHECK = false; // TODO: change back
+const maxCharsForOneSummary = 15000;
+
 
 export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   logger.info("User created: " + user.uid);
@@ -124,26 +126,30 @@ export const summarize = onCall(
     const user = await userRef.get();
     const userData = user.data();
 
+    let summariesToConsume = 1;
+
     // check if the user has any summaries left today
     const summariesLeftToday = userData?.summariesLeftToday;
     if (summariesLeftToday <= 0) {
       return { error: "Error: You have reached the daily limit of summaries" };
     }
 
+    // check the length of the article
+    if (content.length > maxCharsForOneSummary) {
+      // will consume more than 1 summary since the content is so long
+      summariesToConsume += Math.ceil(((content.length / maxCharsForOneSummary) - 1));
+      // logger.info("Article too long: " + content.length);
+      // return {
+      //   error:
+      //     "Error: The article is too long. Please provide a shorter article.",
+      // };
+    }
+
     // update the user's summary count
     await userRef.update({
       lastSummaryDate: new Date().getTime(),
-      summariesLeftToday: FieldValue.increment(-1),
+      summariesLeftToday: FieldValue.increment(-summariesToConsume),
     });
-
-    // check the length of the article
-    if (content.length > 15000) {
-      logger.info("Article too long: " + content.length);
-      return {
-        error:
-          "Error: The article is too long. Please provide a shorter article.",
-      };
-    }
 
     // create the summary with openai
     const completion = await openai.chat.completions.create({

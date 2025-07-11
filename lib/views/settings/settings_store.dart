@@ -205,7 +205,7 @@ abstract class _SettingsStore with Store {
   static const defaultTextWidth = TextWidth.normal;
   static const double defaultLineHeight = 1.2;
   static const double defaultHorizontalPadding = 8.0;
-  static const defaultFontFamily = FontFamily.openSans;
+  static const defaultFontFamily = FontFamily.lora;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)

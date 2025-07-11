@@ -403,6 +403,23 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$showSmallScrollToTopAtom =
+      Atom(name: '_FeedStore.showSmallScrollToTop', context: context);
+
+  @override
+  bool get showSmallScrollToTop {
+    _$showSmallScrollToTopAtom.reportRead();
+    return super.showSmallScrollToTop;
+  }
+
+  @override
+  set showSmallScrollToTop(bool value) {
+    _$showSmallScrollToTopAtom.reportWrite(value, super.showSmallScrollToTop,
+        () {
+      super.showSmallScrollToTop = value;
+    });
+  }
+
   late final _$hasCreatedNewSuggestionAtom =
       Atom(name: '_FeedStore.hasCreatedNewSuggestion', context: context);
 
@@ -602,6 +619,7 @@ bsbHeight: ${bsbHeight},
 scrollController: ${scrollController},
 suggestionsScrollController: ${suggestionsScrollController},
 showScrollToTop: ${showScrollToTop},
+showSmallScrollToTop: ${showSmallScrollToTop},
 hasCreatedNewSuggestion: ${hasCreatedNewSuggestion},
 hasCleanedArticlesToday: ${hasCleanedArticlesToday}
     ''';

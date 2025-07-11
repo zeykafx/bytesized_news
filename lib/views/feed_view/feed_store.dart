@@ -100,6 +100,9 @@ abstract class _FeedStore with Store {
   bool showScrollToTop = false;
 
   @observable
+  bool showSmallScrollToTop = false;
+
+  @observable
   bool hasCreatedNewSuggestion = false;
 
   @observable
@@ -131,8 +134,16 @@ abstract class _FeedStore with Store {
     scrollController.addListener(() {
       if (scrollController.offset > 200 && !showScrollToTop) {
         showScrollToTop = true;
+        showSmallScrollToTop = false;
       } else if (scrollController.offset < 200 && showScrollToTop) {
         showScrollToTop = false;
+        showSmallScrollToTop = false;
+      }
+
+      if (scrollController.offset > 1000 && showScrollToTop && !showSmallScrollToTop) {
+        showSmallScrollToTop = true;
+      } else if (scrollController.offset < 1000 && showScrollToTop && showSmallScrollToTop) {
+        showSmallScrollToTop = false;
       }
     });
 
