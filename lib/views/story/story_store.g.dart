@@ -217,22 +217,6 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$bsbControllerAtom =
-      Atom(name: '_StoryStore.bsbController', context: context);
-
-  @override
-  BottomSheetBarController get bsbController {
-    _$bsbControllerAtom.reportRead();
-    return super.bsbController;
-  }
-
-  @override
-  set bsbController(BottomSheetBarController value) {
-    _$bsbControllerAtom.reportWrite(value, super.bsbController, () {
-      super.bsbController = value;
-    });
-  }
-
   late final _$controllerAtom =
       Atom(name: '_StoryStore.controller', context: context);
 
@@ -470,6 +454,22 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$webviewLastScrollYAtom =
+      Atom(name: '_StoryStore.webviewLastScrollY', context: context);
+
+  @override
+  int get webviewLastScrollY {
+    _$webviewLastScrollYAtom.reportRead();
+    return super.webviewLastScrollY;
+  }
+
+  @override
+  set webviewLastScrollY(int value) {
+    _$webviewLastScrollYAtom.reportWrite(value, super.webviewLastScrollY, () {
+      super.webviewLastScrollY = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -570,17 +570,6 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
-  void onBsbChanged() {
-    final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.onBsbChanged');
-    try {
-      return super.onBsbChanged();
-    } finally {
-      _$_StoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void bookmarkItem() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
         name: '_StoryStore.bookmarkItem');
@@ -603,6 +592,28 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
+  bool notificationListener(ScrollNotification notification) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.notificationListener');
+    try {
+      return super.notificationListener(notification);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void webviewScrollListener(InAppWebViewController controller, int x, int y) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.webviewScrollListener');
+    try {
+      return super.webviewScrollListener(controller, x, y);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 dbUtils: ${dbUtils},
@@ -617,7 +628,6 @@ loading: ${loading},
 isLocked: ${isLocked},
 isCollapsed: ${isCollapsed},
 isExpanded: ${isExpanded},
-bsbController: ${bsbController},
 controller: ${controller},
 initialized: ${initialized},
 adUrlFilters: ${adUrlFilters},
@@ -631,7 +641,8 @@ animationController: ${animationController},
 firestore: ${firestore},
 estReadingTime: ${estReadingTime},
 htmlWidgetKey: ${htmlWidgetKey},
-hideBar: ${hideBar}
+hideBar: ${hideBar},
+webviewLastScrollY: ${webviewLastScrollY}
     ''';
   }
 }

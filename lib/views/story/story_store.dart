@@ -1,4 +1,3 @@
-import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
@@ -64,8 +63,8 @@ abstract class _StoryStore with Store {
   @observable
   bool isExpanded = false;
 
-  @observable
-  BottomSheetBarController bsbController = BottomSheetBarController();
+  // @observable
+  // BottomSheetBarController bsbController = BottomSheetBarController();
 
   @observable
   InAppWebViewController? controller;
@@ -124,6 +123,9 @@ abstract class _StoryStore with Store {
 
   @observable
   bool hideBar = false;
+
+  @observable
+  int webviewLastScrollY = 0;
 
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
@@ -201,6 +203,11 @@ abstract class _StoryStore with Store {
     // filter out duplicate lines
 
     int wordCount = result.content!.split(" ").length;
+
+    if (feedItem.imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
+      feedItem.imageUrl = result.imageUrl!;
+      dbUtils.updateItemInDb(feedItem);
+    }
 
     estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
     return result.content!.split("\n").toSet().join("\n");
@@ -473,6 +480,7 @@ abstract class _StoryStore with Store {
 
   @action
   void toggleReaderMode() {
+    hideBar = false;
     showReaderMode = !showReaderMode;
     if (showReaderMode && controller != null) {
       controller?.dispose();
@@ -484,23 +492,25 @@ abstract class _StoryStore with Store {
 
   @action
   void hideAiSummary() {
+    hideBar = false;
     animationController.toggle();
     hideSummary = !hideSummary;
   }
 
-  @action
-  void onBsbChanged() {
-    if (bsbController.isCollapsed && !isCollapsed) {
-      isCollapsed = true;
-      isExpanded = false;
-    } else if (bsbController.isExpanded && !isExpanded) {
-      isCollapsed = false;
-      isExpanded = true;
-    }
-  }
+  // @action
+  // void onBsbChanged() {
+  //   if (bsbController.isCollapsed && !isCollapsed) {
+  //     isCollapsed = true;
+  //     isExpanded = false;
+  //   } else if (bsbController.isExpanded && !isExpanded) {
+  //     isCollapsed = false;
+  //     isExpanded = true;
+  //   }
+  // }
 
   @action
   void bookmarkItem() {
+    hideBar = false;
     feedItem.bookmarked = !feedItem.bookmarked;
     isBookmarked = feedItem.bookmarked;
     dbUtils.updateItemInDb(feedItem);
@@ -526,5 +536,47 @@ abstract class _StoryStore with Store {
         ),
       ),
     );
+  }
+
+  @action
+  bool notificationListener(ScrollNotification notification) {
+    if (notification is ScrollUpdateNotification &&
+        notification.metrics.pixels > 200 &&
+        !hideBar &&
+        notification.dragDetails != null &&
+        notification.dragDetails!.delta.dy < -1) {
+      hideBar = true;
+    }
+    if (notification.metrics.pixels < 200 && hideBar) {
+      hideBar = false;
+    }
+    if (notification is ScrollUpdateNotification &&
+        notification.metrics.pixels > 200 &&
+        notification.dragDetails != null &&
+        notification.dragDetails!.delta.dy > 1) {
+      hideBar = false;
+    }
+
+    return false;
+  }
+
+  @action
+  void webviewScrollListener(InAppWebViewController controller, int x, int y) {
+    if (y > 200 && !hideBar && webviewLastScrollY - y < -1) {
+      hideBar = true;
+      webviewLastScrollY = y;
+      hideSummary = false;
+      
+    }
+    if (y < 200 && hideBar) {
+      hideBar = false;
+    }
+    if (y > 200 && webviewLastScrollY - y > 1) {
+      hideBar = false;
+      webviewLastScrollY = y;
+      hideSummary = false;
+      
+    }
+    webviewLastScrollY = y;
   }
 }

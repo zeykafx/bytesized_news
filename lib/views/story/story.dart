@@ -104,6 +104,7 @@ class _StoryState extends State<Story> {
                               onWebViewCreated: (controller) {
                                 storyStore.controller = controller;
                               },
+                              onScrollChanged: storyStore.webviewScrollListener,
                               onPermissionRequest: (controller, request) async {
                                 return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
                               },
@@ -137,44 +138,18 @@ class _StoryState extends State<Story> {
                                 child: Container(
                                   constraints: const BoxConstraints(maxWidth: 800),
                                   child: NotificationListener<ScrollNotification>(
-                                    onNotification: (ScrollNotification notification) {
-                                      // print(notification);
-
-                                      // if (notification is UserScrollNotification && notification.direction == ScrollDirection.idle) {
-                                      //   storyStore.hideBar = false;
-                                      // } else {
-                                      // print(notification);
-                                      if (notification is ScrollUpdateNotification &&
-                                          notification.metrics.pixels > 200 &&
-                                          !storyStore.hideBar &&
-                                          notification.dragDetails != null &&
-                                          notification.dragDetails!.delta.dy < -1) {
-                                        storyStore.hideBar = true;
-                                      }
-                                      if (notification.metrics.pixels < 200 && storyStore.hideBar) {
-                                        storyStore.hideBar = false;
-                                      }
-                                      if (notification is ScrollUpdateNotification &&
-                                          notification.metrics.pixels > 200 &&
-                                          notification.dragDetails != null &&
-                                          notification.dragDetails!.delta.dy > 1) {
-                                        // print("HGi");
-                                        storyStore.hideBar = false;
-                                      }
-                                      // }
-
-                                      return false;
-                                    },
+                                    onNotification: storyStore.notificationListener,
                                     child: HtmlWidget(
                                       key: storyStore.htmlWidgetKey,
                                       '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
+                                           <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feedName}</a></p>
                                                ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                               <p class="grey">Reading Time: ${storyStore.estReadingTime.inMinutes} minutes</p>
 
                                                ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
-                                                <p class="grey">Reading Time: ${storyStore.estReadingTime.inMinutes} minutes</p>
                                                  ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                                   <h2>Summary</h2>
                                                   <p>
@@ -186,7 +161,7 @@ class _StoryState extends State<Story> {
                                                   </div>''' : ""}
 
                                                ${storyStore.htmlContent}
-                                               <a href="${storyStore.feedItem.url}">Source</a>
+                                               Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
                                             </div>
                                             ''',
                                       renderMode: RenderMode.listView,
@@ -217,88 +192,62 @@ class _StoryState extends State<Story> {
                             ),
                           ],
                           // AI SUMMARY
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Column(
-                              children: [
-                                storyStore.aiLoading
-                                    ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
-                                        duration: const Duration(milliseconds: 1500),
-                                        colors: [
-                                          const Color(0xBFFFFF00),
-                                          const Color(0xBF00FF00),
-                                          const Color(0xBF00FFFF),
-                                          const Color(0xBF0033FF),
-                                          const Color(0xBFFF00FF),
-                                          const Color(0xBFFF0000),
-                                          const Color(0xBFFFFF00),
-                                        ],
-                                      )
-                                    : const SizedBox(),
-                                storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                    ? GestureDetector(
-                                        onVerticalDragEnd: (dragDetails) {
-                                          if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
-                                            storyStore.hideAiSummary();
-                                          }
-                                        },
-                                        child: Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius: const BorderRadius.only(
-                                                    topLeft: Radius.circular(20),
-                                                    topRight: Radius.circular(20),
-                                                  ),
-                                                  color: Theme.of(context).colorScheme.surface,
-                                                ),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(8.0),
-                                                  child: Card(
-                                                    elevation: 0,
-                                                    shape: const RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.all(
-                                                        Radius.circular(20),
-                                                      ),
-                                                    ),
-                                                    color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(15),
-                                                      child: SelectableText(
-                                                        storyStore.feedItem.aiSummary,
-                                                        style: mediaQuery.size.width > 600
-                                                            ? Theme.of(context).textTheme.bodyMedium
-                                                            : Theme.of(context).textTheme.bodySmall,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                                //     .animate().fadeIn().then().shimmer(
-                                                //   duration: const Duration(milliseconds: 1200),
-                                                //   curve: Curves.easeInOutSine,
-                                                //   colors: [
-                                                //     const Color(0x00FFFF00),
-                                                //     const Color(0xBFFFFF00),
-                                                //     const Color(0xBF00FF00),
-                                                //     const Color(0xBF00FFFF),
-                                                //     const Color(0xBF0033FF),
-                                                //     const Color(0xBFFF00FF),
-                                                //     const Color(0xBFFF0000),
-                                                //     const Color(0xBFFFFF00),
-                                                //     // const Color(0xFFFF00),
-                                                //   ],
-                                                // ),
-                                                ).animate(controller: storyStore.animationController).slideY(
-                                              begin: 2,
-                                              end: 0,
-                                              curve: Curves.easeInOutSine,
-                                              duration: const Duration(milliseconds: 500),
-                                            ),
-                                      )
-                                    : const SizedBox(),
-                              ],
-                            ),
-                          ),
+                          // Positioned(
+                          //   bottom: 30,
+                          //   left: 30,
+                          //   right: 30,
+                          //   child: Column(
+                          //     children: [
+                          //       storyStore.aiLoading
+                          //           ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
+                          //               duration: const Duration(milliseconds: 1500),
+                          //               colors: [
+                          //                 const Color(0xBFFFFF00),
+                          //                 const Color(0xBF00FF00),
+                          //                 const Color(0xBF00FFFF),
+                          //                 const Color(0xBF0033FF),
+                          //                 const Color(0xBFFF00FF),
+                          //                 const Color(0xBFFF0000),
+                          //                 const Color(0xBFFFFF00),
+                          //               ],
+                          //             )
+                          //           : const SizedBox(),
+                          //       storyStore.feedItemSummarized && !storyStore.showReaderMode
+                          //           ? GestureDetector(
+                          //               onVerticalDragEnd: (dragDetails) {
+                          //                 if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
+                          //                   storyStore.hideAiSummary();
+                          //                 }
+                          //               },
+                          //               child: Card(
+                          //                 elevation: 0,
+                          //                 margin: EdgeInsets.zero,
+                          //                 shape: const RoundedRectangleBorder(
+                          //                   borderRadius: BorderRadius.only(
+                          //                     topLeft: Radius.circular(20),
+                          //                     topRight: Radius.circular(20),
+                          //                   ),
+                          //                 ),
+                          //                 color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 1),
+                          //                 child: Padding(
+                          //                   padding: const EdgeInsets.all(15),
+                          //                   child: SelectableText(
+                          //                     storyStore.feedItem.aiSummary,
+                          //                     style:
+                          //                         mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                          //                   ),
+                          //                 ),
+                          //               ).animate(controller: storyStore.animationController).slideY(
+                          //                     begin: 2,
+                          //                     end: 0,
+                          //                     curve: Curves.easeInOutSine,
+                          //                     duration: const Duration(milliseconds: 500),
+                          //                   ),
+                          //             )
+                          //           : const SizedBox(),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       )
                     : const CircularProgressIndicator(),
@@ -309,41 +258,37 @@ class _StoryState extends State<Story> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 20),
                     child: AnimatedSlide(
-                      offset: storyStore.hideBar ? Offset(0, 0.5) : Offset(0, 0),
-                      duration: 200.ms,
+                      offset: storyStore.hideBar ? Offset(0, 0.6) : Offset(0, 0),
+                      duration: 150.ms,
                       curve: Curves.easeInOutQuad,
-                      child: ClipRRect(
-                        clipBehavior: Clip.hardEdge,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(30),
-                        ),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                          child: AnimatedOpacity(
-                            opacity: storyStore.hideBar ? 0.6 : 1,
-                            duration: 250.ms,
-                            curve: Curves.easeInOutQuad,
-                            child: Card.outlined(
-                              margin: EdgeInsets.zero,
-                              color: Theme.of(context).colorScheme.surfaceContainer.withValues(alpha: 0.8),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                                  width: 1,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(30),
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
+                      child: AnimatedOpacity(
+                        opacity: storyStore.hideBar ? 0.7 : 1,
+                        duration: 150.ms,
+                        curve: Curves.easeInOutQuad,
+                        child: Card.outlined(
+                          margin: EdgeInsets.zero,
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                              width: 1,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(30),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisSize: MainAxisSize.max,
                                     spacing: 5,
                                     children: [
                                       // READER MODE
@@ -452,7 +397,66 @@ class _StoryState extends State<Story> {
                                       ),
                                     ],
                                   ),
-                                ),
+                                  AnimatedCrossFade(
+                                    duration: 150.ms,
+                                    firstCurve: Curves.easeInOutQuad,
+                                    secondCurve: Curves.easeInOutQuad,
+                                    sizeCurve: Curves.easeOutQuad,
+                                    crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                        ? CrossFadeState.showFirst
+                                        : CrossFadeState.showSecond,
+                                    firstChild: Container(
+                                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+                                      child: Card.outlined(
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                                            width: 1,
+                                          ),
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(30),
+                                          ),
+                                        ),
+                                        margin: EdgeInsets.only(bottom: 10),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: SelectableText(
+                                            storyStore.feedItem.aiSummary,
+                                            style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    secondChild: const SizedBox.shrink(),
+                                  ),
+
+                                  // storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                  //     ? Container(
+                                  //         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+                                  //         child: Card.outlined(
+                                  //           shape: RoundedRectangleBorder(
+                                  //             side: BorderSide(
+                                  //               color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                                  //               width: 1,
+                                  //             ),
+                                  //             borderRadius: const BorderRadius.all(
+                                  //               Radius.circular(30),
+                                  //             ),
+                                  //           ),
+                                  //           margin: EdgeInsets.only(bottom: 10),
+                                  //           child: Padding(
+                                  //             padding: const EdgeInsets.all(12.0),
+                                  //             child: SelectableText(
+                                  //               storyStore.feedItem.aiSummary,
+                                  //               style: mediaQuery.size.width > 600
+                                  //                   ? Theme.of(context).textTheme.bodyMedium
+                                  //                   : Theme.of(context).textTheme.bodySmall,
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //       )
+                                  //     : const SizedBox.shrink(),
+                                ],
                               ),
                             ),
                           ),
