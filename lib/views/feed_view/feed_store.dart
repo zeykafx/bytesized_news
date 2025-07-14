@@ -240,7 +240,7 @@ abstract class _FeedStore with Store {
       List<FeedItem> items = [];
       Response res;
       try {
-        res = await dio.get(feed.link);
+        res = await dio.get(feed.link, options: Options(receiveTimeout: Duration(seconds: 5)));
       } catch (e) {
         print(e);
         continue;
@@ -313,6 +313,21 @@ abstract class _FeedStore with Store {
   @action
   Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) async {
     item.bookmarked = toggle ? !item.bookmarked : true;
+    item.fetchHtmlContent();
+    item.downloaded = true;
+
+    await dbUtils.updateItemInDb(item);
+  }
+
+  @action
+  Future<void> downloadItem(FeedItem item, {bool toggle = false}) async {
+    if (item.downloaded) {
+      item.downloaded = false;
+      item.htmlContent = "";
+    } else {
+      item.downloaded = true;
+      await item.fetchHtmlContent();
+    }
 
     await dbUtils.updateItemInDb(item);
   }

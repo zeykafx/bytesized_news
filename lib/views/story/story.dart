@@ -1,3 +1,4 @@
+// ignore: unnecessary_import
 import 'dart:ui';
 
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -5,19 +6,19 @@ import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
 import 'package:bytesized_news/views/story/sub_views/story_settings.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:html/dom.dart' as dom;
-
+import 'package:time_formatter/time_formatter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class Story extends StatefulWidget {
@@ -40,7 +41,7 @@ class _StoryState extends State<Story> {
     settingsStore = context.read<SettingsStore>();
     authStore = context.read<AuthStore>();
 
-    PlatformInAppWebViewController.debugLoggingSettings.enabled = false;
+    // PlatformInAppWebViewController.debugLoggingSettings.enabled = false;
 
     storyStore.init(widget.feedItem, context, settingsStore, authStore);
 
@@ -52,7 +53,6 @@ class _StoryState extends State<Story> {
     dom.Document doc = parse(storyStore.feedItem.title);
     String parsedTitle = parse(doc.body!.text).documentElement!.text;
 
-    MediaQueryData mediaQuery = MediaQuery.of(context);
     return PopScope(
       // cannot pop this page by default, but if we popped from some way (such as the navigator), we can pop this page
       canPop: false,
@@ -145,8 +145,9 @@ class _StoryState extends State<Story> {
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
                                            <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feedName}</a></p>
-                                               ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                               <p class="grey">Reading Time: ${storyStore.estReadingTime.inMinutes} minutes</p>
+                                           ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                           <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
+                                           <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
 
                                                ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
@@ -160,7 +161,7 @@ class _StoryState extends State<Story> {
                                                   <p class="tiny">Summarized by LLama 3.1</p>
                                                   </div>''' : ""}
 
-                                               ${storyStore.htmlContent}
+                                               ${storyStore.feedItem.htmlContent}
                                                Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
                                             </div>
                                             ''',
@@ -183,6 +184,28 @@ class _StoryState extends State<Story> {
                                         }
                                         return true;
                                       },
+                                      customWidgetBuilder: (html.Element e) {
+                                        if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
+                                          return null;
+                                        }
+
+                                        String imgSrc = "";
+                                        if (e.attributes case {'src': final String src}) {
+                                          imgSrc = src;
+                                        }
+
+                                        if (imgSrc.isEmpty) {
+                                          return null;
+                                        }
+
+                                        return CachedNetworkImage(
+                                          imageUrl: imgSrc,
+                                          cacheKey: imgSrc,
+                                          cacheManager: DefaultCacheManager(),
+                                          placeholder: (context, url) => CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) => Icon(Icons.error),
+                                        );
+                                      },
                                       enableCaching: true,
                                       buildAsync: true,
                                     ),
@@ -191,63 +214,6 @@ class _StoryState extends State<Story> {
                               ),
                             ),
                           ],
-                          // AI SUMMARY
-                          // Positioned(
-                          //   bottom: 30,
-                          //   left: 30,
-                          //   right: 30,
-                          //   child: Column(
-                          //     children: [
-                          //       storyStore.aiLoading
-                          //           ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
-                          //               duration: const Duration(milliseconds: 1500),
-                          //               colors: [
-                          //                 const Color(0xBFFFFF00),
-                          //                 const Color(0xBF00FF00),
-                          //                 const Color(0xBF00FFFF),
-                          //                 const Color(0xBF0033FF),
-                          //                 const Color(0xBFFF00FF),
-                          //                 const Color(0xBFFF0000),
-                          //                 const Color(0xBFFFFF00),
-                          //               ],
-                          //             )
-                          //           : const SizedBox(),
-                          //       storyStore.feedItemSummarized && !storyStore.showReaderMode
-                          //           ? GestureDetector(
-                          //               onVerticalDragEnd: (dragDetails) {
-                          //                 if (dragDetails.velocity.pixelsPerSecond.dy > 100) {
-                          //                   storyStore.hideAiSummary();
-                          //                 }
-                          //               },
-                          //               child: Card(
-                          //                 elevation: 0,
-                          //                 margin: EdgeInsets.zero,
-                          //                 shape: const RoundedRectangleBorder(
-                          //                   borderRadius: BorderRadius.only(
-                          //                     topLeft: Radius.circular(20),
-                          //                     topRight: Radius.circular(20),
-                          //                   ),
-                          //                 ),
-                          //                 color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 1),
-                          //                 child: Padding(
-                          //                   padding: const EdgeInsets.all(15),
-                          //                   child: SelectableText(
-                          //                     storyStore.feedItem.aiSummary,
-                          //                     style:
-                          //                         mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
-                          //                   ),
-                          //                 ),
-                          //               ).animate(controller: storyStore.animationController).slideY(
-                          //                     begin: 2,
-                          //                     end: 0,
-                          //                     curve: Curves.easeInOutSine,
-                          //                     duration: const Duration(milliseconds: 500),
-                          //                   ),
-                          //             )
-                          //           : const SizedBox(),
-                          //     ],
-                          //   ),
-                          // ),
                         ],
                       )
                     : const LinearProgressIndicator(),
@@ -406,7 +372,7 @@ class _StoryState extends State<Story> {
                                         ? CrossFadeState.showFirst
                                         : CrossFadeState.showSecond,
                                     firstChild: Container(
-                                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+                                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9, maxHeight: 300),
                                       child: Card.outlined(
                                         shape: RoundedRectangleBorder(
                                           side: BorderSide(
@@ -420,9 +386,11 @@ class _StoryState extends State<Story> {
                                         margin: EdgeInsets.only(bottom: 10),
                                         child: Padding(
                                           padding: const EdgeInsets.all(12.0),
-                                          child: SelectableText(
-                                            storyStore.feedItem.aiSummary,
-                                            // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                          child: SingleChildScrollView(
+                                            child: SelectableText(
+                                              storyStore.feedItem.aiSummary,
+                                              // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                            ),
                                           ),
                                         ),
                                       ),

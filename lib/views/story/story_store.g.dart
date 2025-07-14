@@ -369,27 +369,6 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$animationControllerAtom =
-      Atom(name: '_StoryStore.animationController', context: context);
-
-  @override
-  AnimationController get animationController {
-    _$animationControllerAtom.reportRead();
-    return super.animationController;
-  }
-
-  bool _animationControllerIsInitialized = false;
-
-  @override
-  set animationController(AnimationController value) {
-    _$animationControllerAtom.reportWrite(value,
-        _animationControllerIsInitialized ? super.animationController : null,
-        () {
-      super.animationController = value;
-      _animationControllerIsInitialized = true;
-    });
-  }
-
   late final _$firestoreAtom =
       Atom(name: '_StoryStore.firestore', context: context);
 
@@ -403,22 +382,6 @@ mixin _$StoryStore on _StoryStore, Store {
   set firestore(FirebaseFirestore value) {
     _$firestoreAtom.reportWrite(value, super.firestore, () {
       super.firestore = value;
-    });
-  }
-
-  late final _$estReadingTimeAtom =
-      Atom(name: '_StoryStore.estReadingTime', context: context);
-
-  @override
-  Duration get estReadingTime {
-    _$estReadingTimeAtom.reportRead();
-    return super.estReadingTime;
-  }
-
-  @override
-  set estReadingTime(Duration value) {
-    _$estReadingTimeAtom.reportWrite(value, super.estReadingTime, () {
-      super.estReadingTime = value;
     });
   }
 
@@ -478,14 +441,6 @@ mixin _$StoryStore on _StoryStore, Store {
       AuthStore authStore) {
     return _$initAsyncAction
         .run(() => super.init(item, context, setStore, authStore));
-  }
-
-  late final _$fetchPageHtmlAsyncAction =
-      AsyncAction('_StoryStore.fetchPageHtml', context: context);
-
-  @override
-  Future<String> fetchPageHtml() {
-    return _$fetchPageHtmlAsyncAction.run(() => super.fetchPageHtml());
   }
 
   late final _$compareReaderModeLengthToPageHtmlAsyncAction = AsyncAction(
@@ -637,9 +592,7 @@ aiUtils: ${aiUtils},
 feedItemSummarized: ${feedItemSummarized},
 aiLoading: ${aiLoading},
 hideSummary: ${hideSummary},
-animationController: ${animationController},
 firestore: ${firestore},
-estReadingTime: ${estReadingTime},
 htmlWidgetKey: ${htmlWidgetKey},
 hideBar: ${hideBar},
 webviewLastScrollY: ${webviewLastScrollY}

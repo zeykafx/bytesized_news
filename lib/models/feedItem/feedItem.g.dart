@@ -37,53 +37,68 @@ const FeedItemSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'feedName': PropertySchema(
+    r'downloaded': PropertySchema(
       id: 4,
+      name: r'downloaded',
+      type: IsarType.bool,
+    ),
+    r'estReadingTimeMinutes': PropertySchema(
+      id: 5,
+      name: r'estReadingTimeMinutes',
+      type: IsarType.long,
+    ),
+    r'feedName': PropertySchema(
+      id: 6,
       name: r'feedName',
       type: IsarType.string,
     ),
     r'hashCode': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'hashCode',
       type: IsarType.long,
     ),
+    r'htmlContent': PropertySchema(
+      id: 8,
+      name: r'htmlContent',
+      type: IsarType.string,
+    ),
     r'imageUrl': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'imageUrl',
       type: IsarType.string,
     ),
     r'publishedDate': PropertySchema(
-      id: 7,
+      id: 10,
       name: r'publishedDate',
       type: IsarType.dateTime,
     ),
     r'read': PropertySchema(
-      id: 8,
+      id: 11,
       name: r'read',
       type: IsarType.bool,
     ),
     r'suggested': PropertySchema(
-      id: 9,
+      id: 12,
       name: r'suggested',
       type: IsarType.bool,
     ),
     r'summarized': PropertySchema(
-      id: 10,
+      id: 13,
       name: r'summarized',
       type: IsarType.bool,
     ),
     r'timeFetched': PropertySchema(
-      id: 11,
+      id: 14,
       name: r'timeFetched',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 12,
+      id: 15,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 13,
+      id: 16,
       name: r'url',
       type: IsarType.string,
     )
@@ -132,6 +147,12 @@ int _feedItemEstimateSize(
   }
   bytesCount += 3 + object.description.length * 3;
   bytesCount += 3 + object.feedName.length * 3;
+  {
+    final value = object.htmlContent;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.imageUrl.length * 3;
   bytesCount += 3 + object.title.length * 3;
   bytesCount += 3 + object.url.length * 3;
@@ -148,16 +169,19 @@ void _feedItemSerialize(
   writer.writeStringList(offsets[1], object.authors);
   writer.writeBool(offsets[2], object.bookmarked);
   writer.writeString(offsets[3], object.description);
-  writer.writeString(offsets[4], object.feedName);
-  writer.writeLong(offsets[5], object.hashCode);
-  writer.writeString(offsets[6], object.imageUrl);
-  writer.writeDateTime(offsets[7], object.publishedDate);
-  writer.writeBool(offsets[8], object.read);
-  writer.writeBool(offsets[9], object.suggested);
-  writer.writeBool(offsets[10], object.summarized);
-  writer.writeDateTime(offsets[11], object.timeFetched);
-  writer.writeString(offsets[12], object.title);
-  writer.writeString(offsets[13], object.url);
+  writer.writeBool(offsets[4], object.downloaded);
+  writer.writeLong(offsets[5], object.estReadingTimeMinutes);
+  writer.writeString(offsets[6], object.feedName);
+  writer.writeLong(offsets[7], object.hashCode);
+  writer.writeString(offsets[8], object.htmlContent);
+  writer.writeString(offsets[9], object.imageUrl);
+  writer.writeDateTime(offsets[10], object.publishedDate);
+  writer.writeBool(offsets[11], object.read);
+  writer.writeBool(offsets[12], object.suggested);
+  writer.writeBool(offsets[13], object.summarized);
+  writer.writeDateTime(offsets[14], object.timeFetched);
+  writer.writeString(offsets[15], object.title);
+  writer.writeString(offsets[16], object.url);
 }
 
 FeedItem _feedItemDeserialize(
@@ -171,16 +195,19 @@ FeedItem _feedItemDeserialize(
   object.authors = reader.readStringList(offsets[1]) ?? [];
   object.bookmarked = reader.readBool(offsets[2]);
   object.description = reader.readString(offsets[3]);
-  object.feedName = reader.readString(offsets[4]);
+  object.downloaded = reader.readBool(offsets[4]);
+  object.estReadingTimeMinutes = reader.readLong(offsets[5]);
+  object.feedName = reader.readString(offsets[6]);
+  object.htmlContent = reader.readStringOrNull(offsets[8]);
   object.id = id;
-  object.imageUrl = reader.readString(offsets[6]);
-  object.publishedDate = reader.readDateTime(offsets[7]);
-  object.read = reader.readBool(offsets[8]);
-  object.suggested = reader.readBool(offsets[9]);
-  object.summarized = reader.readBool(offsets[10]);
-  object.timeFetched = reader.readDateTime(offsets[11]);
-  object.title = reader.readString(offsets[12]);
-  object.url = reader.readString(offsets[13]);
+  object.imageUrl = reader.readString(offsets[9]);
+  object.publishedDate = reader.readDateTime(offsets[10]);
+  object.read = reader.readBool(offsets[11]);
+  object.suggested = reader.readBool(offsets[12]);
+  object.summarized = reader.readBool(offsets[13]);
+  object.timeFetched = reader.readDateTime(offsets[14]);
+  object.title = reader.readString(offsets[15]);
+  object.url = reader.readString(offsets[16]);
   return object;
 }
 
@@ -200,24 +227,30 @@ P _feedItemDeserializeProp<P>(
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 8:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 9:
-      return (reader.readBool(offset)) as P;
-    case 10:
-      return (reader.readBool(offset)) as P;
-    case 11:
-      return (reader.readDateTime(offset)) as P;
-    case 12:
       return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readDateTime(offset)) as P;
+    case 11:
+      return (reader.readBool(offset)) as P;
+    case 12:
+      return (reader.readBool(offset)) as P;
     case 13:
+      return (reader.readBool(offset)) as P;
+    case 14:
+      return (reader.readDateTime(offset)) as P;
+    case 15:
+      return (reader.readString(offset)) as P;
+    case 16:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -850,6 +883,72 @@ extension FeedItemQueryFilter
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> downloadedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'downloaded',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      estReadingTimeMinutesEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'estReadingTimeMinutes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      estReadingTimeMinutesGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'estReadingTimeMinutes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      estReadingTimeMinutesLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'estReadingTimeMinutes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      estReadingTimeMinutesBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'estReadingTimeMinutes',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1029,6 +1128,155 @@ extension FeedItemQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'htmlContent',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      htmlContentIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'htmlContent',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      htmlContentGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'htmlContent',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'htmlContent',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'htmlContent',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'htmlContent',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      htmlContentIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'htmlContent',
+        value: '',
       ));
     });
   }
@@ -1657,6 +1905,31 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByDownloaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'downloaded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByDownloadedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'downloaded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByEstReadingTimeMinutes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estReadingTimeMinutes', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy>
+      sortByEstReadingTimeMinutesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estReadingTimeMinutes', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFeedName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'feedName', Sort.asc);
@@ -1678,6 +1951,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByHashCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByHtmlContent() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'htmlContent', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByHtmlContentDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'htmlContent', Sort.desc);
     });
   }
 
@@ -1816,6 +2101,31 @@ extension FeedItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByDownloaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'downloaded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByDownloadedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'downloaded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByEstReadingTimeMinutes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estReadingTimeMinutes', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy>
+      thenByEstReadingTimeMinutesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estReadingTimeMinutes', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFeedName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'feedName', Sort.asc);
@@ -1837,6 +2147,18 @@ extension FeedItemQuerySortThenBy
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByHashCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByHtmlContent() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'htmlContent', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByHtmlContentDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'htmlContent', Sort.desc);
     });
   }
 
@@ -1977,6 +2299,19 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByDownloaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'downloaded');
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QDistinct>
+      distinctByEstReadingTimeMinutes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'estReadingTimeMinutes');
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByFeedName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1987,6 +2322,13 @@ extension FeedItemQueryWhereDistinct
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByHashCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'hashCode');
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByHtmlContent(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'htmlContent', caseSensitive: caseSensitive);
     });
   }
 
@@ -2074,6 +2416,19 @@ extension FeedItemQueryProperty
     });
   }
 
+  QueryBuilder<FeedItem, bool, QQueryOperations> downloadedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'downloaded');
+    });
+  }
+
+  QueryBuilder<FeedItem, int, QQueryOperations>
+      estReadingTimeMinutesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'estReadingTimeMinutes');
+    });
+  }
+
   QueryBuilder<FeedItem, String, QQueryOperations> feedNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'feedName');
@@ -2083,6 +2438,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, int, QQueryOperations> hashCodeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'hashCode');
+    });
+  }
+
+  QueryBuilder<FeedItem, String?, QQueryOperations> htmlContentProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'htmlContent');
     });
   }
 

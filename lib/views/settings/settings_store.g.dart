@@ -38,7 +38,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           (json['horizontalPadding'] as num?)?.toDouble() ?? 8.0
       ..fontFamily =
           $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
-              FontFamily.lora;
+              FontFamily.openSans
+      ..markAsReadOnScroll = json['markAsReadOnScroll'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -57,6 +58,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'lineHeight': instance.lineHeight,
       'horizontalPadding': instance.horizontalPadding,
       'fontFamily': _$FontFamilyEnumMap[instance.fontFamily]!,
+      'markAsReadOnScroll': instance.markAsReadOnScroll,
     };
 
 const _$DarkModeEnumMap = {
@@ -410,6 +412,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$markAsReadOnScrollAtom =
+      Atom(name: '_SettingsStore.markAsReadOnScroll', context: context);
+
+  @override
+  bool get markAsReadOnScroll {
+    _$markAsReadOnScrollAtom.reportRead();
+    return super.markAsReadOnScroll;
+  }
+
+  @override
+  set markAsReadOnScroll(bool value) {
+    _$markAsReadOnScrollAtom.reportWrite(value, super.markAsReadOnScroll, () {
+      super.markAsReadOnScroll = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -565,7 +583,8 @@ textAlignment: ${textAlignment},
 textWidth: ${textWidth},
 lineHeight: ${lineHeight},
 horizontalPadding: ${horizontalPadding},
-fontFamily: ${fontFamily}
+fontFamily: ${fontFamily},
+markAsReadOnScroll: ${markAsReadOnScroll}
     ''';
   }
 }

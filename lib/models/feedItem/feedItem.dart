@@ -1,9 +1,14 @@
 import 'package:any_date/any_date.dart';
+import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:html/dom.dart' as dom;
+import 'package:readability/article.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:isar/isar.dart';
+import 'package:readability/readability.dart' as readability;
 
 part "feedItem.g.dart";
 
@@ -28,9 +33,25 @@ class FeedItem {
   String aiSummary = "";
   bool summarized = false;
   bool suggested = false;
+  bool downloaded = false;
+  String? htmlContent;
+  int estReadingTimeMinutes = 0;
 
   @ignore
   Feed? feed;
+
+  @ignore
+  late DbUtils dbUtils;
+
+  @ignore
+  Isar isar = Isar.getInstance()!;
+
+  @ignore
+  static const readingSpeed = 200;
+
+  FeedItem() {
+    dbUtils = DbUtils(isar: isar);
+  }
 
   static Future<FeedItem> fromAtomItem({
     required AtomItem item,
@@ -121,6 +142,41 @@ class FeedItem {
     return feedItem;
   }
 
+  Future<String> fetchHtmlContent() async {
+    Article result = await readability.parseAsync(url);
+
+    int wordCount = result.content!.split(" ").length;
+
+    if (imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
+      imageUrl = result.imageUrl!;
+      // dbUtils.updateItemInDb(this);
+    }
+
+    // estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
+    estReadingTimeMinutes = (wordCount / readingSpeed).toInt();
+
+    htmlContent = result.content!.split("\n").toSet().join("\n");
+    downloaded = true;
+    await dbUtils.updateItemInDb(this);
+
+    dom.Document contentElement = html_parser.parse(htmlContent);
+    print(contentElement.getElementsByTagName("img"));
+    for (dom.Element el in contentElement.getElementsByTagName("img")) {
+      String imgSrc = "";
+      if (el.attributes case {'src': final String src}) {
+        imgSrc = src;
+      }
+
+      if (imgSrc.isEmpty) {
+        continue;
+      }
+
+      await DefaultCacheManager().downloadFile(imgSrc);
+    }
+
+    return htmlContent!;
+  }
+
   @override
   int get hashCode =>
       id.hashCode ^
@@ -133,7 +189,10 @@ class FeedItem {
       feedName.hashCode ^
       read.hashCode ^
       bookmarked.hashCode ^
-      feed.hashCode.hashCode;
+      feed.hashCode.hashCode ^
+      htmlContent.hashCode ^
+      estReadingTimeMinutes.hashCode ^
+      downloaded.hashCode;
 
   @override
   bool operator ==(Object other) {
@@ -150,6 +209,10 @@ class FeedItem {
         other.feedName == feedName &&
         other.read == read &&
         other.bookmarked == bookmarked &&
-        other.feed == feed;
+        other.feed == feed &&
+        other.summarized == summarized &&
+        other.htmlContent == htmlContent &&
+        other.estReadingTimeMinutes == estReadingTimeMinutes &&
+        other.downloaded == downloaded;
   }
 }

@@ -523,6 +523,15 @@ mixin _$FeedStore on _FeedStore, Store {
         .run(() => super.toggleItemBookmarked(item, toggle: toggle));
   }
 
+  late final _$downloadItemAsyncAction =
+      AsyncAction('_FeedStore.downloadItem', context: context);
+
+  @override
+  Future<void> downloadItem(FeedItem item, {bool toggle = false}) {
+    return _$downloadItemAsyncAction
+        .run(() => super.downloadItem(item, toggle: toggle));
+  }
+
   late final _$changeSortAsyncAction =
       AsyncAction('_FeedStore.changeSort', context: context);
 

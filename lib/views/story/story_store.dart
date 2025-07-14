@@ -63,9 +63,6 @@ abstract class _StoryStore with Store {
   @observable
   bool isExpanded = false;
 
-  // @observable
-  // BottomSheetBarController bsbController = BottomSheetBarController();
-
   @observable
   InAppWebViewController? controller;
 
@@ -108,15 +105,12 @@ abstract class _StoryStore with Store {
   late bool hideSummary;
 
   @observable
-  late AnimationController animationController;
-
-  @observable
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  static const readingSpeed = 200;
+  // static const readingSpeed = 200;
 
-  @observable
-  Duration estReadingTime = Duration(minutes: 0);
+  // @observable
+  // Duration estReadingTime = Duration(minutes: 0);
 
   @observable
   UniqueKey htmlWidgetKey = UniqueKey();
@@ -141,14 +135,13 @@ abstract class _StoryStore with Store {
     isBookmarked = feedItem.bookmarked;
     feedItemSummarized = feedItem.summarized;
 
-    htmlContent = await fetchPageHtml();
-
-    // bsbController.addListener(onBsbChanged);
-
-    animationController = AnimationController(
-      vsync: Navigator.of(context),
-      duration: const Duration(milliseconds: 150),
-    );
+    if (!feedItem.downloaded) {
+      htmlContent = await feedItem.fetchHtmlContent();
+      // storeHtmlPageInFeedItem(htmlContent);
+      await compareReaderModeLengthToPageHtml(context);
+    } else {
+      htmlContent = feedItem.htmlContent!;
+    }
 
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
@@ -188,8 +181,6 @@ abstract class _StoryStore with Store {
               : ForceDark.OFF,
     );
 
-    await compareReaderModeLengthToPageHtml(context);
-
     initialized = true;
 
     if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
@@ -197,21 +188,27 @@ abstract class _StoryStore with Store {
     }
   }
 
-  @action
-  Future<String> fetchPageHtml() async {
-    final Article result = await readability.parseAsync(feedItem.url);
-    // filter out duplicate lines
+  // @action
+  // void storeHtmlPageInFeedItem(String content) {
+  //   feedItem.htmlContent = content;
+  //   feedItem.downloaded = true;
+  //   dbUtils.updateItemInDb(feedItem);
+  // }
 
-    int wordCount = result.content!.split(" ").length;
+  // @action
+  // Future<String> fetchPageHtml() async {
+  //   final Article result = await readability.parseAsync(feedItem.url);
 
-    if (feedItem.imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
-      feedItem.imageUrl = result.imageUrl!;
-      dbUtils.updateItemInDb(feedItem);
-    }
+  //   int wordCount = result.content!.split(" ").length;
 
-    estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
-    return result.content!.split("\n").toSet().join("\n");
-  }
+  //   if (feedItem.imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
+  //     feedItem.imageUrl = result.imageUrl!;
+  //     dbUtils.updateItemInDb(feedItem);
+  //   }
+
+  //   estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
+  //   return result.content!.split("\n").toSet().join("\n");
+  // }
 
   @action
   Future<void> compareReaderModeLengthToPageHtml(BuildContext context) async {
@@ -278,7 +275,7 @@ abstract class _StoryStore with Store {
     if (element.className == "tiny") {
       return {
         'font-size': '0.8em',
-        'color': '#${Theme.of(context).dividerColor.value.toRadixString(16).substring(2)}',
+        'color': '#${Theme.of(context).dividerColor.toARGB32().toRadixString(16).substring(2)}',
         'text-align': 'right',
       };
     }
@@ -313,18 +310,18 @@ abstract class _StoryStore with Store {
       case "caption":
         return {
           'font-size': '0.8em',
-          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
           'text-align': 'left',
         };
       case "figcaption":
         return {
           'font-size': '0.8em',
-          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.value.toRadixString(16).substring(2)}',
+          'color': '#${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
           'text-align': 'left',
         };
       case 'a':
         return {
-          'color': '#${Theme.of(context).colorScheme.primary.value.toRadixString(16).substring(2)}',
+          'color': '#${Theme.of(context).colorScheme.primary.toARGB32().toRadixString(16).substring(2)}',
           'text-decoration': 'none',
         };
 
@@ -420,14 +417,14 @@ abstract class _StoryStore with Store {
       return;
     }
 
-    String? htmlValue;
-    if (!showReaderMode) {
-      htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
-    } else {
-      htmlValue = htmlContent;
-    }
+    // String? htmlValue;
+    // if (!showReaderMode) {
+    //   htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
+    // } else {
+    //   htmlValue = htmlContent;
+    // }
 
-    dom.Document document = parse(htmlValue);
+    dom.Document document = parse(htmlContent);
     String docText = document.body!.text;
 
     if (docText.length > 15000) {
@@ -493,20 +490,8 @@ abstract class _StoryStore with Store {
   @action
   void hideAiSummary() {
     hideBar = false;
-    animationController.toggle();
     hideSummary = !hideSummary;
   }
-
-  // @action
-  // void onBsbChanged() {
-  //   if (bsbController.isCollapsed && !isCollapsed) {
-  //     isCollapsed = true;
-  //     isExpanded = false;
-  //   } else if (bsbController.isExpanded && !isExpanded) {
-  //     isCollapsed = false;
-  //     isExpanded = true;
-  //   }
-  // }
 
   @action
   void bookmarkItem() {
@@ -566,7 +551,6 @@ abstract class _StoryStore with Store {
       hideBar = true;
       webviewLastScrollY = y;
       hideSummary = false;
-      
     }
     if (y < 200 && hideBar) {
       hideBar = false;
@@ -575,7 +559,6 @@ abstract class _StoryStore with Store {
       hideBar = false;
       webviewLastScrollY = y;
       hideSummary = false;
-      
     }
     webviewLastScrollY = y;
   }

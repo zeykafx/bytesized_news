@@ -1,6 +1,4 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
-import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
@@ -8,10 +6,8 @@ import 'package:bytesized_news/views/feed_view/bsb_feed_button.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_search.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_story_tile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';

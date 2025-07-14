@@ -52,7 +52,7 @@ class _SettingsState extends State<Settings> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 800),
                     child: const Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,6 +131,9 @@ class _GeneralSettingsState extends State<GeneralSettings> {
             title: const Text(
               "Use Reader Mode by Default",
             ),
+            onTap: () {
+              settingsStore.setUseReaderModeByDefault(!settingsStore.useReaderModeByDefault);
+            },
             trailing: Switch(
               value: settingsStore.useReaderModeByDefault,
               onChanged: (value) {
@@ -142,8 +145,11 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // SHOW AI SUMMARY ON STORY PAGE LOAD
           ListTile(
             title: const Text(
-              "Show AI Summary on Page Load (Premium)",
+              "Show AI Summary on Page Load",
             ),
+            onTap: () {
+              settingsStore.setShowAiSummaryOnLoad(!settingsStore.showAiSummaryOnLoad);
+            },
             trailing: Switch(
               value: settingsStore.showAiSummaryOnLoad,
               onChanged: (value) {
@@ -155,8 +161,11 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // FETCH AI SUMMARY ON STORY PAGE LOAD
           ListTile(
             title: const Text(
-              "Fetch AI Summary on Page Load (Premium)",
+              "Fetch AI Summary on Page Load",
             ),
+            onTap: () {
+              settingsStore.setFetchAiSummaryOnLoad(!settingsStore.fetchAiSummaryOnLoad);
+            },
             trailing: Switch(
               value: settingsStore.fetchAiSummaryOnLoad,
               onChanged: (value) {
@@ -194,6 +203,22 @@ class _GeneralSettingsState extends State<GeneralSettings> {
                   settingsStore.keepArticles = KeepArticlesLength.values[keepArticlesLengthValues.indexOf(value!)];
                 },
                 value: keepArticlesLengthString(settingsStore.keepArticles)),
+          ),
+
+          // Mark as Read On Scroll (toggle)
+          ListTile(
+            title: const Text(
+              "Mark As Read On Scroll",
+            ),
+            onTap: () {
+              settingsStore.markAsReadOnScroll = !settingsStore.markAsReadOnScroll;
+            },
+            trailing: Switch(
+              value: settingsStore.markAsReadOnScroll,
+              onChanged: (value) {
+                settingsStore.markAsReadOnScroll = value;
+              },
+            ),
           ),
         ],
       );
@@ -456,11 +481,13 @@ class _AboutSectionState extends State<AboutSection> {
             title: "About",
             children: [
               ListTile(
-                title: const Text(
-                  "Bytesized News",
-                ),
-                subtitle: Text("Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
-              ),
+                  title: const Text(
+                    "Bytesized News",
+                  ),
+                  subtitle: Text("Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
+                  onTap: () {
+                    showLicensePage(context: context);
+                  }),
               ListTile(
                 title: const Text(
                   "Made by Corentin Detry",

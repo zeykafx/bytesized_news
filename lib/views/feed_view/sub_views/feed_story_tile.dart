@@ -1,3 +1,4 @@
+import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/story/story.dart';
@@ -27,6 +28,15 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
   String parsedTitle = "";
 
   @override
+  void initState() {
+    super.initState();
+    if (!widget.item.read && widget.feedStore.settingsStore.markAsReadOnScroll) {
+      widget.item.read = true;
+      widget.feedStore.dbUtils.updateItemInDb(widget.item);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Parse the title from html (it might be html escaped)
     dom.Document doc = parse(widget.item.title);
@@ -35,12 +45,14 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
     Color cardColor;
     if (widget.isSuggestion) {
       cardColor = Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3);
-    } else if (!widget.item.bookmarked) {
-      cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2);
-    } else if (Theme.of(context).brightness == Brightness.dark) {
-      cardColor = Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4);
-    } else {
+    } else if (widget.item.bookmarked) {
       cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.8);
+      // } else if (widget.item.downloaded) {
+      //   cardColor = Theme.of(context).colorScheme.primaryFixedDim.withValues(alpha: 0.3);
+    } else if (Theme.of(context).brightness == Brightness.dark) {
+      cardColor = Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2);
+    } else {
+      cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2);
     }
 
     return Card(
@@ -88,11 +100,11 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                             clipBehavior: Clip.antiAlias,
                             child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 72, width: 128, fit: BoxFit.fitWidth),
                           )
-                    : SizedBox(
-                        height: 72,
-                        width: 128,
-                        child: const Icon(LucideIcons.rss),
-                      ),
+                        : SizedBox(
+                            height: 72,
+                            width: 128,
+                            child: const Icon(LucideIcons.rss),
+                          ),
                 const SizedBox(width: 5),
               ],
             ),
@@ -130,6 +142,15 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
+
+                    if (widget.item.downloaded) ...[
+                      const SizedBox(width: 10),
+                      Icon(
+                        LucideIcons.download,
+                        color: Theme.of(context).dividerColor,
+                        size: 15,
+                      )
+                    ],
 
                     if (widget.item.bookmarked) ...[
                       const SizedBox(width: 10),
@@ -177,6 +198,12 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                             }
                           case 1:
                             {
+                              widget.feedStore.downloadItem(widget.item, toggle: true);
+                              setState(() {});
+                              break;
+                            }
+                          case 2:
+                            {
                               widget.feedStore.toggleItemBookmarked(widget.item, toggle: true);
                               setState(() {});
                               break;
@@ -204,9 +231,28 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                               ],
                             ),
                           ),
-                          // BOOKMARK
+                          // Download
                           PopupMenuItem(
                             value: 1,
+                            child: Wrap(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Icon(
+                                    LucideIcons.download,
+                                    size: 19,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Text(widget.item.downloaded ? "Remove from downloads" : "Add to downloads"),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // BOOKMARK
+                          PopupMenuItem(
+                            value: 2,
                             child: Wrap(
                               children: [
                                 Padding(

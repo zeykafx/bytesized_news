@@ -83,6 +83,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   skeletonizer: ^2.1.0+1
   google_fonts: ^6.2.1
+  precached_network_image: ^1.2.4
+  flutter_cache_manager: ^3.4.1
 #  drift: ^2.27.0
 #  drift_flutter: ^0.2.4
 

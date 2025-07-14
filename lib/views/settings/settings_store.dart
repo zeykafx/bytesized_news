@@ -4,7 +4,6 @@ import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
-import 'package:rss_dart/domain/media/text.dart';
 
 part 'settings_store.g.dart';
 
@@ -157,6 +156,7 @@ String fontFamilyToString(FontFamily fontFamily) {
     FontFamily.crimsonText => "Crimson Text",
   };
 }
+
 String fontFamilyToExplanation(FontFamily fontFamily) {
   return switch (fontFamily) {
     FontFamily.roboto => "Popular default",
@@ -205,7 +205,8 @@ abstract class _SettingsStore with Store {
   static const defaultTextWidth = TextWidth.normal;
   static const double defaultLineHeight = 1.2;
   static const double defaultHorizontalPadding = 8.0;
-  static const defaultFontFamily = FontFamily.lora;
+  static const defaultFontFamily = FontFamily.openSans;
+  static const defaultMarkAsReadOnScroll = false;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -351,4 +352,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultFontFamily)
   @observable
   FontFamily fontFamily = defaultFontFamily;
+
+  @JsonKey(defaultValue: defaultMarkAsReadOnScroll)
+  @observable
+  bool markAsReadOnScroll = defaultMarkAsReadOnScroll;
 }
