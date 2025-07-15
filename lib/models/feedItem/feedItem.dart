@@ -1,7 +1,6 @@
 import 'package:any_date/any_date.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:readability/article.dart';
@@ -36,6 +35,7 @@ class FeedItem {
   bool downloaded = false;
   String? htmlContent;
   int estReadingTimeMinutes = 0;
+  bool? fetchedInBg = false;
 
   @ignore
   Feed? feed;
@@ -149,7 +149,6 @@ class FeedItem {
 
     if (imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
       imageUrl = result.imageUrl!;
-      // dbUtils.updateItemInDb(this);
     }
 
     // estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
@@ -160,7 +159,6 @@ class FeedItem {
     await dbUtils.updateItemInDb(this);
 
     dom.Document contentElement = html_parser.parse(htmlContent);
-    print(contentElement.getElementsByTagName("img"));
     for (dom.Element el in contentElement.getElementsByTagName("img")) {
       String imgSrc = "";
       if (el.attributes case {'src': final String src}) {

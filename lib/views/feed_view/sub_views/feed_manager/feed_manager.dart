@@ -298,7 +298,7 @@ class _FeedManagerState extends State<FeedManager> {
                               // FeedGroups
                               GridView.count(
                                 crossAxisCount: 2,
-                                childAspectRatio: mediaQuery.size.width > 500 ? 3.5 : 3,
+                                childAspectRatio: 3,
                                 mainAxisSpacing: 3,
                                 crossAxisSpacing: 3,
                                 shrinkWrap: true,

@@ -67,7 +67,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
             // contentPadding: EdgeInsets.zero,
             contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
             title: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(

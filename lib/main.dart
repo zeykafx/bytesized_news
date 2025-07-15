@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bytesized_news/background/background_fetch.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -22,12 +24,40 @@ import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:isar/isar.dart';
+import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:path_provider/path_provider.dart';
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    if (kDebugMode) {
+      print("Running background task: $task");
+    }
+    return BackgroundFetch.runBackgroundFetch();
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Animate.restartOnHotReload;
+
+  Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
+      isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+      );
+
+  final String taskName = "com.zeykafx.bytesized_news.btNewsBgFetch";
+  await Workmanager().registerPeriodicTask(
+    taskName,
+    taskName,
+    // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
+    frequency: Duration(hours: 1),
+    initialDelay: Duration(seconds: 0),
+    constraints: Constraints(
+      // Connected or metered mark the task as requiring internet
+      networkType: NetworkType.connected,
+    ),
+  );
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -88,11 +118,7 @@ void main() async {
   await authStore.init(null);
 
   if (settingsStore.sortFeedName != null) {
-    settingsStore.sortFeed = await isar.feeds
-        .where()
-        .filter()
-        .nameEqualTo(settingsStore.sortFeedName!)
-        .findFirst();
+    settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();
 
     if (settingsStore.sortFeed == null) {
       settingsStore.sortFeedName = null;
@@ -102,11 +128,7 @@ void main() async {
   }
 
   if (settingsStore.sortFeedGroupName != null) {
-    settingsStore.sortFeedGroup = await isar.feedGroups
-        .where()
-        .filter()
-        .nameEqualTo(settingsStore.sortFeedGroupName!)
-        .findFirst();
+    settingsStore.sortFeedGroup = await isar.feedGroups.where().filter().nameEqualTo(settingsStore.sortFeedGroupName!).findFirst();
     if (settingsStore.sortFeedGroup == null) {
       settingsStore.sortFeedGroupName = null;
       settingsStore.sortFeedGroup = null;

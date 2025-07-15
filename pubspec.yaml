@@ -85,6 +85,7 @@ dependencies:
   google_fonts: ^6.2.1
   precached_network_image: ^1.2.4
   flutter_cache_manager: ^3.4.1
+  workmanager: ^0.8.0
 #  drift: ^2.27.0
 #  drift_flutter: ^0.2.4
 

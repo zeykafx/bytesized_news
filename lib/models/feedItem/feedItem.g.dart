@@ -52,53 +52,58 @@ const FeedItemSchema = CollectionSchema(
       name: r'feedName',
       type: IsarType.string,
     ),
-    r'hashCode': PropertySchema(
+    r'fetchedInBg': PropertySchema(
       id: 7,
+      name: r'fetchedInBg',
+      type: IsarType.bool,
+    ),
+    r'hashCode': PropertySchema(
+      id: 8,
       name: r'hashCode',
       type: IsarType.long,
     ),
     r'htmlContent': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'htmlContent',
       type: IsarType.string,
     ),
     r'imageUrl': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'imageUrl',
       type: IsarType.string,
     ),
     r'publishedDate': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'publishedDate',
       type: IsarType.dateTime,
     ),
     r'read': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'read',
       type: IsarType.bool,
     ),
     r'suggested': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'suggested',
       type: IsarType.bool,
     ),
     r'summarized': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'summarized',
       type: IsarType.bool,
     ),
     r'timeFetched': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'timeFetched',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'url',
       type: IsarType.string,
     )
@@ -172,16 +177,17 @@ void _feedItemSerialize(
   writer.writeBool(offsets[4], object.downloaded);
   writer.writeLong(offsets[5], object.estReadingTimeMinutes);
   writer.writeString(offsets[6], object.feedName);
-  writer.writeLong(offsets[7], object.hashCode);
-  writer.writeString(offsets[8], object.htmlContent);
-  writer.writeString(offsets[9], object.imageUrl);
-  writer.writeDateTime(offsets[10], object.publishedDate);
-  writer.writeBool(offsets[11], object.read);
-  writer.writeBool(offsets[12], object.suggested);
-  writer.writeBool(offsets[13], object.summarized);
-  writer.writeDateTime(offsets[14], object.timeFetched);
-  writer.writeString(offsets[15], object.title);
-  writer.writeString(offsets[16], object.url);
+  writer.writeBool(offsets[7], object.fetchedInBg);
+  writer.writeLong(offsets[8], object.hashCode);
+  writer.writeString(offsets[9], object.htmlContent);
+  writer.writeString(offsets[10], object.imageUrl);
+  writer.writeDateTime(offsets[11], object.publishedDate);
+  writer.writeBool(offsets[12], object.read);
+  writer.writeBool(offsets[13], object.suggested);
+  writer.writeBool(offsets[14], object.summarized);
+  writer.writeDateTime(offsets[15], object.timeFetched);
+  writer.writeString(offsets[16], object.title);
+  writer.writeString(offsets[17], object.url);
 }
 
 FeedItem _feedItemDeserialize(
@@ -198,16 +204,17 @@ FeedItem _feedItemDeserialize(
   object.downloaded = reader.readBool(offsets[4]);
   object.estReadingTimeMinutes = reader.readLong(offsets[5]);
   object.feedName = reader.readString(offsets[6]);
-  object.htmlContent = reader.readStringOrNull(offsets[8]);
+  object.fetchedInBg = reader.readBoolOrNull(offsets[7]);
+  object.htmlContent = reader.readStringOrNull(offsets[9]);
   object.id = id;
-  object.imageUrl = reader.readString(offsets[9]);
-  object.publishedDate = reader.readDateTime(offsets[10]);
-  object.read = reader.readBool(offsets[11]);
-  object.suggested = reader.readBool(offsets[12]);
-  object.summarized = reader.readBool(offsets[13]);
-  object.timeFetched = reader.readDateTime(offsets[14]);
-  object.title = reader.readString(offsets[15]);
-  object.url = reader.readString(offsets[16]);
+  object.imageUrl = reader.readString(offsets[10]);
+  object.publishedDate = reader.readDateTime(offsets[11]);
+  object.read = reader.readBool(offsets[12]);
+  object.suggested = reader.readBool(offsets[13]);
+  object.summarized = reader.readBool(offsets[14]);
+  object.timeFetched = reader.readDateTime(offsets[15]);
+  object.title = reader.readString(offsets[16]);
+  object.url = reader.readString(offsets[17]);
   return object;
 }
 
@@ -233,24 +240,26 @@ P _feedItemDeserializeProp<P>(
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 8:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 11:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 12:
       return (reader.readBool(offset)) as P;
     case 13:
       return (reader.readBool(offset)) as P;
     case 14:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 15:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 16:
+      return (reader.readString(offset)) as P;
+    case 17:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1075,6 +1084,33 @@ extension FeedItemQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'feedName',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> fetchedInBgIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'fetchedInBg',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+      fetchedInBgIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'fetchedInBg',
+      ));
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> fetchedInBgEqualTo(
+      bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fetchedInBg',
+        value: value,
       ));
     });
   }
@@ -1942,6 +1978,18 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFetchedInBg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fetchedInBg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFetchedInBgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fetchedInBg', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByHashCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hashCode', Sort.asc);
@@ -2138,6 +2186,18 @@ extension FeedItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFetchedInBg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fetchedInBg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFetchedInBgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fetchedInBg', Sort.desc);
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByHashCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hashCode', Sort.asc);
@@ -2319,6 +2379,12 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByFetchedInBg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fetchedInBg');
+    });
+  }
+
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByHashCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'hashCode');
@@ -2432,6 +2498,12 @@ extension FeedItemQueryProperty
   QueryBuilder<FeedItem, String, QQueryOperations> feedNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'feedName');
+    });
+  }
+
+  QueryBuilder<FeedItem, bool?, QQueryOperations> fetchedInBgProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fetchedInBg');
     });
   }
 

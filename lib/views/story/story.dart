@@ -1,4 +1,5 @@
 // ignore: unnecessary_import
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -95,6 +96,7 @@ class _StoryState extends State<Story> {
               children: [
                 storyStore.initialized
                     ? Stack(
+                      alignment: Alignment.topCenter,
                         children: [
                           if (!storyStore.showReaderMode) ...[
                             InAppWebView(
@@ -135,79 +137,81 @@ class _StoryState extends State<Story> {
                               child: SelectableRegion(
                                 focusNode: FocusNode(),
                                 selectionControls: MaterialTextSelectionControls(),
-                                child: Container(
-                                  constraints: const BoxConstraints(maxWidth: 800),
-                                  child: NotificationListener<ScrollNotification>(
-                                    onNotification: storyStore.notificationListener,
-                                    child: HtmlWidget(
-                                      key: storyStore.htmlWidgetKey,
-                                      '''
+                                child: Center(
+                                  child: Container(
+                                    constraints: const BoxConstraints(maxWidth: 800),
+                                    child: NotificationListener<ScrollNotification>(
+                                      onNotification: storyStore.notificationListener,
+                                      child: HtmlWidget(
+                                        key: storyStore.htmlWidgetKey,
+                                        '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                           <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feedName}</a></p>
-                                           ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                           <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
-                                           <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
-
-                                               ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
-
-                                                 ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
-                                                  <h2>Summary</h2>
-                                                  <p>
-                                                  ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
-                                          return "<p>$part</p>";
-                                        }).join("")}
-                                                  </p>
-                                                  <p class="tiny">Summarized by LLama 3.1</p>
-                                                  </div>''' : ""}
-
-                                               ${storyStore.feedItem.htmlContent}
-                                               Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
-                                            </div>
-                                            ''',
-                                      renderMode: RenderMode.listView,
-                                      textStyle: fontFamilyToGoogleFontTextStyle(settingsStore.fontFamily).copyWith(
-                                        fontSize: settingsStore.fontSize,
-                                        fontWeight: widthToWeight(settingsStore.textWidth),
+                                             <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feedName}</a></p>
+                                             ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                             <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
+                                             <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
+                                  
+                                                 ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+                                  
+                                                   ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                                    <h2>Summary</h2>
+                                                    <p>
+                                                    ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
+                                            return "<p>$part</p>";
+                                          }).join("")}
+                                                    </p>
+                                                    <p class="tiny">Summarized by LLama 3.1</p>
+                                                    </div>''' : ""}
+                                  
+                                                 ${storyStore.feedItem.htmlContent}
+                                                 Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
+                                              </div>
+                                              ''',
+                                        renderMode: RenderMode.listView,
+                                        textStyle: fontFamilyToGoogleFontTextStyle(settingsStore.fontFamily).copyWith(
+                                          fontSize: settingsStore.fontSize,
+                                          fontWeight: widthToWeight(settingsStore.textWidth),
+                                        ),
+                                        customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                        onTapImage: (ImageMetadata imageData) {
+                                          storyStore.showImage(imageData.sources.firstOrNull!.url, context);
+                                        },
+                                        onTapUrl: (String? url) async {
+                                          if (url == null) {
+                                            return false;
+                                          }
+                                          Uri uri = Uri.parse(url);
+                                          if (!await launchUrl(uri)) {
+                                            throw Exception('Could not launch $url');
+                                          }
+                                          return true;
+                                        },
+                                        customWidgetBuilder: (html.Element e) {
+                                          if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
+                                            return null;
+                                          }
+                                  
+                                          String imgSrc = "";
+                                          if (e.attributes case {'src': final String src}) {
+                                            imgSrc = src;
+                                          }
+                                  
+                                          if (imgSrc.isEmpty) {
+                                            return null;
+                                          }
+                                  
+                                          return CachedNetworkImage(
+                                            imageUrl: imgSrc,
+                                            cacheKey: imgSrc,
+                                            cacheManager: DefaultCacheManager(),
+                                            placeholder: (context, url) => CircularProgressIndicator(),
+                                            errorWidget: (context, url, error) => Icon(Icons.error),
+                                          );
+                                        },
+                                        enableCaching: true,
+                                        buildAsync: true,
                                       ),
-                                      customStylesBuilder: (element) => storyStore.buildStyle(context, element),
-                                      onTapImage: (ImageMetadata imageData) {
-                                        storyStore.showImage(imageData.sources.firstOrNull!.url, context);
-                                      },
-                                      onTapUrl: (String? url) async {
-                                        if (url == null) {
-                                          return false;
-                                        }
-                                        Uri uri = Uri.parse(url);
-                                        if (!await launchUrl(uri)) {
-                                          throw Exception('Could not launch $url');
-                                        }
-                                        return true;
-                                      },
-                                      customWidgetBuilder: (html.Element e) {
-                                        if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
-                                          return null;
-                                        }
-
-                                        String imgSrc = "";
-                                        if (e.attributes case {'src': final String src}) {
-                                          imgSrc = src;
-                                        }
-
-                                        if (imgSrc.isEmpty) {
-                                          return null;
-                                        }
-
-                                        return CachedNetworkImage(
-                                          imageUrl: imgSrc,
-                                          cacheKey: imgSrc,
-                                          cacheManager: DefaultCacheManager(),
-                                          placeholder: (context, url) => CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) => Icon(Icons.error),
-                                        );
-                                      },
-                                      enableCaching: true,
-                                      buildAsync: true,
                                     ),
                                   ),
                                 ),
@@ -372,7 +376,7 @@ class _StoryState extends State<Story> {
                                         ? CrossFadeState.showFirst
                                         : CrossFadeState.showSecond,
                                     firstChild: Container(
-                                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9, maxHeight: 300),
+                                      constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
                                       child: Card.outlined(
                                         shape: RoundedRectangleBorder(
                                           side: BorderSide(
