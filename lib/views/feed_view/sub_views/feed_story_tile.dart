@@ -152,6 +152,15 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                       )
                     ],
 
+                    if (widget.item.fetchedInBg != null && widget.item.fetchedInBg!) ...[
+                      const SizedBox(width: 5),
+                      Icon(
+                        Icons.sync,
+                        color: Theme.of(context).dividerColor,
+                        size: 12,
+                      )
+                    ],
+
                     if (widget.item.bookmarked) ...[
                       const SizedBox(width: 10),
                       Icon(

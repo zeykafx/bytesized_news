@@ -51,11 +51,12 @@ void main() async {
     taskName,
     taskName,
     // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
-    frequency: Duration(hours: 1),
+    frequency: Duration(hours: 2),
     initialDelay: Duration(seconds: 0),
     constraints: Constraints(
       // Connected or metered mark the task as requiring internet
       networkType: NetworkType.connected,
+      requiresDeviceIdle: true,
     ),
   );
 

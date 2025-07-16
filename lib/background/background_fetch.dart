@@ -26,9 +26,9 @@ class BackgroundFetch {
     List<Feed> feeds = await dbUtils.getFeeds();
 
     Dio dio = Dio();
-
+    
+    List<FeedItem> items = [];
     for (Feed feed in feeds) {
-      List<FeedItem> items = [];
       Response res;
       try {
         res = await dio.get(feed.link, options: Options(receiveTimeout: Duration(seconds: 5)));
@@ -78,13 +78,10 @@ class BackgroundFetch {
         }
       }
 
-      if (items.isEmpty) {
-        continue;
-      }
-
-      await dbUtils.addNewItems(items);
     }
 
+    await dbUtils.addNewItems(items);
+    
     return true;
   }
 }

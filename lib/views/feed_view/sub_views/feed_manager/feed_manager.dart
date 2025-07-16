@@ -298,7 +298,7 @@ class _FeedManagerState extends State<FeedManager> {
                               // FeedGroups
                               GridView.count(
                                 crossAxisCount: 2,
-                                childAspectRatio: 3,
+                                childAspectRatio: mediaQuery.size.width > 700 ? 6 : 3,
                                 mainAxisSpacing: 3,
                                 crossAxisSpacing: 3,
                                 shrinkWrap: true,
@@ -326,7 +326,7 @@ class _FeedManagerState extends State<FeedManager> {
                               // TODO: use animated fractionally sized thingy
                               GridView.count(
                                 crossAxisCount: feedManagerStore.isList ? 1 : 2,
-                                childAspectRatio: feedManagerStore.isList ? 8 : 4.3,
+                                childAspectRatio: mediaQuery.size.width > 700 ? (feedManagerStore.isList ? 14 : 7) : (feedManagerStore.isList ? 8 : 4.3),
                                 mainAxisSpacing: 3,
                                 crossAxisSpacing: 3,
                                 shrinkWrap: true,
