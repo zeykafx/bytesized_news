@@ -187,6 +187,37 @@ TextStyle fontFamilyToGoogleFontTextStyle(FontFamily fontFamily) {
   };
 }
 
+enum BackgroundFetchInterval {
+  never(Duration(days: 99)),
+  thirtyMinutes(Duration(minutes: 30)),
+  oneHour(Duration(hours: 1)),
+  oneHourAndAHalf(Duration(hours: 1, minutes: 30)),
+  twoHours(Duration(hours: 2)),
+  threeHours(Duration(hours: 3)),
+  sixHours(Duration(hours: 6)),
+  twelveHours(Duration(hours: 12)),
+  oneDay(Duration(days: 1));
+
+  const BackgroundFetchInterval(this.value);
+  final Duration value;
+}
+
+String backgroundFetchIntervalString(BackgroundFetchInterval backgroundFetchInterval) {
+  return switch (backgroundFetchInterval) {
+    BackgroundFetchInterval.never => "Never",
+    BackgroundFetchInterval.thirtyMinutes => "30 minutes",
+    BackgroundFetchInterval.oneHour => "1 hour",
+    BackgroundFetchInterval.oneHourAndAHalf => "1.5 hours",
+    BackgroundFetchInterval.twoHours => "2 hours",
+    BackgroundFetchInterval.threeHours => "3 hours",
+    BackgroundFetchInterval.sixHours => "6 hours",
+    BackgroundFetchInterval.twelveHours => "12 hours",
+    BackgroundFetchInterval.oneDay => "24 hours",
+  };
+}
+
+const backgroundFetchIntervalValues = ["Never", "30 minutes", "1 hour", "1.5 hours", "2 hours", "3 hours", "6 hours", "12 hours", "24 hours"];
+
 @JsonSerializable()
 class SettingsStore extends _SettingsStore with _$SettingsStore {
   SettingsStore();
@@ -207,6 +238,9 @@ abstract class _SettingsStore with Store {
   static const double defaultHorizontalPadding = 8.0;
   static const defaultFontFamily = FontFamily.openSans;
   static const defaultMarkAsReadOnScroll = false;
+  static const defaultBackgroundFetchInterval = BackgroundFetchInterval.oneHourAndAHalf;
+  static const defaultSkipBgFetchOnLowBattery = true;
+  static const defaultRequireDeviceIdleForBgFetch = false;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -356,4 +390,16 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultMarkAsReadOnScroll)
   @observable
   bool markAsReadOnScroll = defaultMarkAsReadOnScroll;
+
+  @JsonKey(defaultValue: defaultBackgroundFetchInterval)
+  @observable
+  BackgroundFetchInterval backgroundFetchInterval = defaultBackgroundFetchInterval;
+
+  @JsonKey(defaultValue: defaultSkipBgFetchOnLowBattery)
+  @observable
+  bool skipBgSyncOnLowBattery = defaultSkipBgFetchOnLowBattery;
+
+  @JsonKey(defaultValue: defaultRequireDeviceIdleForBgFetch)
+  @observable
+  bool requireDeviceIdleForBgFetch = defaultRequireDeviceIdleForBgFetch;
 }

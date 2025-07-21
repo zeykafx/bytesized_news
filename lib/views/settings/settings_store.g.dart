@@ -39,7 +39,14 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..fontFamily =
           $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
               FontFamily.openSans
-      ..markAsReadOnScroll = json['markAsReadOnScroll'] as bool? ?? false;
+      ..markAsReadOnScroll = json['markAsReadOnScroll'] as bool? ?? false
+      ..backgroundFetchInterval = $enumDecodeNullable(
+              _$BackgroundFetchIntervalEnumMap,
+              json['backgroundFetchInterval']) ??
+          BackgroundFetchInterval.oneHourAndAHalf
+      ..skipBgSyncOnLowBattery = json['skipBgSyncOnLowBattery'] as bool? ?? true
+      ..requireDeviceIdleForBgFetch =
+          json['requireDeviceIdleForBgFetch'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -59,6 +66,10 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'horizontalPadding': instance.horizontalPadding,
       'fontFamily': _$FontFamilyEnumMap[instance.fontFamily]!,
       'markAsReadOnScroll': instance.markAsReadOnScroll,
+      'backgroundFetchInterval':
+          _$BackgroundFetchIntervalEnumMap[instance.backgroundFetchInterval]!,
+      'skipBgSyncOnLowBattery': instance.skipBgSyncOnLowBattery,
+      'requireDeviceIdleForBgFetch': instance.requireDeviceIdleForBgFetch,
     };
 
 const _$DarkModeEnumMap = {
@@ -114,6 +125,18 @@ const _$FontFamilyEnumMap = {
   FontFamily.lato: 'lato',
   FontFamily.firaSans: 'firaSans',
   FontFamily.crimsonText: 'crimsonText',
+};
+
+const _$BackgroundFetchIntervalEnumMap = {
+  BackgroundFetchInterval.never: 'never',
+  BackgroundFetchInterval.thirtyMinutes: 'thirtyMinutes',
+  BackgroundFetchInterval.oneHour: 'oneHour',
+  BackgroundFetchInterval.oneHourAndAHalf: 'oneHourAndAHalf',
+  BackgroundFetchInterval.twoHours: 'twoHours',
+  BackgroundFetchInterval.threeHours: 'threeHours',
+  BackgroundFetchInterval.sixHours: 'sixHours',
+  BackgroundFetchInterval.twelveHours: 'twelveHours',
+  BackgroundFetchInterval.oneDay: 'oneDay',
 };
 
 // **************************************************************************
@@ -428,6 +451,57 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$backgroundFetchIntervalAtom =
+      Atom(name: '_SettingsStore.backgroundFetchInterval', context: context);
+
+  @override
+  BackgroundFetchInterval get backgroundFetchInterval {
+    _$backgroundFetchIntervalAtom.reportRead();
+    return super.backgroundFetchInterval;
+  }
+
+  @override
+  set backgroundFetchInterval(BackgroundFetchInterval value) {
+    _$backgroundFetchIntervalAtom
+        .reportWrite(value, super.backgroundFetchInterval, () {
+      super.backgroundFetchInterval = value;
+    });
+  }
+
+  late final _$skipBgSyncOnLowBatteryAtom =
+      Atom(name: '_SettingsStore.skipBgSyncOnLowBattery', context: context);
+
+  @override
+  bool get skipBgSyncOnLowBattery {
+    _$skipBgSyncOnLowBatteryAtom.reportRead();
+    return super.skipBgSyncOnLowBattery;
+  }
+
+  @override
+  set skipBgSyncOnLowBattery(bool value) {
+    _$skipBgSyncOnLowBatteryAtom
+        .reportWrite(value, super.skipBgSyncOnLowBattery, () {
+      super.skipBgSyncOnLowBattery = value;
+    });
+  }
+
+  late final _$requireDeviceIdleForBgFetchAtom = Atom(
+      name: '_SettingsStore.requireDeviceIdleForBgFetch', context: context);
+
+  @override
+  bool get requireDeviceIdleForBgFetch {
+    _$requireDeviceIdleForBgFetchAtom.reportRead();
+    return super.requireDeviceIdleForBgFetch;
+  }
+
+  @override
+  set requireDeviceIdleForBgFetch(bool value) {
+    _$requireDeviceIdleForBgFetchAtom
+        .reportWrite(value, super.requireDeviceIdleForBgFetch, () {
+      super.requireDeviceIdleForBgFetch = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -584,7 +658,10 @@ textWidth: ${textWidth},
 lineHeight: ${lineHeight},
 horizontalPadding: ${horizontalPadding},
 fontFamily: ${fontFamily},
-markAsReadOnScroll: ${markAsReadOnScroll}
+markAsReadOnScroll: ${markAsReadOnScroll},
+backgroundFetchInterval: ${backgroundFetchInterval},
+skipBgSyncOnLowBattery: ${skipBgSyncOnLowBattery},
+requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch}
     ''';
   }
 }

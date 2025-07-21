@@ -289,7 +289,8 @@ abstract class _FeedStore with Store {
         continue;
       }
 
-      feedItems.addAll(await dbUtils.addNewItems(items));
+      await dbUtils.addNewItems(items);
+      feedItems.addAll(items);
       feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     }
 
@@ -477,6 +478,7 @@ abstract class _FeedStore with Store {
       }
 
       suggestedFeedItems.clear();
+
       // Fetch the suggestions from the db and filter out muted keywords (shouldn't be needed)
       List<FeedItem> suggested = await dbUtils.getSuggestedItems(feeds);
       filterArticlesMutedKeywords(suggested);
@@ -501,7 +503,7 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(20);
+      ..take(30);
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;
@@ -553,7 +555,8 @@ abstract class _FeedStore with Store {
     for (FeedItem feedItem in suggestedArticles) {
       if (!feedItem.suggested) {
         feedItem.suggested = true;
-        await dbUtils.updateItemInDb(feedItem);
+        downloadItem(feedItem); // this also updates the item
+        // await dbUtils.updateItemInDb(feedItem);
       }
     }
   }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/background/background_fetch.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
@@ -28,37 +29,30 @@ import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:path_provider/path_provider.dart';
 
+final String taskName = "com.zeykafx.bytesized_news.btNewsBgFetch";
+
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) {
     if (kDebugMode) {
       print("Running background task: $task");
     }
-    return BackgroundFetch.runBackgroundFetch();
+    if (task == taskName) {
+      return BackgroundFetch.runBackgroundFetch();
+    }
+    return Future.value(false);
   });
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  lifecycleEventHandler.init();
+
   Animate.restartOnHotReload;
 
   Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
       );
-
-  final String taskName = "com.zeykafx.bytesized_news.btNewsBgFetch";
-  await Workmanager().registerPeriodicTask(
-    taskName,
-    taskName,
-    // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
-    frequency: Duration(hours: 2),
-    initialDelay: Duration(seconds: 0),
-    constraints: Constraints(
-      // Connected or metered mark the task as requiring internet
-      networkType: NetworkType.connected,
-      requiresDeviceIdle: true,
-    ),
-  );
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -145,6 +139,22 @@ void main() async {
 
         settingsStore.sortFeedGroup!.feeds.add(feed);
       }
+    }
+
+    if (settingsStore.backgroundFetchInterval != BackgroundFetchInterval.never) {
+      await Workmanager().registerPeriodicTask(
+        taskName,
+        taskName,
+        // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
+        frequency: settingsStore.backgroundFetchInterval.value,
+        initialDelay: Duration(minutes: 30),
+        constraints: Constraints(
+          // Connected or metered mark the task as requiring internet
+          networkType: NetworkType.connected,
+          requiresDeviceIdle: settingsStore.requireDeviceIdleForBgFetch,
+          requiresBatteryNotLow: settingsStore.skipBgSyncOnLowBattery,
+        ),
+      );
     }
   }
 

@@ -70,7 +70,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
+                Expanded(
                   child: Text(
                     parsedTitle,
                     overflow: TextOverflow.ellipsis,

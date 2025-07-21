@@ -17,7 +17,6 @@ const openai: OpenAI = new OpenAI({
 const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
 
-
 export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   logger.info("User created: " + user.uid);
 
@@ -137,7 +136,9 @@ export const summarize = onCall(
     // check the length of the article
     if (content.length > maxCharsForOneSummary) {
       // will consume more than 1 summary since the content is so long
-      summariesToConsume += Math.ceil(((content.length / maxCharsForOneSummary) - 1));
+      summariesToConsume += Math.ceil(
+        content.length / maxCharsForOneSummary - 1,
+      );
       // logger.info("Article too long: " + content.length);
       // return {
       //   error:
@@ -159,11 +160,11 @@ export const summarize = onCall(
         {
           role: "system",
           content: `
-        Summarize the article in $maxSummaryLength sentences, DO NOT OUTPUT A SUMMARY LONGER
-        THAN 3 SENTENCES!!Stick to the information in the article.
+        Summarize the article in 6 sentences, DO NOT OUTPUT A SUMMARY LONGER
+        THAN 6 SENTENCES!! Stick to the information in the article.
         Do not add any new information, if an article refers to Twitter as 'X' do not do the same,
         instead refer to it as 'Twitter. Always provide a translation of the units of measurements
-        used in the article (e.g., translate feets to meters and vice versa) (do so in parentheses).
+        used in the article (only translate between metric and imperial) (do so in parentheses).
         ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE "Here is a summary..."!
         If you can, use bullet points with proper formatting such that each bullet point starts on its own line.
         `,

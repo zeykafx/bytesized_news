@@ -12,7 +12,7 @@ class AddFeed extends StatefulWidget {
   final Function getFeeds;
   final Function getItems;
 
-  AddFeed({super.key, required this.getFeeds, required this.getItems});
+  const AddFeed({super.key, required this.getFeeds, required this.getItems});
 
   @override
   State<AddFeed> createState() => _AddFeedState();

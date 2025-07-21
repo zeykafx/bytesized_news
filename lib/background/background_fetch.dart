@@ -1,10 +1,10 @@
+import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
@@ -14,6 +14,13 @@ import 'package:rss_dart/domain/rss_item.dart';
 
 class BackgroundFetch {
   static Future<bool> runBackgroundFetch() async {
+    if (!lifecycleEventHandler.inBackground) {
+      if (kDebugMode) {
+        print("The app is also running in the foreground, bg worker stopping.");
+      }
+      return true;
+    }
+
     // Open the isar instance in this thread
     final dir = await getApplicationDocumentsDirectory();
     final isar = await Isar.open(
@@ -26,9 +33,13 @@ class BackgroundFetch {
     List<Feed> feeds = await dbUtils.getFeeds();
 
     Dio dio = Dio();
-    
+
     List<FeedItem> items = [];
     for (Feed feed in feeds) {
+      if (kDebugMode) {
+        print("Fetching items for $feed from the background worker!");
+      }
+
       Response res;
       try {
         res = await dio.get(feed.link, options: Options(receiveTimeout: Duration(seconds: 5)));
@@ -77,11 +88,10 @@ class BackgroundFetch {
           items.add(feedItem);
         }
       }
-
     }
 
     await dbUtils.addNewItems(items);
-    
+
     return true;
   }
 }

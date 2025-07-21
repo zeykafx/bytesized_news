@@ -107,11 +107,6 @@ abstract class _StoryStore with Store {
   @observable
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // static const readingSpeed = 200;
-
-  // @observable
-  // Duration estReadingTime = Duration(minutes: 0);
-
   @observable
   UniqueKey htmlWidgetKey = UniqueKey();
 

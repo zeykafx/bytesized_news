@@ -1,7 +1,5 @@
 // ignore: unnecessary_import
 import 'dart:math';
-import 'dart:ui';
-
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -96,7 +94,7 @@ class _StoryState extends State<Story> {
               children: [
                 storyStore.initialized
                     ? Stack(
-                      alignment: Alignment.topCenter,
+                        alignment: Alignment.topCenter,
                         children: [
                           if (!storyStore.showReaderMode) ...[
                             InAppWebView(
@@ -130,6 +128,7 @@ class _StoryState extends State<Story> {
                               onLoadStop: storyStore.onLoadStop,
                               onProgressChanged: storyStore.onProgressChanged,
                             ),
+                            const SizedBox(height: 15),
                           ],
                           if (storyStore.showReaderMode) ...[
                             Padding(
@@ -151,9 +150,9 @@ class _StoryState extends State<Story> {
                                              ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
                                              <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
                                              <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
-                                  
+
                                                  ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
-                                  
+
                                                    ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                                     <h2>Summary</h2>
                                                     <p>
@@ -163,7 +162,7 @@ class _StoryState extends State<Story> {
                                                     </p>
                                                     <p class="tiny">Summarized by LLama 3.1</p>
                                                     </div>''' : ""}
-                                  
+
                                                  ${storyStore.feedItem.htmlContent}
                                                  Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
                                               </div>
@@ -191,16 +190,16 @@ class _StoryState extends State<Story> {
                                           if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
                                             return null;
                                           }
-                                  
+
                                           String imgSrc = "";
                                           if (e.attributes case {'src': final String src}) {
                                             imgSrc = src;
                                           }
-                                  
+
                                           if (imgSrc.isEmpty) {
                                             return null;
                                           }
-                                  
+
                                           return CachedNetworkImage(
                                             imageUrl: imgSrc,
                                             cacheKey: imgSrc,
@@ -217,6 +216,7 @@ class _StoryState extends State<Story> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 20),
                           ],
                         ],
                       )

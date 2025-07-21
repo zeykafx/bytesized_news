@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/main.dart' show taskName;
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/opml/opml.dart';
@@ -13,6 +16,7 @@ import 'package:isar/isar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:workmanager/workmanager.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -51,15 +55,18 @@ class _SettingsState extends State<Settings> {
                 Center(
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 800),
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          GeneralSettings(),
-                          ImportExportSection(),
-                          AboutSection(),
+                          const GeneralSettings(),
+                          if (!Platform.isIOS) ...[
+                            const BackgroundSyncSection(),
+                          ],
+                          const ImportExportSection(),
+                          const AboutSection(),
                         ],
                       ),
                     ),
@@ -129,7 +136,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // USE READER MODE BY DEFAULT
           ListTile(
             title: const Text(
-              "Use Reader Mode by Default",
+              "Use Reader Mode by default",
             ),
             onTap: () {
               settingsStore.setUseReaderModeByDefault(!settingsStore.useReaderModeByDefault);
@@ -145,7 +152,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // SHOW AI SUMMARY ON STORY PAGE LOAD
           ListTile(
             title: const Text(
-              "Show AI Summary on Page Load",
+              "Show AI Summary on page load",
             ),
             onTap: () {
               settingsStore.setShowAiSummaryOnLoad(!settingsStore.showAiSummaryOnLoad);
@@ -161,7 +168,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // FETCH AI SUMMARY ON STORY PAGE LOAD
           ListTile(
             title: const Text(
-              "Fetch AI Summary on Page Load",
+              "Fetch AI Summary on page load",
             ),
             onTap: () {
               settingsStore.setFetchAiSummaryOnLoad(!settingsStore.fetchAiSummaryOnLoad);
@@ -208,7 +215,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // Mark as Read On Scroll (toggle)
           ListTile(
             title: const Text(
-              "Mark As Read On Scroll",
+              "Mark as read on scroll",
             ),
             onTap: () {
               settingsStore.markAsReadOnScroll = !settingsStore.markAsReadOnScroll;
@@ -217,6 +224,103 @@ class _GeneralSettingsState extends State<GeneralSettings> {
               value: settingsStore.markAsReadOnScroll,
               onChanged: (value) {
                 settingsStore.markAsReadOnScroll = value;
+              },
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class BackgroundSyncSection extends StatefulWidget {
+  const BackgroundSyncSection({super.key});
+
+  @override
+  State<BackgroundSyncSection> createState() => _BackgroundSyncSectionState();
+}
+
+class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
+  late final SettingsStore settingsStore;
+
+  @override
+  void initState() {
+    super.initState();
+    settingsStore = context.read<SettingsStore>();
+  }
+
+  Future<void> updateBackgroundTask() async {
+    await Workmanager().cancelByUniqueName(taskName);
+
+    await Workmanager().registerPeriodicTask(
+      taskName,
+      taskName,
+      frequency: settingsStore.backgroundFetchInterval.value,
+      initialDelay: Duration(minutes: 30),
+      constraints: Constraints(
+        // Connected or metered mark the task as requiring internet
+        networkType: NetworkType.connected,
+        requiresDeviceIdle: settingsStore.requireDeviceIdleForBgFetch,
+        requiresBatteryNotLow: settingsStore.skipBgSyncOnLowBattery,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(builder: (context) {
+      return SettingsSection(
+        title: "Background Sync",
+        children: [
+          // background sync interval
+          ListTile(
+            title: Text("Background sync interval"),
+            trailing: DropdownButton(
+                items: BackgroundFetchInterval.values.map((bgSyncInt) {
+                  return DropdownMenuItem<String>(
+                    value: backgroundFetchIntervalString(bgSyncInt),
+                    child: Text(backgroundFetchIntervalString(bgSyncInt)),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  settingsStore.backgroundFetchInterval = BackgroundFetchInterval.values[backgroundFetchIntervalValues.indexOf(value!)];
+                  updateBackgroundTask();
+                },
+                value: backgroundFetchIntervalString(settingsStore.backgroundFetchInterval)),
+          ),
+
+          // Skip Background sync when low on battery (toggle)
+          ListTile(
+            title: const Text(
+              "Skip sync when low on battery",
+            ),
+            onTap: () {
+              settingsStore.skipBgSyncOnLowBattery = !settingsStore.skipBgSyncOnLowBattery;
+              updateBackgroundTask();
+            },
+            trailing: Switch(
+              value: settingsStore.skipBgSyncOnLowBattery,
+              onChanged: (value) {
+                settingsStore.skipBgSyncOnLowBattery = value;
+                updateBackgroundTask();
+              },
+            ),
+          ),
+
+          // Require device to be idle for bg sync (toggle)
+          ListTile(
+            title: const Text(
+              "Require device to be idle for background sync",
+            ),
+            onTap: () {
+              settingsStore.requireDeviceIdleForBgFetch = !settingsStore.requireDeviceIdleForBgFetch;
+              updateBackgroundTask();
+            },
+            trailing: Switch(
+              value: settingsStore.requireDeviceIdleForBgFetch,
+              onChanged: (value) {
+                settingsStore.requireDeviceIdleForBgFetch = value;
+                updateBackgroundTask();
               },
             ),
           ),
