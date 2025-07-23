@@ -71,7 +71,7 @@ class _StoryState extends State<Story> {
       child: Scaffold(
         appBar: AppBar(
           title: Observer(builder: (_) {
-            return Text("$parsedTitle - ${storyStore.feedItem.feedName}");
+            return Text("$parsedTitle - ${storyStore.feedItem.feed?.name}");
           }),
           actions: [
             IconButton(
@@ -146,7 +146,7 @@ class _StoryState extends State<Story> {
                                         '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                             <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feedName}</a></p>
+                                             <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feed?.name}</a></p>
                                              ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
                                              <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
                                              <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>

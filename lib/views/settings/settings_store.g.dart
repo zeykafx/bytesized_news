@@ -43,10 +43,12 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..backgroundFetchInterval = $enumDecodeNullable(
               _$BackgroundFetchIntervalEnumMap,
               json['backgroundFetchInterval']) ??
-          BackgroundFetchInterval.oneHourAndAHalf
+          BackgroundFetchInterval.sixHours
       ..skipBgSyncOnLowBattery = json['skipBgSyncOnLowBattery'] as bool? ?? true
       ..requireDeviceIdleForBgFetch =
-          json['requireDeviceIdleForBgFetch'] as bool? ?? false;
+          json['requireDeviceIdleForBgFetch'] as bool? ?? false
+      ..storyTilesMinimalStyle =
+          json['storyTilesMinimalStyle'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -70,6 +72,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
           _$BackgroundFetchIntervalEnumMap[instance.backgroundFetchInterval]!,
       'skipBgSyncOnLowBattery': instance.skipBgSyncOnLowBattery,
       'requireDeviceIdleForBgFetch': instance.requireDeviceIdleForBgFetch,
+      'storyTilesMinimalStyle': instance.storyTilesMinimalStyle,
     };
 
 const _$DarkModeEnumMap = {
@@ -502,6 +505,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$storyTilesMinimalStyleAtom =
+      Atom(name: '_SettingsStore.storyTilesMinimalStyle', context: context);
+
+  @override
+  bool get storyTilesMinimalStyle {
+    _$storyTilesMinimalStyleAtom.reportRead();
+    return super.storyTilesMinimalStyle;
+  }
+
+  @override
+  set storyTilesMinimalStyle(bool value) {
+    _$storyTilesMinimalStyleAtom
+        .reportWrite(value, super.storyTilesMinimalStyle, () {
+      super.storyTilesMinimalStyle = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -661,7 +681,8 @@ fontFamily: ${fontFamily},
 markAsReadOnScroll: ${markAsReadOnScroll},
 backgroundFetchInterval: ${backgroundFetchInterval},
 skipBgSyncOnLowBattery: ${skipBgSyncOnLowBattery},
-requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch}
+requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch},
+storyTilesMinimalStyle: ${storyTilesMinimalStyle}
     ''';
   }
 }

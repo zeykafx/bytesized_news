@@ -33,9 +33,7 @@ class _FeedSearchState extends State<FeedSearch> {
         toolbarHeight: kToolbarHeight + 20,
         centerTitle: true,
         title: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(30)),
-              color: Theme.of(context).colorScheme.surfaceContainer),
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(30)), color: Theme.of(context).colorScheme.surfaceContainer),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -62,39 +60,43 @@ class _FeedSearchState extends State<FeedSearch> {
       ),
       body: Observer(
         builder: (context) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 5.0,
-                  ),
-                  child: Text(
-                    "${widget.feedStore.searchResults.length} results",
-                    style: TextStyle(
-                      color: Theme.of(context).dividerColor,
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 5.0,
+                    ),
+                    child: Text(
+                      "${widget.feedStore.searchResults.length} results",
+                      style: TextStyle(
+                        color: Theme.of(context).dividerColor,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: widget.feedStore.searchResults.length,
-                    addAutomaticKeepAlives: false,
-                    itemBuilder: (context, idx) {
-                      FeedItem item =
-                          widget.feedStore.searchResults.elementAt(idx);
-                      return FeedStoryTile(
-                        feedStore: widget.feedStore,
-                        item: item,
-                      ).animate().fade();
-                    },
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: 700),
+                      child: ListView.builder(
+                        itemCount: widget.feedStore.searchResults.length,
+                        addAutomaticKeepAlives: false,
+                        itemBuilder: (context, idx) {
+                          FeedItem item = widget.feedStore.searchResults.elementAt(idx);
+                          return FeedStoryTile(
+                            feedStore: widget.feedStore,
+                            item: item,
+                          ).animate().fade();
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

@@ -17,9 +17,9 @@ const FeedGroupSchema = CollectionSchema(
   name: r'FeedGroup',
   id: 4402445768558669849,
   properties: {
-    r'feedNames': PropertySchema(
+    r'feedUrls': PropertySchema(
       id: 0,
-      name: r'feedNames',
+      name: r'feedUrls',
       type: IsarType.stringList,
     ),
     r'isPinned': PropertySchema(
@@ -58,10 +58,10 @@ int _feedGroupEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.feedNames.length * 3;
+  bytesCount += 3 + object.feedUrls.length * 3;
   {
-    for (var i = 0; i < object.feedNames.length; i++) {
-      final value = object.feedNames[i];
+    for (var i = 0; i < object.feedUrls.length; i++) {
+      final value = object.feedUrls[i];
       bytesCount += value.length * 3;
     }
   }
@@ -75,7 +75,7 @@ void _feedGroupSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeStringList(offsets[0], object.feedNames);
+  writer.writeStringList(offsets[0], object.feedUrls);
   writer.writeBool(offsets[1], object.isPinned);
   writer.writeString(offsets[2], object.name);
   writer.writeLong(offsets[3], object.pinnedPosition);
@@ -90,7 +90,7 @@ FeedGroup _feedGroupDeserialize(
   final object = FeedGroup(
     reader.readString(offsets[2]),
   );
-  object.feedNames = reader.readStringList(offsets[0]) ?? [];
+  object.feedUrls = reader.readStringList(offsets[0]) ?? [];
   object.id = id;
   object.isPinned = reader.readBool(offsets[1]);
   object.pinnedPosition = reader.readLong(offsets[3]);
@@ -209,13 +209,13 @@ extension FeedGroupQueryWhere
 extension FeedGroupQueryFilter
     on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementEqualTo(
+      feedUrlsElementEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -223,7 +223,7 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementGreaterThan(
+      feedUrlsElementGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -231,7 +231,7 @@ extension FeedGroupQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -239,7 +239,7 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementLessThan(
+      feedUrlsElementLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -247,7 +247,7 @@ extension FeedGroupQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -255,7 +255,7 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementBetween(
+      feedUrlsElementBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -264,7 +264,7 @@ extension FeedGroupQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'feedNames',
+        property: r'feedUrls',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -275,13 +275,13 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementStartsWith(
+      feedUrlsElementStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -289,13 +289,13 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementEndsWith(
+      feedUrlsElementEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -303,10 +303,10 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementContains(String value, {bool caseSensitive = true}) {
+      feedUrlsElementContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: value,
         caseSensitive: caseSensitive,
       ));
@@ -314,10 +314,10 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementMatches(String pattern, {bool caseSensitive = true}) {
+      feedUrlsElementMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'feedNames',
+        property: r'feedUrls',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
@@ -325,30 +325,30 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementIsEmpty() {
+      feedUrlsElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: '',
       ));
     });
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesElementIsNotEmpty() {
+      feedUrlsElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'feedNames',
+        property: r'feedUrls',
         value: '',
       ));
     });
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesLengthEqualTo(int length) {
+      feedUrlsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         length,
         true,
         length,
@@ -357,10 +357,10 @@ extension FeedGroupQueryFilter
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedNamesIsEmpty() {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         0,
         true,
         0,
@@ -370,10 +370,10 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesIsNotEmpty() {
+      feedUrlsIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         0,
         false,
         999999,
@@ -383,13 +383,13 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesLengthLessThan(
+      feedUrlsLengthLessThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         0,
         true,
         length,
@@ -399,13 +399,13 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesLengthGreaterThan(
+      feedUrlsLengthGreaterThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         length,
         include,
         999999,
@@ -415,7 +415,7 @@ extension FeedGroupQueryFilter
   }
 
   QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
-      feedNamesLengthBetween(
+      feedUrlsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -423,7 +423,7 @@ extension FeedGroupQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'feedNames',
+        r'feedUrls',
         lower,
         includeLower,
         upper,
@@ -779,9 +779,9 @@ extension FeedGroupQuerySortThenBy
 
 extension FeedGroupQueryWhereDistinct
     on QueryBuilder<FeedGroup, FeedGroup, QDistinct> {
-  QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByFeedNames() {
+  QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByFeedUrls() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'feedNames');
+      return query.addDistinctBy(r'feedUrls');
     });
   }
 
@@ -813,9 +813,9 @@ extension FeedGroupQueryProperty
     });
   }
 
-  QueryBuilder<FeedGroup, List<String>, QQueryOperations> feedNamesProperty() {
+  QueryBuilder<FeedGroup, List<String>, QQueryOperations> feedUrlsProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'feedNames');
+      return query.addPropertyName(r'feedUrls');
     });
   }
 

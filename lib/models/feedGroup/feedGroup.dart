@@ -7,7 +7,7 @@ part 'feedGroup.g.dart';
 class FeedGroup {
   Id id = Isar.autoIncrement;
   String name;
-  List<String> feedNames = List.empty(growable: true);
+  List<String> feedUrls = List.empty(growable: true);
   bool isPinned = false;
   int pinnedPosition = -1;
 
@@ -16,11 +16,17 @@ class FeedGroup {
 
   FeedGroup(this.name);
 
+  @override
+  String toString() {
+    return 'FeedGroup{id: $id, name: $name, feedUrls: ${feedUrls.toString()}}';
+  }
+
   // toJson
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
-      'feedNames': feedNames,
+      'feedUrls': feedUrls,
       'isPinned': isPinned,
       'pinnedPosition': pinnedPosition,
     };
@@ -28,10 +34,9 @@ class FeedGroup {
 
   // fromJson also fetches the feeds corresponding to the feed names
   FeedGroup.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        feedNames = List<String>.from(json['feedNames']),
+      : id = json["id"],
+        name = json['name'],
+        feedUrls = List<String>.from(json['feedUrls']),
         isPinned = json['isPinned'],
-        pinnedPosition = json['pinnedPosition'] {
-    // for (String feedName in feedNames) {}
-  }
+        pinnedPosition = json['pinnedPosition'];
 }

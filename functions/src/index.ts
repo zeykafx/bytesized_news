@@ -1,7 +1,7 @@
 import { onCall } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import * as functions from "firebase-functions";
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
 import { initializeApp } from "firebase-admin/app";
 import { OpenAI } from "openai";
 import { defineString } from "firebase-functions/params";
@@ -27,10 +27,11 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   // create a firestore document for the user
   const res = await db.doc(`users/${user.uid}`).set({
     email: user.email,
-    created: new Date().getTime(),
+    created: FieldValue.serverTimestamp(),
     tier: "free",
     interests: ["Technology", "Politics"],
     feeds: [],
+    feedGroups: [],
     builtUserProfileDate: null,
     suggestionsLeftToday: suggestionsLimit,
     lastSuggestionDate: null,
@@ -148,23 +149,23 @@ export const summarize = onCall(
 
     // update the user's summary count
     await userRef.update({
-      lastSummaryDate: new Date().getTime(),
+      lastSummaryDate: FieldValue.serverTimestamp(),
       summariesLeftToday: FieldValue.increment(-summariesToConsume),
     });
 
     // create the summary with openai
     const completion = await openai.chat.completions.create({
-      // model: "gpt-4o-mini",
       model: "llama-3.1-8b-instant",
       messages: [
         {
           role: "system",
           content: `
-        Summarize the article in 6 sentences, DO NOT OUTPUT A SUMMARY LONGER
-        THAN 6 SENTENCES!! Stick to the information in the article.
+        Summarize the article in 3 sentences. Only use more sentences if the article is long.
+        But try to stick to 3 setences.
+        DO NOT OUTPUT A SUMMARY LONGER THAN 5 SENTENCES!! Stick to the information in the article.
         Do not add any new information, if an article refers to Twitter as 'X' do not do the same,
         instead refer to it as 'Twitter. Always provide a translation of the units of measurements
-        used in the article (only translate between metric and imperial) (do so in parentheses).
+        used in the article (ONLY translate between metric and imperial, and do so in parentheses).
         ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE "Here is a summary..."!
         If you can, use bullet points with proper formatting such that each bullet point starts on its own line.
         `,
@@ -184,10 +185,11 @@ export const summarize = onCall(
       url: articleUrl,
       title: title,
       summary: summary,
-      generatedAt: new Date().getUTCMilliseconds(),
+      generatedAt: FieldValue.serverTimestamp(),
       // expires in a month
-      expirationTimestamp:
-        new Date().getUTCMilliseconds() + 30 * 24 * 60 * 60 * 1000,
+      expirationTimestamp: Timestamp.fromMillis(
+        Timestamp.now().toMillis() + 30 * 24 * 60 * 60 * 1000,
+      ),
     });
 
     logger.info("Summary created: " + res.id);
@@ -234,7 +236,7 @@ export const getNewsSuggestions = onCall(
 
     // update the user's summary count
     await userRef.update({
-      lastSuggestionDate: new Date().getTime(),
+      lastSuggestionDate: FieldValue.serverTimestamp(),
       suggestionsLeftToday: FieldValue.increment(-1),
     });
 
@@ -381,7 +383,7 @@ export const buildUserInterests = onCall(
     // Add the inferred interests to the user's document
     const userRef = db.doc(`users/${request.auth?.uid}`);
     await userRef.update({
-      builtUserProfileDate: new Date().getTime(),
+      builtUserProfileDate: FieldValue.serverTimestamp(),
       interests: FieldValue.arrayUnion(...parsedCategories),
     });
 

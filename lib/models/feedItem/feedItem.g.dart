@@ -47,10 +47,10 @@ const FeedItemSchema = CollectionSchema(
       name: r'estReadingTimeMinutes',
       type: IsarType.long,
     ),
-    r'feedName': PropertySchema(
+    r'feedId': PropertySchema(
       id: 6,
-      name: r'feedName',
-      type: IsarType.string,
+      name: r'feedId',
+      type: IsarType.long,
     ),
     r'fetchedInBg': PropertySchema(
       id: 7,
@@ -151,7 +151,6 @@ int _feedItemEstimateSize(
     }
   }
   bytesCount += 3 + object.description.length * 3;
-  bytesCount += 3 + object.feedName.length * 3;
   {
     final value = object.htmlContent;
     if (value != null) {
@@ -176,7 +175,7 @@ void _feedItemSerialize(
   writer.writeString(offsets[3], object.description);
   writer.writeBool(offsets[4], object.downloaded);
   writer.writeLong(offsets[5], object.estReadingTimeMinutes);
-  writer.writeString(offsets[6], object.feedName);
+  writer.writeLong(offsets[6], object.feedId);
   writer.writeBool(offsets[7], object.fetchedInBg);
   writer.writeLong(offsets[8], object.hashCode);
   writer.writeString(offsets[9], object.htmlContent);
@@ -203,7 +202,7 @@ FeedItem _feedItemDeserialize(
   object.description = reader.readString(offsets[3]);
   object.downloaded = reader.readBool(offsets[4]);
   object.estReadingTimeMinutes = reader.readLong(offsets[5]);
-  object.feedName = reader.readString(offsets[6]);
+  object.feedId = reader.readLong(offsets[6]);
   object.fetchedInBg = reader.readBoolOrNull(offsets[7]);
   object.htmlContent = reader.readStringOrNull(offsets[9]);
   object.id = id;
@@ -238,7 +237,7 @@ P _feedItemDeserializeProp<P>(
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 7:
       return (reader.readBoolOrNull(offset)) as P;
     case 8:
@@ -958,132 +957,55 @@ extension FeedItemQueryFilter
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedIdEqualTo(
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'feedName',
+        property: r'feedId',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameGreaterThan(
-    String value, {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedIdGreaterThan(
+    int value, {
     bool include = false,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'feedName',
+        property: r'feedId',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameLessThan(
-    String value, {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedIdLessThan(
+    int value, {
     bool include = false,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'feedName',
+        property: r'feedId',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameBetween(
-    String lower,
-    String upper, {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedIdBetween(
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'feedName',
+        property: r'feedId',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'feedName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'feedName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'feedName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'feedName',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'feedName',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> feedNameIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'feedName',
-        value: '',
       ));
     });
   }
@@ -1966,15 +1888,15 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFeedName() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFeedId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'feedName', Sort.asc);
+      return query.addSortBy(r'feedId', Sort.asc);
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFeedNameDesc() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByFeedIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'feedName', Sort.desc);
+      return query.addSortBy(r'feedId', Sort.desc);
     });
   }
 
@@ -2174,15 +2096,15 @@ extension FeedItemQuerySortThenBy
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFeedName() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFeedId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'feedName', Sort.asc);
+      return query.addSortBy(r'feedId', Sort.asc);
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFeedNameDesc() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByFeedIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'feedName', Sort.desc);
+      return query.addSortBy(r'feedId', Sort.desc);
     });
   }
 
@@ -2372,10 +2294,9 @@ extension FeedItemQueryWhereDistinct
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByFeedName(
-      {bool caseSensitive = true}) {
+  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByFeedId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'feedName', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'feedId');
     });
   }
 
@@ -2495,9 +2416,9 @@ extension FeedItemQueryProperty
     });
   }
 
-  QueryBuilder<FeedItem, String, QQueryOperations> feedNameProperty() {
+  QueryBuilder<FeedItem, int, QQueryOperations> feedIdProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'feedName');
+      return query.addPropertyName(r'feedId');
     });
   }
 

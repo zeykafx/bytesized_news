@@ -45,7 +45,7 @@ class Feed {
 
   @override
   String toString() {
-    return 'Feed{name: $name, link: $link, iconUrl: $iconUrl}';
+    return 'Feed{id: $id, name: $name, link: $link, iconUrl: $iconUrl}';
   }
 
   // toJson
@@ -57,7 +57,8 @@ class Feed {
       'iconUrl': iconUrl,
       'isPinned': isPinned,
       'pinnedPosition': pinnedPosition,
-      'articlesRead': 0,
+      'articlesRead': articlesRead,
+      "categories": categories,
     };
   }
 
@@ -69,5 +70,6 @@ class Feed {
         iconUrl = json['iconUrl'],
         isPinned = json['isPinned'],
         pinnedPosition = json['pinnedPosition'],
-        articlesRead = json["articlesRead"];
+        articlesRead = json["articlesRead"],
+        categories = List.from(json["categories"]);
 }

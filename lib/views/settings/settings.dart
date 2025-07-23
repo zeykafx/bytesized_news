@@ -134,51 +134,36 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           ),
 
           // USE READER MODE BY DEFAULT
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Use Reader Mode by default",
             ),
-            onTap: () {
-              settingsStore.setUseReaderModeByDefault(!settingsStore.useReaderModeByDefault);
+            value: settingsStore.useReaderModeByDefault,
+            onChanged: (value) {
+              settingsStore.setUseReaderModeByDefault(value);
             },
-            trailing: Switch(
-              value: settingsStore.useReaderModeByDefault,
-              onChanged: (value) {
-                settingsStore.setUseReaderModeByDefault(value);
-              },
-            ),
           ),
 
           // SHOW AI SUMMARY ON STORY PAGE LOAD
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Show AI Summary on page load",
             ),
-            onTap: () {
-              settingsStore.setShowAiSummaryOnLoad(!settingsStore.showAiSummaryOnLoad);
+            value: settingsStore.showAiSummaryOnLoad,
+            onChanged: (value) {
+              settingsStore.setShowAiSummaryOnLoad(value);
             },
-            trailing: Switch(
-              value: settingsStore.showAiSummaryOnLoad,
-              onChanged: (value) {
-                settingsStore.setShowAiSummaryOnLoad(value);
-              },
-            ),
           ),
 
           // FETCH AI SUMMARY ON STORY PAGE LOAD
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Fetch AI Summary on page load",
             ),
-            onTap: () {
-              settingsStore.setFetchAiSummaryOnLoad(!settingsStore.fetchAiSummaryOnLoad);
+            value: settingsStore.fetchAiSummaryOnLoad,
+            onChanged: (value) {
+              settingsStore.setFetchAiSummaryOnLoad(value);
             },
-            trailing: Switch(
-              value: settingsStore.fetchAiSummaryOnLoad,
-              onChanged: (value) {
-                settingsStore.setFetchAiSummaryOnLoad(value);
-              },
-            ),
           ),
 
           // Muted keywords
@@ -213,19 +198,25 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           ),
 
           // Mark as Read On Scroll (toggle)
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Mark as read on scroll",
             ),
-            onTap: () {
-              settingsStore.markAsReadOnScroll = !settingsStore.markAsReadOnScroll;
+            value: settingsStore.markAsReadOnScroll,
+            onChanged: (value) {
+              settingsStore.markAsReadOnScroll = value;
             },
-            trailing: Switch(
-              value: settingsStore.markAsReadOnScroll,
-              onChanged: (value) {
-                settingsStore.markAsReadOnScroll = value;
-              },
+          ),
+
+          // Story tiles minimal mode
+          SwitchListTile(
+            title: const Text(
+              "Minimal story tiles",
             ),
+            value: settingsStore.storyTilesMinimalStyle,
+            onChanged: (value) {
+              settingsStore.storyTilesMinimalStyle = value;
+            },
           ),
         ],
       );
@@ -290,39 +281,27 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
           ),
 
           // Skip Background sync when low on battery (toggle)
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Skip sync when low on battery",
             ),
-            onTap: () {
-              settingsStore.skipBgSyncOnLowBattery = !settingsStore.skipBgSyncOnLowBattery;
+            value: settingsStore.skipBgSyncOnLowBattery,
+            onChanged: (value) {
+              settingsStore.skipBgSyncOnLowBattery = value;
               updateBackgroundTask();
             },
-            trailing: Switch(
-              value: settingsStore.skipBgSyncOnLowBattery,
-              onChanged: (value) {
-                settingsStore.skipBgSyncOnLowBattery = value;
-                updateBackgroundTask();
-              },
-            ),
           ),
 
           // Require device to be idle for bg sync (toggle)
-          ListTile(
+          SwitchListTile(
             title: const Text(
               "Require device to be idle for background sync",
             ),
-            onTap: () {
-              settingsStore.requireDeviceIdleForBgFetch = !settingsStore.requireDeviceIdleForBgFetch;
+            value: settingsStore.requireDeviceIdleForBgFetch,
+            onChanged: (value) {
+              settingsStore.requireDeviceIdleForBgFetch = value;
               updateBackgroundTask();
             },
-            trailing: Switch(
-              value: settingsStore.requireDeviceIdleForBgFetch,
-              onChanged: (value) {
-                settingsStore.requireDeviceIdleForBgFetch = value;
-                updateBackgroundTask();
-              },
-            ),
           ),
         ],
       );
@@ -385,6 +364,16 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                 return dbFeeds.where((Feed feed2) => feed1.link == feed2.link).isNotEmpty;
               });
 
+              // filter out feedGroups with no new feeds
+              feedGroups.removeWhere((FeedGroup feedGroup) {
+                return feedGroup.feedUrls.every((feedUrl) => dbFeeds.any((feed) => feed.link == feedUrl));
+              });
+
+              // filter out feedgroups that already exist in the db
+              feedGroups.removeWhere((FeedGroup feedGroup) {
+                return dbFeeds.any((feed) => feedGroups.any((fg) => fg.name == feedGroup.name && fg.feedUrls.contains(feed.link)));
+              });
+
               if (feeds.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -394,7 +383,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                 return;
               }
 
-              List<Feed> loneFeeds = feeds.where((Feed feed) => feedGroups.every((FeedGroup feedGroup) => !feedGroup.feedNames.contains(feed.name))).toList();
+              List<Feed> loneFeeds = feeds.where((Feed feed) => feedGroups.every((FeedGroup feedGroup) => !feedGroup.feedUrls.contains(feed.link))).toList();
 
               // show dialog to confirm import, add the selected feeds to the db
               showDialog(
@@ -416,7 +405,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                               ...feedGroups.map(
                                 (feedGroup) => ListTile(
                                   title: Text("Group: ${feedGroup.name}"),
-                                  subtitle: Text(feedGroup.feedNames.join(", ")),
+                                  subtitle: Text(feedGroup.feeds.map((locFeed) => locFeed.name).join(", ")),
                                   selected: selectedFeedGroups.contains(feedGroup),
                                   onTap: () {
                                     dialogSetState(() {
@@ -486,9 +475,12 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                                 await dbUtils.addFeed(feed);
                               }
                               for (FeedGroup feedGroup in selectedFeedGroups) {
+                                print(feedGroup);
                                 // add the feeds for the feedGroup
-                                for (String feedName in feedGroup.feedNames) {
-                                  Feed feed = feeds.firstWhere((feed) => feed.name == feedName);
+                                for (String feedUrl in feedGroup.feedUrls) {
+                                  print(feedUrl);
+                                  print(feeds);
+                                  Feed feed = feeds.firstWhere((feed) => feed.link == feedUrl);
                                   await dbUtils.addFeed(feed);
                                 }
 

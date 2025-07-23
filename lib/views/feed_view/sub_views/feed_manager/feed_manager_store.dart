@@ -1,8 +1,10 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +17,7 @@ class FeedManagerStore = _FeedManagerStore with _$FeedManagerStore;
 
 abstract class _FeedManagerStore with Store {
   late FeedStore feedStore;
+  late AuthStore authStore;
   @observable
   bool selectionMode = false;
 
@@ -52,6 +55,7 @@ abstract class _FeedManagerStore with Store {
   Future<void> init({required FeedStore feedStore}) async {
     dbUtils = DbUtils(isar: isar);
     this.feedStore = feedStore;
+    authStore = feedStore.authStore;
   }
 
   @action
@@ -137,10 +141,11 @@ abstract class _FeedManagerStore with Store {
 
       if (!feedGroup.feeds.contains(feed)) {
         feedGroup.feeds.add(feed);
-        feedGroup.feedNames = feedGroup.feedNames + [feed.name];
+        feedGroup.feedUrls = feedGroup.feedUrls + [feed.link];
         await dbUtils.addFeedGroup(feedGroup);
       }
     }
+    updateFirestoreFeedsAndFeedStore();
   }
 
   @action
@@ -150,12 +155,13 @@ abstract class _FeedManagerStore with Store {
         print("Adding ${selectedFeeds.map((feed) => feed.name).toList()} to feed group: ${feedGroup.name}");
       }
       // remove the selected feeds that are already in the feedGroup
-      List<Feed> localSelectedFeeds = selectedFeeds.where((feed) => !feedGroup.feedNames.contains(feed.name)).toList();
+      List<Feed> localSelectedFeeds = selectedFeeds.where((feed) => !feedGroup.feedUrls.contains(feed.link)).toList();
 
       feedGroup.feeds.addAll(localSelectedFeeds);
-      feedGroup.feedNames = feedGroup.feedNames + localSelectedFeeds.map((feed) => feed.name).toList();
+      feedGroup.feedUrls = feedGroup.feedUrls + localSelectedFeeds.map((feed) => feed.link).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
     }
+    updateFirestoreFeedsAndFeedStore();
   }
 
   @action
@@ -217,7 +223,13 @@ abstract class _FeedManagerStore with Store {
     if (areFeedGroupsSelected) {
       // remove from the pinned list
       feedStore.pinnedFeedsOrFeedGroups.removeWhere(
-          (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedNames == feedGroup.feedNames).isNotEmpty);
+          (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty);
+
+      // remove this feed group from firestore
+      List<Map<String, dynamic>> feedGroupsToRemove = selectedFeedGroups.map((feedGroup) => feedGroup.toJson()).toList();
+      FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+        "feedGroups": FieldValue.arrayRemove(feedGroupsToRemove),
+      });
 
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
@@ -234,6 +246,12 @@ abstract class _FeedManagerStore with Store {
     }
 
     if (areFeedsSelected) {
+      // remove this feed from firestore
+      List<Map<String, dynamic>> feedsToRemove = selectedFeeds.map((feed) => feed.toJson()).toList();
+      FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+        "feeds": FieldValue.arrayRemove(feedsToRemove),
+      });
+
       // Delete selected feeds
       await dbUtils.deleteFeeds(selectedFeeds);
       feedStore.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
@@ -243,7 +261,7 @@ abstract class _FeedManagerStore with Store {
 
       // also remove feedItems from the feed in the db
       for (Feed feed in selectedFeeds) {
-        feedStore.feedItems.removeWhere((item) => item.feedName == feed.name);
+        feedStore.feedItems.removeWhere((item) => item.feedId == feed.id);
         await dbUtils.deleteFeedItems(feed);
 
         // if this group was the current sort, remove it
@@ -255,10 +273,9 @@ abstract class _FeedManagerStore with Store {
 
         // also remove the feed from any feedGroups that it might be in
         for (FeedGroup feedGroup in feedStore.feedGroups) {
-          if (feedGroup.feedNames.contains(feed.name)) {
-            feedGroup.feedNames = feedGroup.feedNames.where((name) => name != feed.name).toList();
-            // feedGroup.feedNames.remove(feed.name);
-            feedGroup.feeds.removeWhere((f) => f.name == feed.name);
+          if (feedGroup.feedUrls.contains(feed.link)) {
+            feedGroup.feedUrls = feedGroup.feedUrls.where((String feedUrl) => feedUrl != feed.link).toList();
+            feedGroup.feeds.removeWhere((f) => f.id == feed.id);
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
         }
@@ -302,6 +319,8 @@ abstract class _FeedManagerStore with Store {
       await dbUtils.addFeedGroup(feedGroup);
     }
 
+    updateFirestoreFeedsAndFeedStore();
+
     if (toggleSelection) {
       selectedFeeds.clear();
       selectedFeedGroups.clear();
@@ -332,10 +351,67 @@ abstract class _FeedManagerStore with Store {
         await dbUtils.addFeedGroup(feedStore.pinnedFeedsOrFeedGroups[i]);
       }
     }
+
+    updateFirestoreFeedsAndFeedStore();
   }
 
   @action
   void handlePinnedExpandedButtonTap() {
     pinnedListExpanded = !pinnedListExpanded;
+  }
+
+  @action
+  void updateFirestoreFeedsAndFeedStore() {
+    updateFirestoreFeedGroups();
+    updateFirestoreFeeds();
+  }
+
+  @action
+  Future<void> updateFirestoreFeeds() async {
+    final batch = FirebaseFirestore.instance.batch();
+    final userDocRef = FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}");
+
+    // convert feeds to a map structure
+    Map<String, dynamic> feedsMap = {};
+    for (Feed feed in feedStore.feeds) {
+      feedsMap[feed.id.toString()] = feed.toJson();
+    }
+
+    // avoid useless writes
+    batch.update(userDocRef, {"feeds": feedsMap});
+
+    await batch.commit();
+
+    if (kDebugMode) {
+      print("Batch updated ${feedsMap.length} feeds in firestore");
+    }
+  }
+
+  @action
+  Future<void> updateSingleFeedInFirestore(Feed feed) async {
+    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+      "feeds.${feed.id}": feed.toJson(),
+    });
+  }
+
+  @action
+  Future<void> updateFirestoreFeedGroups() async {
+    // get all local feedGroups
+    List<FeedGroup> feedGroups = await dbUtils.getFeedGroups(feedStore.feeds);
+
+    // convert to map structure with feedGroup names as keys
+    Map<String, dynamic> feedGroupsMap = {};
+    for (FeedGroup feedGroup in feedGroups) {
+      feedGroupsMap[feedGroup.name] = feedGroup.toJson();
+    }
+
+    // replace the entire feedGroups map
+    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+      "feedGroups": feedGroupsMap,
+    });
+
+    if (kDebugMode) {
+      print("Updated ${feedGroupsMap.length} feed groups in firestore");
+    }
   }
 }

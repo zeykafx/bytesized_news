@@ -230,7 +230,7 @@ abstract class _FeedStore with Store {
       }
 
       // if the sort is for feed groups, and the current feed is not in the group, do not fetch items for it
-      if (settingsStore.sort == FeedListSort.feedGroup && settingsStore.sortFeedGroup != null && !settingsStore.sortFeedGroup!.feedNames.contains(feed.name)) {
+      if (settingsStore.sort == FeedListSort.feedGroup && settingsStore.sortFeedGroup != null && !settingsStore.sortFeedGroup!.feedUrls.contains(feed.link)) {
         continue;
       }
 
@@ -242,7 +242,9 @@ abstract class _FeedStore with Store {
       try {
         res = await dio.get(feed.link, options: Options(receiveTimeout: Duration(seconds: 5)));
       } catch (e) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
         continue;
       }
 

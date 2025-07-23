@@ -222,6 +222,35 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
         .run(() => super.reorderPinnedFeedsOrFeedGroups(oldIndex, newIndex));
   }
 
+  late final _$updateFirestoreFeedsAsyncAction =
+      AsyncAction('_FeedManagerStore.updateFirestoreFeeds', context: context);
+
+  @override
+  Future<void> updateFirestoreFeeds() {
+    return _$updateFirestoreFeedsAsyncAction
+        .run(() => super.updateFirestoreFeeds());
+  }
+
+  late final _$updateSingleFeedInFirestoreAsyncAction = AsyncAction(
+      '_FeedManagerStore.updateSingleFeedInFirestore',
+      context: context);
+
+  @override
+  Future<void> updateSingleFeedInFirestore(Feed feed) {
+    return _$updateSingleFeedInFirestoreAsyncAction
+        .run(() => super.updateSingleFeedInFirestore(feed));
+  }
+
+  late final _$updateFirestoreFeedGroupsAsyncAction = AsyncAction(
+      '_FeedManagerStore.updateFirestoreFeedGroups',
+      context: context);
+
+  @override
+  Future<void> updateFirestoreFeedGroups() {
+    return _$updateFirestoreFeedGroupsAsyncAction
+        .run(() => super.updateFirestoreFeedGroups());
+  }
+
   late final _$_FeedManagerStoreActionController =
       ActionController(name: '_FeedManagerStore', context: context);
 
@@ -363,6 +392,17 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
         name: '_FeedManagerStore.handlePinnedExpandedButtonTap');
     try {
       return super.handlePinnedExpandedButtonTap();
+    } finally {
+      _$_FeedManagerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateFirestoreFeedsAndFeedStore() {
+    final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
+        name: '_FeedManagerStore.updateFirestoreFeedsAndFeedStore');
+    try {
+      return super.updateFirestoreFeedsAndFeedStore();
     } finally {
       _$_FeedManagerStoreActionController.endAction(_$actionInfo);
     }

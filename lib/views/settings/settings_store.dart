@@ -238,9 +238,10 @@ abstract class _SettingsStore with Store {
   static const double defaultHorizontalPadding = 8.0;
   static const defaultFontFamily = FontFamily.openSans;
   static const defaultMarkAsReadOnScroll = false;
-  static const defaultBackgroundFetchInterval = BackgroundFetchInterval.oneHourAndAHalf;
+  static const defaultBackgroundFetchInterval = BackgroundFetchInterval.sixHours;
   static const defaultSkipBgFetchOnLowBattery = true;
   static const defaultRequireDeviceIdleForBgFetch = false;
+  static const defaultStoryTilesMinimal = false;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -402,4 +403,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultRequireDeviceIdleForBgFetch)
   @observable
   bool requireDeviceIdleForBgFetch = defaultRequireDeviceIdleForBgFetch;
+
+  @JsonKey(defaultValue: defaultStoryTilesMinimal)
+  @observable
+  bool storyTilesMinimalStyle = defaultStoryTilesMinimal;
 }

@@ -1,12 +1,13 @@
-import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
+import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 
 class FeedStoryTile extends StatefulWidget {
@@ -26,11 +27,14 @@ class FeedStoryTile extends StatefulWidget {
 
 class _FeedStoryTileState extends State<FeedStoryTile> {
   String parsedTitle = "";
+  late SettingsStore settingsStore;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.item.read && widget.feedStore.settingsStore.markAsReadOnScroll) {
+    settingsStore = context.read<SettingsStore>();
+
+    if (!widget.item.read && settingsStore.markAsReadOnScroll) {
       widget.item.read = true;
       widget.feedStore.dbUtils.updateItemInDb(widget.item);
     }
@@ -65,7 +69,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
           selectionControls: MaterialTextSelectionControls(),
           child: ListTile(
             // contentPadding: EdgeInsets.zero,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+            contentPadding: settingsStore.storyTilesMinimalStyle ? EdgeInsets.symmetric(horizontal: 8.0) : EdgeInsets.symmetric(horizontal: 16.0),
             title: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,37 +79,39 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     parsedTitle,
                     overflow: TextOverflow.ellipsis,
                     maxLines: widget.isSuggestion ? 4 : 5,
-                    style: TextStyle(fontSize: widget.isSuggestion ? 12 : 14),
+                    style: TextStyle(fontSize: (widget.isSuggestion || settingsStore.storyTilesMinimalStyle) ? 12 : 14),
                   ),
                 ),
                 const SizedBox(width: 5),
-                widget.item.imageUrl.isNotEmpty
-                    ? Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: CachedNetworkImage(
-                          imageUrl: widget.item.imageUrl,
-                          fit: BoxFit.cover,
-                          height: 72,
-                          width: 128,
-                        ),
-                      )
-                    : widget.item.feed!.iconUrl.isNotEmpty
-                        ? Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 72, width: 128, fit: BoxFit.fitWidth),
-                          )
-                        : SizedBox(
+                if (!settingsStore.storyTilesMinimalStyle) ...[
+                  widget.item.imageUrl.isNotEmpty
+                      ? Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: CachedNetworkImage(
+                            imageUrl: widget.item.imageUrl,
+                            fit: BoxFit.cover,
                             height: 72,
                             width: 128,
-                            child: const Icon(LucideIcons.rss),
                           ),
-                const SizedBox(width: 5),
+                        )
+                      : widget.item.feed!.iconUrl.isNotEmpty
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 72, width: 128, fit: BoxFit.fitWidth),
+                            )
+                          : SizedBox(
+                              height: 72,
+                              width: 128,
+                              child: const Icon(LucideIcons.rss),
+                            ),
+                  const SizedBox(width: 5),
+                ],
               ],
             ),
             subtitle: Row(
@@ -119,7 +125,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Chip(
                       label: Text(
-                        widget.item.feedName.length > 15 ? "${widget.item.feedName.substring(0, 15)}..." : widget.item.feedName,
+                        widget.item.feed!.name.length > 15 ? "${widget.item.feed!.name.substring(0, 15)}..." : widget.item.feed!.name,
                         style: const TextStyle(fontSize: 10),
                       ),
                       avatar: widget.item.feed!.iconUrl.isNotEmpty
@@ -186,7 +192,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Text(
                       formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
-                      style: TextStyle(color: Theme.of(context).dividerColor),
+                      style: TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle ? 12 : null),
                     ),
                     PopupMenuButton(
                       elevation: 20,

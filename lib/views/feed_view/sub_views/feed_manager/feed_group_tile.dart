@@ -274,29 +274,32 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
 
                                             // SELECTABLE FEED GROUPS
                                             ...feedStore.feeds.map(
-                                              (Feed feed) => Card.outlined(
-                                                color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.1),
-                                                clipBehavior: Clip.hardEdge,
-                                                child: ListTile(
-                                                  leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
-                                                  title: Text(feed.name),
-                                                  trailing:
-                                                      selectedFeeds.contains(feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
-                                                  onTap: () {
-                                                    if (selectedFeeds.contains(feed)) {
-                                                      dialogSetState(() {
-                                                        selectedFeeds.remove(feed);
-                                                      });
-                                                    } else {
-                                                      dialogSetState(() {
-                                                        selectedFeeds.add(feed);
-                                                      });
-                                                    }
-                                                  },
-                                                  selected: selectedFeeds.contains(feed),
-                                                  selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
-                                                ),
-                                              ),
+                                              (Feed feed) => !widget.feedGroup.feedUrls.contains(feed.link)
+                                                  ? Card.outlined(
+                                                      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.1),
+                                                      clipBehavior: Clip.hardEdge,
+                                                      child: ListTile(
+                                                        leading: CachedNetworkImage(imageUrl: feed.iconUrl, width: 20, height: 20),
+                                                        title: Text(feed.name),
+                                                        trailing: selectedFeeds.contains(feed)
+                                                            ? const Icon(Icons.check_circle_rounded)
+                                                            : const Icon(Icons.circle_outlined),
+                                                        onTap: () {
+                                                          if (selectedFeeds.contains(feed)) {
+                                                            dialogSetState(() {
+                                                              selectedFeeds.remove(feed);
+                                                            });
+                                                          } else {
+                                                            dialogSetState(() {
+                                                              selectedFeeds.add(feed);
+                                                            });
+                                                          }
+                                                        },
+                                                        selected: selectedFeeds.contains(feed),
+                                                        selectedTileColor: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
                                             )
                                           ],
                                         ),

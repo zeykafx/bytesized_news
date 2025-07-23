@@ -46,7 +46,7 @@ class OpmlUtils {
             }
 
             feeds.add(feed);
-            feedGroup.feedNames = feedGroup.feedNames + [feed.name];
+            feedGroup.feedUrls = feedGroup.feedUrls + [feed.link];
             feedGroup.feeds.add(feed);
           }
         }
@@ -97,7 +97,7 @@ class OpmlUtils {
 
     // add feeds that are not in a group
     for (Feed feed in feeds) {
-      if (feedGroups.every((element) => !element.feedNames.contains(feed.name))) {
+      if (feedGroups.every((element) => !element.feedUrls.contains(feed.link))) {
         body.add(
           OpmlOutlineBuilder().type("rss").text(feed.name).title(feed.name).xmlUrl(feed.link).build(),
         );

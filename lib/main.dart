@@ -131,11 +131,11 @@ void main() async {
     } else {
       List<Feed> feeds = await isar.feeds.where().findAll();
 
-      for (String feedName in settingsStore.sortFeedGroup!.feedNames) {
-        if (feeds.any((feed) => feed.name != feedName)) {
+      for (String feedUrl in settingsStore.sortFeedGroup!.feedUrls) {
+        if (feeds.any((feed) => feed.link != feedUrl)) {
           continue;
         }
-        Feed feed = feeds.firstWhere((feed) => feed.name == feedName);
+        Feed feed = feeds.firstWhere((feed) => feed.link == feedUrl);
 
         settingsStore.sortFeedGroup!.feeds.add(feed);
       }

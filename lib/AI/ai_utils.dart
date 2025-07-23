@@ -49,7 +49,7 @@ class AiUtils {
 
     String todaysArticles = feedItems
         .map((item) =>
-            "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feedName}")
+            "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feed?.name}")
         .join(", ");
 
     String mostReadFeedsString = mostReadFeeds

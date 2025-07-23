@@ -209,6 +209,44 @@ mixin _$AuthStore on _AuthStore, Store {
     return _$_getIdAsyncAction.run(() => super._getId());
   }
 
+  late final _$_AuthStoreActionController =
+      ActionController(name: '_AuthStore', context: context);
+
+  @override
+  bool _shouldUpdateLocalFeed(Feed localFeed, Feed firestoreFeed) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore._shouldUpdateLocalFeed');
+    try {
+      return super._shouldUpdateLocalFeed(localFeed, firestoreFeed);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  bool _shouldUpdateLocalFeedGroup(
+      FeedGroup localFeedGroup, FeedGroup firestoreFeedGroup) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore._shouldUpdateLocalFeedGroup');
+    try {
+      return super
+          ._shouldUpdateLocalFeedGroup(localFeedGroup, firestoreFeedGroup);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  bool _listsEqual(List<String> list1, List<String> list2) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore._listsEqual');
+    try {
+      return super._listsEqual(list1, list2);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''

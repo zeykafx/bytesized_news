@@ -24,7 +24,7 @@ class FeedItem {
   late List<String> authors;
   late DateTime publishedDate;
   late DateTime timeFetched;
-  late String feedName;
+  late int feedId;
 
   bool read = false;
   bool bookmarked = false;
@@ -88,7 +88,7 @@ class FeedItem {
 
     // Element mainElement = readabilityMainElement(document.documentElement!, config);
     feedItem.timeFetched = DateTime.now();
-    feedItem.feedName = feed.name;
+    feedItem.feedId = feed.id;
     feedItem.feed = feed;
 
     return feedItem;
@@ -136,7 +136,7 @@ class FeedItem {
     }
 
     feedItem.timeFetched = DateTime.now();
-    feedItem.feedName = feed.name;
+    feedItem.feedId = feed.id;
     feedItem.feed = feed;
 
     return feedItem;
@@ -184,7 +184,7 @@ class FeedItem {
       authors.hashCode ^
       publishedDate.hashCode ^
       timeFetched.hashCode ^
-      feedName.hashCode ^
+      feedId.hashCode ^
       read.hashCode ^
       bookmarked.hashCode ^
       feed.hashCode.hashCode ^
@@ -204,13 +204,7 @@ class FeedItem {
         other.authors == authors &&
         other.publishedDate == publishedDate &&
         other.timeFetched == timeFetched &&
-        other.feedName == feedName &&
-        other.read == read &&
-        other.bookmarked == bookmarked &&
-        other.feed == feed &&
-        other.summarized == summarized &&
-        other.htmlContent == htmlContent &&
-        other.estReadingTimeMinutes == estReadingTimeMinutes &&
-        other.downloaded == downloaded;
+        other.feedId == feedId &&
+        other.feed == feed;
   }
 }
