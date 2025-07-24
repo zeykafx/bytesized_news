@@ -149,7 +149,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                       ),
                     ),
 
-                    if (widget.item.downloaded) ...[
+                    if (widget.item.downloaded && !widget.isSuggestion) ...[
                       const SizedBox(width: 10),
                       Icon(
                         LucideIcons.download,
@@ -177,7 +177,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     ],
 
                     // star icon to show if the item has been summarized by AI or not
-                    if (widget.item.summarized) ...[
+                    if (widget.item.summarized && !widget.isSuggestion) ...[
                       const SizedBox(width: 10),
                       Icon(
                         LucideIcons.sparkles,
@@ -192,7 +192,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Text(
                       formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
-                      style: TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle ? 12 : null),
+                      style: TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle || widget.isSuggestion ? 12 : null),
                     ),
                     PopupMenuButton(
                       elevation: 20,

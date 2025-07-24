@@ -145,7 +145,8 @@ abstract class _FeedManagerStore with Store {
         await dbUtils.addFeedGroup(feedGroup);
       }
     }
-    updateFirestoreFeedsAndFeedStore();
+
+    updateSingleFeedGroupInFirestore(feedGroup);
   }
 
   @action
@@ -160,8 +161,9 @@ abstract class _FeedManagerStore with Store {
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedUrls = feedGroup.feedUrls + localSelectedFeeds.map((feed) => feed.link).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
+      updateSingleFeedGroupInFirestore(feedGroup);
     }
-    updateFirestoreFeedsAndFeedStore();
+
   }
 
   @action
@@ -225,11 +227,16 @@ abstract class _FeedManagerStore with Store {
       feedStore.pinnedFeedsOrFeedGroups.removeWhere(
           (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty);
 
-      // remove this feed group from firestore
-      List<Map<String, dynamic>> feedGroupsToRemove = selectedFeedGroups.map((feedGroup) => feedGroup.toJson()).toList();
-      FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-        "feedGroups": FieldValue.arrayRemove(feedGroupsToRemove),
-      });
+
+      for (FeedGroup feedGroup in selectedFeedGroups) {
+        if (kDebugMode) {
+          print("Deleting ${feedGroup.name} from firestore");
+        }
+        FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+          "feedGroups.${feedGroup.name}": FieldValue.delete(),
+        });
+      }
+
 
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
@@ -246,11 +253,15 @@ abstract class _FeedManagerStore with Store {
     }
 
     if (areFeedsSelected) {
-      // remove this feed from firestore
-      List<Map<String, dynamic>> feedsToRemove = selectedFeeds.map((feed) => feed.toJson()).toList();
-      FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-        "feeds": FieldValue.arrayRemove(feedsToRemove),
-      });
+
+      for (Feed feed in selectedFeeds) {
+        if (kDebugMode) {
+          print("Deleting ${feed.name} from firestore");
+        }
+        FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+          "feeds.${feed.id}": FieldValue.delete(),
+        });
+      }
 
       // Delete selected feeds
       await dbUtils.deleteFeeds(selectedFeeds);
@@ -276,6 +287,10 @@ abstract class _FeedManagerStore with Store {
           if (feedGroup.feedUrls.contains(feed.link)) {
             feedGroup.feedUrls = feedGroup.feedUrls.where((String feedUrl) => feedUrl != feed.link).toList();
             feedGroup.feeds.removeWhere((f) => f.id == feed.id);
+
+            // update the feedGroup in firestore
+            updateSingleFeedGroupInFirestore(feedGroup);
+
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
         }
@@ -304,6 +319,7 @@ abstract class _FeedManagerStore with Store {
         feed.pinnedPosition = -1;
       }
 
+      updateSingleFeedInFirestore(feed);
       await dbUtils.addFeed(feed);
     } else {
       FeedGroup feedGroup = feedOrFeedGroup;
@@ -316,10 +332,11 @@ abstract class _FeedManagerStore with Store {
         feedGroup.pinnedPosition = -1;
       }
 
+      updateSingleFeedGroupInFirestore(feedGroup);
       await dbUtils.addFeedGroup(feedGroup);
     }
 
-    updateFirestoreFeedsAndFeedStore();
+    // updateFirestoreFeedsAndFeedStore();
 
     if (toggleSelection) {
       selectedFeeds.clear();
@@ -377,7 +394,6 @@ abstract class _FeedManagerStore with Store {
       feedsMap[feed.id.toString()] = feed.toJson();
     }
 
-    // avoid useless writes
     batch.update(userDocRef, {"feeds": feedsMap});
 
     await batch.commit();
@@ -391,6 +407,13 @@ abstract class _FeedManagerStore with Store {
   Future<void> updateSingleFeedInFirestore(Feed feed) async {
     await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
       "feeds.${feed.id}": feed.toJson(),
+    });
+  }
+
+  @action
+  Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) async {
+    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+      "feedGroups.${feedGroup.name}": feedGroup.toJson(),
     });
   }
 

@@ -241,6 +241,16 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
         .run(() => super.updateSingleFeedInFirestore(feed));
   }
 
+  late final _$updateSingleFeedGroupInFirestoreAsyncAction = AsyncAction(
+      '_FeedManagerStore.updateSingleFeedGroupInFirestore',
+      context: context);
+
+  @override
+  Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) {
+    return _$updateSingleFeedGroupInFirestoreAsyncAction
+        .run(() => super.updateSingleFeedGroupInFirestore(feedGroup));
+  }
+
   late final _$updateFirestoreFeedGroupsAsyncAction = AsyncAction(
       '_FeedManagerStore.updateFirestoreFeedGroups',
       context: context);

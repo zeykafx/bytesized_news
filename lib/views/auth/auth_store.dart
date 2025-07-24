@@ -223,7 +223,7 @@ abstract class _AuthStore with Store {
       localFeedsMap[feed.id.toString()] = feed;
     }
 
-    if (userData["feeds"] != null) {
+    if (userData.data()!.containsKey("feeds")) {
       Map<String, dynamic> firestoreFeeds = userData["feeds"];
 
       // download and update feeds from firestore
@@ -261,21 +261,14 @@ abstract class _AuthStore with Store {
       }
     }
 
-    // // upload any remaining local feeds to firestore (new feeds that don't exist in firestore)
-    // if (localFeedsMap.isNotEmpty) {
-    //   Map<String, dynamic> feedsToUpload = {};
-    //   for (Feed feed in localFeedsMap.values) {
-    //     feedsToUpload[feed.id.toString()] = feed.toJson();
-    //   }
+    // delete feeds that do not appear in firestore
+    if (localFeedsMap.isNotEmpty) {
+      await dbUtils.deleteFeeds(localFeedsMap.values.toList());
 
-    //   await FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-    //     "feeds": feedsToUpload,
-    //   });
-
-    //   if (kDebugMode) {
-    //     print("Uploaded ${feedsToUpload.length} new feeds to firestore");
-    //   }
-    // }
+      if (kDebugMode) {
+        print("Delete local feeds that were not present in firestore");
+      }
+    }
 
     // sync feed groups with firestore ----
     List<Feed> allFeeds = await dbUtils.getFeeds(); // get updated feeds list
@@ -285,7 +278,7 @@ abstract class _AuthStore with Store {
       localFeedGroupsMap[feedGroup.name] = feedGroup;
     }
 
-    if (userData["feedGroups"] != null) {
+    if (userData.data()!.containsKey("feedGroups")) {
       Map<String, dynamic> firestoreFeedGroups = userData["feedGroups"];
 
       for (String feedGroupName in firestoreFeedGroups.keys) {
@@ -321,21 +314,14 @@ abstract class _AuthStore with Store {
       }
     }
 
-    // // upload any remaining local feed groups to firestore
-    // if (localFeedGroupsMap.isNotEmpty) {
-    //   Map<String, dynamic> feedGroupsToUpload = {};
-    //   for (FeedGroup feedGroup in localFeedGroupsMap.values) {
-    //     feedGroupsToUpload[feedGroup.name] = feedGroup.toJson();
-    //   }
+    // delete feedGroupss that do not appear in firestore
+    if (localFeedGroupsMap.isNotEmpty) {
+      await dbUtils.deleteFeedGroups(localFeedGroupsMap.values.toList());
 
-    //   await FirebaseFirestore.instance.doc("/users/${user!.uid}").update({
-    //     "feedGroups": feedGroupsToUpload,
-    //   });
-
-    //   if (kDebugMode) {
-    //     print("Uploaded ${feedGroupsToUpload.length} new feed groups to firestore");
-    //   }
-    // }
+      if (kDebugMode) {
+        print("Delete local feedGroups that were not present in firestore");
+      }
+    }
 
     // Setup auto run reactions for each of these fields
     reaction((_) => userInterests, (_) async {
