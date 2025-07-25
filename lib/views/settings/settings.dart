@@ -63,9 +63,9 @@ class _SettingsState extends State<Settings> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const GeneralSettings(),
-                          if (!Platform.isIOS) ...[
-                            const BackgroundSyncSection(),
-                          ],
+                          // if (!Platform.isIOS) ...[
+                          const BackgroundSyncSection(),
+                          // ],
                           const ImportExportSection(),
                           const AboutSection(),
                         ],
