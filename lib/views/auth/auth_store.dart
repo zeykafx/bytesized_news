@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
@@ -216,6 +215,60 @@ abstract class _AuthStore with Store {
       deviceId = localDeviceId ?? "No Device ID";
     }
 
+    // sync feed groups with firestore ----
+    List<Feed> allFeeds = await dbUtils.getFeeds(); // get updated feeds list
+    List<FeedGroup> localFeedGroups = await dbUtils.getFeedGroups(allFeeds);
+    Map<String, FeedGroup> localFeedGroupsMap = {};
+    for (FeedGroup feedGroup in localFeedGroups) {
+      localFeedGroupsMap[feedGroup.name] = feedGroup;
+    }
+
+    if (userData.data()!.containsKey("feedGroups")) {
+      Map<String, dynamic> firestoreFeedGroups = userData["feedGroups"];
+
+      for (String feedGroupName in firestoreFeedGroups.keys) {
+        try {
+          FeedGroup firestoreFeedGroup = FeedGroup.fromJson(firestoreFeedGroups[feedGroupName]);
+          FeedGroup? localFeedGroup = localFeedGroupsMap[feedGroupName];
+
+          if (localFeedGroup == null) {
+            // feed group doesn't exist locally, add it
+            await dbUtils.addFeedGroup(firestoreFeedGroup);
+            if (kDebugMode) {
+              print("Added new feed group ${firestoreFeedGroup.name} from firestore");
+            }
+          } else {
+            // feed group exists locally, check if firestore version is different
+            bool needsUpdate = _shouldUpdateLocalFeedGroup(localFeedGroup, firestoreFeedGroup);
+
+            if (needsUpdate) {
+              await dbUtils.addFeedGroup(firestoreFeedGroup);
+              if (kDebugMode) {
+                print("Updated ${firestoreFeedGroup.name} from firestore");
+              }
+            }
+          }
+
+          // remove from local map so we know what's been processed
+          localFeedGroupsMap.remove(feedGroupName);
+        } catch (e) {
+          if (kDebugMode) {
+            print("Error processing feed group $feedGroupName: $e");
+          }
+        }
+      }
+    }
+
+    // delete feedGroupss that do not appear in firestore
+    if (localFeedGroupsMap.isNotEmpty) {
+      await dbUtils.deleteFeedGroups(localFeedGroupsMap.values.toList());
+
+      if (kDebugMode) {
+        print("Delete local feedGroups that were not present in firestore");
+      }
+    }
+
+
     // sync feeds with firestore ----
     List<Feed> localFeeds = await dbUtils.getFeeds();
     Map<String, Feed> localFeedsMap = {};
@@ -267,59 +320,6 @@ abstract class _AuthStore with Store {
 
       if (kDebugMode) {
         print("Delete local feeds that were not present in firestore");
-      }
-    }
-
-    // sync feed groups with firestore ----
-    List<Feed> allFeeds = await dbUtils.getFeeds(); // get updated feeds list
-    List<FeedGroup> localFeedGroups = await dbUtils.getFeedGroups(allFeeds);
-    Map<String, FeedGroup> localFeedGroupsMap = {};
-    for (FeedGroup feedGroup in localFeedGroups) {
-      localFeedGroupsMap[feedGroup.name] = feedGroup;
-    }
-
-    if (userData.data()!.containsKey("feedGroups")) {
-      Map<String, dynamic> firestoreFeedGroups = userData["feedGroups"];
-
-      for (String feedGroupName in firestoreFeedGroups.keys) {
-        try {
-          FeedGroup firestoreFeedGroup = FeedGroup.fromJson(firestoreFeedGroups[feedGroupName]);
-          FeedGroup? localFeedGroup = localFeedGroupsMap[feedGroupName];
-
-          if (localFeedGroup == null) {
-            // feed group doesn't exist locally, add it
-            await dbUtils.addFeedGroup(firestoreFeedGroup);
-            if (kDebugMode) {
-              print("Added new feed group ${firestoreFeedGroup.name} from firestore");
-            }
-          } else {
-            // feed group exists locally, check if firestore version is different
-            bool needsUpdate = _shouldUpdateLocalFeedGroup(localFeedGroup, firestoreFeedGroup);
-
-            if (needsUpdate) {
-              await dbUtils.addFeedGroup(firestoreFeedGroup);
-              if (kDebugMode) {
-                print("Updated ${firestoreFeedGroup.name} from firestore");
-              }
-            }
-          }
-
-          // remove from local map so we know what's been processed
-          localFeedGroupsMap.remove(feedGroupName);
-        } catch (e) {
-          if (kDebugMode) {
-            print("Error processing feed group $feedGroupName: $e");
-          }
-        }
-      }
-    }
-
-    // delete feedGroupss that do not appear in firestore
-    if (localFeedGroupsMap.isNotEmpty) {
-      await dbUtils.deleteFeedGroups(localFeedGroupsMap.values.toList());
-
-      if (kDebugMode) {
-        print("Delete local feedGroups that were not present in firestore");
       }
     }
 

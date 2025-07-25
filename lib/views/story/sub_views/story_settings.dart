@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +17,9 @@ class StorySettings extends StatefulWidget {
 
 class _StorySettingsState extends State<StorySettings> {
   late StoryStore storyStore;
-
   Timer? timer;
+
+  static const double textWidth = 35;
 
   @override
   void initState() {
@@ -69,8 +69,11 @@ class _StorySettingsState extends State<StorySettings> {
                           width: 150,
                           child: Row(
                             children: [
-                              Text(
-                                storyStore.settingsStore.fontSize.toString(),
+                              SizedBox(
+                                width: textWidth,
+                                child: Text(
+                                  storyStore.settingsStore.fontSize.toString(),
+                                ),
                               ),
                               Expanded(
                                 child: Slider(
@@ -132,8 +135,11 @@ class _StorySettingsState extends State<StorySettings> {
                           width: 150,
                           child: Row(
                             children: [
-                              Text(
-                                storyStore.settingsStore.lineHeight.toStringAsFixed(2),
+                              SizedBox(
+                                width: textWidth,
+                                child: Text(
+                                  storyStore.settingsStore.lineHeight.toStringAsFixed(2),
+                                ),
                               ),
                               Expanded(
                                 child: Slider(
@@ -169,19 +175,53 @@ class _StorySettingsState extends State<StorySettings> {
                           width: 150,
                           child: Row(
                             children: [
-                              Text(
-                                storyStore.settingsStore.horizontalPadding.toStringAsFixed(2),
+                              SizedBox(
+                                width: textWidth,
+                                child: Text(
+                                  storyStore.settingsStore.horizontalPadding.toStringAsFixed(0),
+                                ),
                               ),
                               Expanded(
                                 child: Slider(
                                   year2023: false, // todo: to fix (somehow)
-                                  label: storyStore.settingsStore.horizontalPadding.toStringAsFixed(2),
+                                  label: storyStore.settingsStore.horizontalPadding.toStringAsFixed(0),
                                   value: storyStore.settingsStore.horizontalPadding,
                                   min: 0.0,
                                   max: 20.0,
                                   divisions: 40,
                                   onChanged: (newVal) {
                                     storyStore.settingsStore.horizontalPadding = newVal;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Viewer Max Width
+                      ListTile(
+                        title: const Text("Max width"),
+                        subtitle: SizedBox(
+                          width: 150,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: textWidth,
+                                child: Text(
+                                  storyStore.settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
+                                ),
+                              ),
+                              Expanded(
+                                child: Slider(
+                                  year2023: false, // todo: to fix (somehow)
+                                  label: storyStore.settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
+                                  value: storyStore.settingsStore.storyReaderMaxWidth,
+                                  min: 200.0,
+                                  max: 1200.0,
+                                  divisions: 20,
+                                  onChanged: (newVal) {
+                                    storyStore.settingsStore.storyReaderMaxWidth = newVal;
                                   },
                                 ),
                               ),

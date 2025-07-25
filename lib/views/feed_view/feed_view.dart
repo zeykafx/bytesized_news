@@ -13,7 +13,6 @@ import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class FeedView extends StatefulWidget {
   const FeedView({super.key});
@@ -96,9 +95,9 @@ class _FeedViewState extends State<FeedView> {
                 ),
               )
                   .then((_) async {
-                await feedStore.getFeeds();
-                await feedStore.getFeedGroups();
-                await feedStore.getItems();
+                // await feedStore.getFeeds();
+                // await feedStore.getFeedGroups();
+                // await feedStore.getItems();
                 setState(() {});
               });
             },
@@ -186,6 +185,11 @@ class _FeedViewState extends State<FeedView> {
                                       }
                                     case 5:
                                       {
+                                        feedStore.changeSort(FeedListSort.downloaded);
+                                        break;
+                                      }
+                                    case 6:
+                                      {
                                         feedStore.changeSort(FeedListSort.bookmarked);
                                         break;
                                       }
@@ -215,7 +219,11 @@ class _FeedViewState extends State<FeedView> {
                                       child: Text("Summarized"),
                                     ),
                                     const PopupMenuItem(
-                                      value: 4,
+                                      value: 5,
+                                      child: Text("Downloaded"),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 6,
                                       child: Text("Bookmarked"),
                                     ),
                                   ];
@@ -270,7 +278,7 @@ class _FeedViewState extends State<FeedView> {
                                 const Center(child: LinearProgressIndicator()),
                               ],
                               if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
-                                const Center(child: Text("No stories loaded")),
+                                const Center(child: Text("Nothing loaded. Refresh to fetch posts!")),
                               ],
                               if (feedStore.suggestionsLoading) ...[
                                 Align(
@@ -319,7 +327,7 @@ class _FeedViewState extends State<FeedView> {
                                                   children: [
                                                     Tooltip(
                                                       message:
-                                                          "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes max 10 times a day.",
+                                                          "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes.",
                                                       child: Padding(
                                                         padding: const EdgeInsets.symmetric(
                                                           horizontal: 8.0,

@@ -15,8 +15,6 @@ import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:photo_view/photo_view.dart';
-import 'package:readability/article.dart';
-import 'package:readability/readability.dart' as readability;
 
 part 'story_store.g.dart';
 
@@ -372,6 +370,8 @@ abstract class _StoryStore with Store {
       );
       return;
     }
+
+    hideBar = false;
 
     if (aiLoading || feedItem.summarized) {
       return;

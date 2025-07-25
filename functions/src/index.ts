@@ -240,9 +240,10 @@ export const getNewsSuggestions = onCall(
       suggestionsLeftToday: FieldValue.increment(-1),
     });
 
-    // create the summary with openai
+    // get the news suggestions with ai
     const completion = await openai.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       response_format: {
         type: "json_object",
       },

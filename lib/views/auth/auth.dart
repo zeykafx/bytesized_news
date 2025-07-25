@@ -1,6 +1,8 @@
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/email_verify.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -31,6 +33,10 @@ class _AuthState extends State<Auth> {
       body: SignInScreen(
         showPasswordVisibilityToggle: true,
         showAuthActionSwitch: true,
+        providers: [
+          EmailAuthProvider(),
+          GoogleProvider(clientId: "286405169123-14tsnaatjeclvf6i5k9m7nsitm8qq6h1.apps.googleusercontent.com", iOSPreferPlist: true),
+        ],
         actions: [
           AuthStateChangeAction<UserCreated>((context, state) async {
             ScaffoldMessenger.of(context).showSnackBar(

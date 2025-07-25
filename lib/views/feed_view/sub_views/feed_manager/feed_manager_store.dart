@@ -146,7 +146,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    updateSingleFeedGroupInFirestore(feedGroup);
+    dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
   }
 
   @action
@@ -161,7 +161,7 @@ abstract class _FeedManagerStore with Store {
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedUrls = feedGroup.feedUrls + localSelectedFeeds.map((feed) => feed.link).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
-      updateSingleFeedGroupInFirestore(feedGroup);
+      dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
     }
 
   }
@@ -289,7 +289,7 @@ abstract class _FeedManagerStore with Store {
             feedGroup.feeds.removeWhere((f) => f.id == feed.id);
 
             // update the feedGroup in firestore
-            updateSingleFeedGroupInFirestore(feedGroup);
+            dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
 
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
@@ -319,7 +319,7 @@ abstract class _FeedManagerStore with Store {
         feed.pinnedPosition = -1;
       }
 
-      updateSingleFeedInFirestore(feed);
+      dbUtils.updateSingleFeedInFirestore(feed, authStore);
       await dbUtils.addFeed(feed);
     } else {
       FeedGroup feedGroup = feedOrFeedGroup;
@@ -332,7 +332,7 @@ abstract class _FeedManagerStore with Store {
         feedGroup.pinnedPosition = -1;
       }
 
-      updateSingleFeedGroupInFirestore(feedGroup);
+      dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
       await dbUtils.addFeedGroup(feedGroup);
     }
 
@@ -369,7 +369,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    updateFirestoreFeedsAndFeedStore();
+    dbUtils.updateFirestoreFeedsAndFeedGroups(authStore);
   }
 
   @action
@@ -377,64 +377,64 @@ abstract class _FeedManagerStore with Store {
     pinnedListExpanded = !pinnedListExpanded;
   }
 
-  @action
-  void updateFirestoreFeedsAndFeedStore() {
-    updateFirestoreFeedGroups();
-    updateFirestoreFeeds();
-  }
+  // @action
+  // void updateFirestoreFeedsAndFeedStore() {
+  //   updateFirestoreFeedGroups();
+  //   updateFirestoreFeeds();
+  // }
 
-  @action
-  Future<void> updateFirestoreFeeds() async {
-    final batch = FirebaseFirestore.instance.batch();
-    final userDocRef = FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}");
+  // @action
+  // Future<void> updateFirestoreFeeds() async {
+  //   final batch = FirebaseFirestore.instance.batch();
+  //   final userDocRef = FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}");
 
-    // convert feeds to a map structure
-    Map<String, dynamic> feedsMap = {};
-    for (Feed feed in feedStore.feeds) {
-      feedsMap[feed.id.toString()] = feed.toJson();
-    }
+  //   // convert feeds to a map structure
+  //   Map<String, dynamic> feedsMap = {};
+  //   for (Feed feed in feedStore.feeds) {
+  //     feedsMap[feed.id.toString()] = feed.toJson();
+  //   }
 
-    batch.update(userDocRef, {"feeds": feedsMap});
+  //   batch.update(userDocRef, {"feeds": feedsMap});
 
-    await batch.commit();
+  //   await batch.commit();
 
-    if (kDebugMode) {
-      print("Batch updated ${feedsMap.length} feeds in firestore");
-    }
-  }
+  //   if (kDebugMode) {
+  //     print("Batch updated ${feedsMap.length} feeds in firestore");
+  //   }
+  // }
 
-  @action
-  Future<void> updateSingleFeedInFirestore(Feed feed) async {
-    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-      "feeds.${feed.id}": feed.toJson(),
-    });
-  }
+  // @action
+  // Future<void> updateSingleFeedInFirestore(Feed feed) async {
+  //   await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+  //     "feeds.${feed.id}": feed.toJson(),
+  //   });
+  // }
 
-  @action
-  Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) async {
-    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-      "feedGroups.${feedGroup.name}": feedGroup.toJson(),
-    });
-  }
+  // @action
+  // Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) async {
+  //   await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+  //     "feedGroups.${feedGroup.name}": feedGroup.toJson(),
+  //   });
+  // }
 
-  @action
-  Future<void> updateFirestoreFeedGroups() async {
-    // get all local feedGroups
-    List<FeedGroup> feedGroups = await dbUtils.getFeedGroups(feedStore.feeds);
+  // @action
+  // Future<void> updateFirestoreFeedGroups() async {
+  //   // get all local feedGroups
+  //   List<FeedGroup> feedGroups = await dbUtils.getFeedGroups(feedStore.feeds);
 
-    // convert to map structure with feedGroup names as keys
-    Map<String, dynamic> feedGroupsMap = {};
-    for (FeedGroup feedGroup in feedGroups) {
-      feedGroupsMap[feedGroup.name] = feedGroup.toJson();
-    }
+  //   // convert to map structure with feedGroup names as keys
+  //   Map<String, dynamic> feedGroupsMap = {};
+  //   for (FeedGroup feedGroup in feedGroups) {
+  //     feedGroupsMap[feedGroup.name] = feedGroup.toJson();
+  //   }
 
-    // replace the entire feedGroups map
-    await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-      "feedGroups": feedGroupsMap,
-    });
+  //   // replace the entire feedGroups map
+  //   await FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
+  //     "feedGroups": feedGroupsMap,
+  //   });
 
-    if (kDebugMode) {
-      print("Updated ${feedGroupsMap.length} feed groups in firestore");
-    }
-  }
+  //   if (kDebugMode) {
+  //     print("Updated ${feedGroupsMap.length} feed groups in firestore");
+  //   }
+  // }
 }

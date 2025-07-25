@@ -65,7 +65,7 @@ class FeedItem {
     feedItem.authors = item.authors.map((author) => author.name!).toList();
 
     AnyDate parser = const AnyDate();
-    feedItem.publishedDate = parser.parse(item.published!);
+    feedItem.publishedDate = parser.parse(item.published ?? DateTime.now().millisecondsSinceEpoch.toString());
 
     // parse html content into description
 
@@ -107,7 +107,7 @@ class FeedItem {
     // print(item.pubDate);
 
     AnyDate parser = const AnyDate();
-    feedItem.publishedDate = parser.parse(item.pubDate!);
+    feedItem.publishedDate = parser.parse(item.pubDate ?? DateTime.now().millisecondsSinceEpoch.toString());
 
     dom.Document? document;
     // parse html content into description

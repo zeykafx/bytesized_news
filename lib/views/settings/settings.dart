@@ -5,6 +5,7 @@ import 'package:bytesized_news/main.dart' show taskName;
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/opml/opml.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -318,6 +319,7 @@ class ImportExportSection extends StatefulWidget {
 
 class _ImportExportSectionState extends State<ImportExportSection> {
   late final SettingsStore settingsStore;
+  late final AuthStore authStore;
 
   Isar isar = Isar.getInstance()!;
   late DbUtils dbUtils;
@@ -326,6 +328,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
+    authStore = context.read<AuthStore>();
     dbUtils = DbUtils(isar: isar);
   }
 
@@ -475,17 +478,16 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                                 await dbUtils.addFeed(feed);
                               }
                               for (FeedGroup feedGroup in selectedFeedGroups) {
-                                print(feedGroup);
                                 // add the feeds for the feedGroup
                                 for (String feedUrl in feedGroup.feedUrls) {
-                                  print(feedUrl);
-                                  print(feeds);
                                   Feed feed = feeds.firstWhere((feed) => feed.link == feedUrl);
                                   await dbUtils.addFeed(feed);
                                 }
 
                                 await dbUtils.addFeedGroup(feedGroup);
                               }
+
+                              dbUtils.updateFirestoreFeedsAndFeedGroups(authStore);
 
                               Navigator.pop(context);
 
@@ -521,6 +523,8 @@ class _ImportExportSectionState extends State<ImportExportSection> {
             String? outputFile = await FilePicker.platform.saveFile(
               dialogTitle: 'Please select an output file:',
               fileName: 'bytesized_news_export.xml',
+              type: FileType.custom,
+              allowedExtensions: [".xml", ".opml"],
               bytes: Uint8List.fromList(xml.codeUnits),
             );
 

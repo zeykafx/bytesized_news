@@ -24,7 +24,7 @@ class Feed {
     Dio dio = Dio();
     Response response;
     try {
-      response = await dio.get(url);
+      response = await dio.get(url, options: Options(receiveTimeout: Duration(seconds: 5)));
     } catch (e) {
       return null;
     }
@@ -33,7 +33,7 @@ class Feed {
 
     String title = "";
     if (feedName.isEmpty) {
-      title = document.querySelector('title')?.text ?? "No title";
+      title = _cleanTitle(document.querySelector('title')?.text ?? "No title");
     } else {
       title = feedName;
     }
@@ -41,6 +41,14 @@ class Feed {
     String iconUrl = document.querySelector("icon")?.innerHtml ?? "https://cdn.brandfetch.io/${Uri.parse(url).host}/fallback/lettermark?c=1ida5nT4eR28egqMeiL";
 
     return Feed(title, url, iconUrl);
+  }
+  
+  static String _cleanTitle(String rawTitle) {
+    // remove CDATA markers
+    String cleaned = rawTitle.replaceAll(RegExp(r'<!\[CDATA\['), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\]\]>'), '');
+    
+    return cleaned.trim();
   }
 
   @override

@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>286405169123-kna6dihea27p7eckp8faq527csc5552n.apps.googleusercontent.com</string>
+	<string>286405169123-14tsnaatjeclvf6i5k9m7nsitm8qq6h1.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.286405169123-kna6dihea27p7eckp8faq527csc5552n</string>
+	<string>com.googleusercontent.apps.286405169123-14tsnaatjeclvf6i5k9m7nsitm8qq6h1</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>286405169123-nne1dbjjskkvvqffc7ih8s7pjna4ddgp.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.zeykafx.bytesizedNews</string>
+	<string>com.zeykafx.bytesizedNews.RunnerTests</string>
 	<key>PROJECT_ID</key>
 	<string>bytesized-news</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:286405169123:ios:9c12da3f04b400b4b21ad6</string>
+	<string>1:286405169123:ios:6ff383b1f80bff5fb21ad6</string>
 </dict>
 </plist>

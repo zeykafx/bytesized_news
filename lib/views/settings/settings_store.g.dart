@@ -43,12 +43,14 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..backgroundFetchInterval = $enumDecodeNullable(
               _$BackgroundFetchIntervalEnumMap,
               json['backgroundFetchInterval']) ??
-          BackgroundFetchInterval.sixHours
+          BackgroundFetchInterval.twelveHours
       ..skipBgSyncOnLowBattery = json['skipBgSyncOnLowBattery'] as bool? ?? true
       ..requireDeviceIdleForBgFetch =
           json['requireDeviceIdleForBgFetch'] as bool? ?? false
       ..storyTilesMinimalStyle =
-          json['storyTilesMinimalStyle'] as bool? ?? false;
+          json['storyTilesMinimalStyle'] as bool? ?? false
+      ..storyReaderMaxWidth =
+          (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -73,6 +75,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'skipBgSyncOnLowBattery': instance.skipBgSyncOnLowBattery,
       'requireDeviceIdleForBgFetch': instance.requireDeviceIdleForBgFetch,
       'storyTilesMinimalStyle': instance.storyTilesMinimalStyle,
+      'storyReaderMaxWidth': instance.storyReaderMaxWidth,
     };
 
 const _$DarkModeEnumMap = {
@@ -87,6 +90,7 @@ const _$FeedListSortEnumMap = {
   FeedListSort.unread: 'unread',
   FeedListSort.read: 'read',
   FeedListSort.summarized: 'summarized',
+  FeedListSort.downloaded: 'downloaded',
   FeedListSort.bookmarked: 'bookmarked',
   FeedListSort.feed: 'feed',
   FeedListSort.feedGroup: 'feedGroup',
@@ -522,6 +526,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$storyReaderMaxWidthAtom =
+      Atom(name: '_SettingsStore.storyReaderMaxWidth', context: context);
+
+  @override
+  double get storyReaderMaxWidth {
+    _$storyReaderMaxWidthAtom.reportRead();
+    return super.storyReaderMaxWidth;
+  }
+
+  @override
+  set storyReaderMaxWidth(double value) {
+    _$storyReaderMaxWidthAtom.reportWrite(value, super.storyReaderMaxWidth, () {
+      super.storyReaderMaxWidth = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -682,7 +702,8 @@ markAsReadOnScroll: ${markAsReadOnScroll},
 backgroundFetchInterval: ${backgroundFetchInterval},
 skipBgSyncOnLowBattery: ${skipBgSyncOnLowBattery},
 requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch},
-storyTilesMinimalStyle: ${storyTilesMinimalStyle}
+storyTilesMinimalStyle: ${storyTilesMinimalStyle},
+storyReaderMaxWidth: ${storyReaderMaxWidth}
     ''';
   }
 }

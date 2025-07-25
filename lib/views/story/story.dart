@@ -138,7 +138,7 @@ class _StoryState extends State<Story> {
                                 selectionControls: MaterialTextSelectionControls(),
                                 child: Center(
                                   child: Container(
-                                    constraints: const BoxConstraints(maxWidth: 800),
+                                    constraints: BoxConstraints(maxWidth: storyStore.settingsStore.storyReaderMaxWidth),
                                     child: NotificationListener<ScrollNotification>(
                                       onNotification: storyStore.notificationListener,
                                       child: HtmlWidget(

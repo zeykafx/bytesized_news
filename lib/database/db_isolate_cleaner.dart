@@ -33,6 +33,7 @@ class DbIsolateCleaner {
     int numberDeleted = await isar.writeTxnSync(() => isar.feedItems
         .where()
         .filter()
+        .bookmarkedEqualTo(false) // don't delete bookmarked items
         .timeFetchedLessThan(DateTime.now().subtract(Duration(days: days)))
         .deleteAllSync());
 
