@@ -1,5 +1,6 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/views/curated_feeds/curated_feeds_view.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/edit_feed.dart';
@@ -114,12 +115,13 @@ class _FeedManagerState extends State<FeedManager> {
                                     onPressed: () {
                                       Navigator.of(context)
                                           .push(
-                                        MaterialPageRoute(
-                                          builder: (context) => AddFeed(
-                                            getFeeds: widget.wrappedGetFeeds,
-                                            getItems: widget.wrappedGetItems,
-                                          ),
-                                        ),
+                                        // MaterialPageRoute(
+                                        //   builder: (context) => AddFeed(
+                                        //     getFeeds: widget.wrappedGetFeeds,
+                                        //     getItems: widget.wrappedGetItems,
+                                        //   ),
+                                        // ),
+                                        MaterialPageRoute(builder: (context) => CuratedFeedsView(context: context)),
                                       )
                                           .then((_) async {
                                         setState(() {});

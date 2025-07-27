@@ -177,20 +177,7 @@ class FeedItem {
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      url.hashCode ^
-      title.hashCode ^
-      description.hashCode ^
-      authors.hashCode ^
-      publishedDate.hashCode ^
-      timeFetched.hashCode ^
-      feedId.hashCode ^
-      read.hashCode ^
-      bookmarked.hashCode ^
-      feed.hashCode.hashCode ^
-      htmlContent.hashCode ^
-      estReadingTimeMinutes.hashCode ^
-      downloaded.hashCode;
+      id.hashCode ^ url.hashCode ^ title.hashCode ^ description.hashCode ^ authors.hashCode ^ publishedDate.hashCode ^ timeFetched.hashCode ^ feedId.hashCode;
 
   @override
   bool operator ==(Object other) {

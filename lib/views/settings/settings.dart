@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/main.dart' show taskName;
 import 'package:bytesized_news/models/feed/feed.dart';

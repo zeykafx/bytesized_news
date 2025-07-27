@@ -29,9 +29,15 @@ class DbUtils {
 
   Future<void> deleteFeed(Feed feed) async {
     await isar.writeTxn(() => isar.feeds.delete(feed.id));
+    // also delete all feed items associated with this feed
+    await deleteFeedItems(feed);
   }
 
   Future<void> deleteFeeds(List<Feed> feeds) async {
+    // delete all feed items associated with these feeds
+    for (Feed feed in feeds) {
+      await deleteFeedItems(feed);
+    }
     await isar.writeTxn(() => isar.feeds.deleteAll(feeds.map((elem) => elem.id).toList()));
   }
 
@@ -49,6 +55,8 @@ class DbUtils {
       } else {
         if (kDebugMode) {
           print("unknow feed id ${item.feedId}");
+          // delete the item if the feed is not found
+          await isar.writeTxn(() => isar.feedItems.delete(item.id));
         }
       }
     }

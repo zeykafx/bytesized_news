@@ -95,9 +95,9 @@ class _FeedViewState extends State<FeedView> {
                 ),
               )
                   .then((_) async {
-                // await feedStore.getFeeds();
-                // await feedStore.getFeedGroups();
-                // await feedStore.getItems();
+                await feedStore.getFeeds();
+                await feedStore.getFeedGroups();
+                await feedStore.getItems();
                 setState(() {});
               });
             },

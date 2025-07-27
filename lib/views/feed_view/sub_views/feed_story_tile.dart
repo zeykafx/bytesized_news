@@ -42,6 +42,11 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.item.feed == null) {
+      // If the feed is null, we can't display the item properly
+      return const SizedBox.shrink();
+    }
+
     // Parse the title from html (it might be html escaped)
     dom.Document doc = parse(widget.item.title);
     parsedTitle = parse(doc.body!.text).documentElement!.text;
@@ -97,7 +102,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                             width: 128,
                           ),
                         )
-                      : widget.item.feed!.iconUrl.isNotEmpty
+                      : widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
                           ? Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
@@ -125,10 +130,12 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Chip(
                       label: Text(
-                        widget.item.feed!.name.length > 15 ? "${widget.item.feed!.name.substring(0, 15)}..." : widget.item.feed!.name,
+                        widget.item.feed != null && widget.item.feed!.name.length > 15
+                            ? "${widget.item.feed!.name.substring(0, 15)}..."
+                            : widget.item.feed!.name,
                         style: const TextStyle(fontSize: 10),
                       ),
-                      avatar: widget.item.feed!.iconUrl.isNotEmpty
+                      avatar: widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
                           ? Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
@@ -192,7 +199,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Text(
                       formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
-                      style: TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle || widget.isSuggestion ? 12 : null),
+                      style:
+                          TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle || widget.isSuggestion ? 12 : null),
                     ),
                     PopupMenuButton(
                       elevation: 20,

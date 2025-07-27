@@ -242,8 +242,8 @@ export const getNewsSuggestions = onCall(
 
     // get the news suggestions with ai
     const completion = await openai.chat.completions.create({
-      // model: "llama-3.1-8b-instant",
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
+      // model: "meta-llama/llama-4-scout-17b-16e-instruct",
       response_format: {
         type: "json_object",
       },

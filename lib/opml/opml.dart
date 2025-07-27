@@ -21,10 +21,14 @@ class OpmlUtils {
         if (outline.text != null) {
           groupName = outline.text!;
         } else if (outline.title != null) {
-          groupName = outline.title!;
+          groupName = outline.title ?? "Unnamed category";
         }
 
         FeedGroup feedGroup = FeedGroup(groupName);
+
+        if (outline.children == null) {
+          continue;
+        }
 
         for (OpmlOutline child in outline.children!) {
           if (child.xmlUrl != null) {
@@ -64,7 +68,7 @@ class OpmlUtils {
           if (feed == null) {
             continue;
           }
-          
+
           feeds.add(feed);
         }
       }

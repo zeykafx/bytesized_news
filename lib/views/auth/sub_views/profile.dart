@@ -1,6 +1,7 @@
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
+import 'package:bytesized_news/views/purchase/purchase_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,6 @@ class _ProfileState extends State<Profile> {
           Text(user?.email ?? "No Email", style: const TextStyle(fontSize: 16)),
         ],
       ),
-      
       showDeleteConfirmationDialog: true,
       actions: [
         SignedOutAction((context) {
@@ -87,6 +87,20 @@ class _ProfileState extends State<Profile> {
             ];
           },
           removePadding: true,
+        ),
+        ListTile(
+          title: Text("Upgrade"),
+          onTap: () {
+            Navigator.of(context)
+                .push(
+              MaterialPageRoute(
+                builder: (context) => const PurchaseView(),
+              ),
+            )
+                .then((_) async {
+              setState(() {});
+            });
+          },
         ),
         Padding(
           padding: const EdgeInsets.symmetric(

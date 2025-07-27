@@ -37,7 +37,7 @@ class BackgroundFetch {
     List<FeedItem> items = [];
     for (Feed feed in feeds) {
       if (kDebugMode) {
-        print("Fetching items for $feed from the background worker!");
+        print("Fetching items for ${feed.name} from the background worker!");
       }
 
       Response res;
