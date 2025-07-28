@@ -11,8 +11,7 @@ class AiUtils {
   int maxSummaryLength = 3;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  FirebaseFunctions functions =
-      FirebaseFunctions.instanceFor(region: "europe-west1");
+  FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
   FirebaseAuth auth = FirebaseAuth.instance;
 
   Future<(String, int)> summarize(
@@ -47,15 +46,10 @@ class AiUtils {
       print("Calling AI API to get suggested news");
     }
 
-    String todaysArticles = feedItems
-        .map((item) =>
-            "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feed?.name}")
-        .join(", ");
+    String todaysArticles = feedItems.map((item) => "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feed?.name}").join(", ");
 
-    String mostReadFeedsString = mostReadFeeds
-        .map((Feed feed) =>
-            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
-        .join(",");
+    String mostReadFeedsString =
+        mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}").join(",");
 
     String userInterestsString = userInterests.join(',');
 
@@ -81,8 +75,7 @@ class AiUtils {
     List<FeedItem> suggestedArticles = [];
     for (var article in jsonData['articles']) {
       int id = article['ID'] ?? 0;
-      var feedItem = feedItems.firstWhere((item) => item.id == id,
-          orElse: () => feedItems[0]);
+      var feedItem = feedItems.firstWhere((item) => item.id == id, orElse: () => feedItems[0]);
       suggestedArticles.add(feedItem);
     }
 
@@ -127,10 +120,8 @@ class AiUtils {
       print("Calling AI API to build user interests.");
     }
 
-    String mostReadFeedsString = feeds
-        .map((Feed feed) =>
-            "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
-        .join(",");
+    String mostReadFeedsString =
+        feeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}").join(",");
 
     final result = await functions.httpsCallable('buildUserInterests').call(
       {

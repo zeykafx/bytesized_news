@@ -85,16 +85,16 @@ abstract class _AuthStore with Store {
 
     // Fetch limits from firestore (this collection is read only for everyone)
     var limits = await FirebaseFirestore.instance.doc("/flags/limits").get();
-    if (limits["suggestions"] != null) {
+    if (limits.data()!.containsKey("suggestions")) {
       defaultNumberOfSuggestionsDaily = limits["suggestions"];
     }
-    if (limits["summaries"] != null) {
+    if (limits.data()!.containsKey("summaries")) {
       defaultNumberOfSummariesDaily = limits["summaries"];
     }
-    if (limits["suggestionsIntervalMinutes"] != null) {
+    if (limits.data()!.containsKey("suggestionsIntervalMinutes")) {
       suggestionsIntervalMinutes = limits["suggestionsIntervalMinutes"];
     }
-    if (limits["summariesIntervalSeconds"] != null) {
+    if (limits.data()!.containsKey("summariesIntervalSeconds")) {
       summariesIntervalSeconds = limits["summariesIntervalSeconds"];
     }
 
@@ -121,13 +121,13 @@ abstract class _AuthStore with Store {
     // );
 
     var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
-    if (userData["tier"] != null) {
+    if (userData.data()!.containsKey("tier")) {
       if (userData["tier"] == "premium") {
         userTier = Tier.premium;
       }
     }
 
-    if (userData["interests"] != null) {
+    if (userData.data()!.containsKey("interests")) {
       List<String> interests = [];
       for (String interest in userData["interests"]) {
         interests.add(interest);
@@ -136,20 +136,22 @@ abstract class _AuthStore with Store {
     }
 
     // builtUserProfileDate = DateTime.fromMillisecondsSinceEpoch(userData["builtUserProfileDate"] ?? 0);
-    Timestamp builtUserProfileTimestamp = userData["builtUserProfileDate"];
+    Timestamp builtUserProfileTimestamp = userData["builtUserProfileDate"] ?? Timestamp.fromDate(DateTime.now());
     builtUserProfileDate = builtUserProfileTimestamp.toDate();
 
-    if (userData["suggestionsLeftToday"] != null) {
+    Timestamp twentyMinutesAgo = Timestamp.fromDate(DateTime.now().subtract(Duration(minutes: 20)));
+
+    if (userData.data()!.containsKey("suggestionsLeftToday")) {
       suggestionsLeftToday = userData["suggestionsLeftToday"];
-      Timestamp timestampLastSuggestionDate = userData["lastSuggestionDate"];
+      Timestamp timestampLastSuggestionDate = userData["lastSuggestionDate"] ?? twentyMinutesAgo;
       lastSuggestionDate = timestampLastSuggestionDate.toDate();
       // lastSuggestionDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSuggestionDate"] ?? 0);
     }
 
-    if (userData["summariesLeftToday"] != null) {
+    if (userData.data()!.containsKey("summariesLeftToday")) {
       summariesLeftToday = userData["summariesLeftToday"];
       // lastSummaryDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"] ?? 0);
-      Timestamp timestampLastSummaryDate = userData["lastSummaryDate"];
+      Timestamp timestampLastSummaryDate = userData["lastSummaryDate"] ?? twentyMinutesAgo;
       lastSummaryDate = timestampLastSummaryDate.toDate();
     }
 
@@ -157,13 +159,16 @@ abstract class _AuthStore with Store {
     // We send this id along with each request, so if a user switches accounts on the same device
     // we can track that and move the limits to the other account.
     List<String?> fbDeviceIds = [];
-    if (userData["deviceIds"] != null) {
+    if (userData.data()!.containsKey("deviceIds") && userData["deviceIds"] != null) {
       for (dynamic devId in userData["deviceIds"]) {
         fbDeviceIds.add(devId);
       }
     }
 
     String? localDeviceId = await _getId();
+    if (kDebugMode) {
+      print("DEVICE ID: $localDeviceId");
+    }
     if (user != null && (fbDeviceIds.isEmpty || !fbDeviceIds.contains(localDeviceId))) {
       if (kDebugMode) {
         print("Updating firebase device ID to add local device ID");
@@ -223,7 +228,7 @@ abstract class _AuthStore with Store {
       localFeedGroupsMap[feedGroup.name] = feedGroup;
     }
 
-    if (userData.data()!.containsKey("feedGroups")) {
+    if (userData.data()!.containsKey("feedGroups") && userData["feedGroups"].isNotEmpty) {
       Map<String, dynamic> firestoreFeedGroups = userData["feedGroups"];
 
       for (String feedGroupName in firestoreFeedGroups.keys) {
@@ -268,7 +273,6 @@ abstract class _AuthStore with Store {
       }
     }
 
-
     // sync feeds with firestore ----
     List<Feed> localFeeds = await dbUtils.getFeeds();
     Map<String, Feed> localFeedsMap = {};
@@ -276,7 +280,7 @@ abstract class _AuthStore with Store {
       localFeedsMap[feed.id.toString()] = feed;
     }
 
-    if (userData.data()!.containsKey("feeds")) {
+    if (userData.data()!.containsKey("feeds") && userData["feeds"].isNotEmpty) {
       Map<String, dynamic> firestoreFeeds = userData["feeds"];
 
       // download and update feeds from firestore

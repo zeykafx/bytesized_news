@@ -29,5 +29,6 @@ module.exports = {
     "max-len": ["error", 140],
     "object-curly-spacing": "off",
     "quote-props": "off",
+    "operator-linebreak": "off",
   },
 };

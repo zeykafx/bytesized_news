@@ -48,4 +48,6 @@ app.*.map.json
 
 .env
 /functions/.env.bytesized-news
+/functions/service-account-google-play.json
+/functions/lib/service-account-google-play.json
 /android/key.properties

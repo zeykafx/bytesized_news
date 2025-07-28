@@ -1,14 +1,16 @@
-import { onCall } from "firebase-functions/v2/https";
+import { onCall, CallableRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
-import * as functions from "firebase-functions";
+import { auth, pubsub } from "firebase-functions/v1";
 import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
-import { initializeApp } from "firebase-admin/app";
 import { OpenAI } from "openai";
 import { defineString } from "firebase-functions/params";
+import * as admin from "firebase-admin";
+import { google } from "googleapis";
+import * as key from "../service-account-google-play.json";
 
-initializeApp();
+admin.initializeApp();
+
 const db = getFirestore();
-// const openaiKey = defineString("OPENAI_API_KEY");
 const groqKey = defineString("GROQ_API_KEY");
 const openai: OpenAI = new OpenAI({
   apiKey: groqKey.value(),
@@ -16,34 +18,259 @@ const openai: OpenAI = new OpenAI({
 });
 const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
+const androidPackageId = "com.zeykafx.bytesized_news";
 
-export const onUserCreate = functions.auth.user().onCreate(async (user) => {
-  logger.info("User created: " + user.uid);
-
-  const limits = await db.collection("flags").doc("limits").get();
-  const suggestionsLimit = limits.data()?.suggestions || 20;
-  const summariesLimit = limits.data()?.summaries || 100;
-
-  // create a firestore document for the user
-  const res = await db.doc(`users/${user.uid}`).set({
-    email: user.email,
-    created: FieldValue.serverTimestamp(),
-    tier: "free",
-    interests: ["Technology", "Politics"],
-    feeds: [],
-    feedGroups: [],
-    builtUserProfileDate: null,
-    suggestionsLeftToday: suggestionsLimit,
-    lastSuggestionDate: null,
-    summariesLeftToday: summariesLimit,
-    lastSummaryDate: null,
-    deviceIds: null,
-  });
-  logger.info("Document created: " + res.writeTime);
-  return res;
+const authClient = new google.auth.JWT({
+  email: key.client_email,
+  key: key.private_key,
+  scopes: ["https://www.googleapis.com/auth/androidpublisher"],
 });
 
-export const onUserDelete = functions.auth.user().onDelete(async (user) => {
+const playDeveloperApiClient = google.androidpublisher({
+  version: "v3",
+  auth: authClient,
+});
+
+interface Data {
+  source: string;
+  productId: string;
+  verificationData: string;
+  // userId: string;
+}
+
+export const verifyPurchases = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request: CallableRequest<Data>) => {
+    const source: string = request.data?.source;
+    const productId: string = request.data?.productId;
+    const verificationData: string = request.data?.verificationData;
+    // const userId: string = request.data?.userId;
+    const uid = request.auth?.uid;
+
+    if (!uid || !productId || !source || !verificationData) {
+      logger.warn("Missing required parameters for purchase verification", {
+        uid: !!uid,
+        productId: !!productId,
+        source: !!source,
+        verificationData: !!verificationData,
+      });
+      return {
+        status: 400,
+        message: "Please pass all required data to the function",
+      };
+    }
+
+    try {
+      await authClient.authorize();
+      const res = await playDeveloperApiClient.purchases.products.get({
+        packageName: androidPackageId,
+        productId,
+        token: verificationData,
+      });
+
+      const purchaseData = res.data;
+
+      if (!purchaseData?.orderId) {
+        logger.warn("Purchase verification failed: no order ID", {
+          uid,
+          productId,
+        });
+        return {
+          status: 400,
+          message: "Invalid purchase: no order ID found",
+        };
+      }
+
+      // check if purchase state is valid (0 = purchased, 1 = cancelled)
+      if (purchaseData.purchaseState !== 0) {
+        logger.warn("Purchase verification failed: invalid state", {
+          uid,
+          productId,
+          purchaseState: purchaseData.purchaseState,
+        });
+        return {
+          status: 400,
+          message: "Purchase is not in a valid state",
+        };
+      }
+
+      // validate purchase time (should not be in the future and not too old)
+      const currentTime = Date.now();
+      const purchaseTime = purchaseData.purchaseTimeMillis
+        ? parseInt(purchaseData.purchaseTimeMillis)
+        : 0;
+      const oneWeekInMs = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+      if (purchaseTime > currentTime) {
+        logger.warn("Purchase verification failed: future timestamp", {
+          uid,
+          productId,
+          purchaseTime,
+          currentTime,
+        });
+        return {
+          status: 400,
+          message: "Invalid purchase timestamp",
+        };
+      }
+
+      if (currentTime - purchaseTime > oneWeekInMs) {
+        logger.warn("Purchase verification failed: too old", {
+          uid,
+          productId,
+          purchaseTime,
+          currentTime,
+        });
+        return {
+          status: 400,
+          message: "Purchase is too old to verify",
+        };
+      }
+
+      // check if the order has been processed already or not
+      const orderId = purchaseData.orderId;
+      const orderRef = db.doc(`processed_orders/${orderId}`);
+      const orderDoc = await orderRef.get();
+
+      if (orderDoc.exists) {
+        logger.warn("Purchase verification failed: already processed", {
+          uid,
+          productId,
+          orderId,
+        });
+        return {
+          status: 400,
+          message: "This purchase has already been processed",
+        };
+      }
+
+      await db.runTransaction(async (transaction) => {
+        // check that the order hasn't been processed by another request
+        const orderDocInTransaction = await transaction.get(orderRef);
+        if (orderDocInTransaction.exists) {
+          throw new Error("Order already processed in concurrent request");
+        }
+
+        // mark as processed
+        transaction.set(orderRef, {
+          userId: uid,
+          productId,
+          processedAt: FieldValue.serverTimestamp(),
+          purchaseTime: new Date(purchaseTime),
+        });
+
+        // update the user's tier
+        const userRef = db.doc(`users/${uid}`);
+        transaction.update(userRef, {
+          tier: productId,
+          lastPurchaseDate: FieldValue.serverTimestamp(),
+          lastOrderId: orderId,
+        });
+      });
+
+      // Acknowledge the purchase to prevent it from being refunded
+      try {
+        await playDeveloperApiClient.purchases.products.acknowledge({
+          packageName: androidPackageId,
+          productId,
+          token: verificationData,
+        });
+      } catch (ackError) {
+        // Purchase was already acknowledged, which is fine
+        logger.info("Purchase already acknowledged", {
+          uid,
+          productId,
+          orderId,
+        });
+      }
+
+      logger.info("Purchase verification successful", {
+        uid,
+        productId,
+        orderId,
+      });
+
+      return {
+        status: 200,
+        message: "Verification successful!",
+        orderId,
+      };
+      // const currentTime = new Date().getTime();
+      // if (
+      //   res?.data?.purchaseTimeMillis &&
+      //   currentTime < parseInt(res.data.purchaseTimeMillis) &&
+      //   res.data?.purchaseState == 0 // 0 is purchased
+      // ) {
+      //   logger.info(
+      //     `Purchase verified for user ${uid} with product ${productId}`,
+      //   );
+
+      //   // update the user's document with the new tier
+      //   const userRef = db.doc(`users/${uid}`);
+      //   await userRef.update({
+      //     tier: productId,
+      //     lastPurchaseDate: FieldValue.serverTimestamp(),
+      //   });
+
+      //   return {
+      //     status: 200,
+      //     message: "Verification Successful!",
+      //   };
+      // }
+    } catch (error) {
+      logger.error("Purchase verification error", {
+        uid,
+        productId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      if (
+        error instanceof Error &&
+        error.message.includes("already processed")
+      ) {
+        return {
+          status: 400,
+          message: "This purchase has already been processed",
+        };
+      }
+
+      return {
+        status: 500,
+        message: "Failed to verify purchase. Please try again.",
+      };
+    }
+  },
+);
+
+export const onUserCreate = auth
+  .user()
+  .onCreate(async (user: auth.UserRecord) => {
+    logger.info("User created: " + user.uid);
+
+    const limits = await db.collection("flags").doc("limits").get();
+    const suggestionsLimit = limits.data()?.suggestions || 20;
+    const summariesLimit = limits.data()?.summaries || 100;
+
+    // create a firestore document for the user
+    const res = await db.doc(`users/${user.uid}`).set({
+      email: user.email,
+      created: FieldValue.serverTimestamp(),
+      tier: "free",
+      interests: ["News"],
+      feeds: [],
+      feedGroups: [],
+      builtUserProfileDate: FieldValue.serverTimestamp(),
+      suggestionsLeftToday: suggestionsLimit,
+      lastSuggestionDate: null,
+      summariesLeftToday: summariesLimit,
+      lastSummaryDate: null,
+      deviceIds: [],
+    });
+    logger.info("Document created: " + res.writeTime);
+    return res;
+  });
+
+export const onUserDelete = auth.user().onDelete(async (user) => {
   logger.info("User deleted: " + user.uid);
 
   // delete the user's document
@@ -53,7 +280,7 @@ export const onUserDelete = functions.auth.user().onDelete(async (user) => {
 });
 
 // Reset quotas daily via Cloud Scheduler
-exports.resetQuotas = functions.pubsub
+exports.resetQuotas = pubsub
   .schedule("0 0 * * *")
   .timeZone("Europe/Brussels")
   .onRun(async (_) => {

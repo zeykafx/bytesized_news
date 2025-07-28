@@ -25,6 +25,42 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
+  late final _$functionsAtom =
+      Atom(name: '_PurchaseStore.functions', context: context);
+
+  @override
+  FirebaseFunctions get functions {
+    _$functionsAtom.reportRead();
+    return super.functions;
+  }
+
+  @override
+  set functions(FirebaseFunctions value) {
+    _$functionsAtom.reportWrite(value, super.functions, () {
+      super.functions = value;
+    });
+  }
+
+  late final _$authStoreAtom =
+      Atom(name: '_PurchaseStore.authStore', context: context);
+
+  @override
+  AuthStore get authStore {
+    _$authStoreAtom.reportRead();
+    return super.authStore;
+  }
+
+  bool _authStoreIsInitialized = false;
+
+  @override
+  set authStore(AuthStore value) {
+    _$authStoreAtom.reportWrite(
+        value, _authStoreIsInitialized ? super.authStore : null, () {
+      super.authStore = value;
+      _authStoreIsInitialized = true;
+    });
+  }
+
   late final _$storeAvailableAtom =
       Atom(name: '_PurchaseStore.storeAvailable', context: context);
 
@@ -61,15 +97,31 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
       Atom(name: '_PurchaseStore.products', context: context);
 
   @override
-  List<ProductDetails> get products {
+  ObservableList<ProductDetails> get products {
     _$productsAtom.reportRead();
     return super.products;
   }
 
   @override
-  set products(List<ProductDetails> value) {
+  set products(ObservableList<ProductDetails> value) {
     _$productsAtom.reportWrite(value, super.products, () {
       super.products = value;
+    });
+  }
+
+  late final _$purchasedProductsAtom =
+      Atom(name: '_PurchaseStore.purchasedProducts', context: context);
+
+  @override
+  ObservableList<ProductDetails> get purchasedProducts {
+    _$purchasedProductsAtom.reportRead();
+    return super.purchasedProducts;
+  }
+
+  @override
+  set purchasedProducts(ObservableList<ProductDetails> value) {
+    _$purchasedProductsAtom.reportWrite(value, super.purchasedProducts, () {
+      super.purchasedProducts = value;
     });
   }
 
@@ -89,12 +141,53 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
+  late final _$hasAlertAtom =
+      Atom(name: '_PurchaseStore.hasAlert', context: context);
+
+  @override
+  bool get hasAlert {
+    _$hasAlertAtom.reportRead();
+    return super.hasAlert;
+  }
+
+  @override
+  set hasAlert(bool value) {
+    _$hasAlertAtom.reportWrite(value, super.hasAlert, () {
+      super.hasAlert = value;
+    });
+  }
+
+  late final _$alertMessageAtom =
+      Atom(name: '_PurchaseStore.alertMessage', context: context);
+
+  @override
+  String get alertMessage {
+    _$alertMessageAtom.reportRead();
+    return super.alertMessage;
+  }
+
+  @override
+  set alertMessage(String value) {
+    _$alertMessageAtom.reportWrite(value, super.alertMessage, () {
+      super.alertMessage = value;
+    });
+  }
+
+  late final _$restorePurchaseAsyncAction =
+      AsyncAction('_PurchaseStore.restorePurchase', context: context);
+
+  @override
+  Future<void> restorePurchase(BuildContext context) {
+    return _$restorePurchaseAsyncAction
+        .run(() => super.restorePurchase(context));
+  }
+
   late final _$initIAPAsyncAction =
       AsyncAction('_PurchaseStore.initIAP', context: context);
 
   @override
-  Future<void> initIAP() {
-    return _$initIAPAsyncAction.run(() => super.initIAP());
+  Future<void> initIAP(AuthStore aStore) {
+    return _$initIAPAsyncAction.run(() => super.initIAP(aStore));
   }
 
   late final _$listenToPurchaseUpdatedAsyncAction =
@@ -111,10 +204,15 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
   String toString() {
     return '''
 inAppPurchase: ${inAppPurchase},
+functions: ${functions},
+authStore: ${authStore},
 storeAvailable: ${storeAvailable},
 subscription: ${subscription},
 products: ${products},
-loading: ${loading}
+purchasedProducts: ${purchasedProducts},
+loading: ${loading},
+hasAlert: ${hasAlert},
+alertMessage: ${alertMessage}
     ''';
   }
 }

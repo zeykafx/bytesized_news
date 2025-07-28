@@ -62,7 +62,7 @@ class _EmailVerifyState extends State<EmailVerify> {
       if (kDebugMode) {
         print("User is null, sleeping for 10 seconds");
       }
-      await Future<void>.delayed(const Duration(seconds: 10));
+      await Future<void>.delayed(const Duration(seconds: 5));
     }
   }
 
