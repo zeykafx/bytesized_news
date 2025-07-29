@@ -87,6 +87,22 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$hasUserRefundedAtom =
+      Atom(name: '_AuthStore.hasUserRefunded', context: context);
+
+  @override
+  bool get hasUserRefunded {
+    _$hasUserRefundedAtom.reportRead();
+    return super.hasUserRefunded;
+  }
+
+  @override
+  set hasUserRefunded(bool value) {
+    _$hasUserRefundedAtom.reportWrite(value, super.hasUserRefunded, () {
+      super.hasUserRefunded = value;
+    });
+  }
+
   late final _$userInterestsAtom =
       Atom(name: '_AuthStore.userInterests', context: context);
 
@@ -255,6 +271,7 @@ functions: ${functions},
 initialized: ${initialized},
 user: ${user},
 userTier: ${userTier},
+hasUserRefunded: ${hasUserRefunded},
 userInterests: ${userInterests},
 builtUserProfileDate: ${builtUserProfileDate},
 suggestionsLeftToday: ${suggestionsLeftToday},

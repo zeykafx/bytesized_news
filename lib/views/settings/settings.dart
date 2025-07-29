@@ -240,7 +240,8 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
   }
 
   Future<void> updateBackgroundTask() async {
-    await Workmanager().cancelByUniqueName(taskName);
+    await Workmanager().cancelAll();
+    // await Workmanager().cancelByUniqueName(taskName);
 
     await Workmanager().registerPeriodicTask(
       taskName,
@@ -579,14 +580,34 @@ class _AboutSectionState extends State<AboutSection> {
             title: "About",
             children: [
               ListTile(
+                  leading: const Icon(LucideIcons.sparkles),
                   title: const Text(
                     "Bytesized News",
                   ),
                   subtitle: Text("Version: ${snapshot.data?.version}\nBuild: ${snapshot.data?.buildNumber}"),
+                  trailing: const Text('View Licences'),
                   onTap: () {
                     showLicensePage(context: context);
                   }),
               ListTile(
+                leading: const Icon(LucideIcons.github),
+                title: const Text(
+                  "Source Code",
+                ),
+                subtitle: const Wrap(
+                  children: [
+                    Text("You can find the source code of this app and the backend at "),
+                    Text("github.com/zeykafx/bytesized_news", style: TextStyle(color: Colors.blue)),
+                  ],
+                ),
+                onTap: () {
+                  // open the paypal link
+                  launchUrlString("https://github.com/zeykafx/bytesized_news");
+                },
+                trailing: const Icon(Icons.open_in_new),
+              ),
+              ListTile(
+                leading: const Icon(Icons.laptop),
                 title: const Text(
                   "Made by Corentin Detry",
                 ),

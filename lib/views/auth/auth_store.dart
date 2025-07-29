@@ -21,8 +21,7 @@ enum Tier { free, premium }
 
 // Defaults
 const defaultUserInterests = [
-  "Technology",
-  "Politics",
+  "News",
 ];
 
 int defaultNumberOfSuggestionsDaily = 20;
@@ -46,6 +45,9 @@ abstract class _AuthStore with Store {
 
   @observable
   Tier userTier = Tier.free;
+
+  @observable
+  bool hasUserRefunded = false;
 
   @observable
   List<String> userInterests = defaultUserInterests;
@@ -98,32 +100,17 @@ abstract class _AuthStore with Store {
       summariesIntervalSeconds = limits["summariesIntervalSeconds"];
     }
 
-    // Not sure if i want this actually, it adds a listener for each connected user...
-    // And the probability that I want to change the limits and have that be reflected instantly in the app is low
-    // TODO: Evaluate this later
-    // FirebaseFirestore.instance.doc("/flags/limits").snapshots().listen(
-    //   (event) {
-    //     var newLimits = event.data()!;
-    //     if (newLimits["suggestions"] != null) {
-    //       defaultNumberOfSuggestionsDaily = newLimits["suggestions"];
-    //     }
-    //     if (newLimits["summaries"] != null) {
-    //       defaultNumberOfSummariesDaily = newLimits["summaries"];
-    //     }
-    //     if (newLimits["suggestionsIntervalMinutes"] != null) {
-    //       suggestionsIntervalMinutes = newLimits["suggestionsIntervalMinutes"];
-    //     }
-    //     if (newLimits["summariesIntervalSeconds"] != null) {
-    //       summariesIntervalSeconds = newLimits["summariesIntervalSeconds"];
-    //     }
-    //   },
-    //   onError: (error) => print("Listen failed: $error"),
-    // );
-
     var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
     if (userData.data()!.containsKey("tier")) {
       if (userData["tier"] == "premium") {
         userTier = Tier.premium;
+      }
+    }
+
+    if (userData.data()!.containsKey("hasRefunded")) {
+      if (userData["hasRefunded"]) {
+        // if the user has refunded a purchase, we prevent them from purchasing anything else
+        hasUserRefunded = true;
       }
     }
 
@@ -135,7 +122,6 @@ abstract class _AuthStore with Store {
       userInterests = interests;
     }
 
-    // builtUserProfileDate = DateTime.fromMillisecondsSinceEpoch(userData["builtUserProfileDate"] ?? 0);
     Timestamp builtUserProfileTimestamp = userData["builtUserProfileDate"] ?? Timestamp.fromDate(DateTime.now());
     builtUserProfileDate = builtUserProfileTimestamp.toDate();
 
@@ -145,19 +131,16 @@ abstract class _AuthStore with Store {
       suggestionsLeftToday = userData["suggestionsLeftToday"];
       Timestamp timestampLastSuggestionDate = userData["lastSuggestionDate"] ?? twentyMinutesAgo;
       lastSuggestionDate = timestampLastSuggestionDate.toDate();
-      // lastSuggestionDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSuggestionDate"] ?? 0);
     }
 
     if (userData.data()!.containsKey("summariesLeftToday")) {
       summariesLeftToday = userData["summariesLeftToday"];
-      // lastSummaryDate = DateTime.fromMillisecondsSinceEpoch(userData["lastSummaryDate"] ?? 0);
       Timestamp timestampLastSummaryDate = userData["lastSummaryDate"] ?? twentyMinutesAgo;
       lastSummaryDate = timestampLastSummaryDate.toDate();
     }
 
-    // Get the current device's id and store that in firebase if it is different
-    // We send this id along with each request, so if a user switches accounts on the same device
-    // we can track that and move the limits to the other account.
+    // get the current device's id and store that in firebase if it is different
+    // we send this id along with each request, so if a user disconnects and tries to log in to another account, we disallow it
     List<String?> fbDeviceIds = [];
     if (userData.data()!.containsKey("deviceIds") && userData["deviceIds"] != null) {
       for (dynamic devId in userData["deviceIds"]) {

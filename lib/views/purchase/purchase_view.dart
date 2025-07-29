@@ -31,6 +31,7 @@ class _PurchaseViewState extends State<PurchaseView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(purchaseStore.alertMessage),
+            duration: Duration(seconds: 30),
           ),
         );
         purchaseStore.hasAlert = false;
@@ -91,12 +92,54 @@ class _PurchaseViewState extends State<PurchaseView> {
     );
   }
 
+  Widget buildCard(String title, String description, {bool isInfo = false}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: isInfo
+            ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+            : Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isInfo ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            isInfo ? Icons.info_rounded : Icons.error,
+            color: isInfo ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
+            size: 32,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: isInfo ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onErrorContainer,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isInfo ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onErrorContainer,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
       return Scaffold(
         appBar: AppBar(title: const Text("Upgrade to Premium")),
-        body: Center(
+        body: Align(
+          alignment: Alignment.topCenter,
           child: Container(
             constraints: BoxConstraints(maxWidth: 800),
             child: SingleChildScrollView(
@@ -129,7 +172,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                           Row(
                             children: [
                               Icon(
-                                LucideIcons.crown,
+                                Icons.workspace_premium,
                                 color: Theme.of(context).colorScheme.primary,
                                 size: 32,
                               ),
@@ -241,206 +284,176 @@ class _PurchaseViewState extends State<PurchaseView> {
 
                     const SizedBox(height: 24),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Available Products",
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                        ),
-                        TextButton.icon(
-                          label: Text("Restore Purchase"),
-                          icon: Icon(Icons.restore),
-                          onPressed: () => purchaseStore.restorePurchase(context),
-                        )
-                      ],
+                    Text(
+                      "Available Products",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                     const SizedBox(height: 16),
 
-                    // Error card if we cant load the products from the store
-                    if (purchaseStore.products.isEmpty) ...[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.error,
-                              color: Theme.of(context).colorScheme.error,
-                              size: 32,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              "Failed to load products from the store",
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onErrorContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Please check your internet connection and try again",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onErrorContainer,
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                    if (authStore.hasUserRefunded) ...[
+                      buildCard(
+                        "Premium upgrades unavailable",
+                        "You have refunded purchase(s) in the past, this prevents you from purchasing upgrades to prevent abuse. Please contact me at corentin.detry(at)gmail.com if you believe this is a mistake.",
                       ),
-                    ],
+                    ] else ...[
+                      // Error card if we cant load the products from the store
+                      if (purchaseStore.products.isEmpty) ...[
+                        buildCard("Failed to load products from the store", "Please check your internet connection and try again"),
+                      ],
 
-                    // All products
-                    for (ProductDetails product in purchaseStore.products)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16.0),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
-                              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
+                      if (authStore.userTier != Tier.free) ...[
+                        buildCard(
+                          "You already have premium!",
+                          "You have already purchased a premium upgrade, but you can always purchase another one to support the development of this app. Thank you again for your support!",
+                          isInfo: true,
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: purchaseStore.loading || purchaseStore.purchasedProducts.contains(product)
-                                ? null
-                                : () {
-                                    if (kDebugMode) {
-                                      print("Starting purchase of item with id: ${product.id}");
-                                    }
-                                    final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
-                                    InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
-                                  },
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // Crown icon
-                                      Container(
-                                        padding: const EdgeInsets.all(12.0),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Icon(
-                                          LucideIcons.crown,
-                                          color: Theme.of(context).colorScheme.primary,
-                                          size: 24,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
+                        const SizedBox(height: 16),
+                      ],
 
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            // Title
-                                            Text(
-                                              product.title,
-                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            // description
-                                            Text(
-                                              product.description,
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                                                  ),
-                                            ),
-                                          ],
+                      // All products
+                      for (ProductDetails product in purchaseStore.products)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16.0),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: purchaseStore.loading || purchaseStore.purchasedProducts.contains(product)
+                                  ? null
+                                  : () {
+                                      if (kDebugMode) {
+                                        print("Starting purchase of item with id: ${product.id}");
+                                      }
+                                      final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
+                                      InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+                                    },
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        // Crown icon
+                                        Container(
+                                          padding: const EdgeInsets.all(12.0),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Icon(
+                                            Icons.workspace_premium,
+                                            color: Theme.of(context).colorScheme.primary,
+                                            size: 24,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          product.price,
-                                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                color: Theme.of(context).colorScheme.onPrimary,
-                                                fontWeight: FontWeight.bold,
+                                        const SizedBox(width: 16),
+
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              // Title
+                                              Text(
+                                                product.title,
+                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                                    ),
                                               ),
-                                        ),
-                                      ),
-                                      if (purchaseStore.loading) ...[
-                                        const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        ),
-                                      ] else if (purchaseStore.purchasedProducts.contains(product)) ...[
-                                        Text(
-                                          "Purchased!",
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                color: Theme.of(context).colorScheme.primary,
-                                                fontWeight: FontWeight.w600,
+                                              const SizedBox(height: 4),
+                                              // description
+                                              Text(
+                                                product.description,
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                                                    ),
                                               ),
-                                        ),
-                                      ] else ...[
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "Tap to purchase",
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: Theme.of(context).colorScheme.primary,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              LucideIcons.arrow_right,
-                                              color: Theme.of(context).colorScheme.primary,
-                                              size: 16,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ],
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).colorScheme.primary,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            product.price,
+                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                  color: Theme.of(context).colorScheme.onPrimary,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                        ),
+                                        if (purchaseStore.loading) ...[
+                                          const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                        ] else if (purchaseStore.purchasedProducts.contains(product)) ...[
+                                          Text(
+                                            "Purchased!",
+                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                  color: Theme.of(context).colorScheme.primary,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ] else ...[
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Tap to purchase",
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: Theme.of(context).colorScheme.primary,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                LucideIcons.arrow_right,
+                                                color: Theme.of(context).colorScheme.primary,
+                                                size: 16,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ).animate().fadeIn(
-                            curve: Curves.easeInOutQuad,
-                            duration: 400.ms,
-                          ),
+                        ).animate().fadeIn(
+                              curve: Curves.easeInOutQuad,
+                              duration: 400.ms,
+                            ),
+                    ],
 
                     const SizedBox(height: 30),
                   ],

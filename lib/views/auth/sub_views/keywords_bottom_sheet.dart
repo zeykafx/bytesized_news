@@ -46,7 +46,10 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: widget.removePadding ? EdgeInsets.zero : null,
-      trailing: const Icon(Icons.edit),
+      trailing: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: const Icon(Icons.edit),
+      ),
       title: Text(widget.title),
       onTap: () => showModalBottomSheet(
         showDragHandle: true,

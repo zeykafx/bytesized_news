@@ -5,6 +5,7 @@ import 'package:bytesized_news/views/purchase/purchase_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
@@ -25,6 +26,65 @@ class _ProfileState extends State<Profile> {
     super.initState();
     authStore = context.read<AuthStore>();
     user = auth.currentUser;
+  }
+
+  Widget buildPremiumUpgradeCard() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primaryContainer,
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.of(context)
+                .push(
+              MaterialPageRoute(
+                builder: (context) => const PurchaseView(),
+              ),
+            )
+                .then((_) async {
+              setState(() {});
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      authStore.userTier == Tier.premium ? "You have premium!" : "Upgrade to Premium",
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            // fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -86,22 +146,10 @@ class _ProfileState extends State<Profile> {
               ...authStore.userInterests..removeAt(index),
             ];
           },
-          removePadding: true,
+          removePadding: false,
         ),
-        ListTile(
-          title: Text("Upgrade"),
-          onTap: () {
-            Navigator.of(context)
-                .push(
-              MaterialPageRoute(
-                builder: (context) => const PurchaseView(),
-              ),
-            )
-                .then((_) async {
-              setState(() {});
-            });
-          },
-        ),
+        const SizedBox(height: 8),
+        buildPremiumUpgradeCard(),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 0,

@@ -168,6 +168,10 @@ abstract class _PurchaseStore with Store {
           // update the auth store
           authStore.userTier = Tier.premium;
 
+          // show success snackbar
+          alertMessage = "Successfully purchased premium! Thank you!!";
+          hasAlert = true;
+          
           loading = false;
           // since the server has verified the purchase, we can complete it now
           if (purchaseDetails.pendingCompletePurchase) {

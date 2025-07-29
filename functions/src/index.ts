@@ -157,12 +157,13 @@ export const verifyPurchases = onCall(
           productId,
           processedAt: FieldValue.serverTimestamp(),
           purchaseTime: new Date(purchaseTime),
+          token: verificationData,
         });
 
         // update the user's tier
         const userRef = db.doc(`users/${uid}`);
         transaction.update(userRef, {
-          tier: productId,
+          tier: "premium",
           lastPurchaseDate: FieldValue.serverTimestamp(),
           lastOrderId: orderId,
         });
@@ -195,28 +196,6 @@ export const verifyPurchases = onCall(
         message: "Verification successful!",
         orderId,
       };
-      // const currentTime = new Date().getTime();
-      // if (
-      //   res?.data?.purchaseTimeMillis &&
-      //   currentTime < parseInt(res.data.purchaseTimeMillis) &&
-      //   res.data?.purchaseState == 0 // 0 is purchased
-      // ) {
-      //   logger.info(
-      //     `Purchase verified for user ${uid} with product ${productId}`,
-      //   );
-
-      //   // update the user's document with the new tier
-      //   const userRef = db.doc(`users/${uid}`);
-      //   await userRef.update({
-      //     tier: productId,
-      //     lastPurchaseDate: FieldValue.serverTimestamp(),
-      //   });
-
-      //   return {
-      //     status: 200,
-      //     message: "Verification Successful!",
-      //   };
-      // }
     } catch (error) {
       logger.error("Purchase verification error", {
         uid,
@@ -279,7 +258,72 @@ export const onUserDelete = auth.user().onDelete(async (user) => {
   return res;
 });
 
-// Reset quotas daily via Cloud Scheduler
+// check the purchases made in the last 48 hours to check for refunds
+exports.checkRefunds = pubsub
+  .schedule("0 0 * * *")
+  .timeZone("Europe/Brussels")
+  .onRun(async (_) => {
+    // Get all user documents
+    const fourtyEightHrsAgo = Timestamp.fromMillis(
+      Date.now() - 48 * 60 * 60 * 1000,
+    );
+    const recentProcessedOrders = await db
+      .collection("processed_orders")
+      .where("processedAt", ">", fourtyEightHrsAgo)
+      .get();
+
+    recentProcessedOrders.forEach((order) => {
+      // check if the order is still valid
+      const orderData = order.data();
+      const userId = orderData.userId;
+      const productId = orderData.productId;
+      const token = orderData.token;
+      // const processedAt = orderData.processedAt as Timestamp;
+      // const purchaseTime = orderData.purchaseTime as Date;
+
+      // check using the Google Play API
+      playDeveloperApiClient.purchases.products
+        .get({
+          packageName: androidPackageId,
+          productId: productId,
+          token: token,
+        })
+        .then((res) => {
+          const purchaseData = res.data;
+
+          // check if the purchase state is valid (0 = purchased, 1 = cancelled)
+          if (purchaseData.purchaseState !== 0) {
+            logger.info(
+              `Purchase ${order.id} for user ${userId} has been refunded or cancelled.`,
+            );
+
+            // update the user's tier to free
+            db.doc(`users/${userId}`).update({
+              tier: "free",
+              lastPurchaseDate: null,
+              lastOrderId: null,
+              hasRefunded: true, // mark the user as having refunded
+              // this way we can prevent them from purchasing again
+            });
+
+            // delete the order from processed_orders
+            db.doc(`processed_orders/${order.id}`).delete();
+          }
+          // else {
+          //   logger.info(
+          //     `Purchase ${order.id} for user ${userId} is still valid.`,
+          //   );
+          // }
+        })
+        .catch((error) => {
+          logger.error(
+            `Error checking purchase ${order.id} for user ${userId}: ${error}`,
+          );
+        });
+    });
+  });
+
+// reset quotas daily via Cloud Scheduler
 exports.resetQuotas = pubsub
   .schedule("0 0 * * *")
   .timeZone("Europe/Brussels")
