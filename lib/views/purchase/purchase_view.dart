@@ -44,7 +44,7 @@ class _PurchaseViewState extends State<PurchaseView> {
   @override
   void dispose() {
     purchaseStore.subscription?.cancel();
-    ;
+
     super.dispose();
   }
 
@@ -100,7 +100,7 @@ class _PurchaseViewState extends State<PurchaseView> {
         color: isInfo
             ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
             : Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isInfo ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) : Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
         ),
@@ -130,7 +130,7 @@ class _PurchaseViewState extends State<PurchaseView> {
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOutQuad);
   }
 
   @override
@@ -148,9 +148,6 @@ class _PurchaseViewState extends State<PurchaseView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (purchaseStore.loading) ...[
-                      const Center(child: LinearProgressIndicator()),
-                    ],
                     // Header Section
                     Container(
                       width: double.infinity,
@@ -291,6 +288,14 @@ class _PurchaseViewState extends State<PurchaseView> {
                           ),
                     ),
                     const SizedBox(height: 16),
+
+                    if (purchaseStore.loading) ...[
+                      const Center(
+                          child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: LinearProgressIndicator(),
+                      )),
+                    ],
 
                     if (authStore.hasUserRefunded) ...[
                       buildCard(

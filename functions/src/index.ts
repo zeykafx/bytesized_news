@@ -262,8 +262,8 @@ export const onUserDelete = auth.user().onDelete(async (user) => {
 exports.checkRefunds = pubsub
   .schedule("0 0 * * *")
   .timeZone("Europe/Brussels")
-  .onRun(async (_) => {
-    // Get all user documents
+  .onRun(async () => {
+    // get all user documents
     const fourtyEightHrsAgo = Timestamp.fromMillis(
       Date.now() - 48 * 60 * 60 * 1000,
     );
@@ -327,7 +327,7 @@ exports.checkRefunds = pubsub
 exports.resetQuotas = pubsub
   .schedule("0 0 * * *")
   .timeZone("Europe/Brussels")
-  .onRun(async (_) => {
+  .onRun(async () => {
     // Get all user documents
     const usersSnapshot = await db.collection("users").get();
     const limits = await db.collection("flags").doc("limits").get();
@@ -396,6 +396,13 @@ export const summarize = onCall(
     const userRef = db.doc(`users/${uid}`);
     const user = await userRef.get();
     const userData = user.data();
+
+    if (userData?.tier !== "premium") {
+      logger.info("Non-Premium user attempted to summarize article: " + uid);
+      return {
+        error: "Error: Not a premium account",
+      };
+    }
 
     let summariesToConsume = 1;
 
@@ -497,6 +504,13 @@ export const getNewsSuggestions = onCall(
     const user = await userRef.get();
     const userData = user.data();
 
+    if (userData?.tier !== "premium") {
+      logger.info("Non-Premium user attempted to get news suggestions: " + uid);
+      return {
+        error: "Error: Not a premium account",
+      };
+    }
+
     // check if the user has any summaries left today
     const suggestionsLeftToday = userData?.suggestionsLeftToday;
     if (suggestionsLeftToday <= 0) {
@@ -571,6 +585,18 @@ export const analyzeFeedCategories = onCall(
       `Analyzing categories for feed name: ${feedName}, link: ${feedLink}`,
     );
 
+    const uid = request.auth?.uid;
+    const userRef = db.doc(`users/${uid}`);
+    const user = await userRef.get();
+    const userData = user.data();
+
+    if (userData?.tier !== "premium") {
+      logger.info("Non-Premium user attempted to get news suggestions: " + uid);
+      return {
+        error: "Error: Not a premium account",
+      };
+    }
+
     const completion = await openai.chat.completions.create({
       model: "llama-3.1-8b-instant",
       response_format: {
@@ -615,6 +641,18 @@ export const buildUserInterests = onCall(
       `Building user interests based on most read feeds: ${mostReadFeedsString}`,
     );
 
+    const uid = request.auth?.uid;
+    const userRef = db.doc(`users/${uid}`);
+    const user = await userRef.get();
+    const userData = user.data();
+
+    if (userData?.tier !== "premium") {
+      logger.info("Non-Premium user attempted to get news suggestions: " + uid);
+      return {
+        error: "Error: Not a premium account",
+      };
+    }
+
     const completion = await openai.chat.completions.create({
       model: "llama-3.1-8b-instant",
       response_format: {
@@ -653,7 +691,7 @@ export const buildUserInterests = onCall(
     }
 
     // Add the inferred interests to the user's document
-    const userRef = db.doc(`users/${request.auth?.uid}`);
+    // const userRef = db.doc(`users/${request.auth?.uid}`);
     await userRef.update({
       builtUserProfileDate: FieldValue.serverTimestamp(),
       interests: FieldValue.arrayUnion(...parsedCategories),

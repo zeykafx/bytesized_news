@@ -49,7 +49,11 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
 
     // Parse the title from html (it might be html escaped)
     dom.Document doc = parse(widget.item.title);
-    parsedTitle = parse(doc.body!.text).documentElement!.text;
+    if (doc.body != null) {
+      parsedTitle = parse(doc.body!.text).documentElement!.text;
+    } else {
+      parsedTitle = widget.item.title;
+    }
 
     Color cardColor;
     if (widget.isSuggestion) {

@@ -61,7 +61,7 @@ abstract class _FeedStore with Store {
   late DbUtils dbUtils;
 
   @observable
-  AiUtils aiUtils = AiUtils();
+  late AiUtils aiUtils;
 
   @observable
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -112,6 +112,7 @@ abstract class _FeedStore with Store {
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
     this.authStore = authStore;
+    aiUtils = AiUtils(authStore);
 
     dbUtils = DbUtils(isar: isar);
 
@@ -458,6 +459,12 @@ abstract class _FeedStore with Store {
 
   @action
   Future<void> createNewsSuggestion() async {
+    if (authStore.userTier != Tier.premium) {
+      if (kDebugMode) {
+        print("Cannot fetch news suggestions, not premium");
+      }
+      return;
+    }
     if (settingsStore.sort != FeedListSort.byDate) {
       return;
     }

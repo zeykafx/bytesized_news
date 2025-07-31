@@ -132,6 +132,26 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
+  late final _$feedSyncAtom =
+      Atom(name: '_FeedManagerStore.feedSync', context: context);
+
+  @override
+  FeedSync get feedSync {
+    _$feedSyncAtom.reportRead();
+    return super.feedSync;
+  }
+
+  bool _feedSyncIsInitialized = false;
+
+  @override
+  set feedSync(FeedSync value) {
+    _$feedSyncAtom
+        .reportWrite(value, _feedSyncIsInitialized ? super.feedSync : null, () {
+      super.feedSync = value;
+      _feedSyncIsInitialized = true;
+    });
+  }
+
   late final _$isReorderingAtom =
       Atom(name: '_FeedManagerStore.isReordering', context: context);
 
@@ -377,6 +397,7 @@ selectedFeeds: ${selectedFeeds},
 selectedFeedGroups: ${selectedFeedGroups},
 isar: ${isar},
 dbUtils: ${dbUtils},
+feedSync: ${feedSync},
 isReordering: ${isReordering},
 isList: ${isList},
 areFeedGroupsSelected: ${areFeedGroupsSelected},

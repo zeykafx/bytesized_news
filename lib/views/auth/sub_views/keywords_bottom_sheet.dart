@@ -47,7 +47,7 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
     return ListTile(
       contentPadding: widget.removePadding ? EdgeInsets.zero : null,
       trailing: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(right: 12),
         child: const Icon(Icons.edit),
       ),
       title: Text(widget.title),

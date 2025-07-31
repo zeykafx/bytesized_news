@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -13,11 +14,23 @@ class AiUtils {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
   FirebaseAuth auth = FirebaseAuth.instance;
+  late AuthStore authStore;
+
+  AiUtils(AuthStore aStore) {
+    authStore = aStore;
+  }
 
   Future<(String, int)> summarize(
     String text,
     FeedItem feedItem,
   ) async {
+    if (authStore.userTier != Tier.premium) {
+      if (kDebugMode) {
+        print("Error: Not a premium account");
+      }
+      throw Exception("Error: You are not allowed to perform this operation.");
+    }
+
     if (kDebugMode) {
       print("Calling AI API...");
     }
@@ -42,6 +55,13 @@ class AiUtils {
     List<String> userInterests,
     List<Feed> mostReadFeeds,
   ) async {
+    if (authStore.userTier != Tier.premium) {
+      if (kDebugMode) {
+        print("Error: Not a premium account");
+      }
+      throw Exception("Error: You are not allowed to perform this operation.");
+    }
+
     if (kDebugMode) {
       print("Calling AI API to get suggested news");
     }
@@ -87,6 +107,12 @@ class AiUtils {
   }
 
   Future<List<String>> getFeedCategories(Feed feed) async {
+    if (authStore.userTier != Tier.premium) {
+      if (kDebugMode) {
+        print("Error: Not a premium account");
+      }
+      throw Exception("Error: You are not allowed to perform this operation.");
+    }
     if (kDebugMode) {
       print("Calling AI API to get feed summaries.");
     }

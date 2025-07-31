@@ -310,10 +310,14 @@ mixin _$StoryStore on _StoryStore, Store {
     return super.aiUtils;
   }
 
+  bool _aiUtilsIsInitialized = false;
+
   @override
   set aiUtils(AiUtils value) {
-    _$aiUtilsAtom.reportWrite(value, super.aiUtils, () {
+    _$aiUtilsAtom
+        .reportWrite(value, _aiUtilsIsInitialized ? super.aiUtils : null, () {
       super.aiUtils = value;
+      _aiUtilsIsInitialized = true;
     });
   }
 

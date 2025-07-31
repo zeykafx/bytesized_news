@@ -91,7 +91,7 @@ abstract class _StoryStore with Store {
   late InAppWebViewSettings settings;
 
   @observable
-  AiUtils aiUtils = AiUtils();
+  late AiUtils aiUtils;
 
   @observable
   bool feedItemSummarized = false;
@@ -118,6 +118,7 @@ abstract class _StoryStore with Store {
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
     this.authStore = authStore;
+    aiUtils = AiUtils(authStore);
 
     showReaderMode = settingsStore.useReaderModeByDefault;
     hideSummary = settingsStore.showAiSummaryOnLoad;

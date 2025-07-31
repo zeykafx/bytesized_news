@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -44,27 +45,6 @@ abstract class _PurchaseStore with Store {
   String alertMessage = "";
 
   @action
-  Future<void> restorePurchase(BuildContext context) async {
-    try {
-      await inAppPurchase.restorePurchases();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Successfully restored purchases!"),
-        ),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error restoring purchases: ${e.toString()}"),
-          ),
-        );
-      }
-    }
-  }
-
-  @action
   Future<void> initIAP(AuthStore aStore) async {
     if (kDebugMode) {
       print("Initializing In-App Purchase");
@@ -104,6 +84,8 @@ abstract class _PurchaseStore with Store {
     productDetails.sort((a, b) => a.rawPrice.toInt() - b.rawPrice.toInt());
     products.clear();
     products.addAll(productDetails);
+
+    loadFirestorePurchases();
   }
 
   @action
@@ -120,67 +102,119 @@ abstract class _PurchaseStore with Store {
           if (kDebugMode) {
             print("Error purchasing: ${purchaseDetails.error?.message}");
           }
-          loading = false;
-        } else if (purchaseDetails.status == PurchaseStatus.purchased || purchaseDetails.status == PurchaseStatus.restored) {
-          if (kDebugMode) {
-            print("Purchasing: ${purchaseDetails.productID}");
-          }
-
-          // call the function to verify the purchase
-          final result = await functions.httpsCallable('verifyPurchases').call(
-            {
-              "source": purchaseDetails.verificationData.source,
-              "productId": purchaseDetails.productID,
-              "verificationData": purchaseDetails.verificationData.serverVerificationData,
-            },
-          );
-          if (kDebugMode) {
-            print("Response from verifyPurchases: ${result.data}");
-          }
-
-          var response = result.data as Map<String, dynamic>;
-          if (response["error"] != null) {
-            throw Exception(response["error"]);
-          }
-
-          // if the code isn't 200, then the verification failed
-          if (response["status"] != 200) {
-            if (kDebugMode) {
-              print("Purchase verification failed: ${response["message"]}");
-            }
-            loading = false;
-            alertMessage = "Failed to verify purchase: ${response["message"]}";
-            hasAlert = true;
-            // complete the purchase even if verification failed to prevent it from staying pending
-            if (purchaseDetails.pendingCompletePurchase) {
-              await InAppPurchase.instance.completePurchase(purchaseDetails);
-            }
-
-            return;
-          }
-
-          // verification successful
-          if (kDebugMode) {
-            print("Purchase verified successfully: ${purchaseDetails.productID}");
-          }
-          // update local state
-          purchasedProducts.add(products.firstWhere((pro) => pro.id == purchaseDetails.productID));
-          // update the auth store
-          authStore.userTier = Tier.premium;
-
-          // show success snackbar
-          alertMessage = "Successfully purchased premium! Thank you!!";
+          // show error snackbar
+          alertMessage = "Failed to purchase item: ${purchaseDetails.error?.message}";
           hasAlert = true;
           
           loading = false;
-          // since the server has verified the purchase, we can complete it now
-          if (purchaseDetails.pendingCompletePurchase) {
-            if (kDebugMode) {
-              print("Completing purchase of product: ${purchaseDetails.productID}");
-            }
-            await InAppPurchase.instance.completePurchase(purchaseDetails);
-          }
+        } else if (purchaseDetails.status == PurchaseStatus.purchased || purchaseDetails.status == PurchaseStatus.restored) {
+          await handlePurchasedEvent(purchaseDetails);
         }
+      }
+    }
+  }
+
+  Future<void> handlePurchasedEvent(PurchaseDetails purchaseDetails) async {
+    if (kDebugMode) {
+      print("Purchasing: ${purchaseDetails.productID}");
+    }
+    loading = true;
+
+    // call the function to verify the purchase
+    final result = await functions.httpsCallable('verifyPurchases').call(
+      {
+        "source": purchaseDetails.verificationData.source,
+        "productId": purchaseDetails.productID,
+        "verificationData": purchaseDetails.verificationData.serverVerificationData,
+      },
+    );
+    if (kDebugMode) {
+      print("Response from verifyPurchases: ${result.data}");
+    }
+
+    var response = result.data as Map<String, dynamic>;
+    if (response["error"] != null) {
+      throw Exception(response["error"]);
+    }
+
+    // if the code isn't 200, then the verification failed
+    if (response["status"] != 200) {
+      if (kDebugMode) {
+        print("Purchase verification failed: ${response["message"]}");
+      }
+      loading = false;
+      alertMessage = "Failed to verify purchase: ${response["message"]}";
+      hasAlert = true;
+      // complete the purchase even if verification failed to prevent it from staying pending
+      if (purchaseDetails.pendingCompletePurchase) {
+        await InAppPurchase.instance.completePurchase(purchaseDetails);
+      }
+
+      return;
+    }
+
+    // verification successful
+    if (kDebugMode) {
+      print("Purchase verified successfully: ${purchaseDetails.productID}");
+    }
+    // update local state
+    purchasedProducts.add(products.firstWhere((pro) => pro.id == purchaseDetails.productID));
+    // update the auth store
+    authStore.userTier = Tier.premium;
+
+    // show success snackbar
+    alertMessage = "Successfully purchased premium! Thank you!!";
+    hasAlert = true;
+
+    loading = false;
+    // since the server has verified the purchase, we can complete it now
+    if (purchaseDetails.pendingCompletePurchase) {
+      if (kDebugMode) {
+        print("Completing purchase of product: ${purchaseDetails.productID}");
+      }
+      await InAppPurchase.instance.completePurchase(purchaseDetails);
+    }
+    return;
+  }
+
+  @action
+  Future<void> restorePurchase(BuildContext context) async {
+    try {
+      await inAppPurchase.restorePurchases();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Successfully restored purchases!"),
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error restoring purchases: ${e.toString()}"),
+          ),
+        );
+      }
+    }
+  }
+
+  @action
+  Future<void> loadFirestorePurchases() async {
+    loading = true;
+    var userPurchases = await FirebaseFirestore.instance.collection("/processed_orders").where("userId", isEqualTo: authStore.user!.uid).get();
+
+    int lenBefore = purchasedProducts.length;
+
+    for (var docSnapshot in userPurchases.docs) {
+      if (docSnapshot.data().containsKey("productId")) {
+        purchasedProducts.add(products.firstWhere((pro) => pro.id == docSnapshot.data()["productId"]));
+      }
+    }
+    loading = false;
+
+    if (kDebugMode) {
+      if (purchasedProducts.length > lenBefore) {
+        print("Loaded ${purchasedProducts.length - lenBefore} products from firestore, Purchased products: ${purchasedProducts.map((p) => p.id)}");
       }
     }
   }

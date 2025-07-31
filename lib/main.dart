@@ -143,19 +143,22 @@ void main() async {
     }
 
     if (settingsStore.backgroundFetchInterval != BackgroundFetchInterval.never) {
-      await Workmanager().registerPeriodicTask(
-        taskName,
-        taskName,
-        // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
-        frequency: settingsStore.backgroundFetchInterval.value,
-        initialDelay: Duration(minutes: 30),
-        constraints: Constraints(
-          // Connected or metered mark the task as requiring internet
-          networkType: NetworkType.connected,
-          requiresDeviceIdle: settingsStore.requireDeviceIdleForBgFetch,
-          requiresBatteryNotLow: settingsStore.skipBgSyncOnLowBattery,
-        ),
-      );
+      bool isScheduled = await Workmanager().isScheduledByUniqueName(taskName);
+      if (!isScheduled) {
+        await Workmanager().registerPeriodicTask(
+          taskName,
+          taskName,
+          // frequency: Duration(hours: 8), // Ignored in IOS, set the duration in seconds in AppDelegate.swift
+          frequency: settingsStore.backgroundFetchInterval.value,
+          // initialDelay: Duration(minutes: 30),
+          constraints: Constraints(
+            // Connected or metered mark the task as requiring internet
+            networkType: NetworkType.connected,
+            requiresDeviceIdle: settingsStore.requireDeviceIdleForBgFetch,
+            requiresBatteryNotLow: settingsStore.skipBgSyncOnLowBattery,
+          ),
+        );
+      }
     }
   }
 

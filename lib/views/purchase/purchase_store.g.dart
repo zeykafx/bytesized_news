@@ -173,15 +173,6 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$restorePurchaseAsyncAction =
-      AsyncAction('_PurchaseStore.restorePurchase', context: context);
-
-  @override
-  Future<void> restorePurchase(BuildContext context) {
-    return _$restorePurchaseAsyncAction
-        .run(() => super.restorePurchase(context));
-  }
-
   late final _$initIAPAsyncAction =
       AsyncAction('_PurchaseStore.initIAP', context: context);
 
@@ -198,6 +189,24 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
       List<PurchaseDetails> purchaseDetailsList) {
     return _$listenToPurchaseUpdatedAsyncAction
         .run(() => super.listenToPurchaseUpdated(purchaseDetailsList));
+  }
+
+  late final _$restorePurchaseAsyncAction =
+      AsyncAction('_PurchaseStore.restorePurchase', context: context);
+
+  @override
+  Future<void> restorePurchase(BuildContext context) {
+    return _$restorePurchaseAsyncAction
+        .run(() => super.restorePurchase(context));
+  }
+
+  late final _$loadFirestorePurchasesAsyncAction =
+      AsyncAction('_PurchaseStore.loadFirestorePurchases', context: context);
+
+  @override
+  Future<void> loadFirestorePurchases() {
+    return _$loadFirestorePurchasesAsyncAction
+        .run(() => super.loadFirestorePurchases());
   }
 
   @override

@@ -5,7 +5,6 @@ import 'package:bytesized_news/views/purchase/purchase_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
@@ -146,7 +145,7 @@ class _ProfileState extends State<Profile> {
               ...authStore.userInterests..removeAt(index),
             ];
           },
-          removePadding: false,
+          removePadding: true,
         ),
         const SizedBox(height: 8),
         buildPremiumUpgradeCard(),
@@ -157,38 +156,40 @@ class _ProfileState extends State<Profile> {
           ),
           child: const Divider(thickness: 0.5),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(top: 0.0, bottom: 5.0, left: 0.0),
-              child: Text(
-                "AI Usage",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        if (authStore.userTier == Tier.premium) ...[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 0.0, bottom: 5.0, left: 0.0),
+                child: Text(
+                  "AI Usage",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                ),
               ),
-            ),
-            Text(
-              "Summaries left today: ${authStore.summariesLeftToday}",
-            ),
-            Text(
-              "Suggestions left today: ${authStore.suggestionsLeftToday}",
-            ),
-            const SizedBox(height: 3),
-            Text(
-              "Limits are reset daily.",
-              style: TextStyle(
-                color: Theme.of(context).dividerColor,
+              Text(
+                "Summaries left today: ${authStore.summariesLeftToday}",
               ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: 4.0,
+              Text(
+                "Suggestions left today: ${authStore.suggestionsLeftToday}",
+              ),
+              const SizedBox(height: 3),
+              Text(
+                "Limits are reset daily.",
+                style: TextStyle(
+                  color: Theme.of(context).dividerColor,
+                ),
+              ),
+            ],
           ),
-          child: const Divider(thickness: 0.5),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: 4.0,
+            ),
+            child: const Divider(thickness: 0.5),
+          ),
+        ],
       ],
     );
   }

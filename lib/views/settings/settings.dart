@@ -1,4 +1,5 @@
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/main.dart' show taskName;
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
@@ -89,11 +90,13 @@ class GeneralSettings extends StatefulWidget {
 
 class _GeneralSettingsState extends State<GeneralSettings> {
   late final SettingsStore settingsStore;
+  late final AuthStore authStore;
 
   @override
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
+    authStore = context.read<AuthStore>();
   }
 
   @override
@@ -146,23 +149,29 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           // SHOW AI SUMMARY ON STORY PAGE LOAD
           SwitchListTile(
             title: const Text(
-              "Show AI Summary on page load",
+              "Show Summary on page load",
             ),
-            value: settingsStore.showAiSummaryOnLoad,
-            onChanged: (value) {
-              settingsStore.setShowAiSummaryOnLoad(value);
-            },
+            subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
+            value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
+            onChanged: authStore.userTier == Tier.premium
+                ? (value) {
+                    settingsStore.setShowAiSummaryOnLoad(value);
+                  }
+                : null,
           ),
 
           // FETCH AI SUMMARY ON STORY PAGE LOAD
           SwitchListTile(
             title: const Text(
-              "Fetch AI Summary on page load",
+              "Generate Summary on page load",
             ),
-            value: settingsStore.fetchAiSummaryOnLoad,
-            onChanged: (value) {
-              settingsStore.setFetchAiSummaryOnLoad(value);
-            },
+            subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
+            value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
+            onChanged: authStore.userTier == Tier.premium
+                ? (value) {
+                    settingsStore.setFetchAiSummaryOnLoad(value);
+                  }
+                : null,
           ),
 
           // Muted keywords
@@ -247,7 +256,7 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
       taskName,
       taskName,
       frequency: settingsStore.backgroundFetchInterval.value,
-      initialDelay: Duration(minutes: 30),
+      // initialDelay: Duration(minutes: 30),
       constraints: Constraints(
         // Connected or metered mark the task as requiring internet
         networkType: NetworkType.connected,
@@ -322,6 +331,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
 
   Isar isar = Isar.getInstance()!;
   late DbUtils dbUtils;
+  late FeedSync feedSync;
 
   @override
   void initState() {
@@ -329,6 +339,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
     settingsStore = context.read<SettingsStore>();
     authStore = context.read<AuthStore>();
     dbUtils = DbUtils(isar: isar);
+    feedSync = FeedSync(isar: isar);
   }
 
   @override
@@ -486,7 +497,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                                 await dbUtils.addFeedGroup(feedGroup);
                               }
 
-                              dbUtils.updateFirestoreFeedsAndFeedGroups(authStore);
+                              feedSync.updateFirestoreFeedsAndFeedGroups(authStore);
 
                               Navigator.pop(context);
 

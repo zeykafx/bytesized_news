@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
 import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
 import 'package:flutter/foundation.dart';

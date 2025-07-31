@@ -1,4 +1,5 @@
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
@@ -46,6 +47,9 @@ abstract class _FeedManagerStore with Store {
   late DbUtils dbUtils;
 
   @observable
+  late FeedSync feedSync;
+
+  @observable
   bool isReordering = false;
 
   @observable
@@ -56,6 +60,7 @@ abstract class _FeedManagerStore with Store {
     dbUtils = DbUtils(isar: isar);
     this.feedStore = feedStore;
     authStore = feedStore.authStore;
+    feedSync = FeedSync(isar: isar);
   }
 
   @action
@@ -146,7 +151,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+    feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
   }
 
   @action
@@ -161,9 +166,8 @@ abstract class _FeedManagerStore with Store {
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedUrls = feedGroup.feedUrls + localSelectedFeeds.map((feed) => feed.link).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
-      dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+      feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
     }
-
   }
 
   @action
@@ -227,7 +231,6 @@ abstract class _FeedManagerStore with Store {
       feedStore.pinnedFeedsOrFeedGroups.removeWhere(
           (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty);
 
-
       for (FeedGroup feedGroup in selectedFeedGroups) {
         if (kDebugMode) {
           print("Deleting ${feedGroup.name} from firestore");
@@ -236,7 +239,6 @@ abstract class _FeedManagerStore with Store {
           "feedGroups.${feedGroup.name}": FieldValue.delete(),
         });
       }
-
 
       // Delete selected feed groups
       await dbUtils.deleteFeedGroups(selectedFeedGroups);
@@ -253,7 +255,6 @@ abstract class _FeedManagerStore with Store {
     }
 
     if (areFeedsSelected) {
-
       for (Feed feed in selectedFeeds) {
         if (kDebugMode) {
           print("Deleting ${feed.name} from firestore");
@@ -289,7 +290,7 @@ abstract class _FeedManagerStore with Store {
             feedGroup.feeds.removeWhere((f) => f.id == feed.id);
 
             // update the feedGroup in firestore
-            dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+            feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
 
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
@@ -319,7 +320,7 @@ abstract class _FeedManagerStore with Store {
         feed.pinnedPosition = -1;
       }
 
-      dbUtils.updateSingleFeedInFirestore(feed, authStore);
+      feedSync.updateSingleFeedInFirestore(feed, authStore);
       await dbUtils.addFeed(feed);
     } else {
       FeedGroup feedGroup = feedOrFeedGroup;
@@ -332,7 +333,7 @@ abstract class _FeedManagerStore with Store {
         feedGroup.pinnedPosition = -1;
       }
 
-      dbUtils.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+      feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
       await dbUtils.addFeedGroup(feedGroup);
     }
 
@@ -369,7 +370,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    dbUtils.updateFirestoreFeedsAndFeedGroups(authStore);
+    feedSync.updateFirestoreFeedsAndFeedGroups(authStore);
   }
 
   @action

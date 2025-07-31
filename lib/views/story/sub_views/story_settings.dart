@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class StorySettings extends StatefulWidget {
 
 class _StorySettingsState extends State<StorySettings> {
   late StoryStore storyStore;
+  late SettingsStore settingsStore;
+  late AuthStore authStore;
   Timer? timer;
 
   static const double textWidth = 35;
@@ -25,6 +28,8 @@ class _StorySettingsState extends State<StorySettings> {
   void initState() {
     super.initState();
     storyStore = widget.storyStore;
+    settingsStore = storyStore.settingsStore;
+    authStore = storyStore.authStore;
   }
 
   @override
@@ -52,12 +57,12 @@ class _StorySettingsState extends State<StorySettings> {
                           "Use Reader Mode by Default",
                         ),
                         onTap: () {
-                          storyStore.settingsStore.setUseReaderModeByDefault(!storyStore.settingsStore.useReaderModeByDefault);
+                          settingsStore.setUseReaderModeByDefault(!settingsStore.useReaderModeByDefault);
                         },
                         trailing: Switch(
-                          value: storyStore.settingsStore.useReaderModeByDefault,
+                          value: settingsStore.useReaderModeByDefault,
                           onChanged: (value) {
-                            storyStore.settingsStore.setUseReaderModeByDefault(value);
+                            settingsStore.setUseReaderModeByDefault(value);
                           },
                         ),
                       ),
@@ -72,19 +77,19 @@ class _StorySettingsState extends State<StorySettings> {
                               SizedBox(
                                 width: textWidth,
                                 child: Text(
-                                  storyStore.settingsStore.fontSize.toString(),
+                                  settingsStore.fontSize.toString(),
                                 ),
                               ),
                               Expanded(
                                 child: Slider(
                                   year2023: false, // todo: to fix (somehow)
-                                  label: storyStore.settingsStore.fontSize.toString(),
-                                  value: storyStore.settingsStore.fontSize ?? 16.0,
+                                  label: settingsStore.fontSize.toString(),
+                                  value: settingsStore.fontSize ?? 16.0,
                                   min: 10.0,
                                   max: 30.0,
                                   divisions: 40,
                                   onChanged: (newVal) {
-                                    storyStore.settingsStore.setFontSize(newVal);
+                                    settingsStore.setFontSize(newVal);
                                   },
                                 ),
                               ),
@@ -104,12 +109,12 @@ class _StorySettingsState extends State<StorySettings> {
                               );
                             }).toList(),
                             onChanged: (String? value) {
-                              storyStore.settingsStore.textAlignment = TextAlign.values[textAlignmentValues.indexOf(value!)];
+                              settingsStore.textAlignment = TextAlign.values[textAlignmentValues.indexOf(value!)];
 
                               storyStore.htmlWidgetKey =
                                   UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
                             },
-                            value: textAlignString(storyStore.settingsStore.textAlignment)),
+                            value: textAlignString(settingsStore.textAlignment)),
                       ),
 
                       // font weight
@@ -123,9 +128,9 @@ class _StorySettingsState extends State<StorySettings> {
                               );
                             }).toList(),
                             onChanged: (String? value) {
-                              storyStore.settingsStore.textWidth = TextWidth.values[textWidthValues.indexOf(value!)];
+                              settingsStore.textWidth = TextWidth.values[textWidthValues.indexOf(value!)];
                             },
-                            value: textWidthToString(storyStore.settingsStore.textWidth)),
+                            value: textWidthToString(settingsStore.textWidth)),
                       ),
 
                       // Line height
@@ -138,19 +143,19 @@ class _StorySettingsState extends State<StorySettings> {
                               SizedBox(
                                 width: textWidth,
                                 child: Text(
-                                  storyStore.settingsStore.lineHeight.toStringAsFixed(2),
+                                  settingsStore.lineHeight.toStringAsFixed(2),
                                 ),
                               ),
                               Expanded(
                                 child: Slider(
                                   year2023: false, // todo: to fix (somehow)
-                                  label: storyStore.settingsStore.lineHeight.toStringAsFixed(2),
-                                  value: storyStore.settingsStore.lineHeight,
+                                  label: settingsStore.lineHeight.toStringAsFixed(2),
+                                  value: settingsStore.lineHeight,
                                   min: 0,
                                   max: 2,
                                   divisions: 40,
                                   onChanged: (newVal) {
-                                    storyStore.settingsStore.lineHeight = newVal;
+                                    settingsStore.lineHeight = newVal;
 
                                     // debounce the key update (to avoid excessive rebuilds while the user moves the slider)
                                     timer?.cancel();
@@ -178,19 +183,19 @@ class _StorySettingsState extends State<StorySettings> {
                               SizedBox(
                                 width: textWidth,
                                 child: Text(
-                                  storyStore.settingsStore.horizontalPadding.toStringAsFixed(0),
+                                  settingsStore.horizontalPadding.toStringAsFixed(0),
                                 ),
                               ),
                               Expanded(
                                 child: Slider(
                                   year2023: false, // todo: to fix (somehow)
-                                  label: storyStore.settingsStore.horizontalPadding.toStringAsFixed(0),
-                                  value: storyStore.settingsStore.horizontalPadding,
+                                  label: settingsStore.horizontalPadding.toStringAsFixed(0),
+                                  value: settingsStore.horizontalPadding,
                                   min: 0.0,
                                   max: 20.0,
                                   divisions: 40,
                                   onChanged: (newVal) {
-                                    storyStore.settingsStore.horizontalPadding = newVal;
+                                    settingsStore.horizontalPadding = newVal;
                                   },
                                 ),
                               ),
@@ -209,19 +214,19 @@ class _StorySettingsState extends State<StorySettings> {
                               SizedBox(
                                 width: textWidth,
                                 child: Text(
-                                  storyStore.settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
+                                  settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
                                 ),
                               ),
                               Expanded(
                                 child: Slider(
                                   year2023: false, // todo: to fix (somehow)
-                                  label: storyStore.settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
-                                  value: storyStore.settingsStore.storyReaderMaxWidth,
+                                  label: settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
+                                  value: settingsStore.storyReaderMaxWidth,
                                   min: 200.0,
                                   max: 1200.0,
                                   divisions: 20,
                                   onChanged: (newVal) {
-                                    storyStore.settingsStore.storyReaderMaxWidth = newVal;
+                                    settingsStore.storyReaderMaxWidth = newVal;
                                   },
                                 ),
                               ),
@@ -241,57 +246,51 @@ class _StorySettingsState extends State<StorySettings> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(fontFamilyToString(font),
-                                        style: TextStyle(fontWeight: storyStore.settingsStore.fontFamily == font ? FontWeight.w600 : FontWeight.normal)),
+                                        style: TextStyle(fontWeight: settingsStore.fontFamily == font ? FontWeight.w600 : FontWeight.normal)),
                                     Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
                                   ],
                                 ),
                               );
                             }).toList(),
                             onChanged: (String? value) {
-                              storyStore.settingsStore.fontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
+                              settingsStore.fontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
 
                               storyStore.htmlWidgetKey =
                                   UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
                             },
-                            value: fontFamilyToString(storyStore.settingsStore.fontFamily)),
+                            value: fontFamilyToString(settingsStore.fontFamily)),
                       ),
 
                       // Other reader mode settings here
                     ],
                   ),
                   SettingsSection(
-                    title: "AI Summary Settings",
+                    title: "Summary Settings",
                     children: [
                       // SHOW AI SUMMARY ON STORY PAGE LOAD
-                      ListTile(
+                      SwitchListTile(
                         title: const Text(
-                          "Show AI Summary on Page Load",
+                          "Show Summary on page load",
                         ),
-                        onTap: () {
-                          storyStore.settingsStore.setShowAiSummaryOnLoad(!storyStore.settingsStore.showAiSummaryOnLoad);
-                        },
-                        trailing: Switch(
-                          value: storyStore.settingsStore.showAiSummaryOnLoad,
-                          onChanged: (value) {
-                            storyStore.settingsStore.setShowAiSummaryOnLoad(value);
-                          },
-                        ),
+                        value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
+                        onChanged: authStore.userTier == Tier.premium
+                            ? (value) {
+                                settingsStore.setShowAiSummaryOnLoad(value);
+                              }
+                            : null,
                       ),
 
                       // FETCH AI SUMMARY ON STORY PAGE LOAD
-                      ListTile(
+                      SwitchListTile(
                         title: const Text(
-                          "Fetch AI Summary on Page Load",
+                          "Generate Summary on page load",
                         ),
-                        onTap: () {
-                          storyStore.settingsStore.setFetchAiSummaryOnLoad(!storyStore.settingsStore.fetchAiSummaryOnLoad);
-                        },
-                        trailing: Switch(
-                          value: storyStore.settingsStore.fetchAiSummaryOnLoad,
-                          onChanged: (value) {
-                            storyStore.settingsStore.setFetchAiSummaryOnLoad(value);
-                          },
-                        ),
+                        value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
+                        onChanged: authStore.userTier == Tier.premium
+                            ? (value) {
+                                settingsStore.setFetchAiSummaryOnLoad(value);
+                              }
+                            : null,
                       ),
                     ],
                   )
