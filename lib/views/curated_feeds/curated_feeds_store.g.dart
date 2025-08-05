@@ -41,20 +41,149 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
+  late final _$selectedFeedsAtom =
+      Atom(name: '_CuratedFeedsStore.selectedFeeds', context: context);
+
+  @override
+  ObservableSet<CuratedFeed> get selectedFeeds {
+    _$selectedFeedsAtom.reportRead();
+    return super.selectedFeeds;
+  }
+
+  @override
+  set selectedFeeds(ObservableSet<CuratedFeed> value) {
+    _$selectedFeedsAtom.reportWrite(value, super.selectedFeeds, () {
+      super.selectedFeeds = value;
+    });
+  }
+
+  late final _$selectedCategoriesAtom =
+      Atom(name: '_CuratedFeedsStore.selectedCategories', context: context);
+
+  @override
+  ObservableSet<CuratedFeedCategory> get selectedCategories {
+    _$selectedCategoriesAtom.reportRead();
+    return super.selectedCategories;
+  }
+
+  @override
+  set selectedCategories(ObservableSet<CuratedFeedCategory> value) {
+    _$selectedCategoriesAtom.reportWrite(value, super.selectedCategories, () {
+      super.selectedCategories = value;
+    });
+  }
+
+  late final _$isarAtom =
+      Atom(name: '_CuratedFeedsStore.isar', context: context);
+
+  @override
+  Isar get isar {
+    _$isarAtom.reportRead();
+    return super.isar;
+  }
+
+  @override
+  set isar(Isar value) {
+    _$isarAtom.reportWrite(value, super.isar, () {
+      super.isar = value;
+    });
+  }
+
+  late final _$dbUtilsAtom =
+      Atom(name: '_CuratedFeedsStore.dbUtils', context: context);
+
+  @override
+  DbUtils get dbUtils {
+    _$dbUtilsAtom.reportRead();
+    return super.dbUtils;
+  }
+
+  bool _dbUtilsIsInitialized = false;
+
+  @override
+  set dbUtils(DbUtils value) {
+    _$dbUtilsAtom
+        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
+      super.dbUtils = value;
+      _dbUtilsIsInitialized = true;
+    });
+  }
+
+  late final _$feedSyncAtom =
+      Atom(name: '_CuratedFeedsStore.feedSync', context: context);
+
+  @override
+  FeedSync get feedSync {
+    _$feedSyncAtom.reportRead();
+    return super.feedSync;
+  }
+
+  bool _feedSyncIsInitialized = false;
+
+  @override
+  set feedSync(FeedSync value) {
+    _$feedSyncAtom
+        .reportWrite(value, _feedSyncIsInitialized ? super.feedSync : null, () {
+      super.feedSync = value;
+      _feedSyncIsInitialized = true;
+    });
+  }
+
   late final _$readCuratedFeedsAsyncAction =
       AsyncAction('_CuratedFeedsStore.readCuratedFeeds', context: context);
 
   @override
-  Future<void> readCuratedFeeds(BuildContext context) {
+  Future<void> readCuratedFeeds(BuildContext context, AuthStore authStore) {
     return _$readCuratedFeedsAsyncAction
-        .run(() => super.readCuratedFeeds(context));
+        .run(() => super.readCuratedFeeds(context, authStore));
+  }
+
+  late final _$_CuratedFeedsStoreActionController =
+      ActionController(name: '_CuratedFeedsStore', context: context);
+
+  @override
+  void toggleFeedSelection(CuratedFeed feed, CuratedFeedCategory category) {
+    final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
+        name: '_CuratedFeedsStore.toggleFeedSelection');
+    try {
+      return super.toggleFeedSelection(feed, category);
+    } finally {
+      _$_CuratedFeedsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void toggleCategorySelection(CuratedFeedCategory category) {
+    final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
+        name: '_CuratedFeedsStore.toggleCategorySelection');
+    try {
+      return super.toggleCategorySelection(category);
+    } finally {
+      _$_CuratedFeedsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void clearSelections() {
+    final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
+        name: '_CuratedFeedsStore.clearSelections');
+    try {
+      return super.clearSelections();
+    } finally {
+      _$_CuratedFeedsStoreActionController.endAction(_$actionInfo);
+    }
   }
 
   @override
   String toString() {
     return '''
 curatedCategories: ${curatedCategories},
-loading: ${loading}
+loading: ${loading},
+selectedFeeds: ${selectedFeeds},
+selectedCategories: ${selectedCategories},
+isar: ${isar},
+dbUtils: ${dbUtils},
+feedSync: ${feedSync}
     ''';
   }
 }

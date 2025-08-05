@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
@@ -26,6 +27,9 @@ class Feed {
     try {
       response = await dio.get(url, options: Options(receiveTimeout: Duration(seconds: 5)));
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       return null;
     }
 
@@ -42,12 +46,12 @@ class Feed {
 
     return Feed(title, url, iconUrl);
   }
-  
+
   static String _cleanTitle(String rawTitle) {
     // remove CDATA markers
     String cleaned = rawTitle.replaceAll(RegExp(r'<!\[CDATA\['), '');
     cleaned = cleaned.replaceAll(RegExp(r'\]\]>'), '');
-    
+
     return cleaned.trim();
   }
 

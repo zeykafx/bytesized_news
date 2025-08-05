@@ -10,20 +10,29 @@ class FeedSync {
   Isar isar;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late DbUtils dbUtils;
+  late AuthStore authStore;
 
-  FeedSync({required this.isar}) {
+  FeedSync({required this.isar, required this.authStore}) {
     dbUtils = DbUtils(isar: isar);
   }
 
-  void updateFirestoreFeedsAndFeedGroups(AuthStore authStore) {
-    updateFirestoreFeedGroups(authStore);
-    updateFirestoreFeeds(authStore);
+  bool checkIsUserPremium() {
+    return authStore.userTier == Tier.premium;
   }
 
-  Future<void> updateFirestoreFeeds(AuthStore authStore) async {
+  void updateFirestoreFeedsAndFeedGroups() {
+    updateFirestoreFeedGroups();
+    updateFirestoreFeeds();
+  }
+
+  Future<void> updateFirestoreFeeds() async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
+
     List<Feed> feeds = await dbUtils.getFeeds();
-    final batch = FirebaseFirestore.instance.batch();
-    final userDocRef = FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}");
+    final batch = firestore.batch();
+    final userDocRef = firestore.doc("/users/${authStore.user!.uid}");
 
     // convert feeds to a map structure
     Map<String, dynamic> feedsMap = {};
@@ -40,7 +49,11 @@ class FeedSync {
     }
   }
 
-  Future<void> updateFirestoreFeedGroups(AuthStore authStore) async {
+  Future<void> updateFirestoreFeedGroups() async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
+
     List<Feed> feeds = await dbUtils.getFeeds();
     List<FeedGroup> feedGroups = await dbUtils.getFeedGroups(feeds);
 
@@ -60,13 +73,45 @@ class FeedSync {
     }
   }
 
+  Future<void> deleteSingleFeedInFirestore(Feed feed, AuthStore authStore) async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
+
+    if (kDebugMode) {
+      print("Deleting ${feed.name} from firestore");
+    }
+    firestore.doc("/users/${authStore.user!.uid}").update({
+      "feeds.${feed.id}": FieldValue.delete(),
+    });
+  }
+
+  Future<void> deleteSingleFeedGroupInFirestore(FeedGroup feedGroup, AuthStore authStore) async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
+
+    if (kDebugMode) {
+      print("Deleting ${feedGroup.name} from firestore");
+    }
+    firestore.doc("/users/${authStore.user!.uid}").update({
+      "feedGroups.${feedGroup.name}": FieldValue.delete(),
+    });
+  }
+
   Future<void> updateSingleFeedInFirestore(Feed feed, AuthStore authStore) async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
     await firestore.doc("/users/${authStore.user!.uid}").update({
       "feeds.${feed.id}": feed.toJson(),
     });
   }
 
   Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup, AuthStore authStore) async {
+    if (!checkIsUserPremium()) {
+      return;
+    }
     await firestore.doc("/users/${authStore.user!.uid}").update({
       "feedGroups.${feedGroup.name}": feedGroup.toJson(),
     });

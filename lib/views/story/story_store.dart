@@ -182,28 +182,6 @@ abstract class _StoryStore with Store {
     }
   }
 
-  // @action
-  // void storeHtmlPageInFeedItem(String content) {
-  //   feedItem.htmlContent = content;
-  //   feedItem.downloaded = true;
-  //   dbUtils.updateItemInDb(feedItem);
-  // }
-
-  // @action
-  // Future<String> fetchPageHtml() async {
-  //   final Article result = await readability.parseAsync(feedItem.url);
-
-  //   int wordCount = result.content!.split(" ").length;
-
-  //   if (feedItem.imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {
-  //     feedItem.imageUrl = result.imageUrl!;
-  //     dbUtils.updateItemInDb(feedItem);
-  //   }
-
-  //   estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
-  //   return result.content!.split("\n").toSet().join("\n");
-  // }
-
   @action
   Future<void> compareReaderModeLengthToPageHtml(BuildContext context) async {
     Dio dio = Dio();
@@ -238,7 +216,7 @@ abstract class _StoryStore with Store {
         'height': 'auto',
         'margin': '0',
         'word-wrap': 'break-word', // other values 'break-word', 'keep-all', 'normal'
-        'padding': '12px 8px !important',
+        'padding': '12px 8px 30px 8px !important', // top, right, bottom, left
         "font-size": "1.1em",
         'text-align': textAlignString(settingsStore.textAlignment).toLowerCase() // other values: 'left', 'right', 'center'
       };

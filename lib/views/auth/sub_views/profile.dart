@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
@@ -28,6 +30,10 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildPremiumUpgradeCard() {
+    if (!Platform.isAndroid) {
+      return SizedBox.shrink();
+    }
+    
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(

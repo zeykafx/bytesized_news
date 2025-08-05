@@ -229,6 +229,17 @@ mixin _$AuthStore on _AuthStore, Store {
       ActionController(name: '_AuthStore', context: context);
 
   @override
+  void signOutUser() {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore.signOutUser');
+    try {
+      return super.signOutUser();
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   bool _shouldUpdateLocalFeed(Feed localFeed, Feed firestoreFeed) {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
         name: '_AuthStore._shouldUpdateLocalFeed');

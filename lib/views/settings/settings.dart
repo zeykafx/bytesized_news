@@ -339,7 +339,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
     settingsStore = context.read<SettingsStore>();
     authStore = context.read<AuthStore>();
     dbUtils = DbUtils(isar: isar);
-    feedSync = FeedSync(isar: isar);
+    feedSync = FeedSync(isar: isar, authStore: authStore);
   }
 
   @override
@@ -497,7 +497,7 @@ class _ImportExportSectionState extends State<ImportExportSection> {
                                 await dbUtils.addFeedGroup(feedGroup);
                               }
 
-                              feedSync.updateFirestoreFeedsAndFeedGroups(authStore);
+                              feedSync.updateFirestoreFeedsAndFeedGroups();
 
                               Navigator.pop(context);
 

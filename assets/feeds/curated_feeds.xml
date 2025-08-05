@@ -56,7 +56,7 @@
     <outline text="Finance" title="Finance">
       <outline type="rss" text="Wall Street Journal - World News" title="Wall Street Journal - World News" xmlUrl="https://feeds.a.dj.com/rss/RSSWorldNews.xml"/>
       <outline type="rss" text="Bloomberg - Markets" title="Bloomberg - Markets" xmlUrl="https://feeds.bloomberg.com/markets/news.rss"/>
-      <outline type="rss" text="Reuters: Business News" title="Reuters: Business News" xmlUrl="http://feeds.reuters.com/reuters/businessNews"/>
+      <outline type="rss" text="Reuters: Business News" title="Reuters: Business News" xmlUrl="https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen"/>
     </outline>
     <outline text="Entertainment" title="Entertainment">
       <outline type="rss" text="Variety" title="Variety" xmlUrl="https://variety.com/feed/"/>

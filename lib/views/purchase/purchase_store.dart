@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 
 part 'purchase_store.g.dart';
@@ -44,12 +46,16 @@ abstract class _PurchaseStore with Store {
   @observable
   String alertMessage = "";
 
+  late FeedSync feedSync;
+  Isar isar = Isar.getInstance()!;
+
   @action
   Future<void> initIAP(AuthStore aStore) async {
     if (kDebugMode) {
       print("Initializing In-App Purchase");
     }
     authStore = aStore;
+    feedSync = FeedSync(authStore: authStore, isar: isar);
     storeAvailable = await inAppPurchase.isAvailable();
     if (!storeAvailable) {
       if (kDebugMode) {
@@ -105,7 +111,7 @@ abstract class _PurchaseStore with Store {
           // show error snackbar
           alertMessage = "Failed to purchase item: ${purchaseDetails.error?.message}";
           hasAlert = true;
-          
+
           loading = false;
         } else if (purchaseDetails.status == PurchaseStatus.purchased || purchaseDetails.status == PurchaseStatus.restored) {
           await handlePurchasedEvent(purchaseDetails);
@@ -161,6 +167,8 @@ abstract class _PurchaseStore with Store {
     purchasedProducts.add(products.firstWhere((pro) => pro.id == purchaseDetails.productID));
     // update the auth store
     authStore.userTier = Tier.premium;
+
+    feedSync.updateFirestoreFeedsAndFeedGroups();
 
     // show success snackbar
     alertMessage = "Successfully purchased premium! Thank you!!";

@@ -60,7 +60,7 @@ abstract class _FeedManagerStore with Store {
     dbUtils = DbUtils(isar: isar);
     this.feedStore = feedStore;
     authStore = feedStore.authStore;
-    feedSync = FeedSync(isar: isar);
+    feedSync = FeedSync(isar: isar, authStore: authStore);
   }
 
   @action
@@ -232,12 +232,7 @@ abstract class _FeedManagerStore with Store {
           (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty);
 
       for (FeedGroup feedGroup in selectedFeedGroups) {
-        if (kDebugMode) {
-          print("Deleting ${feedGroup.name} from firestore");
-        }
-        FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-          "feedGroups.${feedGroup.name}": FieldValue.delete(),
-        });
+        feedSync.deleteSingleFeedGroupInFirestore(feedGroup, authStore);
       }
 
       // Delete selected feed groups
@@ -256,12 +251,7 @@ abstract class _FeedManagerStore with Store {
 
     if (areFeedsSelected) {
       for (Feed feed in selectedFeeds) {
-        if (kDebugMode) {
-          print("Deleting ${feed.name} from firestore");
-        }
-        FirebaseFirestore.instance.doc("/users/${authStore.user!.uid}").update({
-          "feeds.${feed.id}": FieldValue.delete(),
-        });
+        feedSync.deleteSingleFeedInFirestore(feed, authStore);
       }
 
       // Delete selected feeds
@@ -370,7 +360,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    feedSync.updateFirestoreFeedsAndFeedGroups(authStore);
+    feedSync.updateFirestoreFeedsAndFeedGroups();
   }
 
   @action

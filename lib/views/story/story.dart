@@ -216,7 +216,6 @@ class _StoryState extends State<Story> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
                           ],
                         ],
                       )
