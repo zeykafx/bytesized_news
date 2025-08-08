@@ -18,6 +18,8 @@ const openai: OpenAI = new OpenAI({
 });
 const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
+const model = "openai/gpt-oss-20b";
+
 const androidPackageId = "com.zeykafx.bytesized_news";
 
 const authClient = new google.auth.JWT({
@@ -433,7 +435,8 @@ export const summarize = onCall(
 
     // create the summary with openai
     const completion = await openai.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.1-8b-instant",
+      model: model,
       messages: [
         {
           role: "system",
@@ -527,7 +530,8 @@ export const getNewsSuggestions = onCall(
 
     // get the news suggestions with ai
     const completion = await openai.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.1-8b-instant",
+      model: model,
       // model: "meta-llama/llama-4-scout-17b-16e-instruct",
       response_format: {
         type: "json_object",
@@ -598,7 +602,8 @@ export const analyzeFeedCategories = onCall(
     }
 
     const completion = await openai.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.1-8b-instant",
+      model: model,
       response_format: {
         type: "json_object",
       },
@@ -654,7 +659,8 @@ export const buildUserInterests = onCall(
     }
 
     const completion = await openai.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.1-8b-instant",
+      model: model,
       response_format: {
         type: "json_object",
       },

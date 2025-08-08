@@ -288,6 +288,7 @@ class _FeedManagerState extends State<FeedManager> {
                                       ),
                                       onPressed: () {
                                         feedManagerStore.isList = !feedManagerStore.isList;
+                                        widget.feedStore.settingsStore.isList = feedManagerStore.isList;
                                       }),
                                 )
                               ],

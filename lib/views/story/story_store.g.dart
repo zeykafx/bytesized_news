@@ -437,6 +437,22 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$readingStatAtom =
+      Atom(name: '_StoryStore.readingStat', context: context);
+
+  @override
+  ReadingStats get readingStat {
+    _$readingStatAtom.reportRead();
+    return super.readingStat;
+  }
+
+  @override
+  set readingStat(ReadingStats value) {
+    _$readingStatAtom.reportWrite(value, super.readingStat, () {
+      super.readingStat = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -490,6 +506,14 @@ mixin _$StoryStore on _StoryStore, Store {
   Future<void> onLoadStart(InAppWebViewController controller, WebUri? url) {
     return _$onLoadStartAsyncAction
         .run(() => super.onLoadStart(controller, url));
+  }
+
+  late final _$updateReadingAsyncAction =
+      AsyncAction('_StoryStore.updateReading', context: context);
+
+  @override
+  Future<void> updateReading() {
+    return _$updateReadingAsyncAction.run(() => super.updateReading());
   }
 
   late final _$_StoryStoreActionController =
@@ -599,7 +623,8 @@ hideSummary: ${hideSummary},
 firestore: ${firestore},
 htmlWidgetKey: ${htmlWidgetKey},
 hideBar: ${hideBar},
-webviewLastScrollY: ${webviewLastScrollY}
+webviewLastScrollY: ${webviewLastScrollY},
+readingStat: ${readingStat}
     ''';
   }
 }

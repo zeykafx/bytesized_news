@@ -177,10 +177,14 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     return super.isList;
   }
 
+  bool _isListIsInitialized = false;
+
   @override
   set isList(bool value) {
-    _$isListAtom.reportWrite(value, super.isList, () {
+    _$isListAtom.reportWrite(value, _isListIsInitialized ? super.isList : null,
+        () {
       super.isList = value;
+      _isListIsInitialized = true;
     });
   }
 

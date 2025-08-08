@@ -5,7 +5,6 @@ import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,12 +52,13 @@ abstract class _FeedManagerStore with Store {
   bool isReordering = false;
 
   @observable
-  bool isList = true;
+  late bool isList;
 
   @action
   Future<void> init({required FeedStore feedStore}) async {
     dbUtils = DbUtils(isar: isar);
     this.feedStore = feedStore;
+    isList = feedStore.settingsStore.isList;
     authStore = feedStore.authStore;
     feedSync = FeedSync(isar: isar, authStore: authStore);
   }

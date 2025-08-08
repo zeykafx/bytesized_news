@@ -50,7 +50,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..storyTilesMinimalStyle =
           json['storyTilesMinimalStyle'] as bool? ?? false
       ..storyReaderMaxWidth =
-          (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0;
+          (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0
+      ..isList = json['isList'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -76,6 +77,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'requireDeviceIdleForBgFetch': instance.requireDeviceIdleForBgFetch,
       'storyTilesMinimalStyle': instance.storyTilesMinimalStyle,
       'storyReaderMaxWidth': instance.storyReaderMaxWidth,
+      'isList': instance.isList,
     };
 
 const _$DarkModeEnumMap = {
@@ -542,6 +544,22 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$isListAtom =
+      Atom(name: '_SettingsStore.isList', context: context);
+
+  @override
+  bool get isList {
+    _$isListAtom.reportRead();
+    return super.isList;
+  }
+
+  @override
+  set isList(bool value) {
+    _$isListAtom.reportWrite(value, super.isList, () {
+      super.isList = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -703,7 +721,8 @@ backgroundFetchInterval: ${backgroundFetchInterval},
 skipBgSyncOnLowBattery: ${skipBgSyncOnLowBattery},
 requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch},
 storyTilesMinimalStyle: ${storyTilesMinimalStyle},
-storyReaderMaxWidth: ${storyReaderMaxWidth}
+storyReaderMaxWidth: ${storyReaderMaxWidth},
+isList: ${isList}
     ''';
   }
 }

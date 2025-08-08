@@ -1,6 +1,7 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
@@ -11,6 +12,10 @@ class DbUtils {
 
   Future<List<Feed>> getFeeds() async {
     return await isar.feeds.where().findAll();
+  }
+
+  Feed? getFeedWithId(int id) {
+    return isar.feeds.where().idEqualTo(id).findFirstSync();
   }
 
   Future<Feed?> findMatchingFeed(Feed otherFeed) async {
@@ -235,5 +240,23 @@ class DbUtils {
 
   Future<void> addFeedsToFeedGroup(FeedGroup feedGroup) async {
     await isar.writeTxn(() => isar.feedGroups.put(feedGroup));
+  }
+
+  // read logs stuff
+  Future<void> addReading(StoryReading reading) async {
+    await isar.writeTxn(() => isar.storyReadings.put(reading));
+  }
+
+  Future<StoryReading?> getReadingWithStoryId(int feedItemId) async {
+    StoryReading? reading = await isar.storyReadings.filter().feedItemIdEqualTo(feedItemId).findFirst();
+    return reading;
+  }
+
+  Future<void> updateReading(StoryReading reading) async {
+    await addReading(reading);
+  }
+
+  Future<void> deleteReading(StoryReading reading) async {
+    await isar.writeTxn(() => isar.storyReadings.delete(reading.id));
   }
 }

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/reading_stats/reading_stats.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -114,6 +117,11 @@ abstract class _StoryStore with Store {
   @observable
   int webviewLastScrollY = 0;
 
+  @observable
+  ReadingStats readingStat = ReadingStats();
+
+  late final Timer timer;
+
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
@@ -136,6 +144,11 @@ abstract class _StoryStore with Store {
     } else {
       htmlContent = feedItem.htmlContent!;
     }
+
+    // start recording the reading
+    await readingStat.startReadingStory(feedItem);
+
+    timer = Timer.periodic(Duration(seconds: 30), (_) => updateReading());
 
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
@@ -180,6 +193,10 @@ abstract class _StoryStore with Store {
     if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
       await summarizeArticle(context);
     }
+  }
+
+  void dispose() {
+    timer.cancel;
   }
 
   @action
@@ -535,5 +552,13 @@ abstract class _StoryStore with Store {
       hideSummary = false;
     }
     webviewLastScrollY = y;
+  }
+
+  @action
+  Future<void> updateReading() async {
+    if (kDebugMode) {
+      print("Updating reading: ${readingStat.reading}");
+    }
+    readingStat.updateReadingStory(feedItem);
   }
 }

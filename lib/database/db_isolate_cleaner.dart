@@ -1,6 +1,7 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
@@ -21,7 +22,7 @@ class DbIsolateCleaner {
     // Open the isar instance in this thread
     final dir = await getApplicationDocumentsDirectory();
     final isar = await Isar.open(
-      [FeedItemSchema, FeedSchema, FeedGroupSchema],
+      [FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema],
       directory: dir.path,
     );
 

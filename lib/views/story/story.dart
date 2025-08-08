@@ -32,7 +32,7 @@ class Story extends StatefulWidget {
 class _StoryState extends State<Story> {
   late SettingsStore settingsStore;
   late AuthStore authStore;
-  final StoryStore storyStore = StoryStore();
+  StoryStore storyStore = StoryStore();
   final GlobalKey webViewKey = GlobalKey();
 
   @override
@@ -45,6 +45,11 @@ class _StoryState extends State<Story> {
     storyStore.init(widget.feedItem, context, settingsStore, authStore);
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    storyStore.dispose();
   }
 
   @override
@@ -160,7 +165,7 @@ class _StoryState extends State<Story> {
                                             return "<p>$part</p>";
                                           }).join("")}
                                                     </p>
-                                                    <p class="tiny">Summarized by LLama 3.1</p>
+                                                    <p class="tiny">Summarized by GPT-OSS 20B</p>
                                                     </div>''' : ""}
 
                                                  ${storyStore.feedItem.htmlContent}

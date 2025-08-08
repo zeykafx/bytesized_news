@@ -5,6 +5,7 @@ import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/background/background_fetch.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -106,7 +107,7 @@ void main() async {
 
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
-    [FeedItemSchema, FeedSchema, FeedGroupSchema],
+    [FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema],
     directory: dir.path,
   );
 
