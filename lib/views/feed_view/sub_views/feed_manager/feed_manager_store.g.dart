@@ -188,6 +188,23 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
+  late final _$deleteFeedsFromFeedGroupsAtom = Atom(
+      name: '_FeedManagerStore.deleteFeedsFromFeedGroups', context: context);
+
+  @override
+  bool get deleteFeedsFromFeedGroups {
+    _$deleteFeedsFromFeedGroupsAtom.reportRead();
+    return super.deleteFeedsFromFeedGroups;
+  }
+
+  @override
+  set deleteFeedsFromFeedGroups(bool value) {
+    _$deleteFeedsFromFeedGroupsAtom
+        .reportWrite(value, super.deleteFeedsFromFeedGroups, () {
+      super.deleteFeedsFromFeedGroups = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedManagerStore.init', context: context);
 
@@ -404,6 +421,7 @@ dbUtils: ${dbUtils},
 feedSync: ${feedSync},
 isReordering: ${isReordering},
 isList: ${isList},
+deleteFeedsFromFeedGroups: ${deleteFeedsFromFeedGroups},
 areFeedGroupsSelected: ${areFeedGroupsSelected},
 areFeedsSelected: ${areFeedsSelected},
 areMoreThanOneFeedGroupsSelected: ${areMoreThanOneFeedGroupsSelected}

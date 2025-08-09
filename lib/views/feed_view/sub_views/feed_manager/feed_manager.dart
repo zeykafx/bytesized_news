@@ -125,6 +125,9 @@ class _FeedManagerState extends State<FeedManager> {
                                       )
                                           .then((_) async {
                                         setState(() {});
+                                        await feedStore.getFeeds();
+                                        await feedStore.getFeedGroups();
+                                        await feedStore.getItems();
                                       });
                                     },
                                     label: const Text("Add Feed"),
@@ -650,7 +653,24 @@ class _FeedManagerState extends State<FeedManager> {
                                           builder: (BuildContext context) {
                                             return AlertDialog(
                                               title: const Text("Confirm Delete?"),
-                                              content: const Text("Are you sure you want to delete the selected items?"),
+                                              content: Observer(builder: (context) {
+                                                return Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    ListTile(
+                                                      title: const Text("Are you sure you want to delete the selected items?"),
+                                                      contentPadding: EdgeInsets.zero,
+                                                    ),
+                                                    SwitchListTile(
+                                                        value: feedManagerStore.deleteFeedsFromFeedGroups,
+                                                        onChanged: (val) {
+                                                          feedManagerStore.deleteFeedsFromFeedGroups = val;
+                                                        },
+                                                        contentPadding: EdgeInsets.zero,
+                                                        title: const Text("Delete feeds from feed group")),
+                                                  ],
+                                                );
+                                              }),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () {

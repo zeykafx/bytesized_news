@@ -68,8 +68,7 @@ class AiUtils {
 
     String todaysArticles = feedItems.map((item) => "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feed?.name}").join(", ");
 
-    String mostReadFeedsString =
-        mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}").join(",");
+    String mostReadFeedsString = mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}").join(",");
 
     String userInterestsString = userInterests.join(',');
 
@@ -94,7 +93,7 @@ class AiUtils {
     var jsonData = jsonDecode(jsonOutput);
     List<FeedItem> suggestedArticles = [];
     for (var article in jsonData['articles']) {
-      int id = article['ID'] ?? 0;
+      int id = article['id'] ?? 0;
       var feedItem = feedItems.firstWhere((item) => item.id == id, orElse: () => feedItems[0]);
       suggestedArticles.add(feedItem);
     }

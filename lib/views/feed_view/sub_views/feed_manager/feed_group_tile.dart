@@ -331,7 +331,24 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: const Text("Confirm Delete?"),
-                                  content: const Text("Are you sure you want to delete the selected items?"),
+                                  content: Observer(builder: (context) {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          title: const Text("Are you sure you want to delete the selected item?"),
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                        SwitchListTile(
+                                            value: feedManagerStore.deleteFeedsFromFeedGroups,
+                                            onChanged: (val) {
+                                              feedManagerStore.deleteFeedsFromFeedGroups = val;
+                                            },
+                                            contentPadding: EdgeInsets.zero,
+                                            title: const Text("Delete feeds from feed group")),
+                                      ],
+                                    );
+                                  }),
                                   actions: [
                                     TextButton(
                                       onPressed: () {

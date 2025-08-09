@@ -137,7 +137,8 @@ abstract class _CuratedFeedsStore with Store {
   }
 
   bool isFeedSelected(CuratedFeed feed) {
-    return selectedFeeds.contains(feed);
+    bool isInSelectedCategory = selectedCategories.any((cat) => cat.curatedFeeds.contains(feed));
+    return selectedFeeds.contains(feed) || isInSelectedCategory;
   }
 
   bool isCategorySelected(CuratedFeedCategory category) {
@@ -191,6 +192,8 @@ abstract class _CuratedFeedsStore with Store {
         feedGroup.feeds.add(dbFeed);
 
         await dbUtils.addFeed(dbFeed);
+
+        selectedFeeds.remove(feed);
       }
 
       await dbUtils.addFeedGroup(feedGroup);
@@ -218,22 +221,22 @@ abstract class _CuratedFeedsStore with Store {
 
     feedSync.updateFirestoreFeedsAndFeedGroups();
 
-    final feedCount = selectedFeeds.length;
+    // final feedCount = selectedFeeds.length;
 
     // Clear selections after following
     clearSelections();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Following $feedCount feeds'),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: 'View',
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Following $feedCount feeds'),
+    //     behavior: SnackBarBehavior.floating,
+    //     action: SnackBarAction(
+    //       label: 'View',
+    //       onPressed: () {
+    //         Navigator.of(context).pop();
+    //       },
+    //     ),
+    //   ),
+    // );
   }
 }

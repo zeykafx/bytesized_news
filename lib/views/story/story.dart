@@ -49,6 +49,7 @@ class _StoryState extends State<Story> {
 
   @override
   void dispose() {
+    super.dispose();
     storyStore.dispose();
   }
 

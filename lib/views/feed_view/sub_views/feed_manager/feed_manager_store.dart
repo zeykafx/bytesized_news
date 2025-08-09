@@ -54,6 +54,9 @@ abstract class _FeedManagerStore with Store {
   @observable
   late bool isList;
 
+  @observable
+  bool deleteFeedsFromFeedGroups = false;
+
   @action
   Future<void> init({required FeedStore feedStore}) async {
     dbUtils = DbUtils(isar: isar);
@@ -233,6 +236,23 @@ abstract class _FeedManagerStore with Store {
 
       for (FeedGroup feedGroup in selectedFeedGroups) {
         feedSync.deleteSingleFeedGroupInFirestore(feedGroup, authStore);
+
+        if (deleteFeedsFromFeedGroups) {
+          // also delete the feeds that are in the feedgroup if the option is selected
+          for (Feed feed in feedGroup.feeds) {
+            feedSync.deleteSingleFeedInFirestore(feed, authStore);
+
+            await dbUtils.deleteFeed(feed);
+            feedStore.feeds.removeWhere((fd) => fd == feed);
+
+            // also remove from the pinned list
+            feedStore.pinnedFeedsOrFeedGroups.removeWhere((fd) => fd == feed);
+
+            // delete items
+            feedStore.feedItems.removeWhere((item) => item.feedId == feed.id);
+            await dbUtils.deleteFeedItems(feed);
+          }
+        }
       }
 
       // Delete selected feed groups
@@ -250,10 +270,6 @@ abstract class _FeedManagerStore with Store {
     }
 
     if (areFeedsSelected) {
-      for (Feed feed in selectedFeeds) {
-        feedSync.deleteSingleFeedInFirestore(feed, authStore);
-      }
-
       // Delete selected feeds
       await dbUtils.deleteFeeds(selectedFeeds);
       feedStore.feeds.removeWhere((feed) => selectedFeeds.contains(feed));
@@ -263,6 +279,8 @@ abstract class _FeedManagerStore with Store {
 
       // also remove feedItems from the feed in the db
       for (Feed feed in selectedFeeds) {
+        feedSync.deleteSingleFeedInFirestore(feed, authStore);
+
         feedStore.feedItems.removeWhere((item) => item.feedId == feed.id);
         await dbUtils.deleteFeedItems(feed);
 

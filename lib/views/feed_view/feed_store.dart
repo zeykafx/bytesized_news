@@ -292,10 +292,11 @@ abstract class _FeedStore with Store {
         continue;
       }
 
-      await dbUtils.addNewItems(items);
-      feedItems.addAll(items);
-      feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+      List<FeedItem> newItems = await dbUtils.addNewItems(items);
+      feedItems.addAll(newItems);
     }
+
+    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
 
     loading = false;
 
@@ -370,12 +371,12 @@ abstract class _FeedStore with Store {
         if (settingsStore.sortFeed == null) {
           throw Exception("sortFeed cannot be null when changing sort to FeedListSort.Feed.");
         }
-        feedItems = (await dbUtils.getItemsFromFeed(settingsStore.sortFeed!)).asObservable();
+        feedItems = (await dbUtils.getItemsFromFeed(settingsStore.sortFeed!, feeds)).asObservable();
       case FeedListSort.feedGroup:
         if (settingsStore.sortFeedGroup == null) {
           throw Exception("sortFeedGroup cannot be null when changing sort to FeedListSort.FeedGroup.");
         }
-        feedItems = (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!)).asObservable();
+        feedItems = (await dbUtils.getItemsFromFeedGroup(settingsStore.sortFeedGroup!, feeds)).asObservable();
     }
 
     filterArticlesMutedKeywords(feedItems);
@@ -515,7 +516,7 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(30);
+      ..take(40);
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;

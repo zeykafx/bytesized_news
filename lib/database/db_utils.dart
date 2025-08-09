@@ -141,27 +141,28 @@ class DbUtils {
     return feedItems;
   }
 
-  Future<List<FeedItem>> getItemsFromFeed(Feed feed) async {
+  Future<List<FeedItem>> getItemsFromFeed(Feed feed, List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().feedIdEqualTo(feed.id).sortByPublishedDateDesc().findAll();
     // set the feed for each feed item
     for (FeedItem item in feedItems) {
-      item.feed = feed;
+      // item.feed = feed;
+      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      //
     }
     return feedItems;
   }
 
-  Future<List<FeedItem>> getItemsFromFeedGroup(FeedGroup feedGroup) async {
+  Future<List<FeedItem>> getItemsFromFeedGroup(FeedGroup feedGroup, List<Feed> feeds) async {
     List<FeedItem> feedItems = [];
     for (Feed feed in feedGroup.feeds) {
-      feedItems.addAll(await isar.feedItems.filter().feedIdEqualTo(feed.id).sortByPublishedDateDesc().findAll());
+      feedItems.addAll(await getItemsFromFeed(feed, feeds));
     }
 
-    // set the feed for each feed item
-    for (FeedItem item in feedItems) {
-      item.feed = feedGroup.feeds.firstWhere((feed) => feed.id == item.feedId);
-    }
+    // // set the feed for each feed item
+    // for (FeedItem item in feedItems) {
+    //   item.feed = feedGroup.feeds.firstWhere((feed) => feed.id == item.feedId);
+    // }
 
-    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     return feedItems;
   }
 

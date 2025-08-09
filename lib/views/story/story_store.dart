@@ -120,7 +120,7 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
-  late final Timer timer;
+  late Timer timer;
 
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
@@ -148,7 +148,9 @@ abstract class _StoryStore with Store {
     // start recording the reading
     await readingStat.startReadingStory(feedItem);
 
-    timer = Timer.periodic(Duration(seconds: 30), (_) => updateReading());
+    timer = Timer.periodic(Duration(seconds: 30), (_) {
+      return updateReading();
+    });
 
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
@@ -195,8 +197,9 @@ abstract class _StoryStore with Store {
     }
   }
 
+  @action
   void dispose() {
-    timer.cancel;
+    timer.cancel();
   }
 
   @action
@@ -555,7 +558,7 @@ abstract class _StoryStore with Store {
   }
 
   @action
-  Future<void> updateReading() async {
+  void updateReading() {
     if (kDebugMode) {
       print("Updating reading: ${readingStat.reading}");
     }

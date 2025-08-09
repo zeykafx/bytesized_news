@@ -508,16 +508,19 @@ mixin _$StoryStore on _StoryStore, Store {
         .run(() => super.onLoadStart(controller, url));
   }
 
-  late final _$updateReadingAsyncAction =
-      AsyncAction('_StoryStore.updateReading', context: context);
-
-  @override
-  Future<void> updateReading() {
-    return _$updateReadingAsyncAction.run(() => super.updateReading());
-  }
-
   late final _$_StoryStoreActionController =
       ActionController(name: '_StoryStore', context: context);
+
+  @override
+  void dispose() {
+    final _$actionInfo =
+        _$_StoryStoreActionController.startAction(name: '_StoryStore.dispose');
+    try {
+      return super.dispose();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   Map<String, String>? buildStyle(BuildContext context, dom.Element element) {
@@ -591,6 +594,17 @@ mixin _$StoryStore on _StoryStore, Store {
         name: '_StoryStore.webviewScrollListener');
     try {
       return super.webviewScrollListener(controller, x, y);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateReading() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.updateReading');
+    try {
+      return super.updateReading();
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }

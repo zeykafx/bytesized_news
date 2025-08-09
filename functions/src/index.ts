@@ -19,6 +19,7 @@ const openai: OpenAI = new OpenAI({
 const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
 const model = "openai/gpt-oss-20b";
+const betterModel = "openai/gpt-oss-120b";
 
 const androidPackageId = "com.zeykafx.bytesized_news";
 
@@ -531,22 +532,57 @@ export const getNewsSuggestions = onCall(
     // get the news suggestions with ai
     const completion = await openai.chat.completions.create({
       // model: "llama-3.1-8b-instant",
-      model: model,
+      model: betterModel,
       // model: "meta-llama/llama-4-scout-17b-16e-instruct",
       response_format: {
-        type: "json_object",
+        type: "json_schema",
+        json_schema: {
+          name: "product_review",
+          schema: {
+            type: "object",
+            properties: {
+              articles: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "number" },
+                    title: { type: "string" },
+                    feedName: { type: "string" },
+                  },
+                },
+              },
+            },
+            required: ["articles"],
+            additionalProperties: false,
+          },
+        },
       },
+      reasoning_effort: "medium",
       messages: [
         {
           role: "system",
           content: `
-        You are a helpful news suggestion AI, you will receive a list of categories that the user is interested in,
-        the feeds that the user reads the most, and today's unread articles
-        You must return a list of the top 5 most interesting articles (in json format) for this user based on their
-        interests while considering which articles would get the most clicks online and their interest in that feed.
-        the article's IDs must not be changed (Ignore any article advertising deals/coupons or podcasts!)
-        The format must be the following: A json object with the key 'articles' which is an array of json object, each
-        object has an ID (number), a title (string) and the feed name (string)
+        You are an expert news curation AI that personalizes article recommendations for RSS reader users.
+
+        TASK: Select exactly 5 articles from today's unread articles that best match the user's interests and reading patterns.
+
+        SELECTION CRITERIA (in order of priority):
+        1. Relevance to user's stated interests and categories
+        2. Source preference based on user's most-read feeds
+        3. Article quality and newsworthiness (avoid clickbait)
+        4. Timeliness and current relevance
+        5. Diversity across different topics/sources
+
+        STRICT REQUIREMENTS:
+        - Return EXACTLY 5 articles
+        - Preserve original article IDs unchanged
+        - EXCLUDE: promotional content, deals, coupons, advertisements, podcasts
+        - INCLUDE: substantive news, analysis, educational content
+        - Prioritize articles from feeds the user reads most frequently
+        - Balance between user preferences and editorial quality
+
+        OUTPUT FORMAT: Return a JSON object with an "articles" array containing objects with id, title, and feedName fields.
         `,
         },
         {
@@ -562,7 +598,7 @@ export const getNewsSuggestions = onCall(
           content: `Today's articles: ${todaysArticles}`,
         },
       ],
-      temperature: 0.6,
+      temperature: 0.3,
     });
 
     const output = completion.choices[0].message.content || "";

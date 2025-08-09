@@ -123,9 +123,9 @@ void main() async {
       settingsStore.sort = FeedListSort.byDate;
     }
   }
-
   if (settingsStore.sortFeedGroupName != null) {
     settingsStore.sortFeedGroup = await isar.feedGroups.where().filter().nameEqualTo(settingsStore.sortFeedGroupName!).findFirst();
+
     if (settingsStore.sortFeedGroup == null) {
       settingsStore.sortFeedGroupName = null;
       settingsStore.sortFeedGroup = null;
@@ -134,7 +134,7 @@ void main() async {
       List<Feed> feeds = await isar.feeds.where().findAll();
 
       for (String feedUrl in settingsStore.sortFeedGroup!.feedUrls) {
-        if (feeds.any((feed) => feed.link != feedUrl)) {
+        if (!feeds.any((feed) => feed.link == feedUrl)) {
           continue;
         }
         Feed feed = feeds.firstWhere((feed) => feed.link == feedUrl);
@@ -143,7 +143,7 @@ void main() async {
       }
     }
 
-    if (settingsStore.backgroundFetchInterval != BackgroundFetchInterval.never) {
+    if (settingsStore.backgroundFetchInterval != BackgroundFetchInterval.never && Platform.isAndroid) {
       bool isScheduled = await Workmanager().isScheduledByUniqueName(taskName);
       if (!isScheduled) {
         await Workmanager().registerPeriodicTask(
