@@ -102,6 +102,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                           child: CachedNetworkImage(
                             imageUrl: widget.item.imageUrl,
                             fit: BoxFit.cover,
+                            errorWidget: (context, str, obj) => const SizedBox.shrink(),
                             height: 72,
                             width: 128,
                           ),

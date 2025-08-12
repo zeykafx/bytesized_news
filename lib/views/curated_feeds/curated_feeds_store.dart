@@ -18,7 +18,7 @@ class CuratedFeedsStore = _CuratedFeedsStore with _$CuratedFeedsStore;
 
 abstract class _CuratedFeedsStore with Store {
   String curatedFeedsPath = "assets/feeds";
-  List<String> curatedFeedsFilenames = ["curated_feeds.xml", "curated_feeds_2.xml"];
+  List<String> curatedFeedsFilenames = ["curated_feeds.xml"];
 
   @observable
   List<CuratedFeedCategory> curatedCategories = [];
@@ -41,12 +41,23 @@ abstract class _CuratedFeedsStore with Store {
   @observable
   late FeedSync feedSync;
 
+  @observable
+  ObservableList<Feed> followedFeeds = <Feed>[].asObservable();
+
+  @observable
+  ObservableList<FeedGroup> followedFeedGroup = <FeedGroup>[].asObservable();
+
   @action
   Future<void> readCuratedFeeds(BuildContext context, AuthStore authStore) async {
     dbUtils = DbUtils(isar: isar);
     feedSync = FeedSync(isar: isar, authStore: authStore);
 
     loading = true;
+
+    // get the followed feeds and groups
+    followedFeeds = (await dbUtils.getFeeds()).asObservable();
+    followedFeedGroup = (await dbUtils.getFeedGroups(followedFeeds)).asObservable();
+
     try {
       for (String filename in curatedFeedsFilenames) {
         String fileContent = await rootBundle.loadString("$curatedFeedsPath/$filename");
@@ -98,22 +109,38 @@ abstract class _CuratedFeedsStore with Store {
   }
 
   @action
+  bool isFeedAlreadyFollowed(CuratedFeed feed) {
+    return followedFeeds.any((followdFeed) => followdFeed.link == feed.link);
+  }
+
+  @action
+  bool isCategoryAlreadyFollowed(CuratedFeedCategory cat) {
+    return followedFeedGroup.any((FeedGroup feedGroup) => feedGroup.feedUrls == (cat.curatedFeeds.map((feed) => feed.link)));
+  }
+
+  @action
   void toggleFeedSelection(CuratedFeed feed, CuratedFeedCategory category) {
     if (selectedFeeds.contains(feed)) {
       selectedFeeds.remove(feed);
       selectedCategories.remove(category);
-      print("Deselected feed: ${feed.title}");
+      if (kDebugMode) {
+        print("Deselected feed: ${feed.title}");
+      }
     } else {
       selectedFeeds.add(feed);
-      print("Selected feed: ${feed.title}");
-
-      // Check if all feeds in this category are now selected
-      bool allFeedsSelected = category.curatedFeeds.every((feed) => selectedFeeds.contains(feed));
-
-      if (allFeedsSelected && !selectedCategories.contains(category)) {
-        selectedCategories.add(category);
-        print("Auto-selected category: ${category.name} (all feeds selected)");
+      // auto select the category
+      selectedCategories.add(category);
+      if (kDebugMode) {
+        print("Selected feed: ${feed.title}");
       }
+
+      // // Check if all feeds in this category are now selected
+      // bool allFeedsSelected = category.curatedFeeds.every((feed) => selectedFeeds.contains(feed));
+
+      // if (allFeedsSelected && !selectedCategories.contains(category)) {
+      //   selectedCategories.add(category);
+      //   print("Auto-selected category: ${category.name} (all feeds selected)");
+      // }
     }
   }
 
@@ -125,20 +152,33 @@ abstract class _CuratedFeedsStore with Store {
       for (CuratedFeed feed in category.curatedFeeds) {
         selectedFeeds.remove(feed);
       }
-      print("Deselected category: ${category.name}");
+      if (kDebugMode) {
+        print("Deselected category: ${category.name}");
+      }
     } else {
+      if (isCategoryAlreadyFollowed(category)) {
+        return;
+      }
       // Select category and all its feeds
       selectedCategories.add(category);
       for (CuratedFeed feed in category.curatedFeeds) {
-        selectedFeeds.add(feed);
+        if (!isFeedAlreadyFollowed(feed)) {
+          selectedFeeds.add(feed);
+        }
       }
-      print("Selected category: ${category.name}");
+      // if no feeds were selected (because the user already follows all the feeds in the cat, don't select the category)
+      if (selectedFeeds.isEmpty) {
+        selectedCategories.remove(category);
+      } else {
+        if (kDebugMode) {
+          print("Selected category: ${category.name}");
+        }
+      }
     }
   }
 
   bool isFeedSelected(CuratedFeed feed) {
-    bool isInSelectedCategory = selectedCategories.any((cat) => cat.curatedFeeds.contains(feed));
-    return selectedFeeds.contains(feed) || isInSelectedCategory;
+    return selectedFeeds.contains(feed);
   }
 
   bool isCategorySelected(CuratedFeedCategory category) {
@@ -149,7 +189,9 @@ abstract class _CuratedFeedsStore with Store {
   void clearSelections() {
     selectedFeeds.clear();
     selectedCategories.clear();
-    print("Cleared all selections");
+    if (kDebugMode) {
+      print("Cleared all selections");
+    }
   }
 
   Future<void> followSelectedFeeds(BuildContext context) async {
@@ -172,6 +214,8 @@ abstract class _CuratedFeedsStore with Store {
     for (CuratedFeedCategory category in selectedCategories) {
       FeedGroup feedGroup = FeedGroup(category.name);
 
+      // TODO: only follow the specific feeds selected
+      // 
       for (CuratedFeed feed in category.curatedFeeds) {
         Feed? dbFeed = await Feed.createFeed(feed.link, feedName: feed.title);
 
@@ -185,7 +229,7 @@ abstract class _CuratedFeedsStore with Store {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          return;
+          continue;
         }
 
         feedGroup.feedUrls.add(dbFeed.link);
@@ -221,22 +265,9 @@ abstract class _CuratedFeedsStore with Store {
 
     feedSync.updateFirestoreFeedsAndFeedGroups();
 
-    // final feedCount = selectedFeeds.length;
+    Navigator.of(context).pop();
 
     // Clear selections after following
     clearSelections();
-
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text('Following $feedCount feeds'),
-    //     behavior: SnackBarBehavior.floating,
-    //     action: SnackBarAction(
-    //       label: 'View',
-    //       onPressed: () {
-    //         Navigator.of(context).pop();
-    //       },
-    //     ),
-    //   ),
-    // );
   }
 }

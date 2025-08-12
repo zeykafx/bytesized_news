@@ -129,6 +129,38 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
+  late final _$followedFeedsAtom =
+      Atom(name: '_CuratedFeedsStore.followedFeeds', context: context);
+
+  @override
+  ObservableList<Feed> get followedFeeds {
+    _$followedFeedsAtom.reportRead();
+    return super.followedFeeds;
+  }
+
+  @override
+  set followedFeeds(ObservableList<Feed> value) {
+    _$followedFeedsAtom.reportWrite(value, super.followedFeeds, () {
+      super.followedFeeds = value;
+    });
+  }
+
+  late final _$followedFeedGroupAtom =
+      Atom(name: '_CuratedFeedsStore.followedFeedGroup', context: context);
+
+  @override
+  ObservableList<FeedGroup> get followedFeedGroup {
+    _$followedFeedGroupAtom.reportRead();
+    return super.followedFeedGroup;
+  }
+
+  @override
+  set followedFeedGroup(ObservableList<FeedGroup> value) {
+    _$followedFeedGroupAtom.reportWrite(value, super.followedFeedGroup, () {
+      super.followedFeedGroup = value;
+    });
+  }
+
   late final _$readCuratedFeedsAsyncAction =
       AsyncAction('_CuratedFeedsStore.readCuratedFeeds', context: context);
 
@@ -140,6 +172,28 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
 
   late final _$_CuratedFeedsStoreActionController =
       ActionController(name: '_CuratedFeedsStore', context: context);
+
+  @override
+  bool isFeedAlreadyFollowed(CuratedFeed feed) {
+    final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
+        name: '_CuratedFeedsStore.isFeedAlreadyFollowed');
+    try {
+      return super.isFeedAlreadyFollowed(feed);
+    } finally {
+      _$_CuratedFeedsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  bool isCategoryAlreadyFollowed(CuratedFeedCategory cat) {
+    final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
+        name: '_CuratedFeedsStore.isCategoryAlreadyFollowed');
+    try {
+      return super.isCategoryAlreadyFollowed(cat);
+    } finally {
+      _$_CuratedFeedsStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void toggleFeedSelection(CuratedFeed feed, CuratedFeedCategory category) {
@@ -183,7 +237,9 @@ selectedFeeds: ${selectedFeeds},
 selectedCategories: ${selectedCategories},
 isar: ${isar},
 dbUtils: ${dbUtils},
-feedSync: ${feedSync}
+feedSync: ${feedSync},
+followedFeeds: ${followedFeeds},
+followedFeedGroup: ${followedFeedGroup}
     ''';
   }
 }

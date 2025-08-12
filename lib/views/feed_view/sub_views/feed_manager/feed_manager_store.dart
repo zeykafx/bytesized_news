@@ -154,7 +154,7 @@ abstract class _FeedManagerStore with Store {
       }
     }
 
-    feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+    feedSync.updateSingleFeedGroupInFirestore(feedGroup);
   }
 
   @action
@@ -169,7 +169,7 @@ abstract class _FeedManagerStore with Store {
       feedGroup.feeds.addAll(localSelectedFeeds);
       feedGroup.feedUrls = feedGroup.feedUrls + localSelectedFeeds.map((feed) => feed.link).toList();
       await dbUtils.addFeedsToFeedGroup(feedGroup);
-      feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+      feedSync.updateSingleFeedGroupInFirestore(feedGroup);
     }
   }
 
@@ -298,7 +298,7 @@ abstract class _FeedManagerStore with Store {
             feedGroup.feeds.removeWhere((f) => f.id == feed.id);
 
             // update the feedGroup in firestore
-            feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+            feedSync.updateSingleFeedGroupInFirestore(feedGroup);
 
             await dbUtils.addFeedsToFeedGroup(feedGroup);
           }
@@ -328,7 +328,7 @@ abstract class _FeedManagerStore with Store {
         feed.pinnedPosition = -1;
       }
 
-      feedSync.updateSingleFeedInFirestore(feed, authStore);
+      feedSync.updateSingleFeedInFirestore(feed);
       await dbUtils.addFeed(feed);
     } else {
       FeedGroup feedGroup = feedOrFeedGroup;
@@ -341,7 +341,9 @@ abstract class _FeedManagerStore with Store {
         feedGroup.pinnedPosition = -1;
       }
 
-      feedSync.updateSingleFeedGroupInFirestore(feedGroup, authStore);
+      feedSync.updateSingleFeedGroupInFirestore(
+        feedGroup,
+      );
       await dbUtils.addFeedGroup(feedGroup);
     }
 

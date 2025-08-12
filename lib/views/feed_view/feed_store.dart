@@ -294,9 +294,8 @@ abstract class _FeedStore with Store {
 
       List<FeedItem> newItems = await dbUtils.addNewItems(items);
       feedItems.addAll(newItems);
+      feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     }
-
-    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
 
     loading = false;
 

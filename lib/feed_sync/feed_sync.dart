@@ -99,7 +99,7 @@ class FeedSync {
     });
   }
 
-  Future<void> updateSingleFeedInFirestore(Feed feed, AuthStore authStore) async {
+  Future<void> updateSingleFeedInFirestore(Feed feed) async {
     if (!checkIsUserPremium()) {
       return;
     }
@@ -108,7 +108,7 @@ class FeedSync {
     });
   }
 
-  Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup, AuthStore authStore) async {
+  Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) async {
     if (!checkIsUserPremium()) {
       return;
     }

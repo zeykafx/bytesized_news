@@ -233,8 +233,8 @@ class _StoryState extends State<Story> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 20),
                     child: AnimatedSlide(
-                      offset: storyStore.hideBar ? Offset(0, 0.6) : Offset(0, 0),
-                      duration: 150.ms,
+                      offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
+                      duration: 300.ms,
                       curve: Curves.easeInOutQuad,
                       child: AnimatedOpacity(
                         opacity: storyStore.hideBar ? 0.7 : 1,

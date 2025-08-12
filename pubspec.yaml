@@ -127,4 +127,3 @@ flutter:
 
   assets:
     - assets/feeds/curated_feeds.xml
-    - assets/feeds/curated_feeds_2.xml

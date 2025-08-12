@@ -63,6 +63,7 @@ class DbUtils {
         }
       }
     }
+
     return feedItems;
   }
 
@@ -149,6 +150,8 @@ class DbUtils {
       item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
       //
     }
+    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
+    
     return feedItems;
   }
 
@@ -162,6 +165,7 @@ class DbUtils {
     // for (FeedItem item in feedItems) {
     //   item.feed = feedGroup.feeds.firstWhere((feed) => feed.id == item.feedId);
     // }
+    feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
 
     return feedItems;
   }

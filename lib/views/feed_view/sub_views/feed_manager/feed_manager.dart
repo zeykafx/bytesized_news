@@ -121,7 +121,7 @@ class _FeedManagerState extends State<FeedManager> {
                                         //     getItems: widget.wrappedGetItems,
                                         //   ),
                                         // ),
-                                        MaterialPageRoute(builder: (context) => CuratedFeedsView(context: context)),
+                                        MaterialPageRoute(builder: (context) => CuratedFeedsView(context: context, getFeeds: widget.wrappedGetFeeds, getItems: widget.wrappedGetItems)),
                                       )
                                           .then((_) async {
                                         setState(() {});
@@ -661,13 +661,16 @@ class _FeedManagerState extends State<FeedManager> {
                                                       title: const Text("Are you sure you want to delete the selected items?"),
                                                       contentPadding: EdgeInsets.zero,
                                                     ),
-                                                    SwitchListTile(
+                                                    if (feedManagerStore.areFeedGroupsSelected) ...[
+                                                      SwitchListTile(
                                                         value: feedManagerStore.deleteFeedsFromFeedGroups,
                                                         onChanged: (val) {
                                                           feedManagerStore.deleteFeedsFromFeedGroups = val;
                                                         },
                                                         contentPadding: EdgeInsets.zero,
-                                                        title: const Text("Delete feeds from feed group")),
+                                                        title: const Text("Delete feeds from feed group"),
+                                                      ),
+                                                    ],
                                                   ],
                                                 );
                                               }),

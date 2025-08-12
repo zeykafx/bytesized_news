@@ -2,13 +2,16 @@ import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
 import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/curated_feeds/curated_feeds_store.dart';
+import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 class CuratedFeedsView extends StatefulWidget {
   final BuildContext context;
-  const CuratedFeedsView({super.key, required this.context});
+  final Function getFeeds;
+  final Function getItems;
+  const CuratedFeedsView({super.key, required this.context, required this.getFeeds, required this.getItems});
 
   @override
   State<CuratedFeedsView> createState() => _CuratedFeedsViewState();
@@ -115,18 +118,15 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                     color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
-                Text(
-                  'TODO: FIX RSS LINKS!!',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error,
-                  ),
-                ),
               ],
             ),
           ),
         ),
 
-      
+        SliverToBoxAdapter(
+          child: _buildAddFeedCard(colorScheme, theme),
+        ),
+
         // LIST OF CARDS
         SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -142,6 +142,64 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           child: SizedBox(height: 40),
         ),
       ],
+    );
+  }
+
+  Widget _buildAddFeedCard(ColorScheme colorScheme, ThemeData theme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      child: Card(
+        clipBehavior: Clip.hardEdge,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Add RSS/ATOM feeds",
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Manually add any RSS/ATOM feed with its link",
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).dividerColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          initiallyExpanded: false,
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AddFeed(
+              getFeeds: widget.getFeeds,
+              getItems: widget.getItems,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -209,56 +267,52 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          title: InkWell(
-            onTap: () => curatedFeedsStore.toggleCategorySelection(category),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: isSelected,
-                    onChanged: (value) => curatedFeedsStore.toggleCategorySelection(category),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (value) => curatedFeedsStore.isCategoryAlreadyFollowed(category) ? null : curatedFeedsStore.toggleCategorySelection(category),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          category.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${category.curatedFeeds.length} feeds',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (curatedFeedsStore.selectedFeeds.where((feed) => category.curatedFeeds.contains(feed)).isNotEmpty)
-                    Badge(
-                      label: Text(
-                        '${curatedFeedsStore.selectedFeeds.where((feed) => category.curatedFeeds.contains(feed)).length}',
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
-                          fontSize: 11,
+                ),
+                const SizedBox(width: 2),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
                         ),
                       ),
-                      backgroundColor: colorScheme.primary,
+                      const SizedBox(height: 2),
+                      Text(
+                        '${category.curatedFeeds.length} feeds',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (curatedFeedsStore.selectedFeeds.where((feed) => category.curatedFeeds.contains(feed)).isNotEmpty)
+                  Badge(
+                    label: Text(
+                      '${curatedFeedsStore.selectedFeeds.where((feed) => category.curatedFeeds.contains(feed)).length}',
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                ],
-              ),
+                    backgroundColor: colorScheme.primary,
+                  ),
+              ],
             ),
           ),
           initiallyExpanded: false,
@@ -290,57 +344,74 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => curatedFeedsStore.toggleFeedSelection(feed, category),
+        onTap: () => curatedFeedsStore.isFeedAlreadyFollowed(feed) ? null : curatedFeedsStore.toggleFeedSelection(feed, category),
+        enableFeedback: true,
         borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Checkbox(
-                value: isSelected,
-                onChanged: (value) => curatedFeedsStore.toggleFeedSelection(feed, category),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+        child: Opacity(
+          opacity: curatedFeedsStore.isFeedAlreadyFollowed(feed) ? 0.4 : 1,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (value) => curatedFeedsStore.isFeedAlreadyFollowed(feed) ? null : curatedFeedsStore.toggleFeedSelection(feed, category),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-              ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(8),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.rss_feed_rounded,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
                 ),
-                child: Icon(
-                  Icons.rss_feed_rounded,
-                  size: 18,
-                  color: colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      feed.title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: colorScheme.onSurface,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        feed.title,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      feed.link,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                      if (curatedFeedsStore.isFeedAlreadyFollowed(feed)) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          "Already followed",
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 2),
+                      Tooltip(
+                        message: feed.link,
+                        child: Text(
+                          feed.link,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -372,7 +443,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext modalSheetContext) {
         return Container(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -431,7 +502,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(modalSheetContext),
                       child: const Text('Cancel'),
                     ),
                   ),
@@ -439,8 +510,8 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                   Expanded(
                     child: FilledButton(
                       onPressed: () {
-                        Navigator.pop(context);
                         curatedFeedsStore.followSelectedFeeds(context);
+                        Navigator.pop(modalSheetContext);
                       },
                       child: const Text('Follow'),
                     ),
