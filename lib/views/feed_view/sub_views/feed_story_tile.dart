@@ -4,6 +4,7 @@ import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
@@ -68,8 +69,28 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
       cardColor = Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2);
     }
 
+    return ClipRRect(
+      borderRadius: BorderRadius.all(
+        Radius.circular(15),
+      ),
+      child: widget.isSuggestion
+          ? OverflowBox(
+              maxHeight: 140,
+              maxWidth: 350,
+              alignment: Alignment.center,
+              child: buildCard(cardColor, context),
+            )
+          : buildCard(cardColor, context),
+    );
+  }
+
+  Card buildCard(Color cardColor, BuildContext context) {
     return Card(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(15),
+        ),
+      ),
       elevation: 0,
       color: cardColor,
       child: Center(
@@ -87,7 +108,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   child: Text(
                     parsedTitle,
                     overflow: TextOverflow.ellipsis,
-                    maxLines: widget.isSuggestion ? 4 : 5,
+                    maxLines: 4,
                     style: TextStyle(fontSize: (widget.isSuggestion || settingsStore.storyTilesMinimalStyle) ? 12 : 14),
                   ),
                 ),
@@ -138,6 +159,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                         widget.item.feed != null && widget.item.feed!.name.length > 15
                             ? "${widget.item.feed!.name.substring(0, 15)}..."
                             : widget.item.feed!.name,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                         style: const TextStyle(fontSize: 10),
                       ),
                       avatar: widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
@@ -204,6 +227,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                   children: [
                     Text(
                       formatTime(widget.item.publishedDate.millisecondsSinceEpoch),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style:
                           TextStyle(color: Theme.of(context).dividerColor, fontSize: settingsStore.storyTilesMinimalStyle || widget.isSuggestion ? 12 : null),
                     ),

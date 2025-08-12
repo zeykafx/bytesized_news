@@ -72,17 +72,25 @@ class FeedItem {
     if (item.content != null) {
       dom.Document document = html_parser.parse(item.content!);
 
-      // find the image and print the src
-      dom.Element? img = document.querySelector('img');
-      if (img != null) {
-        feedItem.imageUrl = img.attributes['src']!;
+      if (item.media != null && item.media!.thumbnails.isNotEmpty) {
+        feedItem.imageUrl = item.media!.thumbnails.first.url ?? "";
       } else {
-        feedItem.imageUrl = "";
+        // find the image and print the src
+        dom.Element? img = document.querySelector('img');
+        if (img != null) {
+          feedItem.imageUrl = img.attributes['src']!;
+        } else {
+          feedItem.imageUrl = "";
+        }
       }
 
       feedItem.description = document.documentElement!.text.trim();
     } else {
-      feedItem.imageUrl = "";
+      if (item.media != null && item.media!.thumbnails.isNotEmpty) {
+        feedItem.imageUrl = item.media?.thumbnails.first.url ?? "";
+      } else {
+        feedItem.imageUrl = "";
+      }
       feedItem.description = "";
     }
 
@@ -130,6 +138,11 @@ class FeedItem {
           var img = document.querySelector('img');
           if (img != null) {
             feedItem.imageUrl = img.attributes['src']!;
+          } else {
+            img = document.querySelector("image");
+            if (img != null) {
+              feedItem.imageUrl = img.attributes['src']!;
+            }
           }
         }
       }
@@ -159,21 +172,26 @@ class FeedItem {
 
     htmlContent = result.content!.split("\n").toSet().join("\n");
     downloaded = true;
-    await dbUtils.updateItemInDb(this);
 
     dom.Document contentElement = html_parser.parse(htmlContent);
-    for (dom.Element el in contentElement.getElementsByTagName("img")) {
+    List<dom.Element> images = contentElement.getElementsByTagName("img")
+      ..addAll(contentElement.getElementsByTagName("image"))
+      ..addAll(contentElement.getElementsByTagName("picture"));
+    for (dom.Element el in images) {
       String imgSrc = "";
       if (el.attributes case {'src': final String src}) {
         imgSrc = src;
+        imageUrl = imgSrc;
       }
 
       if (imgSrc.isEmpty) {
         continue;
       }
 
-      await DefaultCacheManager().downloadFile(imgSrc);
+      await DefaultCacheManager().downloadFile(imgSrc, force: true);
     }
+
+    await dbUtils.updateItemInDb(this);
 
     return htmlContent!;
   }

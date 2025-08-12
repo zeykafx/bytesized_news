@@ -209,14 +209,14 @@ abstract class _CuratedFeedsStore with Store {
       print("=======================");
     }
 
-    // do something like this:
-
     for (CuratedFeedCategory category in selectedCategories) {
       FeedGroup feedGroup = FeedGroup(category.name);
 
-      // TODO: only follow the specific feeds selected
-      // 
       for (CuratedFeed feed in category.curatedFeeds) {
+        // only follow the feeds selected in the category
+        if (!selectedFeeds.contains(feed)) {
+          continue;
+        }
         Feed? dbFeed = await Feed.createFeed(feed.link, feedName: feed.title);
 
         if (dbFeed == null) {
@@ -244,7 +244,9 @@ abstract class _CuratedFeedsStore with Store {
     }
 
     for (CuratedFeed feed in selectedFeeds) {
-      print(feed.link);
+      if (kDebugMode) {
+        print(feed.link);
+      }
       Feed? dbFeed = await Feed.createFeed(feed.link, feedName: feed.title);
 
       if (dbFeed == null) {

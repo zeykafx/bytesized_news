@@ -166,7 +166,7 @@ class _StoryState extends State<Story> {
                                             return "<p>$part</p>";
                                           }).join("")}
                                                     </p>
-                                                    <p class="tiny">Summarized by GPT-OSS 20B</p>
+                                                    <p class="tiny">Generated content, verify important information.</p>
                                                     </div>''' : ""}
 
                                                  ${storyStore.feedItem.htmlContent}

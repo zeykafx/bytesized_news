@@ -348,39 +348,75 @@ class _FeedViewState extends State<FeedView> {
                                                           ),
                                                         ),
                                                       ),
+                                                      // SizedBox(
+                                                      //   height: 140,
+                                                      //   child: ListView.builder(
+                                                      //     scrollDirection: Axis.horizontal,
+                                                      //     controller: feedStore.suggestionsScrollController,
+                                                      //     itemCount: feedStore.suggestedFeedItems.length,
+                                                      //     cacheExtent: 300,
+                                                      //     addRepaintBoundaries: false,
+                                                      //     addAutomaticKeepAlives: false,
+                                                      //     itemBuilder: (context, idx) {
+                                                      //       FeedItem item = feedStore.suggestedFeedItems[idx];
+
+                                                      //       return SizedBox(
+                                                      //         width: 350,
+                                                      //         child: FeedStoryTile(
+                                                      //           feedStore: feedStore,
+                                                      //           item: item,
+                                                      //           isSuggestion: true,
+                                                      //         ),
+                                                      //       )
+                                                      //           .animate(
+                                                      //             delay: 200.ms,
+                                                      //           )
+                                                      //           .slide(
+                                                      //             begin: Offset(
+                                                      //               -0.1,
+                                                      //               0,
+                                                      //             ),
+                                                      //             end: Offset(0, 0),
+                                                      //             curve: Curves.easeOut,
+                                                      //           )
+                                                      //           .fadeIn();
+                                                      //     },
+                                                      //   ),
+                                                      // ),
+
                                                       SizedBox(
                                                         height: 140,
-                                                        child: ListView.builder(
-                                                            scrollDirection: Axis.horizontal,
-                                                            controller: feedStore.suggestionsScrollController,
-                                                            itemCount: feedStore.suggestedFeedItems.length,
-                                                            cacheExtent: 300,
-                                                            addRepaintBoundaries: false,
-                                                            addAutomaticKeepAlives: false,
-                                                            itemBuilder: (context, idx) {
-                                                              FeedItem item = feedStore.suggestedFeedItems[idx];
-
-                                                              return SizedBox(
+                                                        child: CarouselView(
+                                                          itemExtent: 350,
+                                                          scrollDirection: Axis.horizontal,
+                                                          itemSnapping: true,
+                                                          enableSplash: false,
+                                                        
+                                                          children: [
+                                                            for (FeedItem item in feedStore.suggestedFeedItems) ...[
+                                                              SizedBox(
                                                                 width: 350,
                                                                 child: FeedStoryTile(
                                                                   feedStore: feedStore,
                                                                   item: item,
                                                                   isSuggestion: true,
-                                                                ),
-                                                              )
-                                                                  .animate(
-                                                                    delay: 200.ms,
-                                                                  )
-                                                                  .slide(
-                                                                    begin: Offset(
-                                                                      -0.1,
-                                                                      0,
-                                                                    ),
-                                                                    end: Offset(0, 0),
-                                                                    curve: Curves.easeOut,
-                                                                  )
-                                                                  .fadeIn();
-                                                            }),
+                                                                )
+                                                                    .animate(
+                                                                      delay: 200.ms,
+                                                                    )
+                                                                    .slide(
+                                                                      begin: Offset(
+                                                                        -0.1,
+                                                                        0,
+                                                                      ),
+                                                                      end: Offset(0, 0),
+                                                                      curve: Curves.easeOut,
+                                                                    )
+                                                                    .fadeIn(),
+                                                              ),
+                                                            ],
+                                                          ],
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -390,20 +426,23 @@ class _FeedViewState extends State<FeedView> {
                                               int index = feedStore.suggestedFeedItems.isNotEmpty && settingsStore.sort == FeedListSort.byDate ? idx - 1 : idx;
                                               FeedItem item = feedStore.feedItems[index];
 
-                                              return FeedStoryTile(
-                                                feedStore: feedStore,
-                                                item: item,
-                                              )
-                                                  .animate(
-                                                    delay: 250.ms,
-                                                  )
-                                                  .slide(
-                                                    duration: 300.ms,
-                                                    begin: Offset(0, -0.1),
-                                                    end: Offset(0, 0),
-                                                    curve: Curves.easeOut,
-                                                  )
-                                                  .fadeIn();
+                                              return SizedBox(
+                                                height: 140,
+                                                child: FeedStoryTile(
+                                                  feedStore: feedStore,
+                                                  item: item,
+                                                )
+                                                    .animate(
+                                                      delay: 250.ms,
+                                                    )
+                                                    .slide(
+                                                      duration: 300.ms,
+                                                      begin: Offset(0, -0.1),
+                                                      end: Offset(0, 0),
+                                                      curve: Curves.easeOut,
+                                                    )
+                                                    .fadeIn(),
+                                              );
                                             }),
                                       ),
 
