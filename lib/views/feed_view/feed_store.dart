@@ -513,7 +513,7 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(40);
+      ..take(25);
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;

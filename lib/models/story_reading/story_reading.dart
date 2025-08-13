@@ -12,6 +12,7 @@ class StoryReading {
 
   int readingDuration;
   List<DateTime> readLog = [];
+  DateTime? firstRead;
 
   @ignore
   late Feed feed;
@@ -20,7 +21,7 @@ class StoryReading {
   @ignore
   Isar isar = Isar.getInstance()!;
 
-  StoryReading(this.feedItemId, this.feedId, this.readingDuration, this.readLog);
+  StoryReading(this.feedItemId, this.feedId, this.readingDuration, this.readLog, this.firstRead);
 
   void initFeed() {
     dbUtils = DbUtils(isar: isar);
@@ -36,6 +37,6 @@ class StoryReading {
 
   @override
   String toString() {
-    return "StoryReading{id: $id, feedItemId: $feedItemId, feedId: $feedId, readingDuration: $readingDuration, readLog: ${readLog.toString()}}";
+    return "StoryReading{id: $id, feedItemId: $feedItemId, feedId: $feedId, readingDuration: $readingDuration, firstRead: $firstRead, readLog: ${readLog.toString()}}";
   }
 }

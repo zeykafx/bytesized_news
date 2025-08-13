@@ -247,7 +247,7 @@ abstract class _SettingsStore with Store {
   static const defaultStoryTilesMinimal = false;
   static const defaultStoryReaderMaxWidth = 800.0;
   static const defaultIsList = true;
-
+  static const defaultAutoSwitchReaderTooShort = false;
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
   @observable
@@ -420,4 +420,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultIsList)
   @observable
   bool isList = defaultIsList;
+
+  @JsonKey(defaultValue: defaultAutoSwitchReaderTooShort)
+  @observable
+  bool autoSwitchReaderTooShort = defaultAutoSwitchReaderTooShort;
 }

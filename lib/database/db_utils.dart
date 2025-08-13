@@ -299,4 +299,62 @@ class DbUtils {
   Future<void> deleteReading(StoryReading reading) async {
     await isar.writeTxn(() => isar.storyReadings.delete(reading.id));
   }
+
+  Future<int> getNumberArticlesRead() async {
+    return await isar.storyReadings.filter().readingDurationGreaterThan(0).count();
+  }
+
+  Future<int> getReadingDaysStreak() async {
+    List<StoryReading> items = await isar.storyReadings.where().findAll();
+
+    if (items.isEmpty) {
+      return 0;
+    }
+    // TODO: doesn't work well
+
+    // get the unique days normalized to the start of the day
+    Set<DateTime> uniqueDates = {};
+    for (StoryReading reading in items) {
+      if (reading.firstRead != null) {
+        DateTime normalized = DateTime(reading.firstRead!.year, reading.firstRead!.month, reading.firstRead!.day);
+        uniqueDates.add(normalized);
+      }
+    }
+
+    List<DateTime> sorted = uniqueDates.toList()..sort((a, b) => b.compareTo(a));
+
+    DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    bool hasReadTodayOrYesterday =
+        sorted.isNotEmpty && (sorted[0].isAtSameMomentAs(today) || sorted[0].isAtSameMomentAs(today.subtract(const Duration(days: 1))));
+
+    // streak broken
+    if (!hasReadTodayOrYesterday) {
+      return 0;
+    }
+
+    int streak = 1;
+    DateTime currentDate = sorted[0];
+
+    for (int i = 1; i < sorted.length; i++) {
+      DateTime expectedPrevDay = currentDate.subtract(const Duration(days: 1));
+
+      // if the date matches expected, increase streak
+      if (sorted[i].isAtSameMomentAs(expectedPrevDay)) {
+        streak++;
+        currentDate = sorted[i];
+      }
+      // date is before expected, streak broken
+      else if (sorted[i].isBefore(expectedPrevDay)) {
+        break;
+      } else if (sorted[i].isAtSameMomentAs(currentDate)) {
+        continue;
+      } else {
+        // gap?
+        break;
+      }
+    }
+
+    return streak;
+  }
 }

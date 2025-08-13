@@ -27,13 +27,18 @@ const StoryReadingSchema = CollectionSchema(
       name: r'feedItemId',
       type: IsarType.long,
     ),
-    r'readLog': PropertySchema(
+    r'firstRead': PropertySchema(
       id: 2,
+      name: r'firstRead',
+      type: IsarType.dateTime,
+    ),
+    r'readLog': PropertySchema(
+      id: 3,
       name: r'readLog',
       type: IsarType.dateTimeList,
     ),
     r'readingDuration': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'readingDuration',
       type: IsarType.long,
     )
@@ -70,8 +75,9 @@ void _storyReadingSerialize(
 ) {
   writer.writeLong(offsets[0], object.feedId);
   writer.writeLong(offsets[1], object.feedItemId);
-  writer.writeDateTimeList(offsets[2], object.readLog);
-  writer.writeLong(offsets[3], object.readingDuration);
+  writer.writeDateTime(offsets[2], object.firstRead);
+  writer.writeDateTimeList(offsets[3], object.readLog);
+  writer.writeLong(offsets[4], object.readingDuration);
 }
 
 StoryReading _storyReadingDeserialize(
@@ -83,8 +89,9 @@ StoryReading _storyReadingDeserialize(
   final object = StoryReading(
     reader.readLong(offsets[1]),
     reader.readLong(offsets[0]),
-    reader.readLong(offsets[3]),
-    reader.readDateTimeList(offsets[2]) ?? [],
+    reader.readLong(offsets[4]),
+    reader.readDateTimeList(offsets[3]) ?? [],
+    reader.readDateTimeOrNull(offsets[2]),
   );
   object.id = id;
   return object;
@@ -102,8 +109,10 @@ P _storyReadingDeserializeProp<P>(
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readDateTimeList(offset) ?? []) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
+      return (reader.readDateTimeList(offset) ?? []) as P;
+    case 4:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -307,6 +316,80 @@ extension StoryReadingQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'feedItemId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'firstRead',
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'firstRead',
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firstRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'firstRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'firstRead',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
+      firstReadBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'firstRead',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -603,6 +686,18 @@ extension StoryReadingQuerySortBy
     });
   }
 
+  QueryBuilder<StoryReading, StoryReading, QAfterSortBy> sortByFirstRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterSortBy> sortByFirstReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstRead', Sort.desc);
+    });
+  }
+
   QueryBuilder<StoryReading, StoryReading, QAfterSortBy>
       sortByReadingDuration() {
     return QueryBuilder.apply(this, (query) {
@@ -642,6 +737,18 @@ extension StoryReadingQuerySortThenBy
       thenByFeedItemIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'feedItemId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterSortBy> thenByFirstRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<StoryReading, StoryReading, QAfterSortBy> thenByFirstReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstRead', Sort.desc);
     });
   }
 
@@ -686,6 +793,12 @@ extension StoryReadingQueryWhereDistinct
     });
   }
 
+  QueryBuilder<StoryReading, StoryReading, QDistinct> distinctByFirstRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'firstRead');
+    });
+  }
+
   QueryBuilder<StoryReading, StoryReading, QDistinct> distinctByReadLog() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'readLog');
@@ -717,6 +830,12 @@ extension StoryReadingQueryProperty
   QueryBuilder<StoryReading, int, QQueryOperations> feedItemIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'feedItemId');
+    });
+  }
+
+  QueryBuilder<StoryReading, DateTime?, QQueryOperations> firstReadProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'firstRead');
     });
   }
 

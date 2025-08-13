@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
@@ -27,13 +28,15 @@ class _ProfileState extends State<Profile> {
     super.initState();
     authStore = context.read<AuthStore>();
     user = auth.currentUser;
+
+    getReadingStats();
   }
 
   Widget buildPremiumUpgradeCard() {
     if (!Platform.isAndroid) {
       return SizedBox.shrink();
     }
-    
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -77,6 +80,64 @@ class _ProfileState extends State<Profile> {
                     const SizedBox(width: 12),
                     Text(
                       authStore.userTier == Tier.premium ? "You have premium!" : "Upgrade to Premium",
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            // fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  int readingStreak = 0;
+
+  Future<void> getReadingStats() async {
+    readingStreak = await authStore.dbUtils.getReadingDaysStreak();
+    setState(() {});
+  }
+
+  Widget buildReadingStatsCard() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            // Navigator.of(context)
+            //     .push(
+            //   MaterialPageRoute(
+            //     builder: (context) => const PurchaseView(),
+            //   ),
+            // )
+            //     .then((_) async {
+            //   setState(() {});
+            // });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      readingStreak.toString(),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             // fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -155,6 +216,8 @@ class _ProfileState extends State<Profile> {
         ),
         const SizedBox(height: 8),
         buildPremiumUpgradeCard(),
+        const SizedBox(height: 8),
+        buildReadingStatsCard(),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 0,

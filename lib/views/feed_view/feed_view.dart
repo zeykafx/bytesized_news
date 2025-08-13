@@ -409,7 +409,6 @@ class _FeedViewState extends State<FeedView> {
                                                         //     },
                                                         //   ),
                                                         // ),
-
                                                         SizedBox(
                                                           height: 150,
                                                           child: CarouselView(
@@ -431,20 +430,7 @@ class _FeedViewState extends State<FeedView> {
                                                                       feedStore: feedStore,
                                                                       item: item,
                                                                       isSuggestion: true,
-                                                                    )
-                                                                    // .animate(
-                                                                    //   delay: 200.ms,
-                                                                    // )
-                                                                    // .slide(
-                                                                    //   begin: Offset(
-                                                                    //     -0.1,
-                                                                    //     0,
-                                                                    //   ),
-                                                                    //   end: Offset(0, 0),
-                                                                    //   curve: Curves.easeOut,
-                                                                    // )
-                                                                    // .fadeIn(),
-                                                                    ),
+                                                                    )),
                                                               ],
                                                             ],
                                                           ),

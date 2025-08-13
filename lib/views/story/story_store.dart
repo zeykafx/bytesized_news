@@ -120,11 +120,14 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
-  int imageDepthLimit = 100;
+  int imageDepthLimit = 150;
   @computed
-  bool get hasImageInArticle => htmlContent.split(" ").take(imageDepthLimit).join(" ").contains(feedItem.imageUrl);
+  bool get hasImageInArticle =>
+      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains(feedItem.imageUrl) ||
+      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains("img") ||
+      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains("image");
 
-  late Timer timer;
+  Timer? timer;
 
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
@@ -206,7 +209,9 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print('Stopping reading timer');
     }
-    timer.cancel();
+    if (timer != null) {
+      timer?.cancel();
+    }
   }
 
   @action
@@ -223,7 +228,7 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
-    if ((doc.body!.innerHtml.length / htmlContent.length) > 200) {
+    if ((doc.body!.innerHtml.length / htmlContent.length) > 250 && settingsStore.autoSwitchReaderTooShort) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
       ));

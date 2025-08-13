@@ -145,6 +145,17 @@ class _GeneralSettingsState extends State<GeneralSettings> {
               settingsStore.setUseReaderModeByDefault(value);
             },
           ),
+          
+          // Switch to webview if reader mode is too short
+          SwitchListTile(
+            title: const Text(
+              "Auto switch to webview if reader article is too short",
+            ),
+            value: settingsStore.autoSwitchReaderTooShort,
+            onChanged: (value) {
+              settingsStore.autoSwitchReaderTooShort = value;
+            },
+          ),
 
           // SHOW AI SUMMARY ON STORY PAGE LOAD
           SwitchListTile(

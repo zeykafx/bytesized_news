@@ -23,7 +23,7 @@ class ReadingStats {
     }
 
     List<DateTime> readlog = [DateTime.now()];
-    reading = StoryReading(feedItem.id, feedItem.feedId, 0, readlog);
+    reading = StoryReading(feedItem.id, feedItem.feedId, 0, readlog, DateTime.now());
     reading.initFeed();
     dbUtils.addReading(reading);
   }

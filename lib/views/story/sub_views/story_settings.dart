@@ -67,6 +67,17 @@ class _StorySettingsState extends State<StorySettings> {
                         ),
                       ),
 
+                      // Switch to webview if reader mode is too short
+                      SwitchListTile(
+                        title: const Text(
+                          "Auto switch to webview if reader article is too short",
+                        ),
+                        value: settingsStore.autoSwitchReaderTooShort,
+                        onChanged: (value) {
+                          settingsStore.autoSwitchReaderTooShort = value;
+                        },
+                      ),
+
                       // Viewer font size
                       ListTile(
                         title: const Text("Reader Mode Font Size"),

@@ -51,7 +51,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           json['storyTilesMinimalStyle'] as bool? ?? false
       ..storyReaderMaxWidth =
           (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0
-      ..isList = json['isList'] as bool? ?? true;
+      ..isList = json['isList'] as bool? ?? true
+      ..autoSwitchReaderTooShort =
+          json['autoSwitchReaderTooShort'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -78,6 +80,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'storyTilesMinimalStyle': instance.storyTilesMinimalStyle,
       'storyReaderMaxWidth': instance.storyReaderMaxWidth,
       'isList': instance.isList,
+      'autoSwitchReaderTooShort': instance.autoSwitchReaderTooShort,
     };
 
 const _$DarkModeEnumMap = {
@@ -560,6 +563,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$autoSwitchReaderTooShortAtom =
+      Atom(name: '_SettingsStore.autoSwitchReaderTooShort', context: context);
+
+  @override
+  bool get autoSwitchReaderTooShort {
+    _$autoSwitchReaderTooShortAtom.reportRead();
+    return super.autoSwitchReaderTooShort;
+  }
+
+  @override
+  set autoSwitchReaderTooShort(bool value) {
+    _$autoSwitchReaderTooShortAtom
+        .reportWrite(value, super.autoSwitchReaderTooShort, () {
+      super.autoSwitchReaderTooShort = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -722,7 +742,8 @@ skipBgSyncOnLowBattery: ${skipBgSyncOnLowBattery},
 requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch},
 storyTilesMinimalStyle: ${storyTilesMinimalStyle},
 storyReaderMaxWidth: ${storyReaderMaxWidth},
-isList: ${isList}
+isList: ${isList},
+autoSwitchReaderTooShort: ${autoSwitchReaderTooShort}
     ''';
   }
 }
