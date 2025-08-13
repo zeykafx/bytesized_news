@@ -30,6 +30,12 @@ class AiUtils {
       }
       throw Exception("Error: You are not allowed to perform this operation.");
     }
+    if (authStore.summariesLeftToday <= 0) {
+      if (kDebugMode) {
+        print("Error: No more summaries today");
+      }
+      throw Exception("Error: You reached the daily limit of summaries.");
+    }
 
     if (kDebugMode) {
       print("Calling AI API...");

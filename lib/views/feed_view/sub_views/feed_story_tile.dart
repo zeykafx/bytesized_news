@@ -75,7 +75,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
       ),
       child: widget.isSuggestion
           ? OverflowBox(
-              maxHeight: 140,
+              maxHeight: 150,
               maxWidth: 350,
               alignment: Alignment.center,
               child: buildCard(cardColor, context),
@@ -109,7 +109,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     parsedTitle,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 4,
-                    style: TextStyle(fontSize: (widget.isSuggestion || settingsStore.storyTilesMinimalStyle) ? 12 : 14),
+                    style: TextStyle(fontSize: (widget.isSuggestion || settingsStore.storyTilesMinimalStyle) ? 13 : 14),
                   ),
                 ),
                 const SizedBox(width: 5),

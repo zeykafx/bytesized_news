@@ -18,7 +18,7 @@ import 'package:isar/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:photo_view/photo_view.dart';
-
+import 'package:share_plus/share_plus.dart';
 part 'story_store.g.dart';
 
 class StoryStore = _StoryStore with _$StoryStore;
@@ -120,6 +120,10 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
+  int imageDepthLimit = 100;
+  @computed
+  bool get hasImageInArticle => htmlContent.split(" ").take(imageDepthLimit).join(" ").contains(feedItem.imageUrl);
+
   late Timer timer;
 
   @action
@@ -144,13 +148,6 @@ abstract class _StoryStore with Store {
     } else {
       htmlContent = feedItem.htmlContent!;
     }
-
-    // start recording the reading
-    await readingStat.startReadingStory(feedItem);
-
-    timer = Timer.periodic(Duration(seconds: 30), (_) {
-      return updateReading();
-    });
 
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
@@ -195,10 +192,20 @@ abstract class _StoryStore with Store {
     if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
       await summarizeArticle(context);
     }
+
+    // start recording the reading
+    await readingStat.startReadingStory(feedItem);
+
+    timer = Timer.periodic(Duration(seconds: 30), (_) {
+      return updateReading();
+    });
   }
 
   @action
   void dispose() {
+    if (kDebugMode) {
+      print('Stopping reading timer');
+    }
     timer.cancel();
   }
 
@@ -216,9 +223,9 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
-    if ((doc.body!.innerHtml.length / htmlContent.length) > 150) {
+    if ((doc.body!.innerHtml.length / htmlContent.length) > 200) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("The reader view seems to have a much shorter article than the web page's full length, switching to the web page now."),
+        content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
       ));
       showReaderMode = false;
       return;
@@ -359,7 +366,7 @@ abstract class _StoryStore with Store {
   }
 
   @action
-  Future<void> summarizeArticle(BuildContext context) async {
+  Future<void> summarizeArticle(BuildContext context, {bool longSummaryAccepted = false}) async {
     if (!authStore.initialized) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -421,14 +428,56 @@ abstract class _StoryStore with Store {
     dom.Document document = parse(htmlContent);
     String docText = document.body!.text;
 
-    if (docText.length > 15000) {
-      // docText = docText.substring(0, 15000);
+    // if (docText.length > 15000) {
+    //   // docText = docText.substring(0, 15000);
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text("This webpage is very long, sumarization will take more than 1 credit (according to the size)."),
+    //       duration: Duration(seconds: 5),
+    //     ),
+    //   );
+    if (docText.length < 200) {
+      if (kDebugMode) {
+        print(docText.length);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("This webpage is very long, sumarization will take more than 1 credit (according to the size)."),
+          content: Text("Article too short to summarize."),
           duration: Duration(seconds: 5),
         ),
       );
+      return;
+    } else if (docText.length > 30000 && !longSummaryAccepted) {
+      String summaryCount = (docText.length / 15000).toStringAsFixed(0);
+      await showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Text("Confirm summary for long article"),
+            content: Text("This article is very long, do you really want to summarize it? It will use $summaryCount summary credits."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  return;
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  return summarizeArticle(context, longSummaryAccepted: true);
+                },
+                child: const Text("Confirm"),
+              )
+            ],
+          );
+        },
+      );
+    }
+
+    if (docText.length > 30000 && !longSummaryAccepted) {
+      return;
     }
 
     if (kDebugMode) {
@@ -451,7 +500,7 @@ abstract class _StoryStore with Store {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e.toString().replaceAll("Exception: ", ""),
+            e.toString().replaceAll("Error: ", ""),
           ),
           duration: const Duration(seconds: 10),
         ),
@@ -563,5 +612,12 @@ abstract class _StoryStore with Store {
       print("Updating reading: ${readingStat.reading}");
     }
     readingStat.updateReadingStory(feedItem);
+  }
+
+  @action
+  void shareArticle(BuildContext context) {
+    final params = ShareParams(uri: Uri.parse(feedItem.url));
+
+    SharePlus.instance.share(params);
   }
 }

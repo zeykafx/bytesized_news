@@ -48,20 +48,33 @@ class DbUtils {
     await isar.writeTxn(() => isar.feedItems.where().filter().feedIdEqualTo(feed.id).deleteAll());
   }
 
+  Future<void> setFeedItemFeed(FeedItem item, List<Feed> feeds) async {
+    if (feeds.any((feed) => feed.id == item.feedId)) {
+      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+    } else {
+      if (kDebugMode) {
+        print("unknow feed id ${item.feedId}");
+        // delete the item if the feed is not found
+        await isar.writeTxn(() => isar.feedItems.delete(item.id));
+      }
+    }
+  }
+
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
 
     // find the corresponding feeds for each feed item
     for (FeedItem item in feedItems) {
-      if (feeds.any((feed) => feed.id == item.feedId)) {
-        item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
-      } else {
-        if (kDebugMode) {
-          print("unknow feed id ${item.feedId}");
-          // delete the item if the feed is not found
-          await isar.writeTxn(() => isar.feedItems.delete(item.id));
-        }
-      }
+      // if (feeds.any((feed) => feed.id == item.feedId)) {
+      //   item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // } else {
+      //   if (kDebugMode) {
+      //     print("unknow feed id ${item.feedId}");
+      //     // delete the item if the feed is not found
+      //     await isar.writeTxn(() => isar.feedItems.delete(item.id));
+      //   }
+      // }
+      setFeedItemFeed(item, feeds);
     }
 
     return feedItems;
@@ -72,9 +85,19 @@ class DbUtils {
 
     // find the corresponding feeds for each feed item
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
+  }
+
+  Future<void> resetSuggestedArticles() async {
+    List<FeedItem> suggested = await isar.feedItems.filter().suggestedEqualTo(true).sortByPublishedDateDesc().findAll();
+    await isar.writeTxn(() async {
+      for (FeedItem item in suggested) {
+        item.suggested = false;
+      }
+    });
   }
 
   Future<List<FeedItem>> getTodaysItems(List<Feed> feeds) async {
@@ -84,7 +107,8 @@ class DbUtils {
         .sortByPublishedDateDesc()
         .findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -92,7 +116,8 @@ class DbUtils {
   Future<List<FeedItem>> getUnreadItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().readEqualTo(false).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -105,7 +130,8 @@ class DbUtils {
         .sortByPublishedDateDesc()
         .findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -113,7 +139,8 @@ class DbUtils {
   Future<List<FeedItem>> getReadItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().readEqualTo(true).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -121,7 +148,8 @@ class DbUtils {
   Future<List<FeedItem>> getDownloadedItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().downloadedEqualTo(true).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -129,7 +157,8 @@ class DbUtils {
   Future<List<FeedItem>> getBookmarkedItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().bookmarkedEqualTo(true).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -137,7 +166,8 @@ class DbUtils {
   Future<List<FeedItem>> getSummarizedItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().summarizedEqualTo(true).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -146,12 +176,11 @@ class DbUtils {
     List<FeedItem> feedItems = await isar.feedItems.filter().feedIdEqualTo(feed.id).sortByPublishedDateDesc().findAll();
     // set the feed for each feed item
     for (FeedItem item in feedItems) {
-      // item.feed = feed;
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
-      //
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     feedItems.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-    
+
     return feedItems;
   }
 
@@ -174,7 +203,8 @@ class DbUtils {
   Future<List<FeedItem>> getSearchItems(List<Feed> feeds, String searchTerm) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().titleContains(searchTerm, caseSensitive: false).sortByPublishedDateDesc().findAll();
     for (FeedItem item in feedItems) {
-      item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      // item.feed = feeds.firstWhere((feed) => feed.id == item.feedId);
+      setFeedItemFeed(item, feeds);
     }
     return feedItems;
   }
@@ -223,7 +253,12 @@ class DbUtils {
     // find the corresponding feeds for each feed item
     for (FeedGroup item in feedGroups) {
       for (String feedUrl in item.feedUrls) {
-        item.feeds.add(feeds.firstWhere((feed) => feed.link == feedUrl));
+        if (feeds.any((Feed fd) => fd.link == feedUrl)) {
+          item.feeds.add(feeds.firstWhere((feed) => feed.link == feedUrl));
+        } else {
+          // no feeds exist, remove from feed group
+          continue;
+        }
       }
     }
 

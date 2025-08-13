@@ -8,7 +8,6 @@
     <outline text="News & Current Affairs">
       <outline type="rss" text="Al Jazeera English" title="Al Jazeera English" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml"/>
       <outline text="BBC News" type="rss" xmlUrl="http://feeds.bbci.co.uk/news/rss.xml"/>
-      <outline text="CNN" type="rss" xmlUrl="http://rss.cnn.com/rss/edition.rss"/>
       <outline type="rss" text="Euronews World Affairs" title="Euronews World Affairs" xmlUrl="https://www.euronews.com/rss?format=mrss&level=theme&name=news"/>
       <outline text="Reuters" type="rss" xmlUrl="https://news.google.com/rss/search?q=site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen"/>
       <outline text="NPR" type="rss" xmlUrl="https://feeds.npr.org/1001/rss.xml"/>
@@ -18,6 +17,17 @@
       <outline text="The Harvard Gazette" type="rss" xmlUrl="https://news.harvard.edu/gazette/feed/"/>
       <outline text="Democacy Now!" type="rss" xmlUrl="https://www.democracynow.org/democracynow.rss/"/>
       <outline text="Mother Jones" type="rss" xmlUrl="https://feeds.feedburner.com/motherjones/feed"/>
+      <outline text="Drop Site News" type="rss" xmlUrl="https://www.dropsitenews.com/feed"/>
+    </outline>
+    <outline text="Technology">
+      <outline text="TechCrunch" type="rss" xmlUrl="https://techcrunch.com/feed"/>
+      <outline text="The Verge" type="rss" xmlUrl="https://www.theverge.com/rss/index.xml"/>
+      <outline text="Wired" type="rss" xmlUrl="https://www.wired.com/feed/rss"/>
+      <outline text="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml"/>
+      <outline text="Ars Technica" type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/index"/>
+      <outline text="Mashable" type="rss" xmlUrl="https://mashable.com/feeds/rss/all"/>
+      <outline text="CNET" type="rss" xmlUrl="https://www.cnet.com/rss/news"/>
+      <outline text="VentureBeat" type="rss" xmlUrl="http://feeds.feedburner.com/venturebeat/SZYF"/>
     </outline>
     <outline text="European News" title="European News">
       <outline type="rss" text="POLITICO Europe" title="POLITICO Europe" xmlUrl="https://www.politico.eu/feed/"/>
@@ -49,16 +59,6 @@
         <outline type="rss" text="The Rio Times" title="The Rio Times" xmlUrl="https://www.riotimesonline.com/feed/"/>
         <outline type="rss" text="TeleSUR English" title="TeleSUR English" xmlUrl="https://www.telesurenglish.net/rss"/>
         <outline type="rss" text="El País - English Edition" title="El País - English Edition" xmlUrl="https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada"/>
-    </outline>
-    <outline text="Technology">
-      <outline text="TechCrunch" type="rss" xmlUrl="https://techcrunch.com/feed"/>
-      <outline text="The Verge" type="rss" xmlUrl="https://www.theverge.com/rss/index.xml"/>
-      <outline text="Wired" type="rss" xmlUrl="https://www.wired.com/feed/rss"/>
-      <outline text="Engadget" type="rss" xmlUrl="https://www.engadget.com/rss.xml"/>
-      <outline text="Ars Technica" type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/index"/>
-      <outline text="Mashable" type="rss" xmlUrl="https://mashable.com/feeds/rss/all"/>
-      <outline text="CNET" type="rss" xmlUrl="https://www.cnet.com/rss/news"/>
-      <outline text="VentureBeat" type="rss" xmlUrl="http://feeds.feedburner.com/venturebeat/SZYF"/>
     </outline>
     <outline text="Fashion" title="Fashion">
       <outline type="rss" text="Vogue" title="Vogue" xmlUrl="https://www.vogue.com/feed/rss"/>

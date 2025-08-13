@@ -12,6 +12,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 
 class FeedView extends StatefulWidget {
@@ -25,6 +26,7 @@ class _FeedViewState extends State<FeedView> {
   late SettingsStore settingsStore;
   late AuthStore authStore;
   final FeedStore feedStore = FeedStore();
+  late ReactionDisposer reactionDisposer;
 
   @override
   void initState() {
@@ -32,6 +34,20 @@ class _FeedViewState extends State<FeedView> {
     settingsStore = context.read<SettingsStore>();
     authStore = context.read<AuthStore>();
     init();
+
+    reactionDisposer = reaction((_) => feedStore.hasAlert, (bool hasAlert) {
+      // if there is an alert to show, show it in a snackbar
+      if (hasAlert) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(feedStore.alertMessage),
+            duration: Duration(seconds: 10),
+          ),
+        );
+        feedStore.hasAlert = false;
+        feedStore.alertMessage = "";
+      }
+    });
   }
 
   Future<void> init() async {
@@ -58,6 +74,12 @@ class _FeedViewState extends State<FeedView> {
   Future<void> wrappedGetPinnedFeedsOrFeedGroups() async {
     await feedStore.getPinnedFeedsOrFeedGroups();
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    reactionDisposer();
   }
 
   @override
@@ -291,7 +313,7 @@ class _FeedViewState extends State<FeedView> {
                                   Align(
                                     alignment: Alignment.center,
                                     child: Padding(
-                                      padding: const EdgeInsets.all(5),
+                                      padding: const EdgeInsets.all(2),
                                       child: Opacity(
                                         opacity: 0.5,
                                         child: Text("Fetching suggestions").animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
@@ -329,96 +351,106 @@ class _FeedViewState extends State<FeedView> {
                                                     horizontal: 0.0,
                                                     vertical: 10.0,
                                                   ),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Tooltip(
-                                                        message:
-                                                            "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes.",
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(
-                                                            horizontal: 8.0,
-                                                            vertical: 5.0,
-                                                          ),
-                                                          child: Text(
-                                                            "Suggested Articles:",
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.w500,
+                                                  child: Card(
+                                                    margin: EdgeInsets.zero,
+                                                    elevation: 0,
+                                                    color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Tooltip(
+                                                          message:
+                                                              "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes.",
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(
+                                                              horizontal: 8.0,
+                                                              vertical: 6.0,
+                                                            ),
+                                                            child: Text(
+                                                              "Suggested Articles:",
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.w500,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      // SizedBox(
-                                                      //   height: 140,
-                                                      //   child: ListView.builder(
-                                                      //     scrollDirection: Axis.horizontal,
-                                                      //     controller: feedStore.suggestionsScrollController,
-                                                      //     itemCount: feedStore.suggestedFeedItems.length,
-                                                      //     cacheExtent: 300,
-                                                      //     addRepaintBoundaries: false,
-                                                      //     addAutomaticKeepAlives: false,
-                                                      //     itemBuilder: (context, idx) {
-                                                      //       FeedItem item = feedStore.suggestedFeedItems[idx];
+                                                        // SizedBox(
+                                                        //   height: 140,
+                                                        //   child: ListView.builder(
+                                                        //     scrollDirection: Axis.horizontal,
+                                                        //     controller: feedStore.suggestionsScrollController,
+                                                        //     itemCount: feedStore.suggestedFeedItems.length,
+                                                        //     cacheExtent: 300,
+                                                        //     addRepaintBoundaries: false,
+                                                        //     addAutomaticKeepAlives: false,
+                                                        //     itemBuilder: (context, idx) {
+                                                        //       FeedItem item = feedStore.suggestedFeedItems[idx];
 
-                                                      //       return SizedBox(
-                                                      //         width: 350,
-                                                      //         child: FeedStoryTile(
-                                                      //           feedStore: feedStore,
-                                                      //           item: item,
-                                                      //           isSuggestion: true,
-                                                      //         ),
-                                                      //       )
-                                                      //           .animate(
-                                                      //             delay: 200.ms,
-                                                      //           )
-                                                      //           .slide(
-                                                      //             begin: Offset(
-                                                      //               -0.1,
-                                                      //               0,
-                                                      //             ),
-                                                      //             end: Offset(0, 0),
-                                                      //             curve: Curves.easeOut,
-                                                      //           )
-                                                      //           .fadeIn();
-                                                      //     },
-                                                      //   ),
-                                                      // ),
+                                                        //       return SizedBox(
+                                                        //         width: 350,
+                                                        //         child: FeedStoryTile(
+                                                        //           feedStore: feedStore,
+                                                        //           item: item,
+                                                        //           isSuggestion: true,
+                                                        //         ),
+                                                        //       )
+                                                        //           .animate(
+                                                        //             delay: 200.ms,
+                                                        //           )
+                                                        //           .slide(
+                                                        //             begin: Offset(
+                                                        //               -0.1,
+                                                        //               0,
+                                                        //             ),
+                                                        //             end: Offset(0, 0),
+                                                        //             curve: Curves.easeOut,
+                                                        //           )
+                                                        //           .fadeIn();
+                                                        //     },
+                                                        //   ),
+                                                        // ),
 
-                                                      SizedBox(
-                                                        height: 140,
-                                                        child: CarouselView(
-                                                          itemExtent: 350,
-                                                          scrollDirection: Axis.horizontal,
-                                                          itemSnapping: true,
-                                                          enableSplash: false,
-                                                        
-                                                          children: [
-                                                            for (FeedItem item in feedStore.suggestedFeedItems) ...[
-                                                              SizedBox(
-                                                                width: 350,
-                                                                child: FeedStoryTile(
-                                                                  feedStore: feedStore,
-                                                                  item: item,
-                                                                  isSuggestion: true,
-                                                                )
-                                                                    .animate(
-                                                                      delay: 200.ms,
-                                                                    )
-                                                                    .slide(
-                                                                      begin: Offset(
-                                                                        -0.1,
-                                                                        0,
-                                                                      ),
-                                                                      end: Offset(0, 0),
-                                                                      curve: Curves.easeOut,
-                                                                    )
-                                                                    .fadeIn(),
+                                                        SizedBox(
+                                                          height: 150,
+                                                          child: CarouselView(
+                                                            itemExtent: 350,
+                                                            scrollDirection: Axis.horizontal,
+                                                            itemSnapping: true,
+                                                            enableSplash: false,
+                                                            elevation: 0,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(15),
                                                               ),
+                                                            ),
+                                                            children: [
+                                                              for (FeedItem item in feedStore.suggestedFeedItems) ...[
+                                                                SizedBox(
+                                                                    width: 350,
+                                                                    child: FeedStoryTile(
+                                                                      feedStore: feedStore,
+                                                                      item: item,
+                                                                      isSuggestion: true,
+                                                                    )
+                                                                    // .animate(
+                                                                    //   delay: 200.ms,
+                                                                    // )
+                                                                    // .slide(
+                                                                    //   begin: Offset(
+                                                                    //     -0.1,
+                                                                    //     0,
+                                                                    //   ),
+                                                                    //   end: Offset(0, 0),
+                                                                    //   curve: Curves.easeOut,
+                                                                    // )
+                                                                    // .fadeIn(),
+                                                                    ),
+                                                              ],
                                                             ],
-                                                          ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ).animate(delay: Duration(milliseconds: 100)).fadeIn();
                                               }

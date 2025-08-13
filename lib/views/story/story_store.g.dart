@@ -9,6 +9,14 @@ part of 'story_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$StoryStore on _StoryStore, Store {
+  Computed<bool>? _$hasImageInArticleComputed;
+
+  @override
+  bool get hasImageInArticle => (_$hasImageInArticleComputed ??= Computed<bool>(
+          () => super.hasImageInArticle,
+          name: '_StoryStore.hasImageInArticle'))
+      .value;
+
   late final _$dbUtilsAtom =
       Atom(name: '_StoryStore.dbUtils', context: context);
 
@@ -494,9 +502,10 @@ mixin _$StoryStore on _StoryStore, Store {
       AsyncAction('_StoryStore.summarizeArticle', context: context);
 
   @override
-  Future<void> summarizeArticle(BuildContext context) {
-    return _$summarizeArticleAsyncAction
-        .run(() => super.summarizeArticle(context));
+  Future<void> summarizeArticle(BuildContext context,
+      {bool longSummaryAccepted = false}) {
+    return _$summarizeArticleAsyncAction.run(() => super
+        .summarizeArticle(context, longSummaryAccepted: longSummaryAccepted));
   }
 
   late final _$onLoadStartAsyncAction =
@@ -611,6 +620,17 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
+  void shareArticle(BuildContext context) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.shareArticle');
+    try {
+      return super.shareArticle(context);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 dbUtils: ${dbUtils},
@@ -638,7 +658,8 @@ firestore: ${firestore},
 htmlWidgetKey: ${htmlWidgetKey},
 hideBar: ${hideBar},
 webviewLastScrollY: ${webviewLastScrollY},
-readingStat: ${readingStat}
+readingStat: ${readingStat},
+hasImageInArticle: ${hasImageInArticle}
     ''';
   }
 }

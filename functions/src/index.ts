@@ -409,23 +409,24 @@ export const summarize = onCall(
 
     let summariesToConsume = 1;
 
-    // check if the user has any summaries left today
-    const summariesLeftToday = userData?.summariesLeftToday;
-    if (summariesLeftToday <= 0) {
-      return { error: "Error: You have reached the daily limit of summaries" };
-    }
-
     // check the length of the article
     if (content.length > maxCharsForOneSummary) {
       // will consume more than 1 summary since the content is so long
       summariesToConsume += Math.ceil(
         content.length / maxCharsForOneSummary - 1,
       );
-      // logger.info("Article too long: " + content.length);
-      // return {
-      //   error:
-      //     "Error: The article is too long. Please provide a shorter article.",
-      // };
+    }
+
+    // check if the user has any summaries left today
+    const summariesLeftToday = userData?.summariesLeftToday;
+    if (summariesLeftToday <= 0) {
+      return { error: "Error: You have reached the daily limit of summaries" };
+    }
+    if (summariesLeftToday - summariesToConsume < 0) {
+      return {
+        error:
+          "Error: You have reached the daily limit of summaries or the article is too long to summarize with your remaining credits.",
+      };
     }
 
     // update the user's summary count

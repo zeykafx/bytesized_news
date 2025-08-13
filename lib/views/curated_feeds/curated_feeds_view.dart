@@ -46,7 +46,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Curated Feeds"),
+              const Text("News Sources"),
               if (curatedFeedsStore.selectedFeeds.isNotEmpty)
                 Text(
                   "${curatedFeedsStore.selectedFeeds.length} selected",
@@ -105,7 +105,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Discover curated feeds',
+                  'Discover curated news sources',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
@@ -113,7 +113,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Choose feeds and categories to follow',
+                  'Choose feeds and/or categories to follow',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
@@ -152,9 +152,9 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
         clipBehavior: Clip.hardEdge,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           side: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.2),
+            color: colorScheme.outline.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -162,10 +162,10 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(30),
           ),
           title: InkWell(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(30),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Column(
@@ -255,9 +255,9 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
         clipBehavior: Clip.hardEdge,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           side: BorderSide(
-            color: isSelected ? colorScheme.primary.withValues(alpha: 0.5) : colorScheme.outline.withValues(alpha: 0.2),
+            color: isSelected ? colorScheme.primary.withValues(alpha: 0.5) : colorScheme.outline.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -265,7 +265,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(30),
           ),
           title: Container(
             padding: const EdgeInsets.symmetric(vertical: 4),

@@ -88,6 +88,7 @@ dependencies:
   google_sign_in: ^6.3.0
   firebase_ui_oauth_google: ^1.4.2
   in_app_purchase: ^3.2.3
+  share_plus: ^11.1.0
 
 dev_dependencies:
   flutter_test:

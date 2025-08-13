@@ -108,6 +108,12 @@ abstract class _FeedStore with Store {
   @observable
   bool hasCleanedArticlesToday = false;
 
+  @observable
+  bool hasAlert = false;
+
+  @observable
+  String alertMessage = "";
+
   @action
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
@@ -256,8 +262,14 @@ abstract class _FeedStore with Store {
       try {
         rssFeed = await Isolate.run(() => RssFeed.parse(res.data));
       } catch (e) {
-        atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
-        usingRssFeed = false;
+        try {
+          atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
+          usingRssFeed = false;
+        } catch (e) {
+          alertMessage = "Error: $e";
+          hasAlert = true;
+          continue;
+        }
       }
 
       if (usingRssFeed) {
@@ -299,9 +311,7 @@ abstract class _FeedStore with Store {
 
     loading = false;
 
-    // if (!hasCreatedNewSuggestion) {
     await createNewsSuggestion();
-    // }
   }
 
   @action
@@ -333,16 +343,13 @@ abstract class _FeedStore with Store {
       await item.fetchHtmlContent();
     }
 
-    await dbUtils.updateItemInDb(item);
+    // await dbUtils.updateItemInDb(item); // no need for this, it is already done in fetchHtmlContent
   }
 
   @action
   Future<void> changeSort(FeedListSort sort) async {
     settingsStore.setSort(sort);
 
-    // if (kDebugMode) {
-    //   print("Changing sort to $sort");
-    // }
     switch (sort) {
       case FeedListSort.byDate:
         feedItems = (await dbUtils.getItems(feeds)).asObservable();
@@ -413,11 +420,11 @@ abstract class _FeedStore with Store {
     try {
       await dbUtils.addFeedGroup(feedGroup);
       feedGroups.add(feedGroup);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully created Feed Group!")));
+      alertMessage = "Successfully created Feed Group!";
+      hasAlert = true;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Failed to create Feed Group: error: ${e.toString()}"),
-      ));
+      alertMessage = "Failed to create Feed Group: error: ${e.toString()}";
+      hasAlert = true;
     }
   }
 
@@ -469,14 +476,6 @@ abstract class _FeedStore with Store {
       return;
     }
 
-    buildUserTasteProfile();
-
-    // if (authStore.lastSuggestionDate != null &&
-    //     authStore.lastSuggestionDate!
-    //             .difference(DateTime.now().toUtc())
-    //             .inDays ==
-    //         0 &&
-    //     authStore.lastSuggestionDate!.day == DateTime.now().toUtc().day) {
     if (kDebugMode) {
       print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
       print("Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
@@ -506,9 +505,8 @@ abstract class _FeedStore with Store {
       }
       return;
     }
-    // authStore.lastSuggestionDate = DateTime.now().toUtc();
-    // authStore.suggestionsLeftToday--;
-    // }
+
+    buildUserTasteProfile();
 
     if (kDebugMode) {
       print("Will fetch unread items to get news suggestions");
@@ -526,27 +524,31 @@ abstract class _FeedStore with Store {
     List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
 
     suggestionsLoading = true;
-
-    var (List<FeedItem> suggestedArticles, int suggestionsLeft) = await aiUtils.getNewsSuggestions(
-      todaysUnreadItems,
-      userInterest,
-      mostReadFeeds,
-    );
-    authStore.suggestionsLeftToday = suggestionsLeft;
-    authStore.lastSuggestionDate = DateTime.now().toUtc();
+    var (List<FeedItem> suggestedArticles, int suggestionsLeft) = ([], 0);
+    try {
+      (suggestedArticles, suggestionsLeft) = await aiUtils.getNewsSuggestions(
+        todaysUnreadItems,
+        userInterest,
+        mostReadFeeds,
+      );
+      authStore.suggestionsLeftToday = suggestionsLeft;
+      authStore.lastSuggestionDate = DateTime.now().toUtc();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      alertMessage = "Error: $e";
+      hasAlert = true;
+      suggestionsLoading = false;
+      return;
+    }
 
     if (kDebugMode) {
       print("Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
     }
 
     // Unset the suggested property for this article if it won't be suggested again
-    List<FeedItem> prevSuggested = await dbUtils.getSuggestedItems(feeds);
-    for (FeedItem feedItem in prevSuggested) {
-      // if (!suggestedArticles.contains(feedItem)) {
-      feedItem.suggested = false;
-      await dbUtils.updateItemInDb(feedItem);
-      // }
-    }
+    await dbUtils.resetSuggestedArticles();
 
     // clear the suggestions then add all of the new ones
     suggestedFeedItems.clear();
@@ -567,7 +569,7 @@ abstract class _FeedStore with Store {
     for (FeedItem feedItem in suggestedArticles) {
       if (!feedItem.suggested) {
         feedItem.suggested = true;
-        downloadItem(feedItem); // this also updates the item
+        downloadItem(feedItem); // this also updates the item in the db
         // await dbUtils.updateItemInDb(feedItem);
       }
     }

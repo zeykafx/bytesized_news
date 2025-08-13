@@ -458,6 +458,38 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
+  late final _$hasAlertAtom =
+      Atom(name: '_FeedStore.hasAlert', context: context);
+
+  @override
+  bool get hasAlert {
+    _$hasAlertAtom.reportRead();
+    return super.hasAlert;
+  }
+
+  @override
+  set hasAlert(bool value) {
+    _$hasAlertAtom.reportWrite(value, super.hasAlert, () {
+      super.hasAlert = value;
+    });
+  }
+
+  late final _$alertMessageAtom =
+      Atom(name: '_FeedStore.alertMessage', context: context);
+
+  @override
+  String get alertMessage {
+    _$alertMessageAtom.reportRead();
+    return super.alertMessage;
+  }
+
+  @override
+  set alertMessage(String value) {
+    _$alertMessageAtom.reportWrite(value, super.alertMessage, () {
+      super.alertMessage = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_FeedStore.init', context: context);
 
@@ -634,7 +666,9 @@ suggestionsScrollController: ${suggestionsScrollController},
 showScrollToTop: ${showScrollToTop},
 showSmallScrollToTop: ${showSmallScrollToTop},
 hasCreatedNewSuggestion: ${hasCreatedNewSuggestion},
-hasCleanedArticlesToday: ${hasCleanedArticlesToday}
+hasCleanedArticlesToday: ${hasCleanedArticlesToday},
+hasAlert: ${hasAlert},
+alertMessage: ${alertMessage}
     ''';
   }
 }

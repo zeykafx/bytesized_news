@@ -181,6 +181,9 @@ class FeedItem {
       String imgSrc = "";
       if (el.attributes case {'src': final String src}) {
         imgSrc = src;
+      }
+
+      if (imageUrl.isEmpty) {
         imageUrl = imgSrc;
       }
 

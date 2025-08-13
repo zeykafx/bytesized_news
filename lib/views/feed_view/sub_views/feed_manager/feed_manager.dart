@@ -2,7 +2,6 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/curated_feeds/curated_feeds_view.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
-import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/edit_feed.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_group_tile.dart';
 import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';

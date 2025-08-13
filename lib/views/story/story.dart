@@ -71,6 +71,7 @@ class _StoryState extends State<Story> {
         if (storyStore.canGoBack) {
           if (storyStore.controller != null) storyStore.controller?.goBack();
         } else {
+          storyStore.dispose();
           Navigator.of(context).pop();
         }
       },
@@ -151,13 +152,13 @@ class _StoryState extends State<Story> {
                                         key: storyStore.htmlWidgetKey,
                                         '''
                                         <div class="bytesized_news_html_content">
-                                           ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
+                                           ${storyStore.htmlContent.split(" ").take(50).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
                                              <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feed?.name}</a></p>
                                              ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
                                              <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
                                              <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
 
-                                                 ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.htmlContent.split(" ").take(150).join(" ").contains("img") ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+                                                 ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
                                                    ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
                                                     <h2>Summary</h2>
@@ -264,7 +265,7 @@ class _StoryState extends State<Story> {
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.max,
-                                    spacing: 5,
+                                    spacing: 3,
                                     children: [
                                       // READER MODE
                                       IconButton(
@@ -370,6 +371,8 @@ class _StoryState extends State<Story> {
                                           ),
                                         ],
                                       ),
+
+                                      IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context))
                                     ],
                                   ),
                                   AnimatedCrossFade(
