@@ -18,7 +18,7 @@ class ReadingStats {
     StoryReading? existingReading = await dbUtils.getReadingWithStoryId(feedItem.id);
     if (existingReading != null) {
       reading = existingReading;
-      updateReadingStory(feedItem);
+      // updateReadingStory(feedItem);
       return;
     }
 
@@ -28,10 +28,8 @@ class ReadingStats {
     dbUtils.addReading(reading);
   }
 
-  void updateReadingStory(FeedItem feedItem) {
+  void endReading(FeedItem feedItem) {
     DateTime now = DateTime.now();
-
-    reading.readLog.add(now);
 
     Duration duration = now.difference(lastDateTime);
     reading.readingDuration = reading.readingDuration + duration.inSeconds;

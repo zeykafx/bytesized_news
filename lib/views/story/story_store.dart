@@ -199,9 +199,9 @@ abstract class _StoryStore with Store {
     // start recording the reading
     await readingStat.startReadingStory(feedItem);
 
-    timer = Timer.periodic(Duration(seconds: 30), (_) {
-      return updateReading();
-    });
+    // timer = Timer.periodic(Duration(seconds: 30), (_) {
+    //   return updateReading();
+    // });
   }
 
   @action
@@ -209,9 +209,7 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print('Stopping reading timer');
     }
-    if (timer != null) {
-      timer?.cancel();
-    }
+    endReading();
   }
 
   @action
@@ -262,13 +260,15 @@ abstract class _StoryStore with Store {
         'padding': '0px 10px 0px 10px !important',
         'margin': '0',
         'border-radius': '8px',
-        'box-shadow': '0 0 8px 0 rgba(0,0,0,0.1)',
         'margin-top': '8px',
         'margin-bottom': '8px',
         // "text-align": "justify",
       };
     }
 
+    if (element.className == "top-text") {
+      return {'font-size': '14px', "line-height": "0.4"};
+    }
     if (element.className == "small") {
       return {
         // 'font-size': '14px',
@@ -612,11 +612,11 @@ abstract class _StoryStore with Store {
   }
 
   @action
-  void updateReading() {
+  void endReading() {
     if (kDebugMode) {
-      print("Updating reading: ${readingStat.reading}");
+      print("Ending Reading: ${readingStat.reading}");
     }
-    readingStat.updateReadingStory(feedItem);
+    readingStat.endReading(feedItem);
   }
 
   @action

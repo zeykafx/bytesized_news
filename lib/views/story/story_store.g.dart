@@ -609,11 +609,11 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
-  void updateReading() {
+  void endReading() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.updateReading');
+        name: '_StoryStore.endReading');
     try {
-      return super.updateReading();
+      return super.endReading();
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }

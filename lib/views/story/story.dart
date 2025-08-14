@@ -153,20 +153,20 @@ class _StoryState extends State<Story> {
                                         '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(50).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                             <p>Feed: <a href="${storyStore.feedItem.feed?.link}">${storyStore.feedItem.feed?.name}</a></p>
-                                             ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                             <p> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
-                                             <p class="grey">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
+                                             <p class="top-text">Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.feed?.name}</a></p>
+                                             ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p class='top-text'>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
+                                             <p class="top-text"> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
+                                             <p class="top-text">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
 
                                                  ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
                                                    ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+
                                                     <h2>Summary</h2>
-                                                    <p>
                                                     ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
                                             return "<p>$part</p>";
                                           }).join("")}
-                                                    </p>
+
                                                     <p class="tiny">Generated content, verify important information.</p>
                                                     </div>''' : ""}
 
@@ -213,6 +213,10 @@ class _StoryState extends State<Story> {
                                             cacheManager: DefaultCacheManager(),
                                             placeholder: (context, url) => CircularProgressIndicator(),
                                             errorWidget: (context, url, error) => Icon(Icons.error),
+                                            filterQuality: FilterQuality.high,
+                                            fit: BoxFit.cover,
+                                            fadeInCurve: Curves.easeInQuad,
+                                            fadeInDuration: 400.ms,
                                           );
                                         },
                                         enableCaching: true,
@@ -425,13 +429,18 @@ class _StoryState extends State<Story> {
                     ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
                         duration: const Duration(milliseconds: 1500),
                         colors: [
-                          const Color(0xBFFFFF00),
-                          const Color(0xBF00FF00),
-                          const Color(0xBF00FFFF),
-                          const Color(0xBF0033FF),
-                          const Color(0xBFFF00FF),
-                          const Color(0xBFFF0000),
-                          const Color(0xBFFFFF00),
+                          Theme.of(context).colorScheme.primary,
+                          // Theme.of(context).colorScheme.secondary,
+                          Colors.white,
+                          // Theme.of(context).colorScheme.tertiary,
+                          Theme.of(context).colorScheme.primary,
+                          // const Color(0xBFFFFF00),
+                          // const Color(0xBF00FF00),
+                          // const Color(0xBF00FFFF),
+                          // const Color(0xBF0033FF),
+                          // const Color(0xBFFF00FF),
+                          // const Color(0xBFFF0000),
+                          // const Color(0xBFFFFF00),
                         ],
                       )
                     : const SizedBox(),
