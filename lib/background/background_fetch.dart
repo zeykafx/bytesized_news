@@ -24,10 +24,7 @@ class BackgroundFetch {
 
     // Open the isar instance in this thread
     final dir = await getApplicationDocumentsDirectory();
-    final isar = await Isar.open(
-      [FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema],
-      directory: dir.path,
-    );
+    final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema], directory: dir.path);
 
     DbUtils dbUtils = DbUtils(isar: isar);
 
@@ -67,10 +64,7 @@ class BackgroundFetch {
             continue;
           }
 
-          FeedItem feedItem = await FeedItem.fromRssItem(
-            item: item,
-            feed: feed,
-          );
+          FeedItem feedItem = await FeedItem.fromRssItem(item: item, feed: feed);
           feedItem.fetchedInBg = true;
           items.add(feedItem);
         }
@@ -81,10 +75,7 @@ class BackgroundFetch {
             continue;
           }
 
-          FeedItem feedItem = await FeedItem.fromAtomItem(
-            item: item,
-            feed: feed,
-          );
+          FeedItem feedItem = await FeedItem.fromAtomItem(item: item, feed: feed);
           feedItem.fetchedInBg = true;
           items.add(feedItem);
         }

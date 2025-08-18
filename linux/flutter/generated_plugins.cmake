@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_auth
   dynamic_color
+  gtk
   isar_flutter_libs
   url_launcher_linux
 )

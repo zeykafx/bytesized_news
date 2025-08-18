@@ -23,20 +23,14 @@ class FeedGroup {
 
   // toJson
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'feedUrls': feedUrls,
-      'isPinned': isPinned,
-      'pinnedPosition': pinnedPosition,
-    };
+    return {'id': id, 'name': name, 'feedUrls': feedUrls, 'isPinned': isPinned, 'pinnedPosition': pinnedPosition};
   }
 
   // fromJson also fetches the feeds corresponding to the feed names
   FeedGroup.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
-        name = json['name'],
-        feedUrls = List<String>.from(json['feedUrls']),
-        isPinned = json['isPinned'],
-        pinnedPosition = json['pinnedPosition'];
+    : id = json["id"],
+      name = json['name'],
+      feedUrls = List<String>.from(json['feedUrls']),
+      isPinned = json['isPinned'],
+      pinnedPosition = json['pinnedPosition'];
 }

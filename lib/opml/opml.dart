@@ -90,28 +90,19 @@ class OpmlUtils {
       OpmlOutlineBuilder outlineBuilder = OpmlOutlineBuilder().text(feedGroup.name).title(feedGroup.name);
 
       for (Feed feed in feedGroup.feeds) {
-        outlineBuilder.addChild(
-          OpmlOutlineBuilder().type("rss").text(feed.name).title(feed.name).xmlUrl(feed.link).build(),
-        );
+        outlineBuilder.addChild(OpmlOutlineBuilder().type("rss").text(feed.name).title(feed.name).xmlUrl(feed.link).build());
       }
-      body.add(
-        outlineBuilder.build(),
-      );
+      body.add(outlineBuilder.build());
     }
 
     // add feeds that are not in a group
     for (Feed feed in feeds) {
       if (feedGroups.every((element) => !element.feedUrls.contains(feed.link))) {
-        body.add(
-          OpmlOutlineBuilder().type("rss").text(feed.name).title(feed.name).xmlUrl(feed.link).build(),
-        );
+        body.add(OpmlOutlineBuilder().type("rss").text(feed.name).title(feed.name).xmlUrl(feed.link).build());
       }
     }
 
-    final OpmlDocument opml = OpmlDocument(
-      head: head,
-      body: body,
-    );
+    final OpmlDocument opml = OpmlDocument(head: head, body: body);
 
     final String xml = opml.toXmlString(pretty: true);
     return xml;

@@ -51,3 +51,6 @@ app.*.map.json
 /functions/service-account-google-play.json
 /functions/lib/service-account-google-play.json
 /android/key.properties
+
+# FVM Version Cache
+.fvm/

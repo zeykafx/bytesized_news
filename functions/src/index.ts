@@ -19,7 +19,8 @@ const openai: OpenAI = new OpenAI({
 const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
 const model = "openai/gpt-oss-20b";
-const betterModel = "openai/gpt-oss-120b";
+// const betterModel = "openai/gpt-oss-120b";
+const betterModel = model;
 
 const androidPackageId = "com.zeykafx.bytesized_news";
 
@@ -785,5 +786,65 @@ export const addUserInterests = onCall(
     });
 
     return { success: true };
+  },
+);
+
+// Evaluates an AI-generated summary against the original article using a Groq model.
+export const evaluateSummary = onCall(
+  { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
+  async (request) => {
+    const articleText: string = request.data.articleText;
+    const summaryText: string = request.data.summaryText;
+    const uid = request.auth?.uid;
+    logger.info(`Evaluating summary for user ID: ${uid}`);
+
+    if (!articleText || !summaryText) {
+      return { error: "Missing articleText or summaryText" };
+    }
+
+    // Call the Groq model for evaluation
+    const completion = await openai.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      response_format: {
+        type: "json_object",
+      },
+      messages: [
+        {
+          role: "system",
+          content: `
+            You are an AI evaluator. Given an original article and a generated summary, determine:
+            - useSummary (boolean): whether the summary is sufficiently accurate and usable.
+            - accuracy (float): percentage accuracy of the summary (0.0 to 100.0).
+            Return only a JSON object with keys "useSummary" and "accuracy".
+          `,
+        },
+        {
+          role: "user",
+          content: `Article: ${articleText}`,
+        },
+        {
+          role: "user",
+          content: `Summary: ${summaryText}`,
+        },
+      ],
+      temperature: 0.0,
+    });
+
+    const resultContent = completion.choices[0]?.message?.content || "";
+    let parsed: { useSummary: boolean; accuracy: number } = {
+      useSummary: false,
+      accuracy: 0.0,
+    };
+    try {
+      parsed = JSON.parse(resultContent);
+    } catch (error) {
+      logger.error("Failed to parse evaluation response: " + error);
+      return { error: "Invalid evaluation response" };
+    }
+
+    return {
+      useSummary: parsed.useSummary,
+      accuracy: parsed.accuracy,
+    };
   },
 );

@@ -64,9 +64,7 @@ class FeedSync {
     }
 
     // replace the entire feedGroups map
-    await firestore.doc("/users/${authStore.user!.uid}").update({
-      "feedGroups": feedGroupsMap,
-    });
+    await firestore.doc("/users/${authStore.user!.uid}").update({"feedGroups": feedGroupsMap});
 
     if (kDebugMode) {
       print("Updated ${feedGroupsMap.length} feed groups in firestore");
@@ -81,9 +79,7 @@ class FeedSync {
     if (kDebugMode) {
       print("Deleting ${feed.name} from firestore");
     }
-    firestore.doc("/users/${authStore.user!.uid}").update({
-      "feeds.${feed.id}": FieldValue.delete(),
-    });
+    firestore.doc("/users/${authStore.user!.uid}").update({"feeds.${feed.id}": FieldValue.delete()});
   }
 
   Future<void> deleteSingleFeedGroupInFirestore(FeedGroup feedGroup, AuthStore authStore) async {
@@ -94,26 +90,20 @@ class FeedSync {
     if (kDebugMode) {
       print("Deleting ${feedGroup.name} from firestore");
     }
-    firestore.doc("/users/${authStore.user!.uid}").update({
-      "feedGroups.${feedGroup.name}": FieldValue.delete(),
-    });
+    firestore.doc("/users/${authStore.user!.uid}").update({"feedGroups.${feedGroup.name}": FieldValue.delete()});
   }
 
   Future<void> updateSingleFeedInFirestore(Feed feed) async {
     if (!checkIsUserPremium()) {
       return;
     }
-    await firestore.doc("/users/${authStore.user!.uid}").update({
-      "feeds.${feed.id}": feed.toJson(),
-    });
+    await firestore.doc("/users/${authStore.user!.uid}").update({"feeds.${feed.id}": feed.toJson()});
   }
 
   Future<void> updateSingleFeedGroupInFirestore(FeedGroup feedGroup) async {
     if (!checkIsUserPremium()) {
       return;
     }
-    await firestore.doc("/users/${authStore.user!.uid}").update({
-      "feedGroups.${feedGroup.name}": feedGroup.toJson(),
-    });
+    await firestore.doc("/users/${authStore.user!.uid}").update({"feedGroups.${feedGroup.name}": feedGroup.toJson()});
   }
 }

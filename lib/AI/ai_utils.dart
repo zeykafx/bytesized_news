@@ -20,10 +20,7 @@ class AiUtils {
     authStore = aStore;
   }
 
-  Future<(String, int)> summarize(
-    String text,
-    FeedItem feedItem,
-  ) async {
+  Future<(String, int)> summarize(String text, FeedItem feedItem) async {
     if (authStore.userTier != Tier.premium) {
       if (kDebugMode) {
         print("Error: Not a premium account");
@@ -40,13 +37,7 @@ class AiUtils {
     if (kDebugMode) {
       print("Calling AI API...");
     }
-    final result = await functions.httpsCallable('summarize').call(
-      {
-        "text": feedItem.url,
-        "title": feedItem.title,
-        "content": text,
-      },
-    );
+    final result = await functions.httpsCallable('summarize').call({"text": feedItem.url, "title": feedItem.title, "content": text});
     var response = result.data as Map<String, dynamic>;
     if (response["error"] != null) {
       throw Exception(response["error"]);
@@ -56,11 +47,7 @@ class AiUtils {
     return (summary, summariesLeftToday);
   }
 
-  Future<(List<FeedItem>, int)> getNewsSuggestions(
-    List<FeedItem> feedItems,
-    List<String> userInterests,
-    List<Feed> mostReadFeeds,
-  ) async {
+  Future<(List<FeedItem>, int)> getNewsSuggestions(List<FeedItem> feedItems, List<String> userInterests, List<Feed> mostReadFeeds) async {
     if (authStore.userTier != Tier.premium) {
       if (kDebugMode) {
         print("Error: Not a premium account");
@@ -82,13 +69,11 @@ class AiUtils {
       print("today's articles: $todaysArticles");
     }
 
-    final result = await functions.httpsCallable('getNewsSuggestions').call(
-      {
-        "todaysArticles": todaysArticles,
-        "mostReadFeedsString": mostReadFeedsString,
-        "userInterestsString": userInterestsString,
-      },
-    );
+    final result = await functions.httpsCallable('getNewsSuggestions').call({
+      "todaysArticles": todaysArticles,
+      "mostReadFeedsString": mostReadFeedsString,
+      "userInterestsString": userInterestsString,
+    });
     var response = result.data as Map<String, dynamic>;
     if (response["error"] != null) {
       throw Exception(response["error"]);
@@ -122,12 +107,7 @@ class AiUtils {
       print("Calling AI API to get feed summaries.");
     }
 
-    final result = await functions.httpsCallable('analyzeFeedCategories').call(
-      {
-        "feedName": feed.name,
-        "feedLink": feed.link,
-      },
-    );
+    final result = await functions.httpsCallable('analyzeFeedCategories').call({"feedName": feed.name, "feedLink": feed.link});
     var response = result.data as Map<String, dynamic>;
     if (response["error"] != null) {
       throw Exception(response["error"]);
@@ -143,22 +123,16 @@ class AiUtils {
     return categories;
   }
 
-  Future<List<String>> buildUserInterests(
-    List<Feed> feeds,
-    List<String> userInterests,
-  ) async {
+  Future<List<String>> buildUserInterests(List<Feed> feeds, List<String> userInterests) async {
     if (kDebugMode) {
       print("Calling AI API to build user interests.");
     }
 
-    String mostReadFeedsString =
-        feeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}").join(",");
+    String mostReadFeedsString = feeds
+        .map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
+        .join(",");
 
-    final result = await functions.httpsCallable('buildUserInterests').call(
-      {
-        "mostReadFeedsString": mostReadFeedsString,
-      },
-    );
+    final result = await functions.httpsCallable('buildUserInterests').call({"mostReadFeedsString": mostReadFeedsString});
     var response = result.data as Map<String, dynamic>;
     if (response["error"] != null) {
       throw Exception(response["error"]);
@@ -171,5 +145,29 @@ class AiUtils {
       categories.add(category);
     }
     return categories;
+  }
+
+  /// Evaluates an LLM-generated summary against the full article using a Groq model.
+  /// Returns a tuple of (useSummary, accuracyPercentage).
+  Future<(bool, double)> evaluateSummary(String articleText, String summaryText) async {
+    if (authStore.userTier != Tier.premium) {
+      if (kDebugMode) {
+        print("Error: Not a premium account");
+      }
+      throw Exception("Error: You are not allowed to perform this operation.");
+    }
+
+    if (kDebugMode) {
+      print("Calling AI API to evaluate summary...");
+    }
+    final result = await functions.httpsCallable('evaluateSummary').call({'articleText': articleText, 'summaryText': summaryText});
+    var response = result.data as Map<String, dynamic>;
+    if (response['error'] != null) {
+      throw Exception(response['error']);
+    }
+
+    bool useSummary = response['useSummary'] as bool;
+    double accuracy = (response['accuracy'] as num).toDouble();
+    return (useSummary, accuracy);
   }
 }

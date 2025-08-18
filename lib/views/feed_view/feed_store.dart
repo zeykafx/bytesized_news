@@ -164,13 +164,7 @@ abstract class _FeedStore with Store {
         return true;
       }
 
-      compute(
-        DbIsolateCleaner.cleanOldArticles,
-        [
-          settingsStore.keepArticles.value,
-          rootIsolateToken,
-        ],
-      ).then((_) {
+      compute(DbIsolateCleaner.cleanOldArticles, [settingsStore.keepArticles.value, rootIsolateToken]).then((_) {
         hasCleanedArticlesToday = true;
       });
     }
@@ -231,6 +225,10 @@ abstract class _FeedStore with Store {
 
     loading = true;
     for (Feed feed in feeds) {
+      if (settingsStore.sort != FeedListSort.byDate && settingsStore.sort != FeedListSort.feed && settingsStore.sort != FeedListSort.feedGroup) {
+        continue;
+      }
+
       // if the sort is for feeds, and the current feed is not the same as the feed we are sorting for, continue
       if (settingsStore.sort == FeedListSort.feed && settingsStore.sortFeed != null && feed.name != settingsStore.sortFeed!.name) {
         continue;
@@ -279,10 +277,7 @@ abstract class _FeedStore with Store {
             continue;
           }
 
-          FeedItem feedItem = await FeedItem.fromRssItem(
-            item: item,
-            feed: feed,
-          );
+          FeedItem feedItem = await FeedItem.fromRssItem(item: item, feed: feed);
           items.add(feedItem);
         }
       } else {
@@ -292,10 +287,7 @@ abstract class _FeedStore with Store {
             continue;
           }
 
-          FeedItem feedItem = await FeedItem.fromAtomItem(
-            item: item,
-            feed: feed,
-          );
+          FeedItem feedItem = await FeedItem.fromAtomItem(item: item, feed: feed);
           items.add(feedItem);
         }
       }
@@ -450,10 +442,7 @@ abstract class _FeedStore with Store {
         return;
       }
 
-      List<String> interests = await aiUtils.buildUserInterests(
-        mostReadFeeds,
-        authStore.userInterests,
-      );
+      List<String> interests = await aiUtils.buildUserInterests(mostReadFeeds, authStore.userInterests);
       if (kDebugMode) {
         print("Adding new interests: $interests");
       }
@@ -497,11 +486,7 @@ abstract class _FeedStore with Store {
 
       // scroll back to the start of the suggestions
       if (suggestionsScrollController.hasClients) {
-        suggestionsScrollController.animateTo(
-          0,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+        suggestionsScrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
       }
       return;
     }
@@ -526,11 +511,7 @@ abstract class _FeedStore with Store {
     suggestionsLoading = true;
     var (List<FeedItem> suggestedArticles, int suggestionsLeft) = ([], 0);
     try {
-      (suggestedArticles, suggestionsLeft) = await aiUtils.getNewsSuggestions(
-        todaysUnreadItems,
-        userInterest,
-        mostReadFeeds,
-      );
+      (suggestedArticles, suggestionsLeft) = await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest, mostReadFeeds);
       authStore.suggestionsLeftToday = suggestionsLeft;
       authStore.lastSuggestionDate = DateTime.now().toUtc();
     } catch (e) {
@@ -558,11 +539,7 @@ abstract class _FeedStore with Store {
 
     // scroll back to the start of the suggestions
     if (suggestionsScrollController.hasClients) {
-      suggestionsScrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
+      suggestionsScrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
 
     // Mark all the suggested articles as such (except the ones that already were suggested before)

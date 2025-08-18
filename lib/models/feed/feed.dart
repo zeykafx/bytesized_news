@@ -21,6 +21,19 @@ class Feed {
 
   Feed(this.name, this.link, this.iconUrl);
 
+  static String getFaviconUrl(String host, String faviconProvider) {
+    switch (faviconProvider) {
+      case "Favicon kit":
+        return "https://api.faviconkit.com/$host";
+      case "Google":
+        return "https://www.google.com/s2/favicons?domain=$host&sz=128";
+      case "DuckDuckGo":
+        return "https://icons.duckduckgo.com/ip3/$host.ico";
+      default:
+        return "https://www.google.com/s2/favicons?domain=$host&sz=128";
+    }
+  }
+
   static Future<Feed?> createFeed(String url, {String feedName = ""}) async {
     Dio dio = Dio();
     Response response;
@@ -42,6 +55,7 @@ class Feed {
       title = feedName;
     }
 
+    // String iconUrl = document.querySelector("icon")?.innerHtml ?? getFaviconUrl(Uri.parse(url).host, "Google");
     String iconUrl = document.querySelector("icon")?.innerHtml ?? "https://cdn.brandfetch.io/${Uri.parse(url).host}/fallback/lettermark?c=1ida5nT4eR28egqMeiL";
 
     return Feed(title, url, iconUrl);
@@ -76,12 +90,12 @@ class Feed {
 
   // fromJson
   Feed.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        id = json['id'] ?? 0,
-        link = json['link'],
-        iconUrl = json['iconUrl'],
-        isPinned = json['isPinned'],
-        pinnedPosition = json['pinnedPosition'],
-        articlesRead = json["articlesRead"],
-        categories = List.from(json["categories"]);
+    : name = json['name'],
+      id = json['id'] ?? 0,
+      link = json['link'],
+      iconUrl = json['iconUrl'],
+      isPinned = json['isPinned'],
+      pinnedPosition = json['pinnedPosition'],
+      articlesRead = json["articlesRead"],
+      categories = List.from(json["categories"]);
 }

@@ -35,7 +35,7 @@ abstract class _StoryStore with Store {
   late FeedItem feedItem;
 
   @observable
-  late String htmlContent;
+  String htmlContent = "";
 
   @observable
   late bool showReaderMode;
@@ -84,7 +84,7 @@ abstract class _StoryStore with Store {
     ".*.zedo.com/.*",
     ".*.adsafeprotected.com/.*",
     ".*.teads.tv/.*",
-    ".*.outbrain.com/.*"
+    ".*.outbrain.com/.*",
   ];
 
   @observable
@@ -152,16 +152,16 @@ abstract class _StoryStore with Store {
       htmlContent = feedItem.htmlContent!;
     }
 
+    if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
+      await summarizeArticle(context);
+    }
+
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
       contentBlockers.add(
         ContentBlocker(
-          trigger: ContentBlockerTrigger(
-            urlFilter: adUrlFilter,
-          ),
-          action: ContentBlockerAction(
-            type: ContentBlockerActionType.BLOCK,
-          ),
+          trigger: ContentBlockerTrigger(urlFilter: adUrlFilter),
+          action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
         ),
       );
     }
@@ -169,9 +169,7 @@ abstract class _StoryStore with Store {
     // apply the "display: none" style to some HTML elements
     contentBlockers.add(
       ContentBlocker(
-        trigger: ContentBlockerTrigger(
-          urlFilter: ".*",
-        ),
+        trigger: ContentBlockerTrigger(urlFilter: ".*"),
         action: ContentBlockerAction(type: ContentBlockerActionType.CSS_DISPLAY_NONE, selector: ".banner, .banners, .ads, .ad, .advert"),
       ),
     );
@@ -186,22 +184,14 @@ abstract class _StoryStore with Store {
       forceDark: settingsStore.darkMode == DarkMode.system
           ? ForceDark.AUTO
           : settingsStore.darkMode == DarkMode.dark
-              ? ForceDark.ON
-              : ForceDark.OFF,
+          ? ForceDark.ON
+          : ForceDark.OFF,
     );
 
     initialized = true;
 
-    if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
-      await summarizeArticle(context);
-    }
-
     // start recording the reading
     await readingStat.startReadingStory(feedItem);
-
-    // timer = Timer.periodic(Duration(seconds: 30), (_) {
-    //   return updateReading();
-    // });
   }
 
   @action
@@ -209,7 +199,9 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print('Stopping reading timer');
     }
-    endReading();
+    if (initialized) {
+      endReading();
+    }
   }
 
   @action
@@ -227,9 +219,11 @@ abstract class _StoryStore with Store {
       print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
     }
     if ((doc.body!.innerHtml.length / htmlContent.length) > 250 && settingsStore.autoSwitchReaderTooShort) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
+        ),
+      );
       showReaderMode = false;
       return;
     }
@@ -248,7 +242,7 @@ abstract class _StoryStore with Store {
         'word-wrap': 'break-word', // other values 'break-word', 'keep-all', 'normal'
         'padding': '12px 8px 30px 8px !important', // top, right, bottom, left
         "font-size": "1.1em",
-        'text-align': textAlignString(settingsStore.textAlignment).toLowerCase() // other values: 'left', 'right', 'center'
+        'text-align': textAlignString(settingsStore.textAlignment).toLowerCase(), // other values: 'left', 'right', 'center'
       };
     }
 
@@ -277,11 +271,7 @@ abstract class _StoryStore with Store {
     }
 
     if (element.className == "tiny") {
-      return {
-        'font-size': '0.8em',
-        'color': '#${Theme.of(context).dividerColor.toARGB32().toRadixString(16).substring(2)}',
-        'text-align': 'right',
-      };
+      return {'font-size': '0.8em', 'color': '#${Theme.of(context).dividerColor.toARGB32().toRadixString(16).substring(2)}', 'text-align': 'right'};
     }
 
     switch (element.localName) {
@@ -295,22 +285,13 @@ abstract class _StoryStore with Store {
       case 'h6':
         return {'font-size': '1.0em', 'font-weight': '700'};
       case 'img':
-        return {
-          'border-radius': '8px',
-        };
+        return {'border-radius': '8px'};
       case "image":
-        return {
-          'border-radius': '8px',
-        };
+        return {'border-radius': '8px'};
       case 'figure':
       case 'video':
       case 'iframe':
-        return {
-          'max-width': '100% !important',
-          'height': 'auto',
-          'margin': '0 auto',
-          'display': 'block',
-        };
+        return {'max-width': '100% !important', 'height': 'auto', 'margin': '0 auto', 'display': 'block'};
       case "caption":
         return {
           'font-size': '0.8em',
@@ -324,10 +305,7 @@ abstract class _StoryStore with Store {
           'text-align': 'left',
         };
       case 'a':
-        return {
-          'color': '#${Theme.of(context).colorScheme.primary.toARGB32().toRadixString(16).substring(2)}',
-          'text-decoration': 'none',
-        };
+        return {'color': '#${Theme.of(context).colorScheme.primary.toARGB32().toRadixString(16).substring(2)}', 'text-decoration': 'none'};
 
       case 'blockquote':
         return {'margin': '0', 'padding': '0 0 0 16px', 'border-left': '4px solid #9e9e9e'};
@@ -340,18 +318,18 @@ abstract class _StoryStore with Store {
           'table-layout': 'fixed',
           'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
           'border-collapse': 'collapse',
-          'padding': '0 8px'
+          'padding': '0 8px',
         };
       case 'td':
         return {
           'padding': '0 8px',
           'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
-          'border-collapse': 'collapse'
+          'border-collapse': 'collapse',
         };
       case 'th':
         return {
           'border': '1px solid #${Theme.of(context).textTheme.bodyLarge!.color!.toARGB32().toRadixString(16).substring(2)}',
-          'border-collapse': 'collapse'
+          'border-collapse': 'collapse',
         };
       default:
     }
@@ -373,12 +351,7 @@ abstract class _StoryStore with Store {
   @action
   Future<void> summarizeArticle(BuildContext context, {bool longSummaryAccepted = false}) async {
     if (!authStore.initialized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error, try again in a few seconds."),
-          duration: Duration(seconds: 5),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error, try again in a few seconds."), duration: Duration(seconds: 5)));
       return;
     }
 
@@ -388,6 +361,9 @@ abstract class _StoryStore with Store {
       return;
     }
 
+    dom.Document document = parse(htmlContent);
+    String docText = document.body!.text;
+
     // check firestore for existing summary (This doesn't count towards the user's summaries)
     var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
 
@@ -395,10 +371,12 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print("Summary found in Firestore");
       }
-      feedItem.aiSummary = existingSummary.docs.first.get("summary");
+      String summary = existingSummary.docs.first.get("summary");
+      feedItem.aiSummary = summary;
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
+      evaluateSummary(docText, summary, context);
       return;
     }
 
@@ -430,9 +408,6 @@ abstract class _StoryStore with Store {
     //   htmlValue = htmlContent;
     // }
 
-    dom.Document document = parse(htmlContent);
-    String docText = document.body!.text;
-
     // if (docText.length > 15000) {
     //   // docText = docText.substring(0, 15000);
     //   ScaffoldMessenger.of(context).showSnackBar(
@@ -445,12 +420,7 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print(docText.length);
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Article too short to summarize."),
-          duration: Duration(seconds: 5),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Article too short to summarize."), duration: Duration(seconds: 5)));
       return;
     } else if (docText.length > 30000 && !longSummaryAccepted) {
       String summaryCount = (docText.length / 15000).toStringAsFixed(0);
@@ -474,7 +444,7 @@ abstract class _StoryStore with Store {
                   return summarizeArticle(context, longSummaryAccepted: true);
                 },
                 child: const Text("Confirm"),
-              )
+              ),
             ],
           );
         },
@@ -498,24 +468,40 @@ abstract class _StoryStore with Store {
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
+      evaluateSummary(docText, summary, context);
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e.toString().replaceAll("Error: ", ""),
-          ),
-          duration: const Duration(seconds: 10),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll("Error: ", "")), duration: const Duration(seconds: 10)));
     }
 
     if (kDebugMode) {
       print("Received summary from cloud function");
     }
     aiLoading = false;
+  }
+
+  @action
+  Future<void> evaluateSummary(String article, String summary, BuildContext context) async {
+    var (bool useSummary, double score) = await aiUtils.evaluateSummary(article, summary);
+    if (kDebugMode) {
+      print("Evaluated summary: $useSummary, with score $score");
+    }
+    if (!useSummary) {
+      if (kDebugMode) {
+        print("Not using summary!");
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("The summary for this article was not factually correct, try again later."), duration: const Duration(seconds: 10)),
+      );
+      feedItem.aiSummary = "";
+      authStore.lastSummaryDate = DateTime.now().toUtc();
+      feedItem.summarized = false;
+      await dbUtils.updateItemInDb(feedItem);
+      feedItemSummarized = false;
+    }
   }
 
   @action
@@ -616,7 +602,9 @@ abstract class _StoryStore with Store {
     if (kDebugMode) {
       print("Ending Reading: ${readingStat.reading}");
     }
-    readingStat.endReading(feedItem);
+    if (initialized) {
+      readingStat.endReading(feedItem);
+    }
   }
 
   @action

@@ -20,6 +20,7 @@
       <outline text="Drop Site News" type="rss" xmlUrl="https://www.dropsitenews.com/feed"/>
     </outline>
     <outline text="Technology">
+      <outline text="Hacker News" type="rss" xmlUrl="https://hnrss.org/frontpage"/>
       <outline text="TechCrunch" type="rss" xmlUrl="https://techcrunch.com/feed"/>
       <outline text="The Verge" type="rss" xmlUrl="https://www.theverge.com/rss/index.xml"/>
       <outline text="Wired" type="rss" xmlUrl="https://www.wired.com/feed/rss"/>

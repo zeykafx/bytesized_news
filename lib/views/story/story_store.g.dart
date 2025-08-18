@@ -66,14 +66,10 @@ mixin _$StoryStore on _StoryStore, Store {
     return super.htmlContent;
   }
 
-  bool _htmlContentIsInitialized = false;
-
   @override
   set htmlContent(String value) {
-    _$htmlContentAtom.reportWrite(
-        value, _htmlContentIsInitialized ? super.htmlContent : null, () {
+    _$htmlContentAtom.reportWrite(value, super.htmlContent, () {
       super.htmlContent = value;
-      _htmlContentIsInitialized = true;
     });
   }
 
@@ -506,6 +502,16 @@ mixin _$StoryStore on _StoryStore, Store {
       {bool longSummaryAccepted = false}) {
     return _$summarizeArticleAsyncAction.run(() => super
         .summarizeArticle(context, longSummaryAccepted: longSummaryAccepted));
+  }
+
+  late final _$evaluateSummaryAsyncAction =
+      AsyncAction('_StoryStore.evaluateSummary', context: context);
+
+  @override
+  Future<void> evaluateSummary(
+      String article, String summary, BuildContext context) {
+    return _$evaluateSummaryAsyncAction
+        .run(() => super.evaluateSummary(article, summary, context));
   }
 
   late final _$onLoadStartAsyncAction =

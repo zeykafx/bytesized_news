@@ -7,11 +7,7 @@ import 'package:mobx/mobx.dart';
 
 part 'settings_store.g.dart';
 
-enum DarkMode {
-  system,
-  dark,
-  light,
-}
+enum DarkMode { system, dark, light }
 
 String darkModeString(DarkMode darkMode) {
   return switch (darkMode) {
@@ -23,17 +19,7 @@ String darkModeString(DarkMode darkMode) {
 
 const darkModeNames = ["System", "Dark", "Light"];
 
-enum FeedListSort {
-  byDate,
-  today,
-  unread,
-  read,
-  summarized,
-  downloaded,
-  bookmarked,
-  feed,
-  feedGroup,
-}
+enum FeedListSort { byDate, today, unread, read, summarized, downloaded, bookmarked, feed, feedGroup }
 
 enum KeepArticlesLength {
   oneWeek(7),
@@ -94,15 +80,7 @@ String textAlignString(TextAlign textAlign) {
 
 const textAlignmentValues = ["Left", "Center", "Right", "Justify"];
 
-enum TextWidth {
-  extremelyThin,
-  veryThin,
-  thin,
-  normal,
-  bold,
-  veryBold,
-  extremelyBold,
-}
+enum TextWidth { extremelyThin, veryThin, thin, normal, bold, veryBold, extremelyBold }
 
 const textWidthValues = ["Extremely Thin", "Very Thin", "Thin", "Normal", "Bold", "Very Bold", "Extremely Bold"];
 
@@ -248,6 +226,7 @@ abstract class _SettingsStore with Store {
   static const defaultStoryReaderMaxWidth = 800.0;
   static const defaultIsList = true;
   static const defaultAutoSwitchReaderTooShort = false;
+
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
   @observable

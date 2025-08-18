@@ -51,9 +51,9 @@ void main() async {
 
   Animate.restartOnHotReload;
 
-  Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-      );
+  Workmanager().initialize(
+    callbackDispatcher, // The top level function, aka callbackDispatcher
+  );
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -68,9 +68,7 @@ void main() async {
   // mobx reaction that will save the settings on disk every time they are changed
   autorun((_) => prefs.setString("settings", jsonEncode(settingsStore)));
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize AppCheck
   await FirebaseAppCheck.instance.activate(
@@ -106,10 +104,7 @@ void main() async {
   }
 
   final dir = await getApplicationDocumentsDirectory();
-  final isar = await Isar.open(
-    [FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema],
-    directory: dir.path,
-  );
+  final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema], directory: dir.path);
 
   final AuthStore authStore = AuthStore();
   await authStore.init(null);
@@ -226,8 +221,8 @@ class _MyAppState extends State<MyApp> {
               themeMode: settingsStore.darkMode == DarkMode.system
                   ? ThemeMode.system
                   : settingsStore.darkMode == DarkMode.dark
-                      ? ThemeMode.dark
-                      : ThemeMode.light,
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
               home: user == null ? const Auth() : const FeedView(),
             );
           },

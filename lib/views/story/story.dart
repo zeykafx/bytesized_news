@@ -77,80 +77,74 @@ class _StoryState extends State<Story> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Observer(builder: (_) {
-            return Text("$parsedTitle - ${storyStore.feedItem.feed?.name}");
-          }),
+          title: Observer(
+            builder: (_) {
+              return Text("$parsedTitle - ${storyStore.feedItem.feed?.name}");
+            },
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => StorySettings(
-                      storyStore: storyStore,
-                    ),
-                  ),
-                );
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => StorySettings(storyStore: storyStore)));
               },
             ),
           ],
         ),
-        body: Observer(builder: (_) {
-          return Center(
-            child: Stack(
-              children: [
-                storyStore.initialized
-                    ? Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          if (!storyStore.showReaderMode) ...[
-                            InAppWebView(
-                              key: webViewKey,
-                              initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
-                              initialSettings: storyStore.settings,
-                              onWebViewCreated: (controller) {
-                                storyStore.controller = controller;
-                              },
-                              onScrollChanged: storyStore.webviewScrollListener,
-                              onPermissionRequest: (controller, request) async {
-                                return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
-                              },
-                              shouldOverrideUrlLoading: (controller, navigationAction) async {
-                                var uri = navigationAction.request.url!;
+        body: Observer(
+          builder: (_) {
+            return Center(
+              child: Stack(
+                children: [
+                  Stack(
+                    alignment: Alignment.topCenter,
+                    children: [
+                      if (!storyStore.showReaderMode) ...[
+                        InAppWebView(
+                          key: webViewKey,
+                          initialUrlRequest: URLRequest(url: WebUri(storyStore.feedItem.url)),
+                          initialSettings: storyStore.settings,
+                          onWebViewCreated: (controller) {
+                            storyStore.controller = controller;
+                          },
+                          onScrollChanged: storyStore.webviewScrollListener,
+                          onPermissionRequest: (controller, request) async {
+                            return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+                          },
+                          shouldOverrideUrlLoading: (controller, navigationAction) async {
+                            var uri = navigationAction.request.url!;
 
-                                if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
-                                  if (await canLaunchUrl(uri)) {
-                                    // Launch the App
-                                    await launchUrl(
-                                      uri,
-                                    );
-                                    // and cancel the request
-                                    return NavigationActionPolicy.CANCEL;
-                                  }
-                                }
+                            if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                              if (await canLaunchUrl(uri)) {
+                                // Launch the App
+                                await launchUrl(uri);
+                                // and cancel the request
+                                return NavigationActionPolicy.CANCEL;
+                              }
+                            }
 
-                                return NavigationActionPolicy.ALLOW;
-                              },
-                              onLoadStart: storyStore.onLoadStart,
-                              onLoadStop: storyStore.onLoadStop,
-                              onProgressChanged: storyStore.onProgressChanged,
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                          if (storyStore.showReaderMode) ...[
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: storyStore.settingsStore.horizontalPadding),
-                              child: SelectableRegion(
-                                focusNode: FocusNode(),
-                                selectionControls: MaterialTextSelectionControls(),
-                                child: Center(
-                                  child: Container(
-                                    constraints: BoxConstraints(maxWidth: storyStore.settingsStore.storyReaderMaxWidth),
-                                    child: NotificationListener<ScrollNotification>(
-                                      onNotification: storyStore.notificationListener,
-                                      child: HtmlWidget(
-                                        key: storyStore.htmlWidgetKey,
-                                        '''
+                            return NavigationActionPolicy.ALLOW;
+                          },
+                          onLoadStart: storyStore.onLoadStart,
+                          onLoadStop: storyStore.onLoadStop,
+                          onProgressChanged: storyStore.onProgressChanged,
+                        ),
+                        const SizedBox(height: 15),
+                      ],
+                      if (storyStore.showReaderMode) ...[
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: storyStore.settingsStore.horizontalPadding),
+                          child: SelectableRegion(
+                            focusNode: FocusNode(),
+                            selectionControls: MaterialTextSelectionControls(),
+                            child: Center(
+                              child: Container(
+                                constraints: BoxConstraints(maxWidth: storyStore.settingsStore.storyReaderMaxWidth),
+                                child: NotificationListener<ScrollNotification>(
+                                  onNotification: storyStore.notificationListener,
+                                  child: HtmlWidget(
+                                    key: storyStore.htmlWidgetKey,
+                                    '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(50).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
                                              <p class="top-text">Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.feed?.name}</a></p>
@@ -158,7 +152,7 @@ class _StoryState extends State<Story> {
                                              <p class="top-text"> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
                                              <p class="top-text">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
 
-                                                 ${/* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
+                                                 ${ /* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
                                                    ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
 
@@ -174,246 +168,231 @@ class _StoryState extends State<Story> {
                                                  Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
                                               </div>
                                               ''',
-                                        renderMode: RenderMode.listView,
-                                        textStyle: fontFamilyToGoogleFontTextStyle(settingsStore.fontFamily).copyWith(
-                                          fontSize: settingsStore.fontSize,
-                                          fontWeight: widthToWeight(settingsStore.textWidth),
-                                        ),
-                                        customStylesBuilder: (element) => storyStore.buildStyle(context, element),
-                                        onTapImage: (ImageMetadata imageData) {
-                                          storyStore.showImage(imageData.sources.firstOrNull!.url, context);
-                                        },
-                                        onTapUrl: (String? url) async {
-                                          if (url == null) {
-                                            return false;
-                                          }
-                                          Uri uri = Uri.parse(url);
-                                          if (!await launchUrl(uri)) {
-                                            throw Exception('Could not launch $url');
-                                          }
-                                          return true;
-                                        },
-                                        customWidgetBuilder: (html.Element e) {
-                                          if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
-                                            return null;
-                                          }
+                                    renderMode: RenderMode.listView,
+                                    textStyle: fontFamilyToGoogleFontTextStyle(
+                                      settingsStore.fontFamily,
+                                    ).copyWith(fontSize: settingsStore.fontSize, fontWeight: widthToWeight(settingsStore.textWidth)),
+                                    customStylesBuilder: (element) => storyStore.buildStyle(context, element),
+                                    onTapImage: (ImageMetadata imageData) {
+                                      storyStore.showImage(imageData.sources.firstOrNull!.url, context);
+                                    },
+                                    onTapUrl: (String? url) async {
+                                      if (url == null) {
+                                        return false;
+                                      }
+                                      Uri uri = Uri.parse(url);
+                                      if (!await launchUrl(uri)) {
+                                        throw Exception('Could not launch $url');
+                                      }
+                                      return true;
+                                    },
+                                    customWidgetBuilder: (html.Element e) {
+                                      if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
+                                        return null;
+                                      }
 
-                                          String imgSrc = "";
-                                          if (e.attributes case {'src': final String src}) {
-                                            imgSrc = src;
-                                          }
+                                      String imgSrc = "";
+                                      if (e.attributes case {'src': final String src}) {
+                                        imgSrc = src;
+                                      }
 
-                                          if (imgSrc.isEmpty) {
-                                            return null;
-                                          }
+                                      if (imgSrc.isEmpty) {
+                                        return null;
+                                      }
 
-                                          return CachedNetworkImage(
-                                            imageUrl: imgSrc,
-                                            cacheKey: imgSrc,
-                                            cacheManager: DefaultCacheManager(),
-                                            placeholder: (context, url) => CircularProgressIndicator(),
-                                            errorWidget: (context, url, error) => Icon(Icons.error),
-                                            filterQuality: FilterQuality.high,
-                                            fit: BoxFit.cover,
-                                            fadeInCurve: Curves.easeInQuad,
-                                            fadeInDuration: 400.ms,
-                                          );
-                                        },
-                                        enableCaching: true,
-                                        buildAsync: true,
-                                      ),
-                                    ),
+                                      return CachedNetworkImage(
+                                        imageUrl: imgSrc,
+                                        cacheKey: imgSrc,
+                                        cacheManager: DefaultCacheManager(),
+                                        placeholder: (context, url) => CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) => Icon(Icons.error),
+                                        filterQuality: FilterQuality.high,
+                                        fit: BoxFit.cover,
+                                        fadeInCurve: Curves.easeInQuad,
+                                        fadeInDuration: 400.ms,
+                                      );
+                                    },
+                                    enableCaching: true,
+                                    buildAsync: true,
                                   ),
                                 ),
                               ),
                             ),
-                          ],
-                        ],
-                      )
-                    : const LinearProgressIndicator(),
-
-                // floating bar
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: AnimatedSlide(
-                      offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
-                      duration: 300.ms,
-                      curve: Curves.easeInOutQuad,
-                      child: AnimatedOpacity(
-                        opacity: storyStore.hideBar ? 0.7 : 1,
-                        duration: 150.ms,
-                        curve: Curves.easeInOutQuad,
-                        child: Card.outlined(
-                          margin: EdgeInsets.zero,
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                              width: 1,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(30),
-                            ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.max,
-                                    spacing: 3,
-                                    children: [
-                                      // READER MODE
-                                      IconButton(
-                                        onPressed: () {
-                                          storyStore.toggleReaderMode();
-                                        },
-                                        tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                                        icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
-                                      ),
+                        ),
+                      ],
+                    ],
+                  ),
 
-                                      // RELOAD
-                                      if (!storyStore.showReaderMode) ...[
+                  // floating bar
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 30),
+                      child: AnimatedSlide(
+                        offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
+                        duration: 300.ms,
+                        curve: Curves.easeInOutQuad,
+                        child: AnimatedOpacity(
+                          opacity: storyStore.hideBar ? 0.7 : 1,
+                          duration: 150.ms,
+                          curve: Curves.easeInOutQuad,
+                          child: Card.outlined(
+                            margin: EdgeInsets.zero,
+                            color: Theme.of(context).colorScheme.surfaceContainer,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
+                              borderRadius: const BorderRadius.all(Radius.circular(30)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.max,
+                                      spacing: 3,
+                                      children: [
+                                        // READER MODE
                                         IconButton(
                                           onPressed: () {
-                                            storyStore.controller?.reload();
+                                            storyStore.toggleReaderMode();
                                           },
-                                          tooltip: "Refresh web page",
-                                          icon: const Icon(Icons.refresh),
-                                        ),
-                                      ],
-
-                                      // BACK
-                                      if (!storyStore.showReaderMode) ...[
-                                        IconButton(
-                                          onPressed: () {
-                                            if (storyStore.canGoBack) {
-                                              storyStore.controller?.goBack();
-                                            }
-                                          },
-                                          tooltip: "Go back",
-                                          icon: Icon(
-                                            Icons.arrow_back_ios,
-                                            color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5),
-                                          ),
+                                          tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
+                                          icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
                                         ),
 
-                                        // FORWARD
-                                        IconButton(
-                                          onPressed: () {
-                                            if (storyStore.canGoForward) {
-                                              storyStore.controller?.goForward();
-                                            }
-                                          },
-                                          tooltip: "Go forward",
-                                          icon: Icon(
-                                            Icons.arrow_forward_ios,
-                                            color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5),
-                                          ),
-                                        ),
-                                      ],
-
-                                      storyStore.feedItemSummarized
-                                          ? IconButton(
-                                              onPressed: storyStore.hideAiSummary,
-                                              icon: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  const Align(
-                                                    alignment: Alignment.topRight,
-                                                    widthFactor: 2,
-                                                    heightFactor: 3,
-                                                    child: Icon(LucideIcons.sparkles, size: 14),
-                                                  ),
-                                                  Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                                ],
-                                              ),
-                                              tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                            )
-                                          : IconButton(
-                                              onPressed: () {
-                                                storyStore.summarizeArticle(context);
-                                              },
-                                              icon: const Icon(LucideIcons.sparkles),
-                                              tooltip: "Summarize Article",
-                                            ),
-
-                                      // BOOKMARK
-                                      Stack(
-                                        children: [
-                                          // circle like when held behind the bookmark icon if it's bookmarked
-                                          if (storyStore.isBookmarked) ...[
-                                            Positioned(
-                                              right: 0,
-                                              top: 0,
-                                              bottom: 0,
-                                              left: 0,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                                                  shape: BoxShape.circle,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-
+                                        // RELOAD
+                                        if (!storyStore.showReaderMode) ...[
                                           IconButton(
-                                            isSelected: storyStore.isBookmarked,
                                             onPressed: () {
-                                              storyStore.bookmarkItem();
-                                              widget.feedItem.bookmarked = storyStore.isBookmarked;
+                                              storyStore.controller?.reload();
                                             },
-                                            icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                                            tooltip: "Refresh web page",
+                                            icon: const Icon(Icons.refresh),
                                           ),
                                         ],
-                                      ),
 
-                                      IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context))
-                                    ],
-                                  ),
-                                  AnimatedCrossFade(
-                                    duration: 150.ms,
-                                    firstCurve: Curves.easeInOutQuad,
-                                    secondCurve: Curves.easeInOutQuad,
-                                    sizeCurve: Curves.easeOutQuad,
-                                    crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                        ? CrossFadeState.showFirst
-                                        : CrossFadeState.showSecond,
-                                    firstChild: Container(
-                                      constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
-                                      child: Card.outlined(
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-                                            width: 1,
+                                        // BACK
+                                        if (!storyStore.showReaderMode) ...[
+                                          IconButton(
+                                            onPressed: () {
+                                              if (storyStore.canGoBack) {
+                                                storyStore.controller?.goBack();
+                                              }
+                                            },
+                                            tooltip: "Go back",
+                                            icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
                                           ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(25), // slightly less radius to fit the radius of the container
+
+                                          // FORWARD
+                                          IconButton(
+                                            onPressed: () {
+                                              if (storyStore.canGoForward) {
+                                                storyStore.controller?.goForward();
+                                              }
+                                            },
+                                            tooltip: "Go forward",
+                                            icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
                                           ),
+                                        ],
+
+                                        storyStore.feedItemSummarized
+                                            ? IconButton(
+                                                onPressed: storyStore.hideAiSummary,
+                                                icon: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    const Align(
+                                                      alignment: Alignment.topRight,
+                                                      widthFactor: 2,
+                                                      heightFactor: 3,
+                                                      child: Icon(LucideIcons.sparkles, size: 14),
+                                                    ),
+                                                    Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                                                  ],
+                                                ),
+                                                tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                                              )
+                                            : IconButton(
+                                                onPressed: () {
+                                                  storyStore.summarizeArticle(context);
+                                                },
+                                                icon: const Icon(LucideIcons.sparkles),
+                                                tooltip: "Summarize Article",
+                                              ),
+
+                                        // BOOKMARK
+                                        Stack(
+                                          children: [
+                                            // circle like when held behind the bookmark icon if it's bookmarked
+                                            if (storyStore.isBookmarked) ...[
+                                              Positioned(
+                                                right: 0,
+                                                top: 0,
+                                                bottom: 0,
+                                                left: 0,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+
+                                            IconButton(
+                                              isSelected: storyStore.isBookmarked,
+                                              onPressed: () {
+                                                storyStore.bookmarkItem();
+                                                widget.feedItem.bookmarked = storyStore.isBookmarked;
+                                              },
+                                              icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                                            ),
+                                          ],
                                         ),
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: SingleChildScrollView(
-                                            child: SelectableText(
-                                              storyStore.feedItem.aiSummary,
-                                              // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+
+                                        IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
+                                      ],
+                                    ),
+                                    AnimatedCrossFade(
+                                      duration: 150.ms,
+                                      firstCurve: Curves.easeInOutQuad,
+                                      secondCurve: Curves.easeInOutQuad,
+                                      sizeCurve: Curves.easeOutQuad,
+                                      crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                          ? CrossFadeState.showFirst
+                                          : CrossFadeState.showSecond,
+                                      firstChild: Container(
+                                        constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
+                                        child: Card.outlined(
+                                          shape: RoundedRectangleBorder(
+                                            side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
+                                            borderRadius: const BorderRadius.all(
+                                              Radius.circular(25), // slightly less radius to fit the radius of the container
+                                            ),
+                                          ),
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: SingleChildScrollView(
+                                              child: SelectableText(
+                                                storyStore.feedItem.aiSummary,
+                                                // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
+                                      secondChild: const SizedBox.shrink(),
                                     ),
-                                    secondChild: const SizedBox.shrink(),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -421,33 +400,38 @@ class _StoryState extends State<Story> {
                       ),
                     ),
                   ),
-                ),
-                if (!storyStore.showReaderMode) ...[
-                  storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox(),
+                  if (!storyStore.initialized) ...[const LinearProgressIndicator()],
+
+                  if (!storyStore.showReaderMode) ...[storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox()],
+                  storyStore.aiLoading
+                      ? const LinearProgressIndicator()
+                            .animate()
+                            .fadeIn()
+                            .animate(onPlay: (controller) => controller.repeat())
+                            .shimmer(
+                              duration: const Duration(milliseconds: 1500),
+                              colors: [
+                                Theme.of(context).colorScheme.primary,
+                                // Theme.of(context).colorScheme.secondary,
+                                Theme.of(context).colorScheme.inversePrimary,
+                                // Theme.of(context).colorScheme.tertiary,
+                                Theme.of(context).colorScheme.primary,
+
+                                // const Color(0xBFFFFF00),
+                                // const Color(0xBF00FF00),
+                                // const Color(0xBF00FFFF),
+                                // const Color(0xBF0033FF),
+                                // const Color(0xBFFF00FF),
+                                // const Color(0xBFFF0000),
+                                // const Color(0xBFFFFF00),
+                              ],
+                            )
+                      : const SizedBox(),
                 ],
-                storyStore.aiLoading
-                    ? const LinearProgressIndicator().animate().fadeIn().animate(onPlay: (controller) => controller.repeat()).shimmer(
-                        duration: const Duration(milliseconds: 1500),
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          // Theme.of(context).colorScheme.secondary,
-                          Colors.white,
-                          // Theme.of(context).colorScheme.tertiary,
-                          Theme.of(context).colorScheme.primary,
-                          // const Color(0xBFFFFF00),
-                          // const Color(0xBF00FF00),
-                          // const Color(0xBF00FFFF),
-                          // const Color(0xBF0033FF),
-                          // const Color(0xBFFF00FF),
-                          // const Color(0xBFFF0000),
-                          // const Color(0xBFFFFF00),
-                        ],
-                      )
-                    : const SizedBox(),
-              ],
-            ),
-          );
-        }),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

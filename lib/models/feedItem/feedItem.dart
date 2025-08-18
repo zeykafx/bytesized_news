@@ -53,10 +53,7 @@ class FeedItem {
     dbUtils = DbUtils(isar: isar);
   }
 
-  static Future<FeedItem> fromAtomItem({
-    required AtomItem item,
-    required Feed feed,
-  }) async {
+  static Future<FeedItem> fromAtomItem({required AtomItem item, required Feed feed}) async {
     FeedItem feedItem = FeedItem();
 
     feedItem.url = item.links.first.href ?? "no link";
@@ -102,10 +99,7 @@ class FeedItem {
     return feedItem;
   }
 
-  static Future<FeedItem> fromRssItem({
-    required RssItem item,
-    required Feed feed,
-  }) async {
+  static Future<FeedItem> fromRssItem({required RssItem item, required Feed feed}) async {
     FeedItem feedItem = FeedItem();
 
     feedItem.url = item.link ?? "no link";
@@ -191,7 +185,9 @@ class FeedItem {
         continue;
       }
 
-      await DefaultCacheManager().downloadFile(imgSrc, force: true);
+      try {
+        await DefaultCacheManager().downloadFile(imgSrc, force: true);
+      } catch (_) {}
     }
 
     await dbUtils.updateItemInDb(this);
