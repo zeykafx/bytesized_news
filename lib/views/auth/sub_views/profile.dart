@@ -41,10 +41,7 @@ class _ProfileState extends State<Profile> {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primaryContainer,
-            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
-          ],
+          colors: [Theme.of(context).colorScheme.primaryContainer, Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -55,13 +52,7 @@ class _ProfileState extends State<Profile> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            Navigator.of(context)
-                .push(
-              MaterialPageRoute(
-                builder: (context) => const PurchaseView(),
-              ),
-            )
-                .then((_) async {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const PurchaseView())).then((_) async {
               setState(() {});
             });
           },
@@ -72,18 +63,14 @@ class _ProfileState extends State<Profile> {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.workspace_premium,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 24,
-                    ),
+                    Icon(Icons.workspace_premium, color: Theme.of(context).colorScheme.primary, size: 24),
                     const SizedBox(width: 12),
                     Text(
                       authStore.userTier == Tier.premium ? "You have premium!" : "Upgrade to Premium",
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            // fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
+                        // fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ],
                 ),
@@ -105,9 +92,7 @@ class _ProfileState extends State<Profile> {
   Widget buildReadingStatsCard() {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -130,18 +115,14 @@ class _ProfileState extends State<Profile> {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.workspace_premium,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 24,
-                    ),
+                    Icon(Icons.workspace_premium, color: Theme.of(context).colorScheme.primary, size: 24),
                     const SizedBox(width: 12),
                     Text(
                       readingStreak.toString(),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            // fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
+                        // fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ],
                 ),
@@ -156,16 +137,11 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return ProfileScreen(
-      appBar: AppBar(
-        title: const Text("Profile"),
-      ),
+      appBar: AppBar(title: const Text("Profile")),
       auth: auth,
       avatar: Column(
         children: [
-          const CircleAvatar(
-            radius: 30,
-            child: Icon(Icons.person, size: 50),
-          ),
+          const CircleAvatar(radius: 30, child: Icon(Icons.person, size: 50)),
           const SizedBox(height: 10),
           Text(user?.email ?? "No Email", style: const TextStyle(fontSize: 16)),
         ],
@@ -174,27 +150,16 @@ class _ProfileState extends State<Profile> {
       actions: [
         SignedOutAction((context) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const Auth(),
-            ),
+            MaterialPageRoute(builder: (context) => const Auth()),
             (route) => false, // remove all routes
           );
         }),
       ],
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: 4.0,
-          ),
-          child: const Divider(thickness: 0.5),
-        ),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0), child: const Divider(thickness: 0.5)),
         Container(
           padding: const EdgeInsets.only(top: 0, bottom: 5.0, left: 0.0),
-          child: Text(
-            "General User Settings",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          ),
+          child: Text("General User Settings", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
         ),
         KeywordsBottomSheet(
           getKeywords: () {
@@ -202,15 +167,10 @@ class _ProfileState extends State<Profile> {
           },
           title: "News Interests",
           additionCallback: (String text) {
-            authStore.userInterests = [
-              ...authStore.userInterests,
-              text,
-            ];
+            authStore.userInterests = [...authStore.userInterests, text];
           },
           removalCallback: (int index) {
-            authStore.userInterests = [
-              ...authStore.userInterests..removeAt(index),
-            ];
+            authStore.userInterests = [...authStore.userInterests..removeAt(index)];
           },
           removePadding: true,
         ),
@@ -218,46 +178,22 @@ class _ProfileState extends State<Profile> {
         buildPremiumUpgradeCard(),
         const SizedBox(height: 8),
         buildReadingStatsCard(),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: 4.0,
-          ),
-          child: const Divider(thickness: 0.5),
-        ),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0), child: const Divider(thickness: 0.5)),
         if (authStore.userTier == Tier.premium) ...[
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.only(top: 0.0, bottom: 5.0, left: 0.0),
-                child: Text(
-                  "AI Usage",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                ),
+                child: Text("AI Usage", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
               ),
-              Text(
-                "Summaries left today: ${authStore.summariesLeftToday}",
-              ),
-              Text(
-                "Suggestions left today: ${authStore.suggestionsLeftToday}",
-              ),
+              Text("Summaries left today: ${authStore.summariesLeftToday}"),
+              Text("Suggestions left today: ${authStore.suggestionsLeftToday}"),
               const SizedBox(height: 3),
-              Text(
-                "Limits are reset daily.",
-                style: TextStyle(
-                  color: Theme.of(context).dividerColor,
-                ),
-              ),
+              Text("Limits are reset daily at midnight UTC", style: TextStyle(color: Theme.of(context).dividerColor)),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 0,
-              vertical: 4.0,
-            ),
-            child: const Divider(thickness: 0.5),
-          ),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0), child: const Divider(thickness: 0.5)),
         ],
       ],
     );

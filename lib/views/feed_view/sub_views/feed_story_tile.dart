@@ -86,8 +86,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
             child: InkWell(
               onTap: () => handleTap(context),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 spacing: 0,
                 children: [
                   if (widget.isSuggestion) ...[
@@ -99,7 +98,11 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                               child: CachedNetworkImage(
                                 imageUrl: widget.item.imageUrl,
                                 fit: BoxFit.cover,
-                                errorWidget: (context, str, obj) => const SizedBox.shrink(),
+                                errorWidget: (context, str, obj) => Container(
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 200, width: 350, fit: BoxFit.cover),
+                                ),
                                 width: 350,
                                 height: 200,
                               ),

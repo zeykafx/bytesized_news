@@ -637,6 +637,17 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
+  void searchInArticle(BuildContext context) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.searchInArticle');
+    try {
+      return super.searchInArticle(context);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 dbUtils: ${dbUtils},

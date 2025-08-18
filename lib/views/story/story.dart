@@ -84,6 +84,7 @@ class _StoryState extends State<Story> {
             },
           ),
           actions: [
+            // IconButton(icon: Icon(Icons.search_rounded), onPressed: () => storyStore.searchInArticle(context)),
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
@@ -213,24 +214,82 @@ class _StoryState extends State<Story> {
                                         height = double.tryParse(e.attributes['height']!);
                                       }
 
-                                      Widget imageWidget = CachedNetworkImage(
-                                        imageUrl: imgSrc,
-                                        cacheKey: imgSrc,
-                                        cacheManager: DefaultCacheManager(),
-                                        placeholder: (context, url) => LinearProgressIndicator(),
-                                        errorWidget: (context, url, error) => Icon(Icons.error),
-                                        filterQuality: FilterQuality.high,
-                                        fit: (width != null && height != null) ? BoxFit.contain : BoxFit.fitWidth,
-                                        fadeInCurve: Curves.easeInQuad,
-                                        fadeInDuration: 400.ms,
-                                      );
+                                      // Check if this might be a profile picture or author image
+                                      bool isProfileImage = false;
+                                      final imgTag = e.outerHtml.toLowerCase();
+                                      final classAttr = e.attributes['class']?.toLowerCase() ?? '';
+                                      final altAttr = e.attributes['alt']?.toLowerCase() ?? '';
+                                      final srcAttr = imgSrc.toLowerCase();
 
-                                      // If we have specific dimensions, wrap in SizedBox
-                                      if (width != null && height != null) {
-                                        imageWidget = SizedBox(width: width, height: height, child: imageWidget);
+                                      if (imgTag.contains('author') ||
+                                          imgTag.contains('avatar') ||
+                                          imgTag.contains('profile') ||
+                                          classAttr.contains('author') ||
+                                          classAttr.contains('avatar') ||
+                                          classAttr.contains('profile') ||
+                                          altAttr.contains('author') ||
+                                          altAttr.contains('avatar') ||
+                                          altAttr.contains('profile') ||
+                                          srcAttr.contains('author') ||
+                                          srcAttr.contains('avatar') ||
+                                          srcAttr.contains('profile')) {
+                                        isProfileImage = true;
                                       }
 
-                                      return ClipRRect(borderRadius: BorderRadius.circular(8.0), child: imageWidget);
+                                      // Calculate aspect ratio and detect problematic dimensions
+                                      double? aspectRatio;
+                                      bool hasReliableDimensions = false;
+
+                                      if (width != null && height != null && width > 0 && height > 0) {
+                                        aspectRatio = width / height;
+                                        // Consider dimensions unreliable if aspect ratio is too extreme or if it's a profile image
+                                        hasReliableDimensions = aspectRatio >= 0.1 && aspectRatio <= 10.0 && !isProfileImage;
+                                      }
+
+                                      Widget imageWidget = InkWell(
+                                        onTap: () async {
+                                          storyStore.showImage(imgSrc, context);
+                                        },
+                                        child: CachedNetworkImage(
+                                          imageUrl: imgSrc,
+                                          cacheKey: imgSrc,
+                                          cacheManager: DefaultCacheManager(),
+                                          placeholder: (context, url) => LinearProgressIndicator(),
+                                          errorWidget: (context, url, error) => Icon(Icons.error),
+                                          filterQuality: FilterQuality.high,
+                                          fit: BoxFit.contain,
+                                          fadeInCurve: Curves.easeInQuad,
+                                          fadeInDuration: 400.ms,
+                                        ),
+                                      );
+
+                                      if (isProfileImage) {
+                                        // round pfps
+                                        imageWidget = Container(
+                                          constraints: BoxConstraints(maxWidth: 60, maxHeight: 60),
+                                          child: ClipOval(child: imageWidget),
+                                        );
+                                      } else if (hasReliableDimensions && width! <= 400) {
+                                        // og dimensions for images with reasonable dimensions
+                                        imageWidget = Container(
+                                          constraints: BoxConstraints(
+                                            maxWidth: width,
+                                            maxHeight: 400, // cap height to prevent extremely tall images
+                                          ),
+                                          child: imageWidget,
+                                        );
+                                      } else {
+                                        // for large images or unreliable dimensions, use responsive sizing
+                                        imageWidget = Container(
+                                          constraints: BoxConstraints(
+                                            maxHeight: 300, // max height for article images
+                                          ),
+                                          child: imageWidget,
+                                        );
+                                      }
+
+                                      // apply border radius only for non-profile images (profiles already have ClipOval)
+                                      return isProfileImage ? imageWidget : ClipRRect(borderRadius: BorderRadius.circular(12.0), child: imageWidget);
                                     },
                                     enableCaching: true,
                                     buildAsync: true,
@@ -244,182 +303,7 @@ class _StoryState extends State<Story> {
                     ],
                   ),
 
-                  // floating bar
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 30),
-                      child: AnimatedSlide(
-                        offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
-                        duration: 300.ms,
-                        curve: Curves.easeInOutQuad,
-                        child: AnimatedOpacity(
-                          opacity: storyStore.hideBar ? 0.7 : 1,
-                          duration: 150.ms,
-                          curve: Curves.easeInOutQuad,
-                          child: Card.outlined(
-                            margin: EdgeInsets.zero,
-                            color: Theme.of(context).colorScheme.surfaceContainer,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
-                              borderRadius: const BorderRadius.all(Radius.circular(30)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      spacing: 3,
-                                      children: [
-                                        // READER MODE
-                                        IconButton(
-                                          onPressed: () {
-                                            storyStore.toggleReaderMode();
-                                          },
-                                          tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                                          icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
-                                        ),
-
-                                        // RELOAD
-                                        if (!storyStore.showReaderMode) ...[
-                                          IconButton(
-                                            onPressed: () {
-                                              storyStore.controller?.reload();
-                                            },
-                                            tooltip: "Refresh web page",
-                                            icon: const Icon(Icons.refresh),
-                                          ),
-                                        ],
-
-                                        // BACK
-                                        if (!storyStore.showReaderMode) ...[
-                                          IconButton(
-                                            onPressed: () {
-                                              if (storyStore.canGoBack) {
-                                                storyStore.controller?.goBack();
-                                              }
-                                            },
-                                            tooltip: "Go back",
-                                            icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
-                                          ),
-
-                                          // FORWARD
-                                          IconButton(
-                                            onPressed: () {
-                                              if (storyStore.canGoForward) {
-                                                storyStore.controller?.goForward();
-                                              }
-                                            },
-                                            tooltip: "Go forward",
-                                            icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
-                                          ),
-                                        ],
-
-                                        storyStore.feedItemSummarized
-                                            ? IconButton(
-                                                onPressed: storyStore.hideAiSummary,
-                                                icon: Stack(
-                                                  alignment: Alignment.center,
-                                                  children: [
-                                                    const Align(
-                                                      alignment: Alignment.topRight,
-                                                      widthFactor: 2,
-                                                      heightFactor: 3,
-                                                      child: Icon(LucideIcons.sparkles, size: 14),
-                                                    ),
-                                                    Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                                  ],
-                                                ),
-                                                tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                              )
-                                            : IconButton(
-                                                onPressed: () {
-                                                  storyStore.summarizeArticle(context);
-                                                },
-                                                icon: const Icon(LucideIcons.sparkles),
-                                                tooltip: "Summarize Article",
-                                              ),
-
-                                        // BOOKMARK
-                                        Stack(
-                                          children: [
-                                            // circle like when held behind the bookmark icon if it's bookmarked
-                                            if (storyStore.isBookmarked) ...[
-                                              Positioned(
-                                                right: 0,
-                                                top: 0,
-                                                bottom: 0,
-                                                left: 0,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-
-                                            IconButton(
-                                              isSelected: storyStore.isBookmarked,
-                                              onPressed: () {
-                                                storyStore.bookmarkItem();
-                                                widget.feedItem.bookmarked = storyStore.isBookmarked;
-                                              },
-                                              icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
-                                            ),
-                                          ],
-                                        ),
-
-                                        IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
-                                      ],
-                                    ),
-                                    AnimatedCrossFade(
-                                      duration: 150.ms,
-                                      firstCurve: Curves.easeInOutQuad,
-                                      secondCurve: Curves.easeInOutQuad,
-                                      sizeCurve: Curves.easeOutQuad,
-                                      crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                          ? CrossFadeState.showFirst
-                                          : CrossFadeState.showSecond,
-                                      firstChild: Container(
-                                        constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
-                                        child: Card.outlined(
-                                          shape: RoundedRectangleBorder(
-                                            side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
-                                            borderRadius: const BorderRadius.all(
-                                              Radius.circular(25), // slightly less radius to fit the radius of the container
-                                            ),
-                                          ),
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: SingleChildScrollView(
-                                              child: SelectableText(
-                                                storyStore.feedItem.aiSummary,
-                                                // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      secondChild: const SizedBox.shrink(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  FloatingBar(storyStore: storyStore, widget: widget),
                   if (!storyStore.initialized) ...[const LinearProgressIndicator()],
 
                   if (!storyStore.showReaderMode) ...[storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox()],
@@ -453,6 +337,189 @@ class _StoryState extends State<Story> {
           },
         ),
       ),
+    );
+  }
+}
+
+class FloatingBar extends StatelessWidget {
+  const FloatingBar({super.key, required this.storyStore, required this.widget});
+
+  final StoryStore storyStore;
+  final Story widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (context) {
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 30),
+            child: AnimatedSlide(
+              offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
+              duration: 300.ms,
+              curve: Curves.easeInOutQuad,
+              child: AnimatedOpacity(
+                opacity: storyStore.hideBar ? 0.7 : 1,
+                duration: 150.ms,
+                curve: Curves.easeInOutQuad,
+                child: Card.outlined(
+                  margin: EdgeInsets.zero,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            spacing: 3,
+                            children: [
+                              // READER MODE
+                              IconButton(
+                                onPressed: () {
+                                  storyStore.toggleReaderMode();
+                                },
+                                tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
+                                icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
+                              ),
+        
+                              // RELOAD
+                              if (!storyStore.showReaderMode) ...[
+                                IconButton(
+                                  onPressed: () {
+                                    storyStore.controller?.reload();
+                                  },
+                                  tooltip: "Refresh web page",
+                                  icon: const Icon(Icons.refresh),
+                                ),
+                              ],
+        
+                              // BACK
+                              if (!storyStore.showReaderMode) ...[
+                                IconButton(
+                                  onPressed: () {
+                                    if (storyStore.canGoBack) {
+                                      storyStore.controller?.goBack();
+                                    }
+                                  },
+                                  tooltip: "Go back",
+                                  icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
+                                ),
+        
+                                // FORWARD
+                                IconButton(
+                                  onPressed: () {
+                                    if (storyStore.canGoForward) {
+                                      storyStore.controller?.goForward();
+                                    }
+                                  },
+                                  tooltip: "Go forward",
+                                  icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
+                                ),
+                              ],
+        
+                              storyStore.feedItemSummarized
+                                  ? IconButton(
+                                      onPressed: storyStore.hideAiSummary,
+                                      icon: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          const Align(alignment: Alignment.topRight, widthFactor: 2, heightFactor: 3, child: Icon(LucideIcons.sparkles, size: 14)),
+                                          Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                                        ],
+                                      ),
+                                      tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                                    )
+                                  : IconButton(
+                                      onPressed: () {
+                                        storyStore.summarizeArticle(context);
+                                      },
+                                      icon: const Icon(LucideIcons.sparkles),
+                                      tooltip: "Summarize Article",
+                                    ),
+        
+                              // BOOKMARK
+                              Stack(
+                                children: [
+                                  // circle like when held behind the bookmark icon if it's bookmarked
+                                  if (storyStore.isBookmarked) ...[
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      bottom: 0,
+                                      left: 0,
+                                      child: Container(
+                                        decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1), shape: BoxShape.circle),
+                                      ),
+                                    ),
+                                  ],
+        
+                                  IconButton(
+                                    isSelected: storyStore.isBookmarked,
+                                    onPressed: () {
+                                      storyStore.bookmarkItem();
+                                      widget.feedItem.bookmarked = storyStore.isBookmarked;
+                                    },
+                                    icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                                  ),
+                                ],
+                              ),
+        
+                              // Share button
+                              IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
+                            ],
+                          ),
+                          AnimatedCrossFade(
+                            duration: 150.ms,
+                            firstCurve: Curves.easeInOutQuad,
+                            secondCurve: Curves.easeInOutQuad,
+                            sizeCurve: Curves.easeOutQuad,
+                            crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                ? CrossFadeState.showFirst
+                                : CrossFadeState.showSecond,
+                            firstChild: Container(
+                              constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
+                              child: Card.outlined(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(25), // slightly less radius to fit the radius of the container
+                                  ),
+                                ),
+                                margin: EdgeInsets.only(bottom: 10),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: SingleChildScrollView(
+                                    child: SelectableText(
+                                      storyStore.feedItem.aiSummary,
+                                      // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            secondChild: const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
     );
   }
 }

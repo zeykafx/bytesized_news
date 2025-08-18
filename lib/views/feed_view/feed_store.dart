@@ -528,8 +528,13 @@ abstract class _FeedStore with Store {
       print("Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
     }
 
-    // Unset the suggested property for this article if it won't be suggested again
-    await dbUtils.resetSuggestedArticles();
+    // unset the suggested property for this article if it won't be suggested again
+    // await dbUtils.resetSuggestedArticles();
+    List<FeedItem> prevSuggested = await dbUtils.getSuggestedItems(feeds);
+    for (FeedItem feedItem in prevSuggested) {
+      feedItem.suggested = false;
+      await dbUtils.updateItemInDb(feedItem);
+    }
 
     // clear the suggestions then add all of the new ones
     suggestedFeedItems.clear();

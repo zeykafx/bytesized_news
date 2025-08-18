@@ -563,30 +563,31 @@ export const getNewsSuggestions = onCall(
       model: betterModel,
       // model: "meta-llama/llama-4-scout-17b-16e-instruct",
       response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "product_review",
-          schema: {
-            type: "object",
-            properties: {
-              articles: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    id: { type: "number" },
-                    title: { type: "string" },
-                    feedName: { type: "string" },
-                  },
-                },
-              },
-            },
-            required: ["articles"],
-            additionalProperties: false,
-          },
-        },
+        // type: "json_schema",
+        type: "json_object",
+        // json_schema: {
+        //   name: "product_review",
+        //   schema: {
+        //     type: "object",
+        //     properties: {
+        //       articles: {
+        //         type: "array",
+        //         items: {
+        //           type: "object",
+        //           properties: {
+        //             id: { type: "number" },
+        //             title: { type: "string" },
+        //             feedName: { type: "string" },
+        //           },
+        //         },
+        //       },
+        //     },
+        //     required: ["articles"],
+        //     additionalProperties: false,
+        //   },
+        // },
       },
-      reasoning_effort: "medium",
+      // reasoning_effort: "medium",
       messages: [
         {
           role: "system",
@@ -610,7 +611,28 @@ export const getNewsSuggestions = onCall(
         - Prioritize articles from feeds the user reads most frequently
         - Balance between user preferences and editorial quality
 
-        OUTPUT FORMAT: Return a JSON object with an "articles" array containing objects with id, title, and feedName fields.
+        OUTPUT FORMAT: Return a JSON object that follows this schema:
+        json_schema: {
+          name: "product_review",
+          schema: {
+            type: "object",
+            properties: {
+              articles: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "number" },
+                    title: { type: "string" },
+                    feedName: { type: "string" },
+                  },
+                },
+              },
+            },
+            required: ["articles"],
+            additionalProperties: false,
+          },
+        },
         `,
         },
         {

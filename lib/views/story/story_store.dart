@@ -120,7 +120,7 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
-  int imageDepthLimit = 10;
+  int imageDepthLimit = 20;
   @computed
   bool get hasImageInArticle {
     if (htmlContent.isEmpty || feedItem.imageUrl.isEmpty) return false;
@@ -401,7 +401,7 @@ abstract class _StoryStore with Store {
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
-      evaluateSummary(docText, summary, context);
+      // evaluateSummary(docText, summary, context);
       return;
     }
 
@@ -493,7 +493,7 @@ abstract class _StoryStore with Store {
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
-      evaluateSummary(docText, summary, context);
+      // evaluateSummary(docText, summary, context);
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -572,7 +572,9 @@ abstract class _StoryStore with Store {
                 Positioned(
                   top: 0,
                   right: 10,
-                  child: IconButton(onPressed: () => Navigator.of(ctx).pop(), icon: const Icon(Icons.close)),
+                  child: Card.filled(
+                    child: IconButton(onPressed: () => Navigator.of(ctx).pop(), icon: const Icon(Icons.close)),
+                  ),
                 ),
               ],
             ),
@@ -637,5 +639,44 @@ abstract class _StoryStore with Store {
     final params = ShareParams(uri: Uri.parse(feedItem.url));
 
     SharePlus.instance.share(params);
+  }
+
+  @action
+  void searchInArticle(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, Function dialogSetState) {
+            return AlertDialog(
+              insetPadding: EdgeInsets.all(8),
+              contentPadding: EdgeInsets.all(8),
+              title: const Text("Search"),
+              content: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+
+
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Confirm"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) {});
   }
 }
