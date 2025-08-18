@@ -120,12 +120,32 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
-  int imageDepthLimit = 150;
+  int imageDepthLimit = 10;
   @computed
-  bool get hasImageInArticle =>
-      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains(feedItem.imageUrl) ||
-      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains("img") ||
-      htmlContent.split(" ").take(imageDepthLimit).join(" ").contains("image");
+  bool get hasImageInArticle {
+    if (htmlContent.isEmpty || feedItem.imageUrl.isEmpty) return false;
+
+    // check if the cover image URL is present
+    if (htmlContent.contains(feedItem.imageUrl)) return true;
+
+    // search for img tags in the first part of the content
+    final firstPart = htmlContent.length > imageDepthLimit * 50 ? htmlContent.substring(0, imageDepthLimit * 50) : htmlContent;
+
+    // use regex to find img tags and check if they're not author-related
+    final imgTagRegex = RegExp(r'<(img|picture|figure|svg|video)[^>]*>', caseSensitive: false);
+    final imgTags = imgTagRegex.allMatches(firstPart);
+
+    for (final match in imgTags) {
+      final imgTag = match.group(0)!.toLowerCase();
+      // we skip author images, avatars, profile pics, etc.
+      if (imgTag.contains('author') || imgTag.contains('avatar') || imgTag.contains('profile') || imgTag.contains('byline')) {
+        continue;
+      }
+      return true;
+    }
+
+    return false;
+  }
 
   Timer? timer;
 
@@ -208,25 +228,30 @@ abstract class _StoryStore with Store {
   Future<void> compareReaderModeLengthToPageHtml(BuildContext context) async {
     Dio dio = Dio();
 
-    // fetch the page's html
-    Response res = await dio.get(feedItem.url);
-    dom.Document doc = html_parser.parse(res.data);
-    if (doc.body == null) {
-      return;
+    try {
+      // fetch the page's html
+      Response res = await dio.get(feedItem.url);
+      dom.Document doc = html_parser.parse(res.data);
+      if (doc.body == null) {
+        return;
+      }
+
+      if (kDebugMode) {
+        print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
+      }
+      if ((doc.body!.innerHtml.length / htmlContent.length) > 250 && settingsStore.autoSwitchReaderTooShort) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
+          ),
+        );
+        showReaderMode = false;
+        return;
+      }
+    } catch (_) {
+      showReaderMode = false;
     }
 
-    if (kDebugMode) {
-      print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
-    }
-    if ((doc.body!.innerHtml.length / htmlContent.length) > 250 && settingsStore.autoSwitchReaderTooShort) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
-        ),
-      );
-      showReaderMode = false;
-      return;
-    }
     return;
   }
 

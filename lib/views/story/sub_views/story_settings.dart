@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings.dart';
-import 'package:bytesized_news/views/settings/settings_section.dart';
+import 'package:bytesized_news/views/settings/sections/settings_section.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';

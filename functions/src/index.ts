@@ -20,7 +20,7 @@ const ENFORCE_APPCHECK = false; // TODO: change back
 const maxCharsForOneSummary = 15000;
 const model = "openai/gpt-oss-20b";
 // const betterModel = "openai/gpt-oss-120b";
-const betterModel = model;
+const betterModel = "llama-3.1-8b-instant";
 
 const androidPackageId = "com.zeykafx.bytesized_news";
 

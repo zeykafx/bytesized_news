@@ -1,6 +1,6 @@
 import 'package:bytesized_news/views/settings/sections/about_section.dart';
 import 'package:bytesized_news/views/settings/sections/background_sync_section.dart';
-import 'package:bytesized_news/views/settings/sections/general_settings.dart';
+import 'package:bytesized_news/views/settings/sections/general_settings_section.dart';
 import 'package:bytesized_news/views/settings/sections/import_export_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -46,12 +46,13 @@ class _SettingsState extends State<Settings> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const GeneralSettings(),
+                            const GeneralSettingsSection(),
                             // if (!Platform.isIOS) ...[
                             const BackgroundSyncSection(),
                             // ],
                             const ImportExportSection(),
                             const AboutSection(),
+                            const SizedBox(height: 30),
                           ],
                         ),
                       ),
@@ -66,4 +67,3 @@ class _SettingsState extends State<Settings> {
     );
   }
 }
-

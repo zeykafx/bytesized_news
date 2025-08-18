@@ -1,19 +1,20 @@
+import 'package:bytesized_news/utils/utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
-import 'package:bytesized_news/views/settings/settings_section.dart';
+import 'package:bytesized_news/views/settings/sections/settings_section.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-class GeneralSettings extends StatefulWidget {
-  const GeneralSettings({super.key});
+class GeneralSettingsSection extends StatefulWidget {
+  const GeneralSettingsSection({super.key});
 
   @override
-  State<GeneralSettings> createState() => _GeneralSettingsState();
+  State<GeneralSettingsSection> createState() => _GeneralSettingsSectionState();
 }
 
-class _GeneralSettingsState extends State<GeneralSettings> {
+class _GeneralSettingsSectionState extends State<GeneralSettingsSection> {
   late final SettingsStore settingsStore;
   late final AuthStore authStore;
 

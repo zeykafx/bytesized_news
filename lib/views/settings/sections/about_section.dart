@@ -1,4 +1,4 @@
-import 'package:bytesized_news/views/settings/settings_section.dart';
+import 'package:bytesized_news/views/settings/sections/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:package_info_plus/package_info_plus.dart';

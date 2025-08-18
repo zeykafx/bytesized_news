@@ -4,7 +4,7 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/opml/opml.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
-import 'package:bytesized_news/views/settings/settings_section.dart';
+import 'package:bytesized_news/views/settings/sections/settings_section.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';

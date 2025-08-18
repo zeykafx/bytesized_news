@@ -93,7 +93,7 @@ class _FeedViewState extends State<FeedView> {
             ),
             actions: [
               AnimatedOpacity(
-                opacity: feedStore.isCollapsed ? 1 : 0,
+                opacity: feedStore.isExpanded ? 0 : 1,
                 duration: 200.ms,
                 curve: Curves.easeInOutQuad,
                 child: IconButton(

@@ -72,7 +72,8 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
   }
 
   Widget buildCard(Color cardColor, BuildContext context) {
-    return Center(
+    return ClipRRect(
+      borderRadius: BorderRadius.all(Radius.circular(15)),
       child: Card(
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
         elevation: 0,
@@ -93,7 +94,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     widget.item.imageUrl.isNotEmpty
                         ? Center(
                             child: Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
                               clipBehavior: Clip.antiAlias,
                               child: CachedNetworkImage(
                                 imageUrl: widget.item.imageUrl,

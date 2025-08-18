@@ -1,5 +1,6 @@
 // ignore: unnecessary_import
 import 'dart:math';
+import 'dart:ui';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -187,9 +188,9 @@ class _StoryState extends State<Story> {
                                       return true;
                                     },
                                     customWidgetBuilder: (html.Element e) {
-                                      if (!e.innerHtml.contains("img") || !e.innerHtml.contains("image") || !e.innerHtml.contains("picture")) {
-                                        return null;
-                                      }
+                                      // if (!e.innerHtml.contains("img") && !e.innerHtml.contains("image") && !e.innerHtml.contains("picture")) {
+                                      //   return null;
+                                      // }
 
                                       String imgSrc = "";
                                       if (e.attributes case {'src': final String src}) {
@@ -200,17 +201,36 @@ class _StoryState extends State<Story> {
                                         return null;
                                       }
 
-                                      return CachedNetworkImage(
+                                      // Extract width and height from HTML attributes
+                                      double? width;
+                                      double? height;
+
+                                      if (e.attributes.containsKey('width')) {
+                                        width = double.tryParse(e.attributes['width']!);
+                                      }
+
+                                      if (e.attributes.containsKey('height')) {
+                                        height = double.tryParse(e.attributes['height']!);
+                                      }
+
+                                      Widget imageWidget = CachedNetworkImage(
                                         imageUrl: imgSrc,
                                         cacheKey: imgSrc,
                                         cacheManager: DefaultCacheManager(),
-                                        placeholder: (context, url) => CircularProgressIndicator(),
+                                        placeholder: (context, url) => LinearProgressIndicator(),
                                         errorWidget: (context, url, error) => Icon(Icons.error),
                                         filterQuality: FilterQuality.high,
-                                        fit: BoxFit.cover,
+                                        fit: (width != null && height != null) ? BoxFit.contain : BoxFit.fitWidth,
                                         fadeInCurve: Curves.easeInQuad,
                                         fadeInDuration: 400.ms,
                                       );
+
+                                      // If we have specific dimensions, wrap in SizedBox
+                                      if (width != null && height != null) {
+                                        imageWidget = SizedBox(width: width, height: height, child: imageWidget);
+                                      }
+
+                                      return ClipRRect(borderRadius: BorderRadius.circular(8.0), child: imageWidget);
                                     },
                                     enableCaching: true,
                                     buildAsync: true,
