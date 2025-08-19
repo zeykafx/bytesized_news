@@ -4,6 +4,7 @@ import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/reading_stats/reading_stats.dart';
+import 'package:bytesized_news/utils/utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -120,34 +121,56 @@ abstract class _StoryStore with Store {
   @observable
   ReadingStats readingStat = ReadingStats();
 
-  int imageDepthLimit = 20;
+  @observable
+  bool showArchiveButton = false;
+
+  @observable
+  bool hasAlert = false;
+  @observable
+  bool shortAlert = false;
+
+  @observable
+  String alertMessage = "";
+
+  int imageDepthLimit = 30;
   @computed
   bool get hasImageInArticle {
     if (htmlContent.isEmpty || feedItem.imageUrl.isEmpty) return false;
+    Uri imageUri = Uri.parse(feedItem.imageUrl);
 
-    // check if the cover image URL is present
-    if (htmlContent.contains(feedItem.imageUrl)) return true;
+    // check if the cover image path is present
+    // we only check for the path because it will be the smallest representation of the url without any query params
+    // which would make the check below not match
+    // E.g., with the following imageUrl: https://www.motherjones.com/wp-content/uploads/2025/08/20250818_carbon-economy_2000px.png?w=1200&h=630&crop=1
+    // The path will be /wp-content/uploads/2025/08/20250818_carbon-economy_2000px.png
+    // And the image url in the article is: https://www.motherjones.com/wp-content/uploads/2025/08/20250818_carbon-economy_2000px.png?w=990
+    // -> So we can see that if we checked for the imageUrl, it would fail and display the image twice.
+    if (htmlContent.contains(imageUri.path)) return true;
 
     // search for img tags in the first part of the content
     final firstPart = htmlContent.length > imageDepthLimit * 50 ? htmlContent.substring(0, imageDepthLimit * 50) : htmlContent;
 
     // use regex to find img tags and check if they're not author-related
-    final imgTagRegex = RegExp(r'<(img|picture|figure|svg|video)[^>]*>', caseSensitive: false);
+    final imgTagRegex = RegExp(r'<(img|picture|video)[^>]*>', caseSensitive: false);
     final imgTags = imgTagRegex.allMatches(firstPart);
 
     for (final match in imgTags) {
       final imgTag = match.group(0)!.toLowerCase();
       // we skip author images, avatars, profile pics, etc.
-      if (imgTag.contains('author') || imgTag.contains('avatar') || imgTag.contains('profile') || imgTag.contains('byline')) {
+      if (imgTag.contains(RegExp('author')) ||
+          imgTag.contains(RegExp("author_profile_images")) ||
+          imgTag.contains(RegExp('authors')) ||
+          imgTag.contains(RegExp('avatar')) ||
+          imgTag.contains(RegExp('profile')) ||
+          imgTag.contains(RegExp('byline'))) {
         continue;
       }
+
       return true;
     }
 
     return false;
   }
-
-  Timer? timer;
 
   @action
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
@@ -157,6 +180,7 @@ abstract class _StoryStore with Store {
 
     showReaderMode = settingsStore.useReaderModeByDefault;
     hideSummary = settingsStore.showAiSummaryOnLoad;
+    showArchiveButton = settingsStore.alwaysShowArchiveButton;
 
     dbUtils = DbUtils(isar: isar);
 
@@ -165,7 +189,7 @@ abstract class _StoryStore with Store {
     feedItemSummarized = feedItem.summarized;
 
     if (!feedItem.downloaded) {
-      htmlContent = await feedItem.fetchHtmlContent();
+      htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
       // storeHtmlPageInFeedItem(htmlContent);
       await compareReaderModeLengthToPageHtml(context);
     } else {
@@ -176,6 +200,18 @@ abstract class _StoryStore with Store {
       await summarizeArticle(context);
     }
 
+    checkPaywallOrBotBlock();
+
+    webviewInit();
+
+    initialized = true;
+
+    // start recording the reading
+    await readingStat.startReadingStory(feedItem);
+  }
+
+  @action
+  void webviewInit() {
     // for each Ad URL filter, add a Content Blocker to block its loading.
     for (final adUrlFilter in adUrlFilters) {
       contentBlockers.add(
@@ -207,11 +243,92 @@ abstract class _StoryStore with Store {
           ? ForceDark.ON
           : ForceDark.OFF,
     );
+  }
 
-    initialized = true;
+  @action
+  Future<void> checkPaywallOrBotBlock() async {
+    const List<String> detectionMessages = [
+      "Access Denied",
+      "403 forbidden",
+      "403: Forbidden",
+      "Blocked by bot protection",
+      "We've detected unusual activity",
+      "Please complete the security check",
+      "Are you a robot?",
+      "We've detected unusual activity from your computer network",
+      "Human verification required",
+      "paid members only",
+      "Sign up for free access",
+      "Sign up for access",
+      "Become a paid member",
+      "Become a member",
+      "Become a subscriber",
+      "Subscribe to continue reading",
+      "This article is for subscribers only",
+      "Member exclusive",
+      "You've reached your free article limit",
+      "Not available in your region",
+      "Content blocked in your country",
+      "This content is not available in your location",
+      "Complete the CAPTCHA",
+      "I'm not a robot",
+      "Prove you're not a robot",
+      "reCAPTCHA",
+      "hCAPTCHA",
+      "ray-id",
+      "Error 403",
+      "Error 429",
+      "Error 451",
+      "JavaScript is required",
+      "Please enable JavaScript",
+    ];
+    bool suggestArchiveArticle = false;
+    for (String msg in detectionMessages) {
+      if (htmlContent.contains(msg)) {
+        if (kDebugMode) {
+          print("Block or paywall detected, suggesting Archived article");
+        }
+        suggestArchiveArticle = true;
+        break;
+      }
+    }
 
-    // start recording the reading
-    await readingStat.startReadingStory(feedItem);
+    if (suggestArchiveArticle) {
+      showArchiveButton = true;
+      alertMessage = "Paywall or block detected, click the rightmost button in the bar to fetch the archived link";
+      shortAlert = true;
+      hasAlert = true;
+    }
+  }
+
+  @action
+  Future<bool> getArchivedArticle({bool fromError = false}) async {
+    loading = true;
+    if (!fromError) {
+      alertMessage = "Fetching archived article...";
+      shortAlert = true;
+      hasAlert = true;
+    }
+    var (bool archived, String archiveLink) = await getArchiveUrl(feedItem.url);
+    if (archived) {
+      htmlContent = await feedItem.fetchHtmlContent(archiveLink);
+      feedItem.downloaded = true;
+      await dbUtils.updateItemInDb(feedItem);
+      loading = false;
+      alertMessage = "Showing archived page.";
+      shortAlert = true;
+      hasAlert = true;
+      return true;
+    }
+    if (!fromError) {
+      // don't show the alert if the call to this function is from the error in compareReaderModeLengthToPageHTML, because that already has an alertMsg
+      alertMessage = "No archived result found.";
+      shortAlert = true;
+      hasAlert = true;
+    }
+
+    loading = false;
+    return false;
   }
 
   @action
@@ -240,15 +357,30 @@ abstract class _StoryStore with Store {
         print("Ratio webpage to reader: ${doc.body!.innerHtml.length / htmlContent.length}");
       }
       if ((doc.body!.innerHtml.length / htmlContent.length) > 250 && settingsStore.autoSwitchReaderTooShort) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings"),
-          ),
-        );
+        alertMessage = "Reader view's article length is much shorter than the web page's, switching to it now. Change this behavior in settings.";
+        hasAlert = true;
         showReaderMode = false;
         return;
       }
-    } catch (_) {
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
+      if (err is DioError) {
+        if (err.response?.statusCode == 403) {
+          alertMessage = "Paywall or blocked article, fetching archived version...";
+          hasAlert = true;
+          shortAlert = true;
+          if (await getArchivedArticle(fromError: true)) {
+            showReaderMode = true;
+            alertMessage = "The article was paywalled or blocked the request, showing the archived page now";
+            hasAlert = true;
+            return;
+          }
+        }
+      }
+      alertMessage = "The article was paywalled or blocked the request, but no archived result was found, showing the webpage now.";
+      hasAlert = true;
       showReaderMode = false;
     }
 
@@ -286,7 +418,7 @@ abstract class _StoryStore with Store {
     }
 
     if (element.className == "top-text") {
-      return {'font-size': '14px', "line-height": "0.4"};
+      return {'font-size': '14px', "line-height": "0.4", 'color': '#${Theme.of(context).dividerColor.toARGB32().toRadixString(16).substring(2)}'};
     }
     if (element.className == "small") {
       return {
@@ -301,7 +433,7 @@ abstract class _StoryStore with Store {
 
     switch (element.localName) {
       case 'h1':
-        return {'font-size': '1.5em', 'font-weight': '700', 'text-align': "left"};
+        return {'font-size': '1.7em', 'font-weight': '700', 'text-align': "left"};
       case 'h2':
         return {'font-size': '1.25em', 'font-weight': '700', 'text-align': "left"};
       case 'h3':

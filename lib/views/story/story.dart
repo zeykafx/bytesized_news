@@ -15,6 +15,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:time_formatter/time_formatter.dart';
@@ -35,6 +36,7 @@ class _StoryState extends State<Story> {
   late AuthStore authStore;
   StoryStore storyStore = StoryStore();
   final GlobalKey webViewKey = GlobalKey();
+  late ReactionDisposer reactionDisposer;
 
   @override
   void initState() {
@@ -42,6 +44,21 @@ class _StoryState extends State<Story> {
     authStore = context.read<AuthStore>();
 
     // PlatformInAppWebViewController.debugLoggingSettings.enabled = false;
+    reactionDisposer = reaction((_) => storyStore.hasAlert, (bool hasAlert) {
+      // if there is an alert to show, show it in a snackbar
+      if (hasAlert) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(storyStore.alertMessage),
+            duration: Duration(seconds: storyStore.shortAlert ? 3 : 10),
+            showCloseIcon: !storyStore.shortAlert,
+          ),
+        );
+        storyStore.hasAlert = false;
+        storyStore.shortAlert = false;
+        storyStore.alertMessage = "";
+      }
+    });
 
     storyStore.init(widget.feedItem, context, settingsStore, authStore);
 
@@ -52,6 +69,7 @@ class _StoryState extends State<Story> {
   void dispose() {
     super.dispose();
     storyStore.dispose();
+    reactionDisposer();
   }
 
   @override
@@ -149,10 +167,9 @@ class _StoryState extends State<Story> {
                                     '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(50).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                             <p class="top-text">Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.feed?.name}</a></p>
                                              ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p class='top-text'>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
-                                             <p class="top-text"> Published: ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
-                                             <p class="top-text">Reading Time: ${storyStore.feedItem.estReadingTimeMinutes} minutes</p>
+                                             <p class="top-text">${storyStore.feedItem.feed?.name} | ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
+                                             <p class="top-text">${storyStore.feedItem.estReadingTimeMinutes} minute read</p>
 
                                                  ${ /* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
@@ -214,36 +231,14 @@ class _StoryState extends State<Story> {
                                         height = double.tryParse(e.attributes['height']!);
                                       }
 
-                                      // Check if this might be a profile picture or author image
-                                      bool isProfileImage = false;
-                                      final imgTag = e.outerHtml.toLowerCase();
-                                      final classAttr = e.attributes['class']?.toLowerCase() ?? '';
-                                      final altAttr = e.attributes['alt']?.toLowerCase() ?? '';
-                                      final srcAttr = imgSrc.toLowerCase();
-
-                                      if (imgTag.contains('author') ||
-                                          imgTag.contains('avatar') ||
-                                          imgTag.contains('profile') ||
-                                          classAttr.contains('author') ||
-                                          classAttr.contains('avatar') ||
-                                          classAttr.contains('profile') ||
-                                          altAttr.contains('author') ||
-                                          altAttr.contains('avatar') ||
-                                          altAttr.contains('profile') ||
-                                          srcAttr.contains('author') ||
-                                          srcAttr.contains('avatar') ||
-                                          srcAttr.contains('profile')) {
-                                        isProfileImage = true;
-                                      }
-
-                                      // Calculate aspect ratio and detect problematic dimensions
+                                      // calculate aspect ratio and detect problematic dimensions
                                       double? aspectRatio;
                                       bool hasReliableDimensions = false;
 
                                       if (width != null && height != null && width > 0 && height > 0) {
                                         aspectRatio = width / height;
-                                        // Consider dimensions unreliable if aspect ratio is too extreme or if it's a profile image
-                                        hasReliableDimensions = aspectRatio >= 0.1 && aspectRatio <= 10.0 && !isProfileImage;
+                                        // consider dimensions unreliable if aspect ratio is too extreme or if it's a profile image
+                                        hasReliableDimensions = aspectRatio >= 0.1 && aspectRatio <= 10.0;
                                       }
 
                                       Widget imageWidget = InkWell(
@@ -254,7 +249,7 @@ class _StoryState extends State<Story> {
                                           imageUrl: imgSrc,
                                           cacheKey: imgSrc,
                                           cacheManager: DefaultCacheManager(),
-                                          placeholder: (context, url) => LinearProgressIndicator(),
+                                          placeholder: (context, url) => SizedBox(width: 100, height: 10, child: LinearProgressIndicator()),
                                           errorWidget: (context, url, error) => Icon(Icons.error),
                                           filterQuality: FilterQuality.high,
                                           fit: BoxFit.contain,
@@ -263,13 +258,7 @@ class _StoryState extends State<Story> {
                                         ),
                                       );
 
-                                      if (isProfileImage) {
-                                        // round pfps
-                                        imageWidget = Container(
-                                          constraints: BoxConstraints(maxWidth: 60, maxHeight: 60),
-                                          child: ClipOval(child: imageWidget),
-                                        );
-                                      } else if (hasReliableDimensions && width! <= 400) {
+                                      if (hasReliableDimensions && width! <= 400) {
                                         // og dimensions for images with reasonable dimensions
                                         imageWidget = Container(
                                           constraints: BoxConstraints(
@@ -288,8 +277,9 @@ class _StoryState extends State<Story> {
                                         );
                                       }
 
-                                      // apply border radius only for non-profile images (profiles already have ClipOval)
-                                      return isProfileImage ? imageWidget : ClipRRect(borderRadius: BorderRadius.circular(12.0), child: imageWidget);
+                                      return Center(
+                                        child: ClipRRect(borderRadius: BorderRadius.circular(12.0), child: imageWidget),
+                                      );
                                     },
                                     enableCaching: true,
                                     buildAsync: true,
@@ -392,7 +382,7 @@ class FloatingBar extends StatelessWidget {
                                 tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
                                 icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
                               ),
-        
+
                               // RELOAD
                               if (!storyStore.showReaderMode) ...[
                                 IconButton(
@@ -403,7 +393,7 @@ class FloatingBar extends StatelessWidget {
                                   icon: const Icon(Icons.refresh),
                                 ),
                               ],
-        
+
                               // BACK
                               if (!storyStore.showReaderMode) ...[
                                 IconButton(
@@ -415,7 +405,7 @@ class FloatingBar extends StatelessWidget {
                                   tooltip: "Go back",
                                   icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
                                 ),
-        
+
                                 // FORWARD
                                 IconButton(
                                   onPressed: () {
@@ -427,14 +417,19 @@ class FloatingBar extends StatelessWidget {
                                   icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
                                 ),
                               ],
-        
+
                               storyStore.feedItemSummarized
                                   ? IconButton(
                                       onPressed: storyStore.hideAiSummary,
                                       icon: Stack(
                                         alignment: Alignment.center,
                                         children: [
-                                          const Align(alignment: Alignment.topRight, widthFactor: 2, heightFactor: 3, child: Icon(LucideIcons.sparkles, size: 14)),
+                                          const Align(
+                                            alignment: Alignment.topRight,
+                                            widthFactor: 2,
+                                            heightFactor: 3,
+                                            child: Icon(LucideIcons.sparkles, size: 14),
+                                          ),
                                           Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
                                         ],
                                       ),
@@ -447,7 +442,7 @@ class FloatingBar extends StatelessWidget {
                                       icon: const Icon(LucideIcons.sparkles),
                                       tooltip: "Summarize Article",
                                     ),
-        
+
                               // BOOKMARK
                               Stack(
                                 children: [
@@ -459,11 +454,14 @@ class FloatingBar extends StatelessWidget {
                                       bottom: 0,
                                       left: 0,
                                       child: Container(
-                                        decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1), shape: BoxShape.circle),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
                                   ],
-        
+
                                   IconButton(
                                     isSelected: storyStore.isBookmarked,
                                     onPressed: () {
@@ -474,9 +472,20 @@ class FloatingBar extends StatelessWidget {
                                   ),
                                 ],
                               ),
-        
+
                               // Share button
                               IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
+
+                              // READER MODE
+                              storyStore.showArchiveButton
+                                  ? IconButton(
+                                      onPressed: () {
+                                        storyStore.getArchivedArticle();
+                                      },
+                                      tooltip: "Search Archive.org for the article to bypass the paywall/block",
+                                      icon: Icon(Icons.archive_rounded),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                           AnimatedCrossFade(
@@ -519,7 +528,7 @@ class FloatingBar extends StatelessWidget {
             ),
           ),
         );
-      }
+      },
     );
   }
 }

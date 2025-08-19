@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:bytesized_news/views/auth/auth_store.dart';
-import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/sections/settings_section.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
@@ -74,29 +73,73 @@ class _StorySettingsState extends State<StorySettings> {
                           },
                         ),
 
-                        // Viewer font size
+                        // Always show the archive button
+                        SwitchListTile(
+                          title: const Text("Always show 'Fetch Archived link' button in bar"),
+                          value: settingsStore.alwaysShowArchiveButton,
+                          onChanged: (value) {
+                            settingsStore.alwaysShowArchiveButton = value;
+                          },
+                        ),
+                      ],
+                    ),
+
+                    SettingsSection(
+                      title: "Summary Settings",
+                      children: [
+                        // SHOW AI SUMMARY ON STORY PAGE LOAD
+                        SwitchListTile(
+                          title: const Text("Show Summary on page load"),
+                          value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
+                          onChanged: authStore.userTier == Tier.premium
+                              ? (value) {
+                                  settingsStore.setShowAiSummaryOnLoad(value);
+                                }
+                              : null,
+                        ),
+
+                        // FETCH AI SUMMARY ON STORY PAGE LOAD
+                        SwitchListTile(
+                          title: const Text("Generate Summary on page load"),
+                          value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
+                          onChanged: authStore.userTier == Tier.premium
+                              ? (value) {
+                                  settingsStore.setFetchAiSummaryOnLoad(value);
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                    
+                    SettingsSection(
+                      title: "Reader Font Settings",
+                      children: [
+                        // Font
                         ListTile(
-                          title: const Text("Reader Mode Font Size"),
-                          subtitle: SizedBox(
-                            width: 150,
-                            child: Row(
-                              children: [
-                                SizedBox(width: textWidth, child: Text(settingsStore.fontSize.toString())),
-                                Expanded(
-                                  child: Slider(
-                                    year2023: false, // todo: to fix (somehow)
-                                    label: settingsStore.fontSize.toString(),
-                                    value: settingsStore.fontSize ?? 16.0,
-                                    min: 10.0,
-                                    max: 30.0,
-                                    divisions: 40,
-                                    onChanged: (newVal) {
-                                      settingsStore.setFontSize(newVal);
-                                    },
-                                  ),
+                          title: Text("Font"),
+                          trailing: DropdownButton(
+                            items: FontFamily.values.map((font) {
+                              return DropdownMenuItem<String>(
+                                value: fontFamilyToString(font),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fontFamilyToString(font),
+                                      style: TextStyle(fontWeight: settingsStore.fontFamily == font ? FontWeight.w600 : FontWeight.normal),
+                                    ),
+                                    Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              settingsStore.fontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
+
+                              storyStore.htmlWidgetKey =
+                                  UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
+                            },
+                            value: fontFamilyToString(settingsStore.fontFamily),
                           ),
                         ),
 
@@ -128,6 +171,32 @@ class _StorySettingsState extends State<StorySettings> {
                               settingsStore.textWidth = TextWidth.values[textWidthValues.indexOf(value!)];
                             },
                             value: textWidthToString(settingsStore.textWidth),
+                          ),
+                        ),
+
+                        // Viewer font size
+                        ListTile(
+                          title: const Text("Reader Mode Font Size"),
+                          subtitle: SizedBox(
+                            width: 150,
+                            child: Row(
+                              children: [
+                                SizedBox(width: textWidth, child: Text(settingsStore.fontSize.toString())),
+                                Expanded(
+                                  child: Slider(
+                                    year2023: false, // todo: to fix (somehow)
+                                    label: settingsStore.fontSize.toString(),
+                                    value: settingsStore.fontSize ?? 16.0,
+                                    min: 10.0,
+                                    max: 30.0,
+                                    divisions: 40,
+                                    onChanged: (newVal) {
+                                      settingsStore.setFontSize(newVal);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
@@ -218,62 +287,7 @@ class _StorySettingsState extends State<StorySettings> {
                           ),
                         ),
 
-                        // Font
-                        ListTile(
-                          title: Text("Font"),
-                          trailing: DropdownButton(
-                            items: FontFamily.values.map((font) {
-                              return DropdownMenuItem<String>(
-                                value: fontFamilyToString(font),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      fontFamilyToString(font),
-                                      style: TextStyle(fontWeight: settingsStore.fontFamily == font ? FontWeight.w600 : FontWeight.normal),
-                                    ),
-                                    Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              settingsStore.fontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
-
-                              storyStore.htmlWidgetKey =
-                                  UniqueKey(); // Force update the key of the html widget to force the widget to call the buildstyles function again
-                            },
-                            value: fontFamilyToString(settingsStore.fontFamily),
-                          ),
-                        ),
-
                         // Other reader mode settings here
-                      ],
-                    ),
-                    SettingsSection(
-                      title: "Summary Settings",
-                      children: [
-                        // SHOW AI SUMMARY ON STORY PAGE LOAD
-                        SwitchListTile(
-                          title: const Text("Show Summary on page load"),
-                          value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
-                          onChanged: authStore.userTier == Tier.premium
-                              ? (value) {
-                                  settingsStore.setShowAiSummaryOnLoad(value);
-                                }
-                              : null,
-                        ),
-
-                        // FETCH AI SUMMARY ON STORY PAGE LOAD
-                        SwitchListTile(
-                          title: const Text("Generate Summary on page load"),
-                          value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
-                          onChanged: authStore.userTier == Tier.premium
-                              ? (value) {
-                                  settingsStore.setFetchAiSummaryOnLoad(value);
-                                }
-                              : null,
-                        ),
                       ],
                     ),
 

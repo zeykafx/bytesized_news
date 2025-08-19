@@ -226,6 +226,7 @@ abstract class _SettingsStore with Store {
   static const defaultStoryReaderMaxWidth = 800.0;
   static const defaultIsList = true;
   static const defaultAutoSwitchReaderTooShort = false;
+  static const defaultAlwaysShowArchiveButton = false;
 
   // Settings
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
@@ -403,4 +404,9 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultAutoSwitchReaderTooShort)
   @observable
   bool autoSwitchReaderTooShort = defaultAutoSwitchReaderTooShort;
+
+  //defaultAlwaysShowArchiveButton
+  @JsonKey(defaultValue: defaultAlwaysShowArchiveButton)
+  @observable
+  bool alwaysShowArchiveButton = defaultAlwaysShowArchiveButton;
 }

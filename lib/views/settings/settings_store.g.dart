@@ -53,7 +53,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0
       ..isList = json['isList'] as bool? ?? true
       ..autoSwitchReaderTooShort =
-          json['autoSwitchReaderTooShort'] as bool? ?? false;
+          json['autoSwitchReaderTooShort'] as bool? ?? false
+      ..alwaysShowArchiveButton =
+          json['alwaysShowArchiveButton'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -81,6 +83,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'storyReaderMaxWidth': instance.storyReaderMaxWidth,
       'isList': instance.isList,
       'autoSwitchReaderTooShort': instance.autoSwitchReaderTooShort,
+      'alwaysShowArchiveButton': instance.alwaysShowArchiveButton,
     };
 
 const _$DarkModeEnumMap = {
@@ -580,6 +583,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$alwaysShowArchiveButtonAtom =
+      Atom(name: '_SettingsStore.alwaysShowArchiveButton', context: context);
+
+  @override
+  bool get alwaysShowArchiveButton {
+    _$alwaysShowArchiveButtonAtom.reportRead();
+    return super.alwaysShowArchiveButton;
+  }
+
+  @override
+  set alwaysShowArchiveButton(bool value) {
+    _$alwaysShowArchiveButtonAtom
+        .reportWrite(value, super.alwaysShowArchiveButton, () {
+      super.alwaysShowArchiveButton = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -743,7 +763,8 @@ requireDeviceIdleForBgFetch: ${requireDeviceIdleForBgFetch},
 storyTilesMinimalStyle: ${storyTilesMinimalStyle},
 storyReaderMaxWidth: ${storyReaderMaxWidth},
 isList: ${isList},
-autoSwitchReaderTooShort: ${autoSwitchReaderTooShort}
+autoSwitchReaderTooShort: ${autoSwitchReaderTooShort},
+alwaysShowArchiveButton: ${alwaysShowArchiveButton}
     ''';
   }
 }

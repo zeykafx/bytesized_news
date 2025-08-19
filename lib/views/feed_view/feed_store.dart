@@ -147,9 +147,9 @@ abstract class _FeedStore with Store {
         showSmallScrollToTop = false;
       }
 
-      if (scrollController.offset > 1000 && showScrollToTop && !showSmallScrollToTop) {
+      if (scrollController.offset > 1500 && showScrollToTop && !showSmallScrollToTop) {
         showSmallScrollToTop = true;
-      } else if (scrollController.offset < 1000 && showScrollToTop && showSmallScrollToTop) {
+      } else if (scrollController.offset < 1500 && showScrollToTop && showSmallScrollToTop) {
         showSmallScrollToTop = false;
       }
     });
@@ -319,7 +319,7 @@ abstract class _FeedStore with Store {
   @action
   Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) async {
     item.bookmarked = toggle ? !item.bookmarked : true;
-    item.fetchHtmlContent();
+    item.fetchHtmlContent(item.url);
     item.downloaded = true;
 
     await dbUtils.updateItemInDb(item);
@@ -332,7 +332,7 @@ abstract class _FeedStore with Store {
       item.htmlContent = "";
     } else {
       item.downloaded = true;
-      await item.fetchHtmlContent();
+      await item.fetchHtmlContent(item.url);
     }
 
     // await dbUtils.updateItemInDb(item); // no need for this, it is already done in fetchHtmlContent

@@ -1,4 +1,3 @@
-import 'package:bytesized_news/utils/utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
 import 'package:bytesized_news/views/settings/sections/settings_section.dart';

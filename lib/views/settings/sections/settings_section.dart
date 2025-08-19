@@ -11,7 +11,8 @@ class SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card.filled(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      color: Theme.of(context).colorScheme.surfaceContainerLow.withValues(alpha: 0.7),
+      // color: Theme.of(context).colorScheme.surfaceContainerLow.withValues(alpha: 0.7),
+      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

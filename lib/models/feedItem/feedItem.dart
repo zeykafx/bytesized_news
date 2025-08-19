@@ -149,8 +149,8 @@ class FeedItem {
     return feedItem;
   }
 
-  Future<String> fetchHtmlContent() async {
-    Article result = await readability.parseAsync(url);
+  Future<String> fetchHtmlContent(String articleUrl) async {
+    Article result = await readability.parseAsync(articleUrl);
     if (result.content == null) {
       estReadingTimeMinutes = 0;
       return "";

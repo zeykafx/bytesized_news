@@ -457,6 +457,70 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$showArchiveButtonAtom =
+      Atom(name: '_StoryStore.showArchiveButton', context: context);
+
+  @override
+  bool get showArchiveButton {
+    _$showArchiveButtonAtom.reportRead();
+    return super.showArchiveButton;
+  }
+
+  @override
+  set showArchiveButton(bool value) {
+    _$showArchiveButtonAtom.reportWrite(value, super.showArchiveButton, () {
+      super.showArchiveButton = value;
+    });
+  }
+
+  late final _$hasAlertAtom =
+      Atom(name: '_StoryStore.hasAlert', context: context);
+
+  @override
+  bool get hasAlert {
+    _$hasAlertAtom.reportRead();
+    return super.hasAlert;
+  }
+
+  @override
+  set hasAlert(bool value) {
+    _$hasAlertAtom.reportWrite(value, super.hasAlert, () {
+      super.hasAlert = value;
+    });
+  }
+
+  late final _$shortAlertAtom =
+      Atom(name: '_StoryStore.shortAlert', context: context);
+
+  @override
+  bool get shortAlert {
+    _$shortAlertAtom.reportRead();
+    return super.shortAlert;
+  }
+
+  @override
+  set shortAlert(bool value) {
+    _$shortAlertAtom.reportWrite(value, super.shortAlert, () {
+      super.shortAlert = value;
+    });
+  }
+
+  late final _$alertMessageAtom =
+      Atom(name: '_StoryStore.alertMessage', context: context);
+
+  @override
+  String get alertMessage {
+    _$alertMessageAtom.reportRead();
+    return super.alertMessage;
+  }
+
+  @override
+  set alertMessage(String value) {
+    _$alertMessageAtom.reportWrite(value, super.alertMessage, () {
+      super.alertMessage = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -465,6 +529,24 @@ mixin _$StoryStore on _StoryStore, Store {
       AuthStore authStore) {
     return _$initAsyncAction
         .run(() => super.init(item, context, setStore, authStore));
+  }
+
+  late final _$checkPaywallOrBotBlockAsyncAction =
+      AsyncAction('_StoryStore.checkPaywallOrBotBlock', context: context);
+
+  @override
+  Future<void> checkPaywallOrBotBlock() {
+    return _$checkPaywallOrBotBlockAsyncAction
+        .run(() => super.checkPaywallOrBotBlock());
+  }
+
+  late final _$getArchivedArticleAsyncAction =
+      AsyncAction('_StoryStore.getArchivedArticle', context: context);
+
+  @override
+  Future<bool> getArchivedArticle({bool fromError = false}) {
+    return _$getArchivedArticleAsyncAction
+        .run(() => super.getArchivedArticle(fromError: fromError));
   }
 
   late final _$compareReaderModeLengthToPageHtmlAsyncAction = AsyncAction(
@@ -525,6 +607,17 @@ mixin _$StoryStore on _StoryStore, Store {
 
   late final _$_StoryStoreActionController =
       ActionController(name: '_StoryStore', context: context);
+
+  @override
+  void webviewInit() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.webviewInit');
+    try {
+      return super.webviewInit();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void dispose() {
@@ -676,6 +769,10 @@ htmlWidgetKey: ${htmlWidgetKey},
 hideBar: ${hideBar},
 webviewLastScrollY: ${webviewLastScrollY},
 readingStat: ${readingStat},
+showArchiveButton: ${showArchiveButton},
+hasAlert: ${hasAlert},
+shortAlert: ${shortAlert},
+alertMessage: ${alertMessage},
 hasImageInArticle: ${hasImageInArticle}
     ''';
   }
