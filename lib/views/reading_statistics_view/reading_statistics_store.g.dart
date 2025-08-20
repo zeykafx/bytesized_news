@@ -113,6 +113,22 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
+  late final _$currentSortAtom =
+      Atom(name: '_ReadingStatisticsStore.currentSort', context: context);
+
+  @override
+  String get currentSort {
+    _$currentSortAtom.reportRead();
+    return super.currentSort;
+  }
+
+  @override
+  set currentSort(String value) {
+    _$currentSortAtom.reportWrite(value, super.currentSort, () {
+      super.currentSort = value;
+    });
+  }
+
   late final _$longuestReadArticleAtom = Atom(
       name: '_ReadingStatisticsStore.longuestReadArticle', context: context);
 
@@ -219,6 +235,16 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
         .run(() => super.getReadingStatistics());
   }
 
+  late final _$sortButtonOnChangedAsyncAction = AsyncAction(
+      '_ReadingStatisticsStore.sortButtonOnChanged',
+      context: context);
+
+  @override
+  Future<void> sortButtonOnChanged(String? item) {
+    return _$sortButtonOnChangedAsyncAction
+        .run(() => super.sortButtonOnChanged(item));
+  }
+
   late final _$_ReadingStatisticsStoreActionController =
       ActionController(name: '_ReadingStatisticsStore', context: context);
 
@@ -253,6 +279,7 @@ readingStreak: ${readingStreak},
 totalReadingTime: ${totalReadingTime},
 numberArticlesRead: ${numberArticlesRead},
 loading: ${loading},
+currentSort: ${currentSort},
 longuestReadArticle: ${longuestReadArticle},
 mostReadDay: ${mostReadDay},
 mostReadDayCount: ${mostReadDayCount},

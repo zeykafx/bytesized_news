@@ -34,19 +34,17 @@ The app is built with Flutter and Mobx.
 #### Integrated browser:
 <img alt="Integrated browser" src="./.images/reader_browser.png" width="300"/>
 
+### Reading statistics
+<img alt="Reading statistics page" src="./.images/reading_stats.png" width="300"/>
 
 ### Feed Manager
 <img alt="Feed Manager" src="./.images/feed_mngr.png" width="300"/>
 
-### Search
-<img alt="Search" src="./.images/search.png" width="300"/>
-
 ### Curated News Sources
 <img alt="Curated feeds" src="./.images/curated_feeds.png" width="300"/>
 
-
-### Reading statistics
-<img alt="Reading statistics page" src="./.images/reading_stats.png" width="300"/>
+### Search
+<img alt="Search" src="./.images/search.png" width="300"/>
 
 ### Settings
 <img alt="Settings" src="./.images/settings.png" width="300"/>

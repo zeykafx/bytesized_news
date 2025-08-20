@@ -13,6 +13,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 
@@ -103,6 +104,16 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                     controller: store.scrollController,
                     slivers: [
                       SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: AnimatedOpacity(
+                            duration: 200.ms,
+                            opacity: store.loading ? 1 : 0,
+                            child: LinearProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
                         child: GridView.count(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
@@ -117,10 +128,33 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                       ),
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
-                          child: Text(
-                            "Read articles",
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Read articles",
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+                              ),
+                              DropdownButton<String>(
+                                borderRadius: BorderRadius.circular(12),
+                                dropdownColor: Theme.of(context).colorScheme.secondaryContainer,
+                                underline: const SizedBox.shrink(),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                iconEnabledColor: Theme.of(context).colorScheme.primary,
+                                elevation: 0,
+                                iconSize: 25,
+                                value: store.currentSort,
+                                icon: const Icon(Icons.sort_rounded),
+                                items: [
+                                  DropdownMenuItem<String>(value: "by_date", child: Text("Sort by reading date")),
+                                  DropdownMenuItem<String>(value: "by_duration", child: Text("Sort by reading duration")),
+                                ],
+                                onChanged: (String? item) => store.sortButtonOnChanged(item),
+                              ),
+                            ],
                           ),
                         ).animate(delay: 200.ms).fadeIn(),
                       ),
@@ -180,10 +214,31 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
   }
 
   StatsCard buildReadingTimeCard() {
+    double percentageOfYear = (store.totalReadingTime.inMinutes / 5259492) * 100;
     return StatsCard(
       title: "Reading time",
-      content: "${store.totalReadingTime.inHours}h ${store.totalReadingTime.inMinutes.remainder(60)}m",
-      widgetContent: null,
+      // content: "${store.totalReadingTime.inHours}h ${store.totalReadingTime.inMinutes.remainder(60)}m",
+      content: "",
+      widgetContent: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(
+            "${store.totalReadingTime.inHours}h ${store.totalReadingTime.inMinutes.remainder(60)}m",
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            textAlign: ui.TextAlign.right,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "That is ${percentageOfYear.toStringAsFixed(2)}% of a whole year",
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+            textAlign: ui.TextAlign.right,
+          ),
+        ],
+      ),
     );
   }
 
@@ -448,7 +503,7 @@ class ReadArticleCard extends StatelessWidget {
 
     return Card.filled(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.2),
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       child: Material(
         color: Colors.transparent,

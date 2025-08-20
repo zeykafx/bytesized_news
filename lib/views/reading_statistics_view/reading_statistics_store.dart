@@ -28,6 +28,9 @@ abstract class _ReadingStatisticsStore with Store {
   bool loading = false;
 
   @observable
+  String currentSort = "by_date";
+
+  @observable
   (FeedItem?, StoryReading?) longuestReadArticle = (null, null);
 
   @observable
@@ -78,5 +81,18 @@ abstract class _ReadingStatisticsStore with Store {
   @action
   void scrollToTop() {
     scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+  }
+
+  @action
+  Future<void> sortButtonOnChanged(String? item) async {
+    loading = true;
+    currentSort = item ?? "by_date";
+
+    if (item == "by_date") {
+      allArticlesRead = (await dbUtils.getReadArticlesWithStats()).asObservable();
+    } else if (item == "by_duration") {
+      allArticlesRead = (await dbUtils.getReadArticlesWithStats(sortByReadingDuration: true)).asObservable();
+    }
+    loading = false;
   }
 }
