@@ -210,6 +210,7 @@ class SettingsStore extends _SettingsStore with _$SettingsStore {
 
 abstract class _SettingsStore with Store {
   // Defaults
+  static const defaultHasShownWelcomeScreen = false;
   static const defaultDarkMode = DarkMode.system;
   static const defaultSort = FeedListSort.byDate;
   static const defaultMutedKeywords = <String>[];
@@ -229,6 +230,10 @@ abstract class _SettingsStore with Store {
   static const defaultAlwaysShowArchiveButton = false;
 
   // Settings
+  @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
+  @observable
+  bool hasShownWelcomeScreen = defaultHasShownWelcomeScreen;
+
   @JsonKey(defaultValue: defaultDarkMode, unknownEnumValue: DarkMode.system)
   @observable
   DarkMode darkMode = DarkMode.system;

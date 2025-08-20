@@ -96,6 +96,16 @@ class _StorySettingsState extends State<StorySettings> {
                                   settingsStore.setShowAiSummaryOnLoad(value);
                                 }
                               : null,
+                          // thumbIcon: WidgetStateProperty.resolveWith<Icon?>((Set<WidgetState> states) {
+                          //   if (states.contains(WidgetState.selected)) {
+                          //     return Icon(
+                          //       Icons.check,
+                          //       color:  Theme.of(context).colorScheme.onSurface,
+                          //     );
+                          //   }
+                          //   // All other states will use the default thumbIcon.
+                          //   return Icon(Icons.close, color: Theme.of(context).colorScheme.onPrimary);
+                          // }),
                         ),
 
                         // FETCH AI SUMMARY ON STORY PAGE LOAD
@@ -110,7 +120,7 @@ class _StorySettingsState extends State<StorySettings> {
                         ),
                       ],
                     ),
-                    
+
                     SettingsSection(
                       title: "Reader Font Settings",
                       children: [

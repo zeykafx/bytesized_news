@@ -443,16 +443,6 @@ export const summarize = onCall(
       messages: [
         {
           role: "system",
-          //   content: `
-          // Summarize the article in 3 sentences. Only use more sentences if the article is long.
-          // But try to stick to 3 setences.
-          // DO NOT OUTPUT A SUMMARY LONGER THAN 5 SENTENCES!! Stick to the information in the article.
-          // Do not add any new information, if an article refers to Twitter as 'X' do not do the same,
-          // instead refer to it as 'Twitter. Always provide a translation of the units of measurements
-          // used in the article (ONLY translate between metric and imperial, and do so in parentheses).
-          // ONLY OUTPUT THE SUMMARY, NO INTRODUCTION LIKE "Here is a summary..."!
-          // If you can, use bullet points with proper formatting such that each bullet point starts on its own line.
-          // `,
           content: `
           ### Role
           You are a precise article summarizer. Extract only the essential information without adding interpretations or new content.
@@ -460,10 +450,10 @@ export const summarize = onCall(
           ### Instructions
           - Summarize the article in exactly 3 bullet points (max 5 if article is exceptionally long)
           - Each bullet point must start on a new line with a proper bullet character (•)
-          - Use Twitter's official name (Twitter) even if the article refers to it as "X"
           - Convert units of measurement between metric and imperial systems (provide in parentheses)
           - Maintain factual accuracy - include ONLY information present in the original text
           - Keep each bullet concise and focused on one key point
+          - Use Twitter's official name (Twitter) even if the article refers to it as "X"
 
           ### Context
           The article requires concise summarization while preserving all critical information.
@@ -478,6 +468,7 @@ export const summarize = onCall(
           - NO concluding remarks
           - NO additional context or opinions
           - STRICTLY adhere to bullet point format
+          - Add a short warning at the end of the summary if the article is from non trustworthy "news" sources from the far right
           `,
         },
         {
@@ -764,7 +755,7 @@ export const buildUserInterests = onCall(
           content: `Most Read Feeds: ${mostReadFeedsString}`,
         },
       ],
-      temperature: 0.6,
+      temperature: 0.3,
     });
 
     const result = completion.choices[0]?.message?.content || "";
@@ -849,7 +840,7 @@ export const evaluateSummary = onCall(
           content: `Summary: ${summaryText}`,
         },
       ],
-      temperature: 0.0,
+      temperature: 0.3,
     });
 
     const resultContent = completion.choices[0]?.message?.content || "";

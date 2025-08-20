@@ -93,13 +93,14 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                     widget.item.imageUrl.isNotEmpty
                         ? Center(
                             child: Container(
+                              margin: EdgeInsets.all(4),
                               decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
                               clipBehavior: Clip.antiAlias,
                               child: CachedNetworkImage(
                                 imageUrl: widget.item.imageUrl,
                                 fit: BoxFit.cover,
                                 errorWidget: (context, str, obj) => Container(
-                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
                                   clipBehavior: Clip.antiAlias,
                                   child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 200, width: 350, fit: BoxFit.cover),
                                 ),

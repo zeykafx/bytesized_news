@@ -177,12 +177,12 @@ class FeedItem {
         imgSrc = src;
       }
 
-      if (imageUrl.isEmpty) {
-        imageUrl = imgSrc;
-      }
-
       if (imgSrc.isEmpty) {
         continue;
+      }
+
+      if (imageUrl.isEmpty) {
+        imageUrl = imgSrc;
       }
 
       try {

@@ -631,6 +631,17 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
+  void getSettingsStoreValues() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.getSettingsStoreValues');
+    try {
+      return super.getSettingsStoreValues();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   Map<String, String>? buildStyle(BuildContext context, dom.Element element) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
         name: '_StoryStore.buildStyle');

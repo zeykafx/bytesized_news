@@ -8,6 +8,7 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
+      ..hasShownWelcomeScreen = json['hasShownWelcomeScreen'] as bool? ?? false
       ..darkMode = $enumDecodeNullable(_$DarkModeEnumMap, json['darkMode'],
               unknownValue: DarkMode.system) ??
           DarkMode.system
@@ -59,6 +60,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
+      'hasShownWelcomeScreen': instance.hasShownWelcomeScreen,
       'darkMode': _$DarkModeEnumMap[instance.darkMode]!,
       'sort': _$FeedListSortEnumMap[instance.sort]!,
       'sortFeedName': instance.sortFeedName,
@@ -161,6 +163,23 @@ const _$BackgroundFetchIntervalEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SettingsStore on _SettingsStore, Store {
+  late final _$hasShownWelcomeScreenAtom =
+      Atom(name: '_SettingsStore.hasShownWelcomeScreen', context: context);
+
+  @override
+  bool get hasShownWelcomeScreen {
+    _$hasShownWelcomeScreenAtom.reportRead();
+    return super.hasShownWelcomeScreen;
+  }
+
+  @override
+  set hasShownWelcomeScreen(bool value) {
+    _$hasShownWelcomeScreenAtom.reportWrite(value, super.hasShownWelcomeScreen,
+        () {
+      super.hasShownWelcomeScreen = value;
+    });
+  }
+
   late final _$darkModeAtom =
       Atom(name: '_SettingsStore.darkMode', context: context);
 
@@ -738,6 +757,7 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   String toString() {
     return '''
+hasShownWelcomeScreen: ${hasShownWelcomeScreen},
 darkMode: ${darkMode},
 sort: ${sort},
 sortFeed: ${sortFeed},

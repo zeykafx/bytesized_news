@@ -8,6 +8,7 @@ import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:bytesized_news/views/welcome/welcome.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -215,7 +216,7 @@ class _MyAppState extends State<MyApp> {
         return Observer(
           builder: (context) {
             return MaterialApp(
-              title: 'ByteSized News',
+              title: 'Bytesized News',
               theme: lightTheme(light),
               darkTheme: darkTheme(dark),
               themeMode: settingsStore.darkMode == DarkMode.system
@@ -223,7 +224,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                   ? ThemeMode.dark
                   : ThemeMode.light,
-              home: user == null ? const Auth() : const FeedView(),
+              home: user == null ? const Auth() : (settingsStore.hasShownWelcomeScreen ? const FeedView() : const Welcome()),
             );
           },
         );

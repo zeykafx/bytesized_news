@@ -119,8 +119,9 @@ abstract class _FeedStore with Store {
     settingsStore = setStore;
     this.authStore = authStore;
     aiUtils = AiUtils(authStore);
-
     dbUtils = DbUtils(isar: isar);
+
+    settingsStore.hasShownWelcomeScreen = true;
 
     bsbController.addListener(onBsbChanged);
 

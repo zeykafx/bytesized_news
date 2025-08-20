@@ -342,6 +342,13 @@ abstract class _StoryStore with Store {
   }
 
   @action
+  void getSettingsStoreValues() {
+    showReaderMode = settingsStore.useReaderModeByDefault;
+    hideSummary = settingsStore.showAiSummaryOnLoad;
+    showArchiveButton = settingsStore.alwaysShowArchiveButton;
+  }
+
+  @action
   Future<void> compareReaderModeLengthToPageHtml(BuildContext context) async {
     Dio dio = Dio();
 

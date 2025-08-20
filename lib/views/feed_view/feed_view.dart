@@ -38,7 +38,9 @@ class _FeedViewState extends State<FeedView> {
     reactionDisposer = reaction((_) => feedStore.hasAlert, (bool hasAlert) {
       // if there is an alert to show, show it in a snackbar
       if (hasAlert) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(feedStore.alertMessage), duration: Duration(seconds: 10)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(feedStore.alertMessage), showCloseIcon: true, duration: Duration(seconds: 10), behavior: SnackBarBehavior.floating),
+        );
         feedStore.hasAlert = false;
         feedStore.alertMessage = "";
       }

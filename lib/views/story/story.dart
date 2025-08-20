@@ -52,6 +52,7 @@ class _StoryState extends State<Story> {
             content: Text(storyStore.alertMessage),
             duration: Duration(seconds: storyStore.shortAlert ? 3 : 10),
             showCloseIcon: !storyStore.shortAlert,
+            behavior: SnackBarBehavior.floating,
           ),
         );
         storyStore.hasAlert = false;
@@ -106,7 +107,9 @@ class _StoryState extends State<Story> {
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => StorySettings(storyStore: storyStore)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => StorySettings(storyStore: storyStore))).then((_) {
+                  storyStore.getSettingsStoreValues();
+                });
               },
             ),
           ],
@@ -167,8 +170,8 @@ class _StoryState extends State<Story> {
                                     '''
                                         <div class="bytesized_news_html_content">
                                            ${storyStore.htmlContent.split(" ").take(50).join(" ").contains(storyStore.feedItem.title) ? "" : "<h1>${storyStore.feedItem.title}</h1>"}
-                                             ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p class='top-text'>Author${storyStore.feedItem.authors.length > 1 ? "s" : ""}: ${storyStore.feedItem.authors.join(", ")}</p>"}
                                              <p class="top-text">${storyStore.feedItem.feed?.name} | ${formatTime(storyStore.feedItem.publishedDate.millisecondsSinceEpoch)}</p>
+                                             ${storyStore.htmlContent.split(" ").take(100).join(" ").contains(storyStore.feedItem.authors.join("|")) ? "" : "<p class='top-text'> ${storyStore.feedItem.authors.join(", ")}</p>"}
                                              <p class="top-text">${storyStore.feedItem.estReadingTimeMinutes} minute read</p>
 
                                                  ${ /* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
@@ -436,9 +439,13 @@ class FloatingBar extends StatelessWidget {
                                       tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
                                     )
                                   : IconButton(
-                                      onPressed: () {
-                                        storyStore.summarizeArticle(context);
-                                      },
+                                      onPressed: storyStore.aiLoading
+                                          ? null
+                                          : () {
+                                              if (!storyStore.aiLoading) {
+                                                storyStore.summarizeArticle(context);
+                                              }
+                                            },
                                       icon: const Icon(LucideIcons.sparkles),
                                       tooltip: "Summarize Article",
                                     ),
