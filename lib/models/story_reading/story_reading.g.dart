@@ -91,7 +91,7 @@ StoryReading _storyReadingDeserialize(
     reader.readLong(offsets[0]),
     reader.readLong(offsets[4]),
     reader.readDateTimeList(offsets[3]) ?? [],
-    reader.readDateTimeOrNull(offsets[2]),
+    reader.readDateTime(offsets[2]),
   );
   object.id = id;
   return object;
@@ -109,7 +109,7 @@ P _storyReadingDeserializeProp<P>(
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 3:
       return (reader.readDateTimeList(offset) ?? []) as P;
     case 4:
@@ -325,25 +325,7 @@ extension StoryReadingQueryFilter
   }
 
   QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
-      firstReadIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'firstRead',
-      ));
-    });
-  }
-
-  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
-      firstReadIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'firstRead',
-      ));
-    });
-  }
-
-  QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
-      firstReadEqualTo(DateTime? value) {
+      firstReadEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'firstRead',
@@ -354,7 +336,7 @@ extension StoryReadingQueryFilter
 
   QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
       firstReadGreaterThan(
-    DateTime? value, {
+    DateTime value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -368,7 +350,7 @@ extension StoryReadingQueryFilter
 
   QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
       firstReadLessThan(
-    DateTime? value, {
+    DateTime value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -382,8 +364,8 @@ extension StoryReadingQueryFilter
 
   QueryBuilder<StoryReading, StoryReading, QAfterFilterCondition>
       firstReadBetween(
-    DateTime? lower,
-    DateTime? upper, {
+    DateTime lower,
+    DateTime upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -833,7 +815,7 @@ extension StoryReadingQueryProperty
     });
   }
 
-  QueryBuilder<StoryReading, DateTime?, QQueryOperations> firstReadProperty() {
+  QueryBuilder<StoryReading, DateTime, QQueryOperations> firstReadProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'firstRead');
     });

@@ -10,9 +10,9 @@ class StoryReading {
   int feedItemId;
   int feedId;
 
-  int readingDuration;
+  int readingDuration; // IN SECONDS
   List<DateTime> readLog = [];
-  DateTime? firstRead;
+  DateTime firstRead;
 
   @ignore
   late Feed feed;

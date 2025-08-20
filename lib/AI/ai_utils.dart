@@ -27,6 +27,11 @@ class AiUtils {
       }
       throw Exception("Error: You are not allowed to perform this operation.");
     }
+
+    if (text.length < 500) {
+      throw Exception("Error: The article is too short to summarize.");
+    }
+
     if (authStore.summariesLeftToday <= 0) {
       if (kDebugMode) {
         print("Error: No more summaries today");

@@ -697,28 +697,6 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
-  bool notificationListener(ScrollNotification notification) {
-    final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.notificationListener');
-    try {
-      return super.notificationListener(notification);
-    } finally {
-      _$_StoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void webviewScrollListener(InAppWebViewController controller, int x, int y) {
-    final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.webviewScrollListener');
-    try {
-      return super.webviewScrollListener(controller, x, y);
-    } finally {
-      _$_StoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void endReading() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
         name: '_StoryStore.endReading');
@@ -741,11 +719,22 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
-  void searchInArticle(BuildContext context) {
+  bool notificationListener(ScrollNotification notification) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.searchInArticle');
+        name: '_StoryStore.notificationListener');
     try {
-      return super.searchInArticle(context);
+      return super.notificationListener(notification);
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void webviewScrollListener(InAppWebViewController controller, int x, int y) {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.webviewScrollListener');
+    try {
+      return super.webviewScrollListener(controller, x, y);
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }

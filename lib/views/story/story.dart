@@ -51,8 +51,7 @@ class _StoryState extends State<Story> {
           SnackBar(
             content: Text(storyStore.alertMessage),
             duration: Duration(seconds: storyStore.shortAlert ? 3 : 10),
-            showCloseIcon: !storyStore.shortAlert,
-            behavior: SnackBarBehavior.floating,
+            // showCloseIcon: !storyStore.shortAlert,
           ),
         );
         storyStore.hasAlert = false;
@@ -253,7 +252,7 @@ class _StoryState extends State<Story> {
                                           cacheKey: imgSrc,
                                           cacheManager: DefaultCacheManager(),
                                           placeholder: (context, url) => SizedBox(width: 100, height: 10, child: LinearProgressIndicator()),
-                                          errorWidget: (context, url, error) => Icon(Icons.error),
+                                          errorWidget: (context, url, error) => const SizedBox.shrink(),
                                           filterQuality: FilterQuality.high,
                                           fit: BoxFit.contain,
                                           fadeInCurve: Curves.easeInQuad,
@@ -366,167 +365,170 @@ class FloatingBar extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            spacing: 3,
-                            children: [
-                              // READER MODE
-                              IconButton(
-                                onPressed: () {
-                                  storyStore.toggleReaderMode();
-                                },
-                                tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                                icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
-                              ),
-
-                              // RELOAD
-                              if (!storyStore.showReaderMode) ...[
+                    child: AnimatedSize(
+                      duration: 300.ms,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              spacing: 3,
+                              children: [
+                                // READER MODE
                                 IconButton(
                                   onPressed: () {
-                                    storyStore.controller?.reload();
+                                    storyStore.toggleReaderMode();
                                   },
-                                  tooltip: "Refresh web page",
-                                  icon: const Icon(Icons.refresh),
-                                ),
-                              ],
-
-                              // BACK
-                              if (!storyStore.showReaderMode) ...[
-                                IconButton(
-                                  onPressed: () {
-                                    if (storyStore.canGoBack) {
-                                      storyStore.controller?.goBack();
-                                    }
-                                  },
-                                  tooltip: "Go back",
-                                  icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
+                                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
+                                  icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
                                 ),
 
-                                // FORWARD
-                                IconButton(
-                                  onPressed: () {
-                                    if (storyStore.canGoForward) {
-                                      storyStore.controller?.goForward();
-                                    }
-                                  },
-                                  tooltip: "Go forward",
-                                  icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
-                                ),
-                              ],
-
-                              storyStore.feedItemSummarized
-                                  ? IconButton(
-                                      onPressed: storyStore.hideAiSummary,
-                                      icon: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          const Align(
-                                            alignment: Alignment.topRight,
-                                            widthFactor: 2,
-                                            heightFactor: 3,
-                                            child: Icon(LucideIcons.sparkles, size: 14),
-                                          ),
-                                          Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                        ],
-                                      ),
-                                      tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                    )
-                                  : IconButton(
-                                      onPressed: storyStore.aiLoading
-                                          ? null
-                                          : () {
-                                              if (!storyStore.aiLoading) {
-                                                storyStore.summarizeArticle(context);
-                                              }
-                                            },
-                                      icon: const Icon(LucideIcons.sparkles),
-                                      tooltip: "Summarize Article",
-                                    ),
-
-                              // BOOKMARK
-                              Stack(
-                                children: [
-                                  // circle like when held behind the bookmark icon if it's bookmarked
-                                  if (storyStore.isBookmarked) ...[
-                                    Positioned(
-                                      right: 0,
-                                      top: 0,
-                                      bottom: 0,
-                                      left: 0,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-
+                                // RELOAD
+                                if (!storyStore.showReaderMode) ...[
                                   IconButton(
-                                    isSelected: storyStore.isBookmarked,
                                     onPressed: () {
-                                      storyStore.bookmarkItem();
-                                      widget.feedItem.bookmarked = storyStore.isBookmarked;
+                                      storyStore.controller?.reload();
                                     },
-                                    icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                                    tooltip: "Refresh web page",
+                                    icon: const Icon(Icons.refresh),
                                   ),
                                 ],
-                              ),
 
-                              // Share button
-                              IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
-
-                              // READER MODE
-                              storyStore.showArchiveButton
-                                  ? IconButton(
-                                      onPressed: () {
-                                        storyStore.getArchivedArticle();
-                                      },
-                                      tooltip: "Search Archive.org for the article to bypass the paywall/block",
-                                      icon: Icon(Icons.archive_rounded),
-                                    )
-                                  : const SizedBox.shrink(),
-                            ],
-                          ),
-                          AnimatedCrossFade(
-                            duration: 150.ms,
-                            firstCurve: Curves.easeInOutQuad,
-                            secondCurve: Curves.easeInOutQuad,
-                            sizeCurve: Curves.easeOutQuad,
-                            crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                ? CrossFadeState.showFirst
-                                : CrossFadeState.showSecond,
-                            firstChild: Container(
-                              constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
-                              child: Card.outlined(
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(25), // slightly less radius to fit the radius of the container
+                                // BACK
+                                if (!storyStore.showReaderMode) ...[
+                                  IconButton(
+                                    onPressed: () {
+                                      if (storyStore.canGoBack) {
+                                        storyStore.controller?.goBack();
+                                      }
+                                    },
+                                    tooltip: "Go back",
+                                    icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
                                   ),
+
+                                  // FORWARD
+                                  IconButton(
+                                    onPressed: () {
+                                      if (storyStore.canGoForward) {
+                                        storyStore.controller?.goForward();
+                                      }
+                                    },
+                                    tooltip: "Go forward",
+                                    icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
+                                  ),
+                                ],
+
+                                storyStore.feedItemSummarized
+                                    ? IconButton(
+                                        onPressed: storyStore.hideAiSummary,
+                                        icon: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            const Align(
+                                              alignment: Alignment.topRight,
+                                              widthFactor: 2,
+                                              heightFactor: 3,
+                                              child: Icon(LucideIcons.sparkles, size: 14),
+                                            ),
+                                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                                          ],
+                                        ),
+                                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                                      )
+                                    : IconButton(
+                                        onPressed: storyStore.aiLoading
+                                            ? null
+                                            : () {
+                                                if (!storyStore.aiLoading) {
+                                                  storyStore.summarizeArticle(context);
+                                                }
+                                              },
+                                        icon: const Icon(LucideIcons.sparkles),
+                                        tooltip: "Summarize Article",
+                                      ),
+
+                                // BOOKMARK
+                                Stack(
+                                  children: [
+                                    // circle like when held behind the bookmark icon if it's bookmarked
+                                    if (storyStore.isBookmarked) ...[
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        left: 0,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+
+                                    IconButton(
+                                      isSelected: storyStore.isBookmarked,
+                                      onPressed: () {
+                                        storyStore.bookmarkItem();
+                                        widget.feedItem.bookmarked = storyStore.isBookmarked;
+                                      },
+                                      icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
+                                    ),
+                                  ],
                                 ),
-                                margin: EdgeInsets.only(bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: SingleChildScrollView(
-                                    child: SelectableText(
-                                      storyStore.feedItem.aiSummary,
-                                      // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+
+                                // Share button
+                                IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
+
+                                // READER MODE
+                                storyStore.showArchiveButton
+                                    ? IconButton(
+                                        onPressed: () {
+                                          storyStore.getArchivedArticle();
+                                        },
+                                        tooltip: "Search Archive.org for the article to bypass the paywall/block",
+                                        icon: Icon(Icons.archive_rounded),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            ),
+                            AnimatedCrossFade(
+                              duration: 150.ms,
+                              firstCurve: Curves.easeInOutQuad,
+                              secondCurve: Curves.easeInOutQuad,
+                              sizeCurve: Curves.easeOutQuad,
+                              crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              firstChild: Container(
+                                constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
+                                child: Card.outlined(
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(25), // slightly less radius to fit the radius of the container
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: SingleChildScrollView(
+                                      child: SelectableText(
+                                        storyStore.feedItem.aiSummary,
+                                        // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
+                              secondChild: const SizedBox.shrink(),
                             ),
-                            secondChild: const SizedBox.shrink(),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

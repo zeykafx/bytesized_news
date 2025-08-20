@@ -106,7 +106,7 @@ dev_dependencies:
   in_app_purchase_platform_interface: ^1.4.0
 
 dependency_overrides:
-  analyzer: ^6.9.0
+  analyzer: ^6.0.0
   source_gen: ^2.0.0
   # dart_style: ^3.0.0
 

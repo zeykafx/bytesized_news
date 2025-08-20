@@ -554,37 +554,18 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print("Fetching summaries too fast");
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)",
-          ),
-          duration: const Duration(seconds: 10),
-        ),
-      );
+      alertMessage = "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)";
+      hasAlert = true;
+
       return;
     }
 
-    // String? htmlValue;
-    // if (!showReaderMode) {
-    //   htmlValue = await controller?.evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
-    // } else {
-    //   htmlValue = htmlContent;
-    // }
-
-    // if (docText.length > 15000) {
-    //   // docText = docText.substring(0, 15000);
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       content: Text("This webpage is very long, sumarization will take more than 1 credit (according to the size)."),
-    //       duration: Duration(seconds: 5),
-    //     ),
-    //   );
-    if (docText.length < 200) {
+    if (docText.length < 500) {
       if (kDebugMode) {
         print(docText.length);
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Article too short to summarize."), duration: Duration(seconds: 5)));
+      alertMessage = "Article too short to summarize.";
+      hasAlert = true;
       return;
     } else if (docText.length > 30000 && !longSummaryAccepted) {
       String summaryCount = (docText.length / 15000).toStringAsFixed(0);
@@ -637,7 +618,8 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print(e);
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll("Error: ", "")), duration: const Duration(seconds: 10)));
+      alertMessage = e.toString().replaceAll("Error: ", "");
+      hasAlert = true;
     }
 
     if (kDebugMode) {
@@ -656,10 +638,9 @@ abstract class _StoryStore with Store {
       if (kDebugMode) {
         print("Not using summary!");
       }
+      alertMessage = "The summary for this article was not factually correct, try again later.";
+      hasAlert = true;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("The summary for this article was not factually correct, try again later."), duration: const Duration(seconds: 10)),
-      );
       feedItem.aiSummary = "";
       authStore.lastSummaryDate = DateTime.now().toUtc();
       feedItem.summarized = false;
@@ -724,6 +705,61 @@ abstract class _StoryStore with Store {
   }
 
   @action
+  void endReading() {
+    if (kDebugMode) {
+      print("Ending Reading: ${readingStat.reading}");
+    }
+    if (initialized) {
+      readingStat.endReading(feedItem);
+    }
+  }
+
+  @action
+  void shareArticle(BuildContext context) {
+    final params = ShareParams(uri: Uri.parse(feedItem.url));
+
+    SharePlus.instance.share(params);
+  }
+
+  // @action
+  // void searchInArticle(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (context, Function dialogSetState) {
+  //           return AlertDialog(
+  //             insetPadding: EdgeInsets.all(8),
+  //             contentPadding: EdgeInsets.all(8),
+  //             title: const Text("Search"),
+  //             content: SingleChildScrollView(
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [],
+  //               ),
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.of(context).pop();
+  //                 },
+  //                 child: const Text("Cancel"),
+  //               ),
+  //               TextButton(
+  //                 onPressed: () async {
+  //                   Navigator.of(context).pop();
+  //                 },
+  //                 child: const Text("Confirm"),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   ).then((_) {});
+  // }
+
+  @action
   bool notificationListener(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification &&
         notification.metrics.pixels > 200 &&
@@ -761,61 +797,5 @@ abstract class _StoryStore with Store {
       hideSummary = false;
     }
     webviewLastScrollY = y;
-  }
-
-  @action
-  void endReading() {
-    if (kDebugMode) {
-      print("Ending Reading: ${readingStat.reading}");
-    }
-    if (initialized) {
-      readingStat.endReading(feedItem);
-    }
-  }
-
-  @action
-  void shareArticle(BuildContext context) {
-    final params = ShareParams(uri: Uri.parse(feedItem.url));
-
-    SharePlus.instance.share(params);
-  }
-
-  @action
-  void searchInArticle(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, Function dialogSetState) {
-            return AlertDialog(
-              insetPadding: EdgeInsets.all(8),
-              contentPadding: EdgeInsets.all(8),
-              title: const Text("Search"),
-              content: SingleChildScrollView(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-
-
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Confirm"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    ).then((_) {});
   }
 }

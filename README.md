@@ -10,27 +10,23 @@ The app is built with Flutter and Mobx.
 - Synchronize your feeds and feed groups across all of your devices
 - Background fetching for articles (with customizable interval)
 - Read articles with a built-in browser
+- Instantly summarize articles (paid feature)
+- Get personalized article suggestions based on your reading history
+- Download articles for offline reading
+- Reading statistics
+- Curated list of popular feeds
 - Auto dark mode in web browser
 - Ad blocker in web browser
-- Summarize articles with AI (paid feature)
-- Get personalized article suggestions based on your reading history
 - Sort articles by date or title, read or unread, bookmarked, summarized, downloaded
 - Bookmark articles
-- Download articles for offline reading
 - Create feed groups (folders) to easily organize your feeds and navigate between them
-- Curated list of popular feeds
 
 ## Screenshots
 
 <img alt="Home" src="./.images/home.png" width="300"/>
 
 ### Reader Mode
-#### With AI summary:
-
 <img alt="Reader mode with AI summary" src="./.images/reader_ai.png" width="300"/>
-
-#### Without:
-<img alt="Reader mode" src="./.images/reader.png" width="300"/>
 
 #### Reader mode customization
 <img alt="Reader mode customization" src="./.images/reader_customization.png" width="300"/>
@@ -45,6 +41,12 @@ The app is built with Flutter and Mobx.
 ### Search
 <img alt="Search" src="./.images/search.png" width="300"/>
 
+### Curated News Sources
+<img alt="Curated feeds" src="./.images/curated_feeds.png" width="300"/>
+
+
+### Reading statistics
+<img alt="Reading statistics page" src="./.images/reading_stats.png" width="300"/>
 
 ### Settings
 <img alt="Settings" src="./.images/settings.png" width="300"/>

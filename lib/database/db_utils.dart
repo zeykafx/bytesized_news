@@ -80,6 +80,15 @@ class DbUtils {
     return feedItems;
   }
 
+  Future<FeedItem?> getFeedItemWithID(int feedItemId, List<Feed> feeds) async {
+    FeedItem? item = await isar.feedItems.filter().idEqualTo(feedItemId).sortByPublishedDateDesc().findFirst();
+    if (item == null) {
+      return null;
+    }
+    setFeedItemFeed(item, feeds);
+    return item;
+  }
+
   Future<List<FeedItem>> getSuggestedItems(List<Feed> feeds) async {
     List<FeedItem> feedItems = await isar.feedItems.filter().suggestedEqualTo(true).sortByPublishedDateDesc().findAll();
 
@@ -300,8 +309,34 @@ class DbUtils {
     await isar.writeTxn(() => isar.storyReadings.delete(reading.id));
   }
 
-  Future<int> getNumberArticlesRead() async {
-    return await isar.storyReadings.filter().readingDurationGreaterThan(0).count();
+  Future<FeedItem?> getArticleForReading(StoryReading reading, List<Feed> feeds) async {
+    FeedItem? feedItem = await getFeedItemWithID(reading.feedItemId, feeds);
+    if (feedItem == null) {
+      return null;
+    }
+
+    return feedItem;
+  }
+
+  Future<List<(StoryReading, FeedItem)>> getReadArticlesWithStats({bool sortByReadingDuration = false}) async {
+    List<(StoryReading, FeedItem)> articles = [];
+
+    List<Feed> feeds = await getFeeds();
+
+    // get the readings sorted on the reading date or the reading duration (depending on the bool argument)
+    List<StoryReading> readings = sortByReadingDuration
+        ? await isar.storyReadings.where().sortByReadingDurationDesc().findAll()
+        : await isar.storyReadings.where().sortByFirstReadDesc().findAll();
+
+    for (StoryReading reading in readings) {
+      FeedItem? feedItem = await getArticleForReading(reading, feeds);
+      if (feedItem == null) {
+        continue;
+      }
+
+      articles.add((reading, feedItem));
+    }
+    return articles;
   }
 
   Future<int> getReadingDaysStreak() async {
@@ -310,15 +345,12 @@ class DbUtils {
     if (items.isEmpty) {
       return 0;
     }
-    // TODO: doesn't work well
 
     // get the unique days normalized to the start of the day
     Set<DateTime> uniqueDates = {};
     for (StoryReading reading in items) {
-      if (reading.firstRead != null) {
-        DateTime normalized = DateTime(reading.firstRead!.year, reading.firstRead!.month, reading.firstRead!.day);
-        uniqueDates.add(normalized);
-      }
+      DateTime normalized = DateTime(reading.firstRead.year, reading.firstRead.month, reading.firstRead.day);
+      uniqueDates.add(normalized);
     }
 
     List<DateTime> sorted = uniqueDates.toList()..sort((a, b) => b.compareTo(a));
@@ -356,5 +388,58 @@ class DbUtils {
     }
 
     return streak;
+  }
+
+  Future<int> getNumberArticlesRead() async {
+    return await isar.storyReadings.filter().readingDurationGreaterThan(0).count();
+  }
+
+  Future<(DateTime, int)> getMostReadDay() async {
+    List<StoryReading> readings = await isar.storyReadings.filter().readingDurationGreaterThan(0).findAll();
+    List<DateTime> days = readings.map((reading) => reading.firstRead).toList();
+
+    Map<DateTime, int> dayCounts = {};
+    for (DateTime day in days) {
+      DateTime normalizedDay = DateTime(day.year, day.month, day.day);
+      dayCounts[normalizedDay] = (dayCounts[normalizedDay] ?? 0) + 1;
+    }
+
+    // get the most represented day in the list of days
+    DateTime mostReadDay = DateTime.now();
+    int maxCount = 0;
+    for (MapEntry<DateTime, int> entry in dayCounts.entries) {
+      if (entry.value > maxCount) {
+        maxCount = entry.value;
+        mostReadDay = entry.key;
+      }
+    }
+
+    return (mostReadDay, maxCount);
+  }
+
+  Future<Duration> getReadingTime() async {
+    Duration totalReadingTime = Duration();
+    List<StoryReading> items = await isar.storyReadings.filter().readingDurationGreaterThan(0).findAll();
+
+    for (StoryReading reading in items) {
+      totalReadingTime += Duration(seconds: reading.readingDuration);
+    }
+    return totalReadingTime;
+  }
+
+  Future<(FeedItem?, StoryReading?)> getLongestReadArticle() async {
+    List<StoryReading> topReadings = await isar.storyReadings.filter().readingDurationGreaterThan(0).sortByReadingDurationDesc().findAll();
+    // we get the top readings because we might have readings for deleted articles
+    List<Feed> feeds = await getFeeds();
+
+    for (StoryReading reading in topReadings) {
+      FeedItem? feedItem = await getArticleForReading(reading, feeds);
+      // the first feedItem that we find that isn't null is then going to be the most read article (still in the db)
+      if (feedItem != null) {
+        return (feedItem, reading);
+      }
+    }
+
+    return (null, null);
   }
 }
