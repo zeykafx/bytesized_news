@@ -74,7 +74,7 @@ abstract class _ReadingStatisticsStore with Store {
     mostReadDay = result.$1;
     mostReadDayCount = result.$2;
 
-    allArticlesRead = (await dbUtils.getReadArticlesWithStats()).asObservable();
+    allArticlesRead = (await dbUtils.getReadArticlesWithStats(sortByReadingDuration: (currentSort == "by_duration"))).asObservable();
     loading = false;
   }
 

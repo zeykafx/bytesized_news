@@ -2,6 +2,7 @@ import 'package:bytesized_news/views/settings/sections/about_section.dart';
 import 'package:bytesized_news/views/settings/sections/background_sync_section.dart';
 import 'package:bytesized_news/views/settings/sections/general_settings_section.dart';
 import 'package:bytesized_news/views/settings/sections/import_export_section.dart';
+import 'package:bytesized_news/views/settings/sections/reader_mode_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -47,6 +48,7 @@ class _SettingsState extends State<Settings> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const GeneralSettingsSection(),
+                            const ReaderModeSection(),
                             // if (!Platform.isIOS) ...[
                             const BackgroundSyncSection(),
                             // ],

@@ -75,7 +75,7 @@ class _StorySettingsState extends State<StorySettings> {
 
                         // Always show the archive button
                         SwitchListTile(
-                          title: const Text("Always show 'Fetch Archived link' button in bar"),
+                          title: const Text("Always show 'Fetch Archived.org page' button in bar"),
                           value: settingsStore.alwaysShowArchiveButton,
                           onChanged: (value) {
                             settingsStore.alwaysShowArchiveButton = value;
@@ -118,6 +118,15 @@ class _StorySettingsState extends State<StorySettings> {
                                 }
                               : null,
                         ),
+
+                        // // open links in reader mode
+                        // SwitchListTile(
+                        //   title: const Text("Open clicked links in reader mode"),
+                        //   value: settingsStore.openLinksInReaderMode,
+                        //   onChanged: (value) {
+                        //     settingsStore.openLinksInReaderMode = value;
+                        //   },
+                        // ),
                       ],
                     ),
 

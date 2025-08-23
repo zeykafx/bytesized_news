@@ -54,48 +54,6 @@ class _GeneralSettingsSectionState extends State<GeneralSettingsSection> {
               ),
             ),
 
-            // USE READER MODE BY DEFAULT
-            SwitchListTile(
-              title: const Text("Use Reader Mode by default"),
-              value: settingsStore.useReaderModeByDefault,
-              onChanged: (value) {
-                settingsStore.setUseReaderModeByDefault(value);
-              },
-            ),
-
-            // Switch to webview if reader mode is too short
-            SwitchListTile(
-              title: const Text("Auto switch to webview if reader article is too short"),
-              value: settingsStore.autoSwitchReaderTooShort,
-              onChanged: (value) {
-                settingsStore.autoSwitchReaderTooShort = value;
-              },
-            ),
-
-            // SHOW AI SUMMARY ON STORY PAGE LOAD
-            SwitchListTile(
-              title: const Text("Show Summary on page load"),
-              subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
-              value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
-              onChanged: authStore.userTier == Tier.premium
-                  ? (value) {
-                      settingsStore.setShowAiSummaryOnLoad(value);
-                    }
-                  : null,
-            ),
-
-            // FETCH AI SUMMARY ON STORY PAGE LOAD
-            SwitchListTile(
-              title: const Text("Generate Summary on page load"),
-              subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
-              value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
-              onChanged: authStore.userTier == Tier.premium
-                  ? (value) {
-                      settingsStore.setFetchAiSummaryOnLoad(value);
-                    }
-                  : null,
-            ),
-
             // Muted keywords
             KeywordsBottomSheet(
               title: "Mute title keywords from feed",

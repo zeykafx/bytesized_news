@@ -152,7 +152,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
         clipBehavior: Clip.hardEdge,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(
             color: colorScheme.outline.withValues(alpha: 0.1),
             width: 1,
@@ -162,10 +162,10 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(12),
           ),
           title: InkWell(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Column(
@@ -255,7 +255,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
         clipBehavior: Clip.hardEdge,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(
             color: isSelected ? colorScheme.primary.withValues(alpha: 0.5) : colorScheme.outline.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
@@ -265,7 +265,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(12),
           ),
           title: Container(
             padding: const EdgeInsets.symmetric(vertical: 4),

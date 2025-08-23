@@ -521,6 +521,38 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$readerModeHistoryAtom =
+      Atom(name: '_StoryStore.readerModeHistory', context: context);
+
+  @override
+  ObservableList<String> get readerModeHistory {
+    _$readerModeHistoryAtom.reportRead();
+    return super.readerModeHistory;
+  }
+
+  @override
+  set readerModeHistory(ObservableList<String> value) {
+    _$readerModeHistoryAtom.reportWrite(value, super.readerModeHistory, () {
+      super.readerModeHistory = value;
+    });
+  }
+
+  late final _$currentUrlAtom =
+      Atom(name: '_StoryStore.currentUrl', context: context);
+
+  @override
+  String get currentUrl {
+    _$currentUrlAtom.reportRead();
+    return super.currentUrl;
+  }
+
+  @override
+  set currentUrl(String value) {
+    _$currentUrlAtom.reportWrite(value, super.currentUrl, () {
+      super.currentUrl = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -538,6 +570,25 @@ mixin _$StoryStore on _StoryStore, Store {
   Future<void> checkPaywallOrBotBlock() {
     return _$checkPaywallOrBotBlockAsyncAction
         .run(() => super.checkPaywallOrBotBlock());
+  }
+
+  late final _$openUrlInReaderModeAsyncAction =
+      AsyncAction('_StoryStore.openUrlInReaderMode', context: context);
+
+  @override
+  Future<void> openUrlInReaderMode(String url,
+      {bool replaceItemContent = true}) {
+    return _$openUrlInReaderModeAsyncAction.run(() =>
+        super.openUrlInReaderMode(url, replaceItemContent: replaceItemContent));
+  }
+
+  late final _$goBackInReaderHistoryAsyncAction =
+      AsyncAction('_StoryStore.goBackInReaderHistory', context: context);
+
+  @override
+  Future<void> goBackInReaderHistory() {
+    return _$goBackInReaderHistoryAsyncAction
+        .run(() => super.goBackInReaderHistory());
   }
 
   late final _$getArchivedArticleAsyncAction =
@@ -773,6 +824,8 @@ showArchiveButton: ${showArchiveButton},
 hasAlert: ${hasAlert},
 shortAlert: ${shortAlert},
 alertMessage: ${alertMessage},
+readerModeHistory: ${readerModeHistory},
+currentUrl: ${currentUrl},
 hasImageInArticle: ${hasImageInArticle}
     ''';
   }

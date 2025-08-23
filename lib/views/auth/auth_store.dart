@@ -70,6 +70,9 @@ abstract class _AuthStore with Store {
   @observable
   String? deviceId;
 
+  @observable
+  bool authLoading = false;
+
   late DbUtils dbUtils;
   Isar isar = Isar.getInstance()!;
 
@@ -82,6 +85,8 @@ abstract class _AuthStore with Store {
       initialized = true;
       return false;
     }
+
+    authLoading = true;
 
     dbUtils = DbUtils(isar: isar);
 
@@ -171,6 +176,7 @@ abstract class _AuthStore with Store {
           print(err);
         }
         auth.signOut();
+        authLoading = false;
         Navigator.of(buildContext!).push(
           MaterialPageRoute(
             builder: (context) => const Auth(),
@@ -189,6 +195,7 @@ abstract class _AuthStore with Store {
               content: Text("You have been logged out, Another account has already registered this device."),
             ),
           );
+          authLoading = false;
           Navigator.of(buildContext).push(
             MaterialPageRoute(
               builder: (context) => const Auth(),
@@ -330,7 +337,7 @@ abstract class _AuthStore with Store {
         throw Exception(response["error"]);
       }
     });
-
+    authLoading = false;
     initialized = true;
     return true;
   }

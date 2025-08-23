@@ -14,6 +14,7 @@ import 'package:bytesized_news/views/settings/settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:time_formatter/time_formatter.dart';
 
 class FeedView extends StatefulWidget {
   const FeedView({super.key});
@@ -205,7 +206,7 @@ class _FeedViewState extends State<FeedView> {
                                                     children: [
                                                       Tooltip(
                                                         message:
-                                                            "Suggested articles based on your interests and taste profile. Can be refreshed once per 10 minutes.",
+                                                            "Suggested articles based on your interests and taste profile. Suggested ${formatTime(feedStore.authStore.lastSuggestionDate!.microsecondsSinceEpoch)}",
                                                         child: Padding(
                                                           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
                                                           child: Text("Suggested Articles", style: TextStyle(fontWeight: FontWeight.w500)),

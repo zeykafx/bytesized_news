@@ -217,6 +217,22 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
+  late final _$authLoadingAtom =
+      Atom(name: '_AuthStore.authLoading', context: context);
+
+  @override
+  bool get authLoading {
+    _$authLoadingAtom.reportRead();
+    return super.authLoading;
+  }
+
+  @override
+  set authLoading(bool value) {
+    _$authLoadingAtom.reportWrite(value, super.authLoading, () {
+      super.authLoading = value;
+    });
+  }
+
   late final _$_getIdAsyncAction =
       AsyncAction('_AuthStore._getId', context: context);
 
@@ -289,7 +305,8 @@ suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate},
 summariesLeftToday: ${summariesLeftToday},
 lastSummaryDate: ${lastSummaryDate},
-deviceId: ${deviceId}
+deviceId: ${deviceId},
+authLoading: ${authLoading}
     ''';
   }
 }

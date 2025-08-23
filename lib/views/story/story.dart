@@ -113,12 +113,12 @@ class _StoryState extends State<Story> {
             ),
           ],
         ),
-        body: Observer(
-          builder: (_) {
-            return Center(
-              child: Stack(
-                children: [
-                  Stack(
+        body: Center(
+          child: Stack(
+            children: [
+              Observer(
+                builder: (context) {
+                  return Stack(
                     alignment: Alignment.topCenter,
                     children: [
                       if (!storyStore.showReaderMode) ...[
@@ -175,17 +175,9 @@ class _StoryState extends State<Story> {
 
                                                  ${ /* TODO: Tweak; if there is an image early in the article, don't show our image */ storyStore.hasImageInArticle ? "" : '<img src="${storyStore.feedItem.imageUrl}" alt="Cover Image"/>'}
 
-                                                   ${storyStore.hideSummary && storyStore.feedItemSummarized ? '''<div class="ai_container">
+                                                   <div class='ai_container'></div>
 
-                                                    <h2>Summary</h2>
-                                                    ${storyStore.feedItem.aiSummary.split('\n').map((String part) {
-                                            return "<p>$part</p>";
-                                          }).join("")}
-
-                                                    <p class="tiny">Generated content, verify important information.</p>
-                                                    </div>''' : ""}
-
-                                                 ${storyStore.feedItem.htmlContent}
+                                                 ${storyStore.feedItem.htmlContent ?? "Loading..."}
                                                  Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
                                               </div>
                                               ''',
@@ -202,12 +194,19 @@ class _StoryState extends State<Story> {
                                         return false;
                                       }
                                       Uri uri = Uri.parse(url);
+                                      // if (storyStore.showReaderMode && settingsStore.openLinksInReaderMode) {
+                                      //   storyStore.openUrlInReaderMode(url, replaceItemContent: false);
+                                      // } else
                                       if (!await launchUrl(uri)) {
                                         throw Exception('Could not launch $url');
                                       }
                                       return true;
                                     },
                                     customWidgetBuilder: (html.Element e) {
+                                      if (e.className == "ai_container") {
+                                        return SummaryCard(settingsStore: settingsStore, storyStore: storyStore).animate().fadeIn(duration: 300.ms);
+                                      }
+
                                       // if (!e.innerHtml.contains("img") && !e.innerHtml.contains("image") && !e.innerHtml.contains("picture")) {
                                       //   return null;
                                       // }
@@ -293,40 +292,193 @@ class _StoryState extends State<Story> {
                         ),
                       ],
                     ],
-                  ),
-
-                  FloatingBar(storyStore: storyStore, widget: widget),
-                  if (!storyStore.initialized) ...[const LinearProgressIndicator()],
-
-                  if (!storyStore.showReaderMode) ...[storyStore.loading ? LinearProgressIndicator(value: storyStore.progress / 100) : const SizedBox()],
-                  storyStore.aiLoading
-                      ? const LinearProgressIndicator()
-                            .animate()
-                            .fadeIn()
-                            .animate(onPlay: (controller) => controller.repeat())
-                            .shimmer(
-                              duration: const Duration(milliseconds: 1500),
-                              colors: [
-                                Theme.of(context).colorScheme.primary,
-                                // Theme.of(context).colorScheme.secondary,
-                                Theme.of(context).colorScheme.inversePrimary,
-                                // Theme.of(context).colorScheme.tertiary,
-                                Theme.of(context).colorScheme.primary,
-
-                                // const Color(0xBFFFFF00),
-                                // const Color(0xBF00FF00),
-                                // const Color(0xBF00FFFF),
-                                // const Color(0xBF0033FF),
-                                // const Color(0xBFFF00FF),
-                                // const Color(0xBFFF0000),
-                                // const Color(0xBFFFFF00),
-                              ],
-                            )
-                      : const SizedBox(),
-                ],
+                  );
+                },
               ),
-            );
-          },
+
+              FloatingBar(storyStore: storyStore, widget: widget),
+              Observer(
+                builder: (context) {
+                  if (!storyStore.initialized) {
+                    return const LinearProgressIndicator();
+                  }
+
+                  if (!storyStore.showReaderMode && storyStore.loading) {
+                    return LinearProgressIndicator(value: storyStore.progress / 100);
+                  }
+
+                  if (storyStore.aiLoading) {
+                    return const LinearProgressIndicator()
+                        .animate()
+                        .fadeIn()
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .shimmer(
+                          duration: const Duration(milliseconds: 1500),
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.inversePrimary,
+                            Theme.of(context).colorScheme.primary,
+                          ],
+                        );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SummaryCard extends StatelessWidget {
+  const SummaryCard({
+    super.key,
+    required this.settingsStore,
+    required this.storyStore,
+  });
+
+  final SettingsStore settingsStore;
+  final StoryStore storyStore;
+
+  @override
+  Widget build(BuildContext context) {
+    final BorderRadius borderRadius = BorderRadius.circular(12);
+
+    return Observer(
+      builder: (context) {
+        if (storyStore.authStore.userTier != Tier.premium) {
+          return SizedBox.shrink();
+        }
+
+        return AnimatedCrossFade(
+          crossFadeState: !storyStore.feedItemSummarized ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+          duration: 250.ms,
+          firstCurve: Curves.easeOutCubic,
+          secondCurve: Curves.easeOutCubic,
+          sizeCurve: Curves.easeOutCubic,
+          firstChild: buildButtonCard(context, borderRadius),
+          secondChild: buildSummaryCard(context, borderRadius),
+        );
+      },
+    );
+  }
+
+  Card buildButtonCard(BuildContext context, BorderRadius borderRadius) {
+    return Card.filled(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: borderRadius,
+          onTap: !storyStore.aiLoading
+              ? () {
+                  if (!storyStore.aiLoading) {
+                    storyStore.summarizeArticle(context);
+                  }
+                }
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child:
+                  Text(
+                        storyStore.aiLoading ? "Loading..." : "Summarize",
+                        style:
+                            fontFamilyToGoogleFontTextStyle(
+                              settingsStore.fontFamily,
+                            ).copyWith(
+                              fontSize: ((settingsStore.fontSize ?? 16) * 0.9),
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      )
+                      .animate(target: storyStore.aiLoading ? 1 : 0, onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        duration: const Duration(milliseconds: 1500),
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.inversePrimary,
+                          Theme.of(context).colorScheme.primary,
+                        ],
+                      ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Card buildSummaryCard(BuildContext context, BorderRadius borderRadius) {
+    return Card.filled(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: ExpansionTile(
+          enableFeedback: true,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: borderRadius,
+          ),
+          initiallyExpanded: settingsStore.showAiSummaryOnLoad,
+          title: Text(
+            "Summary",
+            style:
+                fontFamilyToGoogleFontTextStyle(
+                  settingsStore.fontFamily,
+                ).copyWith(
+                  fontSize: ((settingsStore.fontSize ?? 16) * 1.1),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+          ),
+          children: [
+            ...storyStore.feedItem.aiSummary.split("\n").map((line) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Text(
+                  line,
+                  style:
+                      fontFamilyToGoogleFontTextStyle(
+                        settingsStore.fontFamily,
+                      ).copyWith(
+                        fontSize: settingsStore.fontSize,
+                        fontWeight: widthToWeight(settingsStore.textWidth),
+                        height: settingsStore.lineHeight,
+                      ),
+                ),
+              );
+            }),
+            const SizedBox(height: 5),
+
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                "Generated content, verify important information.",
+                style:
+                    fontFamilyToGoogleFontTextStyle(
+                      settingsStore.fontFamily,
+                    ).copyWith(
+                      fontSize: ((settingsStore.fontSize ?? 16) * 0.7),
+                      fontWeight: widthToWeight(settingsStore.textWidth),
+                      height: settingsStore.lineHeight,
+                      color: Theme.of(context).dividerColor,
+                    ),
+              ),
+            ),
+            const SizedBox(height: 5),
+          ],
         ),
       ),
     );
@@ -341,13 +493,13 @@ class FloatingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        return Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 30),
-            child: AnimatedSlide(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: Observer(
+          builder: (context) {
+            return AnimatedSlide(
               offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
               duration: 300.ms,
               curve: Curves.easeInOutQuad,
@@ -399,17 +551,27 @@ class FloatingBar extends StatelessWidget {
                                 ],
 
                                 // BACK
-                                if (!storyStore.showReaderMode) ...[
+                                if (!storyStore.showReaderMode || storyStore.readerModeHistory.isNotEmpty) ...[
                                   IconButton(
                                     onPressed: () {
-                                      if (storyStore.canGoBack) {
-                                        storyStore.controller?.goBack();
+                                      if (!storyStore.showReaderMode) {
+                                        if (storyStore.canGoBack) {
+                                          storyStore.controller?.goBack();
+                                        }
+                                      } else {
+                                        storyStore.goBackInReaderHistory();
                                       }
                                     },
                                     tooltip: "Go back",
-                                    icon: Icon(Icons.arrow_back_ios, color: storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
+                                    icon: Icon(
+                                      Icons.arrow_back_ios,
+                                      color: (storyStore.showReaderMode)
+                                          ? (storyStore.readerModeHistory.isNotEmpty ? null : Colors.grey.withValues(alpha: 0.5))
+                                          : (storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
+                                    ),
                                   ),
-
+                                ],
+                                if (!storyStore.showReaderMode) ...[
                                   // FORWARD
                                   IconButton(
                                     onPressed: () {
@@ -422,34 +584,34 @@ class FloatingBar extends StatelessWidget {
                                   ),
                                 ],
 
-                                storyStore.feedItemSummarized
-                                    ? IconButton(
-                                        onPressed: storyStore.hideAiSummary,
-                                        icon: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            const Align(
-                                              alignment: Alignment.topRight,
-                                              widthFactor: 2,
-                                              heightFactor: 3,
-                                              child: Icon(LucideIcons.sparkles, size: 14),
-                                            ),
-                                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                          ],
-                                        ),
-                                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                      )
-                                    : IconButton(
-                                        onPressed: storyStore.aiLoading
-                                            ? null
-                                            : () {
-                                                if (!storyStore.aiLoading) {
-                                                  storyStore.summarizeArticle(context);
-                                                }
-                                              },
-                                        icon: const Icon(LucideIcons.sparkles),
-                                        tooltip: "Summarize Article",
-                                      ),
+                                // storyStore.feedItemSummarized
+                                //     ? IconButton(
+                                //         onPressed: storyStore.hideAiSummary,
+                                //         icon: Stack(
+                                //           alignment: Alignment.center,
+                                //           children: [
+                                //             const Align(
+                                //               alignment: Alignment.topRight,
+                                //               widthFactor: 2,
+                                //               heightFactor: 3,
+                                //               child: Icon(LucideIcons.sparkles, size: 14),
+                                //             ),
+                                //             Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                                //           ],
+                                //         ),
+                                //         tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                                //       )
+                                //     : IconButton(
+                                //         onPressed: storyStore.aiLoading
+                                //             ? null
+                                //             : () {
+                                //                 if (!storyStore.aiLoading) {
+                                //                   storyStore.summarizeArticle(context);
+                                //                 }
+                                //               },
+                                //         icon: const Icon(LucideIcons.sparkles),
+                                //         tooltip: "Summarize Article",
+                                //       ),
 
                                 // BOOKMARK
                                 Stack(
@@ -534,10 +696,10 @@ class FloatingBar extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 }

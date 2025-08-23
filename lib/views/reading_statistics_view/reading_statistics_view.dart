@@ -13,7 +13,6 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:html/parser.dart';
 import 'package:isar/isar.dart';
-import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 
@@ -90,17 +89,17 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        return Scaffold(
-          appBar: AppBar(title: Text("Reading Statistics")),
-          body: Container(
-            constraints: BoxConstraints(maxWidth: 700),
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Stack(
-              children: [
-                Center(
-                  child: CustomScrollView(
+    return Scaffold(
+      appBar: AppBar(title: Text("Reading Statistics")),
+      body: Container(
+        constraints: BoxConstraints(maxWidth: 700),
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: Stack(
+          children: [
+            Center(
+              child: Observer(
+                builder: (context) {
+                  return CustomScrollView(
                     controller: store.scrollController,
                     slivers: [
                       SliverToBoxAdapter(
@@ -175,9 +174,13 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                         child: SizedBox(height: 80), // space for the scroll to top button
                       ),
                     ],
-                  ),
-                ),
-                Positioned(
+                  );
+                },
+              ),
+            ),
+            Observer(
+              builder: (context) {
+                return Positioned(
                   bottom: 20,
                   right: 20,
                   child: AnimatedSlide(
@@ -190,12 +193,12 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                       label: Text("Scroll To Top", style: TextStyle(fontSize: 12)),
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -252,7 +255,7 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Text(
-            "Read ${store.mostReadDayCount} on ${weekdayIdxToString[store.mostReadDay.weekday]} ${monthIdxToString[store.mostReadDay.month]} ${store.mostReadDay.day}${getOrdinalSuffix(store.mostReadDay.day)} ${store.mostReadDay.year}",
+            "Read ${store.mostReadDayCount} articles on ${weekdayIdxToString[store.mostReadDay.weekday]}, ${monthIdxToString[store.mostReadDay.month]} ${store.mostReadDay.day}${getOrdinalSuffix(store.mostReadDay.day)} ${store.mostReadDay.year}",
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -403,7 +406,6 @@ class StatsCardWithArticle extends StatelessWidget {
                 .then((_) {
                   store.getReadingStatistics();
                 });
-            ;
           },
           child: Padding(
             padding: const EdgeInsets.all(12.0),

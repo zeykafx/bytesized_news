@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bytesized_news/AI/ai_utils.dart';
+import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/reading_stats/reading_stats.dart';
@@ -132,6 +133,12 @@ abstract class _StoryStore with Store {
   @observable
   String alertMessage = "";
 
+  @observable
+  ObservableList<String> readerModeHistory = <String>[].asObservable();
+
+  @observable
+  String currentUrl = "";
+
   int imageDepthLimit = 30;
   @computed
   bool get hasImageInArticle {
@@ -187,6 +194,7 @@ abstract class _StoryStore with Store {
     feedItem = item;
     isBookmarked = feedItem.bookmarked;
     feedItemSummarized = feedItem.summarized;
+    currentUrl = feedItem.url;
 
     if (!feedItem.downloaded) {
       htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
@@ -246,6 +254,16 @@ abstract class _StoryStore with Store {
   }
 
   @action
+  void dispose() {
+    if (kDebugMode) {
+      print('Stopping reading timer');
+    }
+    if (initialized) {
+      endReading();
+    }
+  }
+
+  @action
   Future<void> checkPaywallOrBotBlock() async {
     const List<String> detectionMessages = [
       "Access Denied",
@@ -272,10 +290,20 @@ abstract class _StoryStore with Store {
       "This content is not available in your location",
       "Complete the CAPTCHA",
       "I'm not a robot",
+      "Please enable JS",
+      "Please enable JavaScript",
+      "Please enable Cookies",
+      "Please enable Javascript",
+      "Please enable javascript",
+      "disable your ad blocker",
+      "Disable your ad blocker",
+      "disable your AdBlocker",
+      "disable your Adblocker",
+      "disable any ad blocker",
       "Prove you're not a robot",
       "reCAPTCHA",
       "hCAPTCHA",
-      "ray-id",
+      "Ray ID",
       "Error 403",
       "Error 429",
       "Error 451",
@@ -302,6 +330,25 @@ abstract class _StoryStore with Store {
   }
 
   @action
+  Future<void> openUrlInReaderMode(String url, {bool replaceItemContent = true}) async {
+    loading = true;
+    readerModeHistory.add(currentUrl);
+
+    htmlContent = await feedItem.fetchHtmlContent(url);
+    // we may not always want to replace the item's content in the db, e.g., if we nagivate to a link
+    if (replaceItemContent) {
+      feedItem.downloaded = true;
+      await dbUtils.updateItemInDb(feedItem);
+    }
+    loading = false;
+  }
+
+  @action
+  Future<void> goBackInReaderHistory() async {
+    htmlContent = await feedItem.fetchHtmlContent(readerModeHistory.removeLast());
+  }
+
+  @action
   Future<bool> getArchivedArticle({bool fromError = false}) async {
     loading = true;
     if (!fromError) {
@@ -311,10 +358,7 @@ abstract class _StoryStore with Store {
     }
     var (bool archived, String archiveLink) = await getArchiveUrl(feedItem.url);
     if (archived) {
-      htmlContent = await feedItem.fetchHtmlContent(archiveLink);
-      feedItem.downloaded = true;
-      await dbUtils.updateItemInDb(feedItem);
-      loading = false;
+      openUrlInReaderMode(archiveLink);
       alertMessage = "Showing archived page.";
       shortAlert = true;
       hasAlert = true;
@@ -329,16 +373,6 @@ abstract class _StoryStore with Store {
 
     loading = false;
     return false;
-  }
-
-  @action
-  void dispose() {
-    if (kDebugMode) {
-      print('Stopping reading timer');
-    }
-    if (initialized) {
-      endReading();
-    }
   }
 
   @action
