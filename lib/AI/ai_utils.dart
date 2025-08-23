@@ -70,10 +70,6 @@ class AiUtils {
 
     String userInterestsString = userInterests.join(',');
 
-    if (kDebugMode) {
-      print("today's articles: $todaysArticles");
-    }
-
     final result = await functions.httpsCallable('getNewsSuggestions').call({
       "todaysArticles": todaysArticles,
       "mostReadFeedsString": mostReadFeedsString,

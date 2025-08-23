@@ -230,6 +230,7 @@ abstract class _SettingsStore with Store {
   static const defaultAlwaysShowArchiveButton = false;
   static const defaultShowShareButton = true;
   static const defaultShowCommentsButton = true;
+  static const defaultEnableCustomAiProvider = false;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -415,12 +416,16 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultAlwaysShowArchiveButton)
   @observable
   bool alwaysShowArchiveButton = defaultAlwaysShowArchiveButton;
-  
+
   @JsonKey(defaultValue: defaultShowShareButton)
   @observable
   bool showShareButton = defaultShowShareButton;
-  
+
   @JsonKey(defaultValue: defaultShowCommentsButton)
   @observable
   bool showCommentsButton = defaultShowCommentsButton;
+
+  @JsonKey(defaultValue: defaultEnableCustomAiProvider)
+  @observable
+  bool enableCustomAiProvider = defaultEnableCustomAiProvider;
 }

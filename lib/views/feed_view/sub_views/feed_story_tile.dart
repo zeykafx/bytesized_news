@@ -102,18 +102,25 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                 errorWidget: (context, str, obj) => Container(
                                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
                                   clipBehavior: Clip.antiAlias,
-                                  child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 200, width: 350, fit: BoxFit.cover),
+                                  child: SizedBox(height: 200, width: 350, child: const Icon(Icons.rss_feed_rounded)),
                                 ),
+
                                 width: 350,
                                 height: 200,
                               ),
                             ),
                           )
-                        : widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
+                        : widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty && !widget.item.feed!.iconUrl.endsWith("svg")
                         ? Container(
                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                             clipBehavior: Clip.antiAlias,
-                            child: CachedNetworkImage(imageUrl: widget.item.feed!.iconUrl, height: 200, width: 350, fit: BoxFit.cover),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.item.feed!.iconUrl,
+                              height: 200,
+                              width: 350,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, str, obj) => SizedBox(height: 200, width: 350, child: const Icon(Icons.rss_feed_rounded)),
+                            ),
                           )
                         : SizedBox(height: 200, width: 350, child: const Icon(Icons.rss_feed_rounded)),
                   ],
@@ -137,7 +144,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                           ),
                           const SizedBox(width: 5),
                           if (!settingsStore.storyTilesMinimalStyle && !widget.isSuggestion) ...[
-                            widget.item.imageUrl.isNotEmpty
+                            widget.item.imageUrl.isNotEmpty && !widget.item.imageUrl.endsWith("svg")
                                 ? Container(
                                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                                     clipBehavior: Clip.antiAlias,
@@ -149,7 +156,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                       width: 128,
                                     ),
                                   )
-                                : widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
+                                : widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty && !widget.item.feed!.iconUrl.endsWith("svg")
                                 ? Container(
                                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                                     clipBehavior: Clip.antiAlias,
@@ -178,7 +185,7 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
                                   softWrap: false,
                                   style: const TextStyle(fontSize: 10),
                                 ),
-                                avatar: widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty
+                                avatar: widget.item.feed != null && widget.item.feed!.iconUrl.isNotEmpty && !widget.item.feed!.iconUrl.endsWith("svg")
                                     ? Container(
                                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(3)),
                                         clipBehavior: Clip.hardEdge,

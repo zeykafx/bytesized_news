@@ -58,7 +58,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..alwaysShowArchiveButton =
           json['alwaysShowArchiveButton'] as bool? ?? false
       ..showShareButton = json['showShareButton'] as bool? ?? true
-      ..showCommentsButton = json['showCommentsButton'] as bool? ?? true;
+      ..showCommentsButton = json['showCommentsButton'] as bool? ?? true
+      ..enableCustomAiProvider =
+          json['enableCustomAiProvider'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -90,6 +92,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'alwaysShowArchiveButton': instance.alwaysShowArchiveButton,
       'showShareButton': instance.showShareButton,
       'showCommentsButton': instance.showCommentsButton,
+      'enableCustomAiProvider': instance.enableCustomAiProvider,
     };
 
 const _$DarkModeEnumMap = {
@@ -655,6 +658,23 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$enableCustomAiProviderAtom =
+      Atom(name: '_SettingsStore.enableCustomAiProvider', context: context);
+
+  @override
+  bool get enableCustomAiProvider {
+    _$enableCustomAiProviderAtom.reportRead();
+    return super.enableCustomAiProvider;
+  }
+
+  @override
+  set enableCustomAiProvider(bool value) {
+    _$enableCustomAiProviderAtom
+        .reportWrite(value, super.enableCustomAiProvider, () {
+      super.enableCustomAiProvider = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -822,7 +842,8 @@ isList: ${isList},
 autoSwitchReaderTooShort: ${autoSwitchReaderTooShort},
 alwaysShowArchiveButton: ${alwaysShowArchiveButton},
 showShareButton: ${showShareButton},
-showCommentsButton: ${showCommentsButton}
+showCommentsButton: ${showCommentsButton},
+enableCustomAiProvider: ${enableCustomAiProvider}
     ''';
   }
 }

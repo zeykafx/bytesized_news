@@ -37,7 +37,7 @@ class Settings extends StatelessWidget {
           TopLvlSettingsSection(
             iconData: Icons.info_rounded,
             title: "About",
-            subtitle: "Version, source code",
+            subtitle: "Version, source code, licences",
             settingsPage: AboutSettingsPage(),
           ),
         ],

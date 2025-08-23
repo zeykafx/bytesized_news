@@ -59,7 +59,7 @@ class _BsbFeedButtonState extends State<BsbFeedButton> {
             ),
             margin: const EdgeInsets.symmetric(horizontal: 1),
             clipBehavior: Clip.antiAlias,
-            child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25),
+            child: CachedNetworkImage(imageUrl: feed.iconUrl, width: 25, height: 25, errorWidget: (contex, str, obj) => const SizedBox.shrink()),
           ),
         ),
       );

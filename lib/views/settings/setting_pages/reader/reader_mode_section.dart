@@ -72,7 +72,7 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
             
             // Always show the archive button
             SwitchListTile(
-              title: const Text("Always show Archive.org button"),
+              title: const Text("Always show archive.org button"),
               subtitle: const Text("Bypass more bot protections & paywalls. Will be shown only when a paywall is detected if off"),
               value: settingsStore.alwaysShowArchiveButton,
               onChanged: (value) {

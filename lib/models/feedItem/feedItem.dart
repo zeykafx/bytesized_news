@@ -192,7 +192,9 @@ class FeedItem {
       }
 
       try {
-        await DefaultCacheManager().downloadFile(imgSrc, force: true);
+        if (!imgSrc.endsWith("svg")) {
+          await DefaultCacheManager().downloadFile(imgSrc, force: true);
+        }
       } catch (_) {}
     }
 

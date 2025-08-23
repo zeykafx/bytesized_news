@@ -529,30 +529,38 @@ abstract class _FeedStore with Store {
       print("Suggestions: ${suggestedArticles.map((item) => "ID: ${item.id}, Title: ${item.title}").join(",")}");
     }
 
-    // unset the suggested property for this article if it won't be suggested again
-    // await dbUtils.resetSuggestedArticles();
-    List<FeedItem> prevSuggested = await dbUtils.getSuggestedItems(feeds);
-    for (FeedItem feedItem in prevSuggested) {
-      feedItem.suggested = false;
-      await dbUtils.updateItemInDb(feedItem);
-    }
-
     // clear the suggestions then add all of the new ones
     suggestedFeedItems.clear();
     suggestedFeedItems.addAll(suggestedArticles);
-
-    suggestionsLoading = false;
 
     // scroll back to the start of the suggestions
     if (suggestionsScrollController.hasClients) {
       suggestionsScrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
 
+    suggestionsLoading = false;
+
+    // unset the suggested property for this article if it won't be suggested again
+    // await dbUtils.resetSuggestedArticles();
+    List<FeedItem> prevSuggested = await dbUtils.getSuggestedItems(feeds);
+    for (FeedItem feedItem in prevSuggested) {
+      feedItem.suggested = false;
+      dbUtils.updateItemInDb(feedItem);
+    }
+
     // Mark all the suggested articles as such (except the ones that already were suggested before)
     for (FeedItem feedItem in suggestedArticles) {
       if (!feedItem.suggested) {
         feedItem.suggested = true;
-        downloadItem(feedItem); // this also updates the item in the db
+        try {
+          downloadItem(feedItem); // this also updates the item in the db
+        } catch (e) {
+          if (kDebugMode) {
+            print("Failed to download item: ${feedItem.id}, with error: ${e}");
+          }
+          alertMessage = "A suggested item wasn't able to be downloaded: $e";
+          hasAlert = true;
+        }
         // await dbUtils.updateItemInDb(feedItem);
       }
     }
