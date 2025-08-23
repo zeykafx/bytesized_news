@@ -37,6 +37,8 @@ class FeedItem {
   int estReadingTimeMinutes = 0;
   bool? fetchedInBg = false;
 
+  String? commentsUrl = "";
+
   @ignore
   Feed? feed;
 
@@ -140,6 +142,10 @@ class FeedItem {
           }
         }
       }
+    }
+
+    if (item.comments != null) {
+      feedItem.commentsUrl = item.comments;
     }
 
     feedItem.timeFetched = DateTime.now();

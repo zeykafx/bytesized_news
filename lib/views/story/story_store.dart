@@ -21,6 +21,7 @@ import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 part 'story_store.g.dart';
 
 class StoryStore = _StoryStore with _$StoryStore;
@@ -139,6 +140,9 @@ abstract class _StoryStore with Store {
   @observable
   String currentUrl = "";
 
+  @observable
+  bool showHnButton = false;
+
   int imageDepthLimit = 30;
   @computed
   bool get hasImageInArticle {
@@ -209,6 +213,7 @@ abstract class _StoryStore with Store {
     }
 
     checkPaywallOrBotBlock();
+    detectHackerNews();
 
     webviewInit();
 
@@ -301,7 +306,8 @@ abstract class _StoryStore with Store {
       "disable your Adblocker",
       "disable any ad blocker",
       "Prove you're not a robot",
-      "reCAPTCHA",
+      "Your request has been blocked by our server's security policies"
+          "reCAPTCHA",
       "hCAPTCHA",
       "Ray ID",
       "Error 403",
@@ -312,7 +318,7 @@ abstract class _StoryStore with Store {
     ];
     bool suggestArchiveArticle = false;
     for (String msg in detectionMessages) {
-      if (htmlContent.contains(msg)) {
+      if (htmlContent.split("\n").contains(msg)) {
         if (kDebugMode) {
           print("Block or paywall detected, suggesting Archived article");
         }
@@ -326,6 +332,29 @@ abstract class _StoryStore with Store {
       alertMessage = "Paywall or block detected, click the rightmost button in the bar to fetch the archived link";
       shortAlert = true;
       hasAlert = true;
+    }
+  }
+
+  @action
+  void detectHackerNews() {
+    if (feedItem.commentsUrl != null) {
+      showHnButton = true;
+    }
+    // List<String> hn = ["hnrss.org", "https://news.ycombinator.com/rss"];
+    // if (feedItem.feed != null && (hn.map((url) => feedItem.feed!.link.contains(url)).isNotEmpty)) {
+    //   showHnButton = true;
+    // }
+  }
+
+  @action
+  Future<void> openHnCommentsPage() async {
+    if (feedItem.commentsUrl == null) {
+      return;
+    }
+
+    Uri uri = Uri.parse(feedItem.commentsUrl!);
+    if (!await launchUrl(uri)) {
+      throw Exception('Could not launch ${feedItem.commentsUrl}');
     }
   }
 

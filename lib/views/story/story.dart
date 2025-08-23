@@ -584,34 +584,34 @@ class FloatingBar extends StatelessWidget {
                                   ),
                                 ],
 
-                                // storyStore.feedItemSummarized
-                                //     ? IconButton(
-                                //         onPressed: storyStore.hideAiSummary,
-                                //         icon: Stack(
-                                //           alignment: Alignment.center,
-                                //           children: [
-                                //             const Align(
-                                //               alignment: Alignment.topRight,
-                                //               widthFactor: 2,
-                                //               heightFactor: 3,
-                                //               child: Icon(LucideIcons.sparkles, size: 14),
-                                //             ),
-                                //             Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                //           ],
-                                //         ),
-                                //         tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                //       )
-                                //     : IconButton(
-                                //         onPressed: storyStore.aiLoading
-                                //             ? null
-                                //             : () {
-                                //                 if (!storyStore.aiLoading) {
-                                //                   storyStore.summarizeArticle(context);
-                                //                 }
-                                //               },
-                                //         icon: const Icon(LucideIcons.sparkles),
-                                //         tooltip: "Summarize Article",
-                                //       ),
+                                !storyStore.showReaderMode && storyStore.feedItemSummarized
+                                    ? IconButton(
+                                        onPressed: storyStore.hideAiSummary,
+                                        icon: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            const Align(
+                                              alignment: Alignment.topRight,
+                                              widthFactor: 2,
+                                              heightFactor: 3,
+                                              child: Icon(LucideIcons.sparkles, size: 14),
+                                            ),
+                                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
+                                          ],
+                                        ),
+                                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
+                                      )
+                                    : IconButton(
+                                        onPressed: storyStore.aiLoading
+                                            ? null
+                                            : () {
+                                                if (!storyStore.aiLoading) {
+                                                  storyStore.summarizeArticle(context);
+                                                }
+                                              },
+                                        icon: const Icon(LucideIcons.sparkles),
+                                        tooltip: "Summarize Article",
+                                      ),
 
                                 // BOOKMARK
                                 Stack(
@@ -646,6 +646,17 @@ class FloatingBar extends StatelessWidget {
                                 // Share button
                                 IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
 
+                                // HN COMMENTS BUTTON
+                                storyStore.showHnButton
+                                    ? IconButton(
+                                        onPressed: () {
+                                          storyStore.openHnCommentsPage();
+                                        },
+                                        tooltip: "Open Comments",
+                                        icon: Icon(Icons.comment_sharp),
+                                      )
+                                    : const SizedBox.shrink(),
+
                                 // READER MODE
                                 storyStore.showArchiveButton
                                     ? IconButton(
@@ -658,6 +669,8 @@ class FloatingBar extends StatelessWidget {
                                     : const SizedBox.shrink(),
                               ],
                             ),
+
+                            // summary in the bottom bar (only shown when using the webview)
                             AnimatedCrossFade(
                               duration: 150.ms,
                               firstCurve: Curves.easeInOutQuad,

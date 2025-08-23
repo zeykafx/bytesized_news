@@ -553,6 +553,22 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
+  late final _$showHnButtonAtom =
+      Atom(name: '_StoryStore.showHnButton', context: context);
+
+  @override
+  bool get showHnButton {
+    _$showHnButtonAtom.reportRead();
+    return super.showHnButton;
+  }
+
+  @override
+  set showHnButton(bool value) {
+    _$showHnButtonAtom.reportWrite(value, super.showHnButton, () {
+      super.showHnButton = value;
+    });
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_StoryStore.init', context: context);
 
@@ -570,6 +586,15 @@ mixin _$StoryStore on _StoryStore, Store {
   Future<void> checkPaywallOrBotBlock() {
     return _$checkPaywallOrBotBlockAsyncAction
         .run(() => super.checkPaywallOrBotBlock());
+  }
+
+  late final _$openHnCommentsPageAsyncAction =
+      AsyncAction('_StoryStore.openHnCommentsPage', context: context);
+
+  @override
+  Future<void> openHnCommentsPage() {
+    return _$openHnCommentsPageAsyncAction
+        .run(() => super.openHnCommentsPage());
   }
 
   late final _$openUrlInReaderModeAsyncAction =
@@ -676,6 +701,17 @@ mixin _$StoryStore on _StoryStore, Store {
         _$_StoryStoreActionController.startAction(name: '_StoryStore.dispose');
     try {
       return super.dispose();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void detectHackerNews() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.detectHackerNews');
+    try {
+      return super.detectHackerNews();
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }
@@ -826,6 +862,7 @@ shortAlert: ${shortAlert},
 alertMessage: ${alertMessage},
 readerModeHistory: ${readerModeHistory},
 currentUrl: ${currentUrl},
+showHnButton: ${showHnButton},
 hasImageInArticle: ${hasImageInArticle}
     ''';
   }
