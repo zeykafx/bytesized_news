@@ -226,6 +226,8 @@ PODS:
   - flutter_inappwebview_ios/Core (0.0.1):
     - Flutter
     - OrderedSet (~> 6.0.3)
+  - flutter_secure_storage (6.0.0):
+    - Flutter
   - google_sign_in_ios (0.0.1):
     - AppAuth (>= 1.7.4)
     - Flutter
@@ -359,6 +361,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_file_dialog (from `.symlinks/plugins/flutter_file_dialog/ios`)
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
@@ -452,6 +455,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_file_dialog/ios"
   flutter_inappwebview_ios:
     :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   google_sign_in_ios:
     :path: ".symlinks/plugins/google_sign_in_ios/darwin"
   in_app_purchase_storekit:
@@ -526,6 +531,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_file_dialog: ca8d7fbd1772d4f0c2777b4ab20a7787ef4e7dd8
   flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
+  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   google_sign_in_ios: b48bb9af78576358a168361173155596c845f0b9
   GoogleAdsOnDeviceConversion: 2be6297a4f048459e0ae17fad9bfd2844e10cf64
   GoogleAppMeasurement: 8f6ab04ad6ae493b53fcf56bd26323fb2f1384f3

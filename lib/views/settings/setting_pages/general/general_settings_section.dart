@@ -1,7 +1,8 @@
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/keywords_bottom_sheet.dart';
-import 'package:bytesized_news/views/settings/sections/settings_section.dart';
+
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:bytesized_news/views/settings/shared/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -29,28 +30,19 @@ class _GeneralSettingsSectionState extends State<GeneralSettingsSection> {
     return Observer(
       builder: (context) {
         return SettingsSection(
-          title: "General",
+          title: "Feed",
+          onlySection: false,
           children: [
-            // DARK MODE
             ListTile(
-              title: const Text("Dark Mode"),
-              subtitle: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: SegmentedButton(
-                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                  segments: darkModeNames
-                      .map(
-                        (option) => ButtonSegment(
-                          value: option,
-                          label: Text(option, overflow: TextOverflow.ellipsis),
-                        ),
-                      )
-                      .toList(),
-                  selected: {darkModeNames[settingsStore.darkMode.index]},
-                  onSelectionChanged: (selection) async {
-                    settingsStore.setDarkMode(DarkMode.values[darkModeNames.indexOf(selection.first)]);
-                  },
-                ),
+              title: Text("Delete articles older than"),
+              trailing: DropdownButton(
+                items: KeepArticlesLength.values.map((arLen) {
+                  return DropdownMenuItem<String>(value: keepArticlesLengthString(arLen), child: Text(keepArticlesLengthString(arLen)));
+                }).toList(),
+                onChanged: (String? value) {
+                  settingsStore.keepArticles = KeepArticlesLength.values[keepArticlesLengthValues.indexOf(value!)];
+                },
+                value: keepArticlesLengthString(settingsStore.keepArticles),
               ),
             ),
 
@@ -64,19 +56,6 @@ class _GeneralSettingsSectionState extends State<GeneralSettingsSection> {
               removalCallback: (int index) {
                 settingsStore.mutedKeywords = [...settingsStore.mutedKeywords..removeAt(index)];
               },
-            ),
-
-            ListTile(
-              title: Text("Delete articles older than"),
-              trailing: DropdownButton(
-                items: KeepArticlesLength.values.map((arLen) {
-                  return DropdownMenuItem<String>(value: keepArticlesLengthString(arLen), child: Text(keepArticlesLengthString(arLen)));
-                }).toList(),
-                onChanged: (String? value) {
-                  settingsStore.keepArticles = KeepArticlesLength.values[keepArticlesLengthValues.indexOf(value!)];
-                },
-                value: keepArticlesLengthString(settingsStore.keepArticles),
-              ),
             ),
 
             // Mark as Read On Scroll (toggle)

@@ -1,4 +1,4 @@
-import 'package:bytesized_news/views/settings/sections/settings_section.dart';
+import 'package:bytesized_news/views/settings/shared/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -25,6 +25,8 @@ class _AboutSectionState extends State<AboutSection> {
         }
         return SettingsSection(
           title: "About",
+          onlySection: true,
+
           children: [
             ListTile(
               leading: const Icon(LucideIcons.sparkles),

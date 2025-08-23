@@ -1,6 +1,7 @@
 import 'package:bytesized_news/main.dart' show taskName;
-import 'package:bytesized_news/views/settings/sections/settings_section.dart';
+
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:bytesized_news/views/settings/shared/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,7 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
       builder: (context) {
         return SettingsSection(
           title: "Background Sync",
+          onlySection: false,
           children: [
             // background sync interval
             ListTile(

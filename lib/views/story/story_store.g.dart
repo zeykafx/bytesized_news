@@ -696,6 +696,17 @@ mixin _$StoryStore on _StoryStore, Store {
   }
 
   @override
+  void getSettingsStoreValues() {
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+        name: '_StoryStore.getSettingsStoreValues');
+    try {
+      return super.getSettingsStoreValues();
+    } finally {
+      _$_StoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void dispose() {
     final _$actionInfo =
         _$_StoryStoreActionController.startAction(name: '_StoryStore.dispose');
@@ -712,17 +723,6 @@ mixin _$StoryStore on _StoryStore, Store {
         name: '_StoryStore.detectHackerNews');
     try {
       return super.detectHackerNews();
-    } finally {
-      _$_StoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void getSettingsStoreValues() {
-    final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.getSettingsStoreValues');
-    try {
-      return super.getSettingsStoreValues();
     } finally {
       _$_StoryStoreActionController.endAction(_$actionInfo);
     }

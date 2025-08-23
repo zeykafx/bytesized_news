@@ -56,7 +56,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..autoSwitchReaderTooShort =
           json['autoSwitchReaderTooShort'] as bool? ?? false
       ..alwaysShowArchiveButton =
-          json['alwaysShowArchiveButton'] as bool? ?? false;
+          json['alwaysShowArchiveButton'] as bool? ?? false
+      ..showShareButton = json['showShareButton'] as bool? ?? true
+      ..showCommentsButton = json['showCommentsButton'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -86,6 +88,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'isList': instance.isList,
       'autoSwitchReaderTooShort': instance.autoSwitchReaderTooShort,
       'alwaysShowArchiveButton': instance.alwaysShowArchiveButton,
+      'showShareButton': instance.showShareButton,
+      'showCommentsButton': instance.showCommentsButton,
     };
 
 const _$DarkModeEnumMap = {
@@ -619,6 +623,38 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$showShareButtonAtom =
+      Atom(name: '_SettingsStore.showShareButton', context: context);
+
+  @override
+  bool get showShareButton {
+    _$showShareButtonAtom.reportRead();
+    return super.showShareButton;
+  }
+
+  @override
+  set showShareButton(bool value) {
+    _$showShareButtonAtom.reportWrite(value, super.showShareButton, () {
+      super.showShareButton = value;
+    });
+  }
+
+  late final _$showCommentsButtonAtom =
+      Atom(name: '_SettingsStore.showCommentsButton', context: context);
+
+  @override
+  bool get showCommentsButton {
+    _$showCommentsButtonAtom.reportRead();
+    return super.showCommentsButton;
+  }
+
+  @override
+  set showCommentsButton(bool value) {
+    _$showCommentsButtonAtom.reportWrite(value, super.showCommentsButton, () {
+      super.showCommentsButton = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController =
       ActionController(name: '_SettingsStore', context: context);
 
@@ -784,7 +820,9 @@ storyTilesMinimalStyle: ${storyTilesMinimalStyle},
 storyReaderMaxWidth: ${storyReaderMaxWidth},
 isList: ${isList},
 autoSwitchReaderTooShort: ${autoSwitchReaderTooShort},
-alwaysShowArchiveButton: ${alwaysShowArchiveButton}
+alwaysShowArchiveButton: ${alwaysShowArchiveButton},
+showShareButton: ${showShareButton},
+showCommentsButton: ${showCommentsButton}
     ''';
   }
 }

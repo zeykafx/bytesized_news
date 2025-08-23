@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:bytesized_news/AI/ai_utils.dart';
-import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/reading_stats/reading_stats.dart';
@@ -205,7 +203,7 @@ abstract class _StoryStore with Store {
       // storeHtmlPageInFeedItem(htmlContent);
       await compareReaderModeLengthToPageHtml(context);
     } else {
-      htmlContent = feedItem.htmlContent!;
+      htmlContent = feedItem.htmlContent ?? "No Content";
     }
 
     if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
@@ -259,6 +257,13 @@ abstract class _StoryStore with Store {
   }
 
   @action
+  void getSettingsStoreValues() {
+    showReaderMode = settingsStore.useReaderModeByDefault;
+    hideSummary = settingsStore.showAiSummaryOnLoad;
+    showArchiveButton = settingsStore.alwaysShowArchiveButton;
+  }
+
+  @action
   void dispose() {
     if (kDebugMode) {
       print('Stopping reading timer');
@@ -306,8 +311,8 @@ abstract class _StoryStore with Store {
       "disable your Adblocker",
       "disable any ad blocker",
       "Prove you're not a robot",
-      "Your request has been blocked by our server's security policies"
-          "reCAPTCHA",
+      "Your request has been blocked by our server's security policies",
+      "reCAPTCHA",
       "hCAPTCHA",
       "Ray ID",
       "Error 403",
@@ -337,7 +342,7 @@ abstract class _StoryStore with Store {
 
   @action
   void detectHackerNews() {
-    if (feedItem.commentsUrl != null) {
+    if (feedItem.commentsUrl != null && feedItem.commentsUrl!.isNotEmpty) {
       showHnButton = true;
     }
     // List<String> hn = ["hnrss.org", "https://news.ycombinator.com/rss"];
@@ -348,7 +353,7 @@ abstract class _StoryStore with Store {
 
   @action
   Future<void> openHnCommentsPage() async {
-    if (feedItem.commentsUrl == null) {
+    if (feedItem.commentsUrl == null || feedItem.commentsUrl!.isEmpty) {
       return;
     }
 
@@ -402,13 +407,6 @@ abstract class _StoryStore with Store {
 
     loading = false;
     return false;
-  }
-
-  @action
-  void getSettingsStoreValues() {
-    showReaderMode = settingsStore.useReaderModeByDefault;
-    hideSummary = settingsStore.showAiSummaryOnLoad;
-    showArchiveButton = settingsStore.alwaysShowArchiveButton;
   }
 
   @action

@@ -1,70 +1,46 @@
-import 'package:bytesized_news/views/settings/sections/about_section.dart';
-import 'package:bytesized_news/views/settings/sections/background_sync_section.dart';
-import 'package:bytesized_news/views/settings/sections/general_settings_section.dart';
-import 'package:bytesized_news/views/settings/sections/import_export_section.dart';
-import 'package:bytesized_news/views/settings/sections/reader_mode_section.dart';
+import 'package:bytesized_news/views/settings/setting_pages/about/about_settings_page.dart';
+import 'package:bytesized_news/views/settings/setting_pages/appearance/appearance_settings_page.dart';
+import 'package:bytesized_news/views/settings/setting_pages/general/general_settings_page.dart';
+import 'package:bytesized_news/views/settings/setting_pages/reader/reader_settings_page.dart';
+import 'package:bytesized_news/views/settings/shared/settings_page.dart';
+import 'package:bytesized_news/views/settings/shared/top_lvl_settings_section.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:bytesized_news/views/settings/settings_store.dart';
-import 'package:provider/provider.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends StatelessWidget {
   const Settings({super.key});
-
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  late final SettingsStore settingsStore;
-
-  @override
-  void initState() {
-    super.initState();
-    settingsStore = context.read<SettingsStore>();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: Observer(
-        builder: (context) {
-          return SingleChildScrollView(
-            child: Center(
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Visibility(visible: settingsStore.loading, child: const CircularProgressIndicator()),
-                  ),
-                  Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const GeneralSettingsSection(),
-                            const ReaderModeSection(),
-                            // if (!Platform.isIOS) ...[
-                            const BackgroundSyncSection(),
-                            // ],
-                            const ImportExportSection(),
-                            const AboutSection(),
-                            const SizedBox(height: 30),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+      body: SettingsPage(
+        title: "Settings",
+        isMainView: true,
+        sections: [
+          TopLvlSettingsSection(
+            iconData: Icons.settings_applications_rounded,
+            title: "General",
+            subtitle: "Feed settings, background sync, import/export feeds",
+            settingsPage: GeneralSettingsPage(),
+          ),
+          TopLvlSettingsSection(
+            iconData: Icons.chrome_reader_mode_rounded,
+            title: "Reader",
+            subtitle: "Reader options, artificial intelligence, custom providers",
+            settingsPage: ReaderSettingsPage(),
+          ),
+          TopLvlSettingsSection(
+            iconData: Icons.palette_rounded,
+            title: "Appearance",
+            subtitle: "Dark theme, dynamic color",
+            settingsPage: AppearanceSettingsPage(),
+          ),
+          TopLvlSettingsSection(
+            iconData: Icons.info_rounded,
+            title: "About",
+            subtitle: "Version, source code",
+            settingsPage: AboutSettingsPage(),
+          ),
+        ],
       ),
     );
   }

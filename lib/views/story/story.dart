@@ -1,16 +1,14 @@
-// ignore: unnecessary_import
-import 'dart:math';
-import 'dart:ui';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:bytesized_news/views/story/widgets/summary_card.dart';
+import 'package:bytesized_news/views/story/widgets/floating_bar.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
-import 'package:bytesized_news/views/story/sub_views/story_settings.dart';
+import 'package:bytesized_news/views/story/widgets/story_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as html;
@@ -43,7 +41,6 @@ class _StoryState extends State<Story> {
     settingsStore = context.read<SettingsStore>();
     authStore = context.read<AuthStore>();
 
-    // PlatformInAppWebViewController.debugLoggingSettings.enabled = false;
     reactionDisposer = reaction((_) => storyStore.hasAlert, (bool hasAlert) {
       // if there is an alert to show, show it in a snackbar
       if (hasAlert) {
@@ -178,7 +175,8 @@ class _StoryState extends State<Story> {
                                                    <div class='ai_container'></div>
 
                                                  ${storyStore.feedItem.htmlContent ?? "Loading..."}
-                                                 Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a>
+
+                                                 <p>Source: <a href="${storyStore.feedItem.url}">${storyStore.feedItem.url}</a></p>
                                               </div>
                                               ''',
                                     renderMode: RenderMode.listView,
@@ -297,9 +295,10 @@ class _StoryState extends State<Story> {
               ),
 
               FloatingBar(storyStore: storyStore, widget: widget),
+              
               Observer(
                 builder: (context) {
-                  if (!storyStore.initialized) {
+                  if (!storyStore.initialized || storyStore.loading) {
                     return const LinearProgressIndicator();
                   }
 
@@ -327,390 +326,6 @@ class _StoryState extends State<Story> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class SummaryCard extends StatelessWidget {
-  const SummaryCard({
-    super.key,
-    required this.settingsStore,
-    required this.storyStore,
-  });
-
-  final SettingsStore settingsStore;
-  final StoryStore storyStore;
-
-  @override
-  Widget build(BuildContext context) {
-    final BorderRadius borderRadius = BorderRadius.circular(12);
-
-    return Observer(
-      builder: (context) {
-        if (storyStore.authStore.userTier != Tier.premium) {
-          return SizedBox.shrink();
-        }
-
-        return AnimatedCrossFade(
-          crossFadeState: !storyStore.feedItemSummarized ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-          duration: 250.ms,
-          firstCurve: Curves.easeOutCubic,
-          secondCurve: Curves.easeOutCubic,
-          sizeCurve: Curves.easeOutCubic,
-          firstChild: buildButtonCard(context, borderRadius),
-          secondChild: buildSummaryCard(context, borderRadius),
-        );
-      },
-    );
-  }
-
-  Card buildButtonCard(BuildContext context, BorderRadius borderRadius) {
-    return Card.filled(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: borderRadius,
-          onTap: !storyStore.aiLoading
-              ? () {
-                  if (!storyStore.aiLoading) {
-                    storyStore.summarizeArticle(context);
-                  }
-                }
-              : null,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child:
-                  Text(
-                        storyStore.aiLoading ? "Loading..." : "Summarize",
-                        style:
-                            fontFamilyToGoogleFontTextStyle(
-                              settingsStore.fontFamily,
-                            ).copyWith(
-                              fontSize: ((settingsStore.fontSize ?? 16) * 0.9),
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                      )
-                      .animate(target: storyStore.aiLoading ? 1 : 0, onPlay: (controller) => controller.repeat())
-                      .shimmer(
-                        duration: const Duration(milliseconds: 1500),
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.inversePrimary,
-                          Theme.of(context).colorScheme.primary,
-                        ],
-                      ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Card buildSummaryCard(BuildContext context, BorderRadius borderRadius) {
-    return Card.filled(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius,
-      ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: ExpansionTile(
-          enableFeedback: true,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          shape: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-          ),
-          initiallyExpanded: settingsStore.showAiSummaryOnLoad,
-          title: Text(
-            "Summary",
-            style:
-                fontFamilyToGoogleFontTextStyle(
-                  settingsStore.fontFamily,
-                ).copyWith(
-                  fontSize: ((settingsStore.fontSize ?? 16) * 1.1),
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-          children: [
-            ...storyStore.feedItem.aiSummary.split("\n").map((line) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
-                child: Text(
-                  line,
-                  style:
-                      fontFamilyToGoogleFontTextStyle(
-                        settingsStore.fontFamily,
-                      ).copyWith(
-                        fontSize: settingsStore.fontSize,
-                        fontWeight: widthToWeight(settingsStore.textWidth),
-                        height: settingsStore.lineHeight,
-                      ),
-                ),
-              );
-            }),
-            const SizedBox(height: 5),
-
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                "Generated content, verify important information.",
-                style:
-                    fontFamilyToGoogleFontTextStyle(
-                      settingsStore.fontFamily,
-                    ).copyWith(
-                      fontSize: ((settingsStore.fontSize ?? 16) * 0.7),
-                      fontWeight: widthToWeight(settingsStore.textWidth),
-                      height: settingsStore.lineHeight,
-                      color: Theme.of(context).dividerColor,
-                    ),
-              ),
-            ),
-            const SizedBox(height: 5),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class FloatingBar extends StatelessWidget {
-  const FloatingBar({super.key, required this.storyStore, required this.widget});
-
-  final StoryStore storyStore;
-  final Story widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: Observer(
-          builder: (context) {
-            return AnimatedSlide(
-              offset: storyStore.hideBar ? Offset(0, 1.8) : Offset(0, 0),
-              duration: 300.ms,
-              curve: Curves.easeInOutQuad,
-              child: AnimatedOpacity(
-                opacity: storyStore.hideBar ? 0.7 : 1,
-                duration: 150.ms,
-                curve: Curves.easeInOutQuad,
-                child: Card.outlined(
-                  margin: EdgeInsets.zero,
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: AnimatedSize(
-                      duration: 300.ms,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.max,
-                              spacing: 3,
-                              children: [
-                                // READER MODE
-                                IconButton(
-                                  onPressed: () {
-                                    storyStore.toggleReaderMode();
-                                  },
-                                  tooltip: storyStore.showReaderMode ? "Disable reader mode" : "Enable reader mode",
-                                  icon: Icon(storyStore.showReaderMode ? Icons.web_asset_rounded : Icons.menu_book_rounded),
-                                ),
-
-                                // RELOAD
-                                if (!storyStore.showReaderMode) ...[
-                                  IconButton(
-                                    onPressed: () {
-                                      storyStore.controller?.reload();
-                                    },
-                                    tooltip: "Refresh web page",
-                                    icon: const Icon(Icons.refresh),
-                                  ),
-                                ],
-
-                                // BACK
-                                if (!storyStore.showReaderMode || storyStore.readerModeHistory.isNotEmpty) ...[
-                                  IconButton(
-                                    onPressed: () {
-                                      if (!storyStore.showReaderMode) {
-                                        if (storyStore.canGoBack) {
-                                          storyStore.controller?.goBack();
-                                        }
-                                      } else {
-                                        storyStore.goBackInReaderHistory();
-                                      }
-                                    },
-                                    tooltip: "Go back",
-                                    icon: Icon(
-                                      Icons.arrow_back_ios,
-                                      color: (storyStore.showReaderMode)
-                                          ? (storyStore.readerModeHistory.isNotEmpty ? null : Colors.grey.withValues(alpha: 0.5))
-                                          : (storyStore.canGoBack ? null : Colors.grey.withValues(alpha: 0.5)),
-                                    ),
-                                  ),
-                                ],
-                                if (!storyStore.showReaderMode) ...[
-                                  // FORWARD
-                                  IconButton(
-                                    onPressed: () {
-                                      if (storyStore.canGoForward) {
-                                        storyStore.controller?.goForward();
-                                      }
-                                    },
-                                    tooltip: "Go forward",
-                                    icon: Icon(Icons.arrow_forward_ios, color: storyStore.canGoForward ? null : Colors.grey.withValues(alpha: 0.5)),
-                                  ),
-                                ],
-
-                                !storyStore.showReaderMode && storyStore.feedItemSummarized
-                                    ? IconButton(
-                                        onPressed: storyStore.hideAiSummary,
-                                        icon: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            const Align(
-                                              alignment: Alignment.topRight,
-                                              widthFactor: 2,
-                                              heightFactor: 3,
-                                              child: Icon(LucideIcons.sparkles, size: 14),
-                                            ),
-                                            Icon(storyStore.hideSummary ? Icons.visibility : Icons.visibility_off),
-                                          ],
-                                        ),
-                                        tooltip: storyStore.hideSummary ? "Show AI Summary" : "Hide AI Summary",
-                                      )
-                                    : IconButton(
-                                        onPressed: storyStore.aiLoading
-                                            ? null
-                                            : () {
-                                                if (!storyStore.aiLoading) {
-                                                  storyStore.summarizeArticle(context);
-                                                }
-                                              },
-                                        icon: const Icon(LucideIcons.sparkles),
-                                        tooltip: "Summarize Article",
-                                      ),
-
-                                // BOOKMARK
-                                Stack(
-                                  children: [
-                                    // circle like when held behind the bookmark icon if it's bookmarked
-                                    if (storyStore.isBookmarked) ...[
-                                      Positioned(
-                                        right: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        left: 0,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-
-                                    IconButton(
-                                      isSelected: storyStore.isBookmarked,
-                                      onPressed: () {
-                                        storyStore.bookmarkItem();
-                                        widget.feedItem.bookmarked = storyStore.isBookmarked;
-                                      },
-                                      icon: Icon(storyStore.isBookmarked ? Icons.bookmark_added : Icons.bookmark_add),
-                                    ),
-                                  ],
-                                ),
-
-                                // Share button
-                                IconButton(icon: Icon(Icons.share_rounded), onPressed: () => storyStore.shareArticle(context)),
-
-                                // HN COMMENTS BUTTON
-                                storyStore.showHnButton
-                                    ? IconButton(
-                                        onPressed: () {
-                                          storyStore.openHnCommentsPage();
-                                        },
-                                        tooltip: "Open Comments",
-                                        icon: Icon(Icons.comment_sharp),
-                                      )
-                                    : const SizedBox.shrink(),
-
-                                // READER MODE
-                                storyStore.showArchiveButton
-                                    ? IconButton(
-                                        onPressed: () {
-                                          storyStore.getArchivedArticle();
-                                        },
-                                        tooltip: "Search Archive.org for the article to bypass the paywall/block",
-                                        icon: Icon(Icons.archive_rounded),
-                                      )
-                                    : const SizedBox.shrink(),
-                              ],
-                            ),
-
-                            // summary in the bottom bar (only shown when using the webview)
-                            AnimatedCrossFade(
-                              duration: 150.ms,
-                              firstCurve: Curves.easeInOutQuad,
-                              secondCurve: Curves.easeInOutQuad,
-                              sizeCurve: Curves.easeOutQuad,
-                              crossFadeState: storyStore.hideSummary && storyStore.feedItemSummarized && !storyStore.showReaderMode
-                                  ? CrossFadeState.showFirst
-                                  : CrossFadeState.showSecond,
-                              firstChild: Container(
-                                constraints: BoxConstraints(maxWidth: min(MediaQuery.of(context).size.width * 0.9, 700), maxHeight: 300),
-                                child: Card.outlined(
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5), width: 1),
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(25), // slightly less radius to fit the radius of the container
-                                    ),
-                                  ),
-                                  margin: EdgeInsets.only(bottom: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: SingleChildScrollView(
-                                      child: SelectableText(
-                                        storyStore.feedItem.aiSummary,
-                                        // style: mediaQuery.size.width > 600 ? Theme.of(context).textTheme.bodyMedium : Theme.of(context).textTheme.bodySmall,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              secondChild: const SizedBox.shrink(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
         ),
       ),
     );
