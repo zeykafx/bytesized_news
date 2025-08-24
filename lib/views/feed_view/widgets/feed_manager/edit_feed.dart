@@ -1,4 +1,4 @@
-import 'package:bytesized_news/views/feed_view/sub_views/feed_manager/feed_manager_store.dart';
+import 'package:bytesized_news/views/feed_view/widgets/feed_manager/feed_manager_store.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/feed/feed.dart';

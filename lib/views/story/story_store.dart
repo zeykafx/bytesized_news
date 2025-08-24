@@ -198,27 +198,27 @@ abstract class _StoryStore with Store {
     feedItemSummarized = feedItem.summarized;
     currentUrl = feedItem.url;
 
+    webviewInit();
+
     if (!feedItem.downloaded) {
       htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
       // storeHtmlPageInFeedItem(htmlContent);
       await compareReaderModeLengthToPageHtml(context);
     } else {
       htmlContent = feedItem.htmlContent ?? "No Content";
+      await compareReaderModeLengthToPageHtml(context);
     }
+
+    checkPaywallOrBotBlock();
+    await readingStat.startReadingStory(feedItem);
 
     if (settingsStore.fetchAiSummaryOnLoad && showReaderMode) {
       await summarizeArticle(context);
     }
 
-    checkPaywallOrBotBlock();
     detectHackerNews();
 
-    webviewInit();
-
     initialized = true;
-
-    // start recording the reading
-    await readingStat.startReadingStory(feedItem);
   }
 
   @action
@@ -416,6 +416,10 @@ abstract class _StoryStore with Store {
     try {
       // fetch the page's html
       Response res = await dio.get(feedItem.url);
+
+      Map headers = res.headers.map;
+      handlePdfDocs(headers);
+
       dom.Document doc = html_parser.parse(res.data);
       if (doc.body == null) {
         return;
@@ -453,6 +457,20 @@ abstract class _StoryStore with Store {
     }
 
     return;
+  }
+
+  void handlePdfDocs(Map<dynamic, dynamic> headers) {
+    if (headers.keys.contains("content-type") || headers.keys.contains("Content-Type")) {
+      if (headers["content-type"].contains("application/pdf")) {
+        if (kDebugMode) {
+          print("Document is PDF");
+        }
+        showReaderMode = false;
+        alertMessage = "PDF Documents are shown in the webview";
+        hasAlert = true;
+        shortAlert = true;
+      }
+    }
   }
 
   @action

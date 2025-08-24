@@ -157,10 +157,11 @@ class FeedItem {
 
   Future<String> fetchHtmlContent(String articleUrl) async {
     Article result = await readability.parseAsync(articleUrl);
-    if (result.content == null) {
+    if (result.content == null || result.content!.isEmpty) {
       estReadingTimeMinutes = 0;
       return "";
     }
+
     int wordCount = result.content!.split(" ").length;
 
     if (imageUrl.isEmpty && result.imageUrl != null && result.imageUrl!.isNotEmpty) {

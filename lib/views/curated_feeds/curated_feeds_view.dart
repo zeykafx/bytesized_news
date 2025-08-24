@@ -2,7 +2,7 @@ import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
 import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/curated_feeds/curated_feeds_store.dart';
-import 'package:bytesized_news/views/feed_view/sub_views/add_feed.dart';
+import 'package:bytesized_news/views/feed_view/widgets/add_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -39,52 +39,54 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Observer(builder: (context) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        appBar: AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("News Sources"),
-              if (curatedFeedsStore.selectedFeeds.isNotEmpty)
-                Text(
-                  "${curatedFeedsStore.selectedFeeds.length} selected",
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-            ],
-          ),
+    return Observer(
+      builder: (context) {
+        return Scaffold(
           backgroundColor: colorScheme.surface,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          actions: [
-            if (curatedFeedsStore.selectedFeeds.isNotEmpty || curatedFeedsStore.selectedCategories.isNotEmpty)
-              Container(
-                margin: const EdgeInsets.only(right: 8),
-                child: Badge(
-                  label: Text('${curatedFeedsStore.selectedFeeds.length}'),
-                  child: IconButton.filled(
-                    onPressed: () {
-                      _showFollowConfirmation(context);
-                    },
-                    icon: const Icon(Icons.add),
-                    style: IconButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
+          appBar: AppBar(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("News Sources"),
+                if (curatedFeedsStore.selectedFeeds.isNotEmpty)
+                  Text(
+                    "${curatedFeedsStore.selectedFeeds.length} selected",
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
+            ),
+            backgroundColor: colorScheme.surface,
+            elevation: 0,
+            scrolledUnderElevation: 1,
+            actions: [
+              if (curatedFeedsStore.selectedFeeds.isNotEmpty || curatedFeedsStore.selectedCategories.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  child: Badge(
+                    label: Text('${curatedFeedsStore.selectedFeeds.length}'),
+                    child: IconButton.filled(
+                      onPressed: () {
+                        _showFollowConfirmation(context);
+                      },
+                      icon: const Icon(Icons.add),
+                      style: IconButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            const SizedBox(width: 8),
-          ],
-        ),
-        body: _buildBody(context, theme, colorScheme),
-        floatingActionButton: _buildFloatingActionButton(context, colorScheme),
-      );
-    });
+              const SizedBox(width: 8),
+            ],
+          ),
+          body: _buildBody(context, theme, colorScheme),
+          floatingActionButton: _buildFloatingActionButton(context, colorScheme),
+        );
+      },
+    );
   }
 
   Widget _buildBody(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
@@ -460,8 +462,8 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                   Text(
                     'Follow Feeds',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -469,8 +471,8 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
               Text(
                 'You\'re about to follow:',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
               const SizedBox(height: 12),
               if (selectedCategoriesCount > 0)
