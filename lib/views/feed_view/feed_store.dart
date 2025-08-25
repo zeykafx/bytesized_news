@@ -336,7 +336,7 @@ abstract class _FeedStore with Store {
       await item.fetchHtmlContent(item.url);
     }
 
-    // await dbUtils.updateItemInDb(item); // no need for this, it is already done in fetchHtmlContent
+    await dbUtils.updateItemInDb(item); 
   }
 
   @action
@@ -553,7 +553,7 @@ abstract class _FeedStore with Store {
       if (!feedItem.suggested) {
         feedItem.suggested = true;
         try {
-          downloadItem(feedItem); // this also updates the item in the db
+          await downloadItem(feedItem); // this also updates the item in the db
         } catch (e) {
           if (kDebugMode) {
             print("Failed to download item: ${feedItem.id}, with error: ${e}");

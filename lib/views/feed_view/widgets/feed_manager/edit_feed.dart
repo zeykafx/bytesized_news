@@ -7,8 +7,7 @@ class EditFeed extends StatefulWidget {
   final FeedManagerStore feedManagerStore;
   final Feed feed;
 
-  const EditFeed(
-      {super.key, required this.feed, required this.feedManagerStore});
+  const EditFeed({super.key, required this.feed, required this.feedManagerStore});
 
   @override
   State<EditFeed> createState() => _EditFeedState();
@@ -37,7 +36,7 @@ class _EditFeedState extends State<EditFeed> {
       ),
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 700),
+          constraints: BoxConstraints(maxWidth: feedManagerStore.feedStore.settingsStore.maxWidth),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Stack(
@@ -77,8 +76,7 @@ class _EditFeedState extends State<EditFeed> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 70, left: 20, right: 20, top: 10),
+                    padding: const EdgeInsets.only(bottom: 70, left: 20, right: 20, top: 10),
                     child: Card.outlined(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -87,12 +85,10 @@ class _EditFeedState extends State<EditFeed> {
                           Expanded(
                             child: TextButton.icon(
                               onPressed: () async {
-                                if (feedNameController.text.isEmpty ||
-                                    feedLinkController.text.isEmpty) {
+                                if (feedNameController.text.isEmpty || feedLinkController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text(
-                                          "Feed Name or Feed Link cannot be empty"),
+                                      content: Text("Feed Name or Feed Link cannot be empty"),
                                     ),
                                   );
                                   return;
@@ -101,8 +97,7 @@ class _EditFeedState extends State<EditFeed> {
                                 widget.feed.link = feedLinkController.text;
 
                                 // used as an update method for the feed group in the db
-                                await feedManagerStore.dbUtils
-                                    .addFeed(widget.feed);
+                                await feedManagerStore.dbUtils.addFeed(widget.feed);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text("Successfully updated Feed!"),

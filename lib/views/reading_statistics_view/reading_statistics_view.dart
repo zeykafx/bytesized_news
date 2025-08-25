@@ -91,15 +91,15 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Reading Statistics")),
-      body: Container(
-        constraints: BoxConstraints(maxWidth: 700),
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: Stack(
-          children: [
-            Center(
-              child: Observer(
-                builder: (context) {
-                  return CustomScrollView(
+      body: Observer(
+        builder: (context) {
+          return Container(
+            constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: Stack(
+              children: [
+                Center(
+                  child: CustomScrollView(
                     controller: store.scrollController,
                     slivers: [
                       SliverToBoxAdapter(
@@ -174,13 +174,9 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                         child: SizedBox(height: 80), // space for the scroll to top button
                       ),
                     ],
-                  );
-                },
-              ),
-            ),
-            Observer(
-              builder: (context) {
-                return Positioned(
+                  ),
+                ),
+                Positioned(
                   bottom: 20,
                   right: 20,
                   child: AnimatedSlide(
@@ -193,11 +189,11 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                       label: Text("Scroll To Top", style: TextStyle(fontSize: 12)),
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

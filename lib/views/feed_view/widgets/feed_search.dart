@@ -1,9 +1,11 @@
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_story_tile.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 
 class FeedSearch extends StatefulWidget {
   final FeedStore feedStore;
@@ -18,6 +20,7 @@ class FeedSearch extends StatefulWidget {
 
 class _FeedSearchState extends State<FeedSearch> {
   late TextEditingController textEditingController;
+  late SettingsStore settingsStore;
 
   String currentSort = "by_date_desc";
   bool loading = false;
@@ -25,6 +28,7 @@ class _FeedSearchState extends State<FeedSearch> {
   @override
   void initState() {
     super.initState();
+    settingsStore = context.read<SettingsStore>();
     textEditingController = TextEditingController();
   }
 
@@ -123,7 +127,7 @@ class _FeedSearchState extends State<FeedSearch> {
                   ),
                   Expanded(
                     child: Container(
-                      constraints: BoxConstraints(maxWidth: 700),
+                      constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
                       child: ListView.builder(
                         itemCount: widget.feedStore.searchResults.length,
                         addAutomaticKeepAlives: false,

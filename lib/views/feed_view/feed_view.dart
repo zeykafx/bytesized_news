@@ -148,7 +148,7 @@ class _FeedViewState extends State<FeedView> {
 
                         Expanded(
                           child: Container(
-                            constraints: const BoxConstraints(maxWidth: 500),
+                            constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [

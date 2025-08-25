@@ -39,7 +39,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
       ),
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 700),
+          constraints: BoxConstraints(maxWidth: feedManagerStore.feedStore.settingsStore.maxWidth),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Stack(
@@ -59,8 +59,8 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                             ),
                           ),
                         ),
-                        // const Divider(),
 
+                        // const Divider(),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
                           child: Align(
@@ -120,8 +120,9 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                                       TextButton(
                                                         onPressed: () async {
                                                           widget.feedGroup.feeds.remove(feed);
-                                                          widget.feedGroup.feedUrls =
-                                                              widget.feedGroup.feedUrls.where((String feedUrl) => feed.link != feedUrl).toList();
+                                                          widget.feedGroup.feedUrls = widget.feedGroup.feedUrls
+                                                              .where((String feedUrl) => feed.link != feedUrl)
+                                                              .toList();
                                                           // used as an update method for the feed group in the db
                                                           await feedManagerStore.dbUtils.addFeedGroup(widget.feedGroup);
                                                           setState(() {
@@ -134,7 +135,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                                           Navigator.of(context).pop();
                                                         },
                                                         child: const Text("Remove"),
-                                                      )
+                                                      ),
                                                     ],
                                                   );
                                                 },
@@ -146,7 +147,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                   Visibility(
                                     visible: selectionMode,
                                     child: selectedFeeds.contains(feed) ? const Icon(Icons.check_circle_rounded) : const Icon(Icons.circle_outlined),
-                                  )
+                                  ),
                                 ],
                               ),
                               selected: selectionMode && selectedFeeds.contains(feed),
@@ -196,7 +197,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                               },
                             ),
                           );
-                        })
+                        }),
                       ],
                     ),
                   ),
@@ -272,7 +273,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                               Navigator.of(context).pop();
                                             },
                                             child: const Text("Remove"),
-                                          )
+                                          ),
                                         ],
                                       );
                                     },
@@ -305,7 +306,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
                                 },
                               ),
                             ),
-                          ]
+                          ],
                         ],
                       ),
                     ),

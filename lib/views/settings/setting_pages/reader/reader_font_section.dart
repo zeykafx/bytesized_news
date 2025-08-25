@@ -206,7 +206,7 @@ class _ReaderModeSectionState extends State<ReaderFontSection> {
                         year2023: false,
                         label: settingsStore.storyReaderMaxWidth.toStringAsFixed(0),
                         value: settingsStore.storyReaderMaxWidth,
-                        min: 200.0,
+                        min: 400.0,
                         max: 1200.0,
                         divisions: 20,
                         onChanged: (newVal) {

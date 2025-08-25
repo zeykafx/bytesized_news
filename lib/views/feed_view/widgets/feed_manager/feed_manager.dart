@@ -71,7 +71,7 @@ class _FeedManagerState extends State<FeedManager> {
         builder: (_) {
           return Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 700),
+              constraints: BoxConstraints(maxWidth: feedStore.settingsStore.maxWidth),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Stack(

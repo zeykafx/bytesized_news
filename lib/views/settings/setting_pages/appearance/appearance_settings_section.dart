@@ -83,12 +83,11 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
                 }).toList(),
                 onChanged: (String? value) {
                   settingsStore.appFontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
-
                 },
                 value: fontFamilyToString(settingsStore.appFontFamily),
               ),
             ),
-            
+
             // DARK MODE
             ListTile(
               title: const Text("Dark Mode"),
@@ -112,6 +111,7 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
               ),
             ),
 
+            // Dynamic color
             SwitchListTile(
               title: const Text("Use dynamic color"),
               subtitle: Text("App's theme based on your wallpaper"),
@@ -121,49 +121,80 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
               },
             ),
 
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 5,
-              children: [
-                Center(
-                  child: SizedBox(
-                    height: 80,
-                    child: PageView(
-                      controller: pageController,
-                      onPageChanged: handlePageViewChanged,
-                      children: [
-                        for (int i = 0; i < (colorSeeds.length + 3) ~/ 4; i++) ...[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            spacing: 5,
-                            children: [
-                              for (Color color in colorSeeds.getRange(i * 4, min((i + 1) * 4, colorSeeds.length))) ...[
-                                ColorButton(
-                                  color: color,
-                                  colorScheme: ColorScheme.fromSeed(seedColor: color),
-                                  settingsStore: settingsStore,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      ],
+            // color buttons
+            buildColorButtonsBar(context),
+
+            // app wide max width
+            ListTile(
+              title: const Text("Max width"),
+              subtitle: SizedBox(
+                width: 150,
+                child: Row(
+                  children: [
+                    SizedBox(width: 35, child: Text(settingsStore.maxWidth.toStringAsFixed(0))),
+                    Expanded(
+                      child: Slider(
+                        year2023: false,
+                        label: settingsStore.maxWidth.toStringAsFixed(0),
+                        value: settingsStore.maxWidth,
+                        min: 400.0,
+                        max: 1200.0,
+                        divisions: 20,
+                        onChanged: (newVal) {
+                          settingsStore.maxWidth = newVal;
+                        },
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                TabPageSelector(
-                  controller: tabController,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  selectedColor: Theme.of(context).colorScheme.primary,
-                  borderStyle: BorderStyle.none,
-                ),
-              ],
+              ),
             ),
           ],
         );
       },
+    );
+  }
+
+  Column buildColorButtonsBar(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 5,
+      children: [
+        Center(
+          child: SizedBox(
+            height: 80,
+            child: PageView(
+              controller: pageController,
+              onPageChanged: handlePageViewChanged,
+              children: [
+                for (int i = 0; i < (colorSeeds.length + 3) ~/ 4; i++) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 5,
+                    children: [
+                      for (Color color in colorSeeds.getRange(i * 4, min((i + 1) * 4, colorSeeds.length))) ...[
+                        ColorButton(
+                          color: color,
+                          colorScheme: ColorScheme.fromSeed(seedColor: color),
+                          settingsStore: settingsStore,
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        TabPageSelector(
+          controller: tabController,
+          color: Theme.of(context).colorScheme.primaryContainer,
+          selectedColor: Theme.of(context).colorScheme.primary,
+          borderStyle: BorderStyle.none,
+        ),
+      ],
     );
   }
 }

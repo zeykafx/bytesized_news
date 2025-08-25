@@ -283,6 +283,7 @@ abstract class _SettingsStore with Store {
   static const defaultUseDynamicColor = true;
   static const defaultColorSeedIndex = 0;
   static const defaultAppFontFamily = FontFamily.roboto;
+  static const defaultMaxWidth = 700.0;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -492,4 +493,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultAppFontFamily)
   @observable
   FontFamily appFontFamily = defaultAppFontFamily;
+
+  @JsonKey(defaultValue: defaultMaxWidth)
+  @observable
+  double maxWidth = defaultMaxWidth;
 }

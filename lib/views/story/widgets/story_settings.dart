@@ -38,7 +38,7 @@ class _StorySettingsState extends State<StorySettings> {
           return SingleChildScrollView(
             child: Center(
               child: Container(
-                constraints: const BoxConstraints(maxWidth: 800),
+                constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.start,

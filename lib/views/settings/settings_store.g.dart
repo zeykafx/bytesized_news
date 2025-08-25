@@ -73,7 +73,8 @@ SettingsStore _$SettingsStoreFromJson(
   ..colorSeedIndex = (json['colorSeedIndex'] as num?)?.toInt() ?? 0
   ..appFontFamily =
       $enumDecodeNullable(_$FontFamilyEnumMap, json['appFontFamily']) ??
-      FontFamily.roboto;
+      FontFamily.roboto
+  ..maxWidth = (json['maxWidth'] as num?)?.toDouble() ?? 700.0;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -109,6 +110,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'useDynamicColor': instance.useDynamicColor,
       'colorSeedIndex': instance.colorSeedIndex,
       'appFontFamily': _$FontFamilyEnumMap[instance.appFontFamily]!,
+      'maxWidth': instance.maxWidth,
     };
 
 const _$DarkModeEnumMap = {
@@ -835,6 +837,24 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$maxWidthAtom = Atom(
+    name: '_SettingsStore.maxWidth',
+    context: context,
+  );
+
+  @override
+  double get maxWidth {
+    _$maxWidthAtom.reportRead();
+    return super.maxWidth;
+  }
+
+  @override
+  set maxWidth(double value) {
+    _$maxWidthAtom.reportWrite(value, super.maxWidth, () {
+      super.maxWidth = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -1020,7 +1040,8 @@ showCommentsButton: ${showCommentsButton},
 enableCustomAiProvider: ${enableCustomAiProvider},
 useDynamicColor: ${useDynamicColor},
 colorSeedIndex: ${colorSeedIndex},
-appFontFamily: ${appFontFamily}
+appFontFamily: ${appFontFamily},
+maxWidth: ${maxWidth}
     ''';
   }
 }
