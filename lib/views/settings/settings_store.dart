@@ -1,7 +1,6 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
@@ -110,24 +109,35 @@ FontWeight widthToWeight(TextWidth width) {
 }
 
 enum FontFamily {
-  roboto, // Current default
-  openSans, // Most popular alternative
-  lora, // Best serif for reading
-  merriweather, // Screen-optimized serif
-  inter, // Modern sans-serif
-  sourceSerif, // Clean serif
-  playfairDisplay, // Elegant serif
-  lato, // Friendly sans-serif
-  firaSans, // Humanist sans-serif
-  crimsonText, // Classic book feel
+  openSans,
+  roboto,
+  lora,
+  merriweather,
+  inter,
+  sourceSerif,
+  playfairDisplay,
+  lato,
+  firaSans,
+  crimsonText,
 }
 
-const fontFamilyValues = ["Roboto", "Open Sans", "Lora", "Merriweather", "Inter", "Source Serif Pro", "Playfair Display", "Lato", "Fira Sans", "Crimson Text"];
+const fontFamilyValues = [
+  "Open Sans",
+  "Roboto Flex",
+  "Lora",
+  "Merriweather",
+  "Inter",
+  "Source Serif Pro",
+  "Playfair Display",
+  "Lato",
+  "Fira Sans",
+  "Crimson Text",
+];
 
 String fontFamilyToString(FontFamily fontFamily) {
   return switch (fontFamily) {
-    FontFamily.roboto => "Roboto",
     FontFamily.openSans => "Open Sans",
+    FontFamily.roboto => "Roboto Flex",
     FontFamily.lora => "Lora",
     FontFamily.merriweather => "Merriweather",
     FontFamily.inter => "Inter",
@@ -141,8 +151,8 @@ String fontFamilyToString(FontFamily fontFamily) {
 
 String fontFamilyToExplanation(FontFamily fontFamily) {
   return switch (fontFamily) {
-    FontFamily.roboto => "Popular default",
-    FontFamily.openSans => "Default font",
+    FontFamily.openSans => "Popular font",
+    FontFamily.roboto => "Default font",
     FontFamily.lora => "Best serif for reading",
     FontFamily.merriweather => "Screen-optimized serif",
     FontFamily.inter => "Modern sans-serif",
@@ -166,6 +176,21 @@ TextStyle fontFamilyToGoogleFontTextStyle(FontFamily fontFamily) {
     FontFamily.lato => GoogleFonts.lato(),
     FontFamily.firaSans => GoogleFonts.firaSans(),
     FontFamily.crimsonText => GoogleFonts.crimsonText(),
+  };
+}
+
+TextTheme fontFamilyToTextTheme(FontFamily fontFamily, TextTheme baseTextTheme) {
+  return switch (fontFamily) {
+    FontFamily.roboto => GoogleFonts.robotoFlexTextTheme(baseTextTheme),
+    FontFamily.openSans => GoogleFonts.openSansTextTheme(baseTextTheme),
+    FontFamily.lora => GoogleFonts.loraTextTheme(baseTextTheme),
+    FontFamily.merriweather => GoogleFonts.merriweatherTextTheme(baseTextTheme),
+    FontFamily.inter => GoogleFonts.interTextTheme(baseTextTheme),
+    FontFamily.sourceSerif => GoogleFonts.sourceSerif4TextTheme(baseTextTheme),
+    FontFamily.playfairDisplay => GoogleFonts.playfairDisplayTextTheme(baseTextTheme),
+    FontFamily.lato => GoogleFonts.latoTextTheme(baseTextTheme),
+    FontFamily.firaSans => GoogleFonts.firaSansTextTheme(baseTextTheme),
+    FontFamily.crimsonText => GoogleFonts.crimsonTextTextTheme(baseTextTheme),
   };
 }
 
@@ -200,27 +225,26 @@ String backgroundFetchIntervalString(BackgroundFetchInterval backgroundFetchInte
 
 const backgroundFetchIntervalValues = ["Never", "30 minutes", "1 hour", "1.5 hours", "2 hours", "3 hours", "6 hours", "12 hours", "24 hours"];
 
-
 List<Color> colorSeeds = [
   Colors.blue,
+  Colors.blueGrey,
   Colors.lightGreen,
-  Colors.purple,
-  Colors.indigo,
-  Colors.orange,
-  Colors.pink,
   Colors.teal,
-  Colors.red,
-  Colors.amber,
+  Colors.indigo,
   Colors.cyan,
   Colors.lime,
+  Colors.orange,
+  Colors.purple,
+  Colors.pink,
+  Colors.red,
+  Colors.amber,
   Colors.deepPurple,
   Colors.deepOrange,
   Colors.orange,
   Colors.orangeAccent,
+  Colors.brown,
   Colors.yellow,
   Colors.yellowAccent,
-  Colors.blueGrey,
-  Colors.brown,
   Colors.grey,
 ];
 
@@ -258,6 +282,7 @@ abstract class _SettingsStore with Store {
   static const defaultEnableCustomAiProvider = false;
   static const defaultUseDynamicColor = true;
   static const defaultColorSeedIndex = 0;
+  static const defaultAppFontFamily = FontFamily.roboto;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -463,4 +488,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultColorSeedIndex)
   @observable
   int colorSeedIndex = defaultColorSeedIndex;
+
+  @JsonKey(defaultValue: defaultAppFontFamily)
+  @observable
+  FontFamily appFontFamily = defaultAppFontFamily;
 }

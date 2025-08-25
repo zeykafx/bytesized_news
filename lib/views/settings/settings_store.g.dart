@@ -70,7 +70,10 @@ SettingsStore _$SettingsStoreFromJson(
   ..showCommentsButton = json['showCommentsButton'] as bool? ?? true
   ..enableCustomAiProvider = json['enableCustomAiProvider'] as bool? ?? false
   ..useDynamicColor = json['useDynamicColor'] as bool? ?? true
-  ..colorSeedIndex = (json['colorSeedIndex'] as num?)?.toInt() ?? 0;
+  ..colorSeedIndex = (json['colorSeedIndex'] as num?)?.toInt() ?? 0
+  ..appFontFamily =
+      $enumDecodeNullable(_$FontFamilyEnumMap, json['appFontFamily']) ??
+      FontFamily.roboto;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -105,6 +108,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'enableCustomAiProvider': instance.enableCustomAiProvider,
       'useDynamicColor': instance.useDynamicColor,
       'colorSeedIndex': instance.colorSeedIndex,
+      'appFontFamily': _$FontFamilyEnumMap[instance.appFontFamily]!,
     };
 
 const _$DarkModeEnumMap = {
@@ -151,8 +155,8 @@ const _$TextWidthEnumMap = {
 };
 
 const _$FontFamilyEnumMap = {
-  FontFamily.roboto: 'roboto',
   FontFamily.openSans: 'openSans',
+  FontFamily.roboto: 'roboto',
   FontFamily.lora: 'lora',
   FontFamily.merriweather: 'merriweather',
   FontFamily.inter: 'inter',
@@ -813,6 +817,24 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$appFontFamilyAtom = Atom(
+    name: '_SettingsStore.appFontFamily',
+    context: context,
+  );
+
+  @override
+  FontFamily get appFontFamily {
+    _$appFontFamilyAtom.reportRead();
+    return super.appFontFamily;
+  }
+
+  @override
+  set appFontFamily(FontFamily value) {
+    _$appFontFamilyAtom.reportWrite(value, super.appFontFamily, () {
+      super.appFontFamily = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -997,7 +1019,8 @@ showShareButton: ${showShareButton},
 showCommentsButton: ${showCommentsButton},
 enableCustomAiProvider: ${enableCustomAiProvider},
 useDynamicColor: ${useDynamicColor},
-colorSeedIndex: ${colorSeedIndex}
+colorSeedIndex: ${colorSeedIndex},
+appFontFamily: ${appFontFamily}
     ''';
   }
 }

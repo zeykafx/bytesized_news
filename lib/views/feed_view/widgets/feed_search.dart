@@ -129,10 +129,13 @@ class _FeedSearchState extends State<FeedSearch> {
                         addAutomaticKeepAlives: false,
                         itemBuilder: (context, idx) {
                           FeedItem item = widget.feedStore.searchResults.elementAt(idx);
-                          return FeedStoryTile(
-                            feedStore: widget.feedStore,
-                            item: item,
-                          ).animate().fade();
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: FeedStoryTile(
+                              feedStore: widget.feedStore,
+                              item: item,
+                            ).animate().fade(),
+                          );
                         },
                       ),
                     ),

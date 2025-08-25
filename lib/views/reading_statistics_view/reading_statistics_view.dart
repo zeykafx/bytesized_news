@@ -37,13 +37,13 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
   }
 
   Map<int, String> weekdayIdxToString = {
-    1: "Monday",
-    2: "Tusday",
-    3: "Wednesday",
-    4: "Thursday",
-    5: "Friday",
-    6: "Saturday",
-    7: "Sunday",
+    1: "Mon",
+    2: "Tue",
+    3: "Wed",
+    4: "Thur",
+    5: "Fri",
+    6: "Sat",
+    7: "Sun",
   };
 
   Map<int, String> monthIdxToString = {
@@ -228,16 +228,18 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Text(
-            "${store.totalReadingTime.inHours}h ${store.totalReadingTime.inMinutes.remainder(60)}m",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            "Read for ${percentageOfYear.toStringAsFixed(2)}% of a whole year",
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
             textAlign: ui.TextAlign.right,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
-            "That is ${percentageOfYear.toStringAsFixed(2)}% of a whole year",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+            "${store.totalReadingTime.inHours}h ${store.totalReadingTime.inMinutes.remainder(60)}m",
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
             textAlign: ui.TextAlign.right,
           ),
         ],
@@ -256,14 +258,16 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
         children: [
           Text(
             "Read ${store.mostReadDayCount} articles on ${weekdayIdxToString[store.mostReadDay.weekday]}, ${monthIdxToString[store.mostReadDay.month]} ${store.mostReadDay.day}${getOrdinalSuffix(store.mostReadDay.day)} ${store.mostReadDay.year}",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
             textAlign: ui.TextAlign.right,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
-            "Read ${store.numberArticlesRead} in total",
+            "${store.numberArticlesRead} in total",
             style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
           ),
         ],

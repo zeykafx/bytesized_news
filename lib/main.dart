@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
@@ -192,35 +193,43 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
+    var baseTheme = ThemeData(brightness: Brightness.light);
+
     if (settingsStore.useDynamicColor) {
       return ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme,
         colorSchemeSeed: lightColorScheme == null ? Colors.red : null,
         brightness: Brightness.light,
+        textTheme: fontFamilyToTextTheme(settingsStore.appFontFamily, baseTheme.textTheme),
       );
     } else {
       return ThemeData(
         useMaterial3: true,
         colorSchemeSeed: colorSeeds[settingsStore.colorSeedIndex],
         brightness: Brightness.light,
+        textTheme: fontFamilyToTextTheme(settingsStore.appFontFamily, baseTheme.textTheme),
       );
     }
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
+    var baseTheme = ThemeData(brightness: Brightness.dark);
+
     if (settingsStore.useDynamicColor) {
       return ThemeData(
         useMaterial3: true,
         colorScheme: darkColorScheme,
         colorSchemeSeed: darkColorScheme == null ? Colors.red : null,
         brightness: Brightness.dark,
+        textTheme: fontFamilyToTextTheme(settingsStore.appFontFamily, baseTheme.textTheme),
       );
     } else {
       return ThemeData(
         useMaterial3: true,
         colorSchemeSeed: colorSeeds[settingsStore.colorSeedIndex],
         brightness: Brightness.dark,
+        textTheme: fontFamilyToTextTheme(settingsStore.appFontFamily, baseTheme.textTheme),
       );
     }
   }

@@ -4,6 +4,7 @@ import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/settings/shared/settings_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -61,6 +62,33 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
           title: "Look & Feel",
           onlySection: true,
           children: [
+            // Font
+            ListTile(
+              title: Text("App Font"),
+              trailing: DropdownButton(
+                items: FontFamily.values.map((font) {
+                  return DropdownMenuItem<String>(
+                    value: fontFamilyToString(font),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          fontFamilyToString(font),
+                          style: TextStyle(fontWeight: settingsStore.appFontFamily == font ? FontWeight.w600 : FontWeight.normal),
+                        ),
+                        Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  settingsStore.appFontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
+
+                },
+                value: fontFamilyToString(settingsStore.appFontFamily),
+              ),
+            ),
+            
             // DARK MODE
             ListTile(
               title: const Text("Dark Mode"),
@@ -195,7 +223,7 @@ class ColorButton extends StatelessWidget {
                           Align(
                             alignment: Alignment.bottomRight,
                             child: Container(
-                              color: colorScheme.secondary, // secondary
+                              color: colorScheme.primaryFixedDim, // secondary
                               width: 24,
                               height: 24,
                             ),
@@ -203,7 +231,7 @@ class ColorButton extends StatelessWidget {
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: Container(
-                              color: colorScheme.tertiary, // tertiary
+                              color: colorScheme.tertiaryFixedDim, // tertiary
                               width: 24,
                               height: 24,
                             ),
@@ -214,7 +242,7 @@ class ColorButton extends StatelessWidget {
                   ),
                   Observer(
                     builder: (context) {
-                      if (colorIndex == settingsStore.colorSeedIndex) {
+                      if (colorIndex == settingsStore.colorSeedIndex && !settingsStore.useDynamicColor) {
                         return Center(
                           child: Container(
                             decoration: BoxDecoration(
@@ -235,6 +263,6 @@ class ColorButton extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ).animate(delay: 100.ms).fadeIn(duration: 300.ms, curve: Curves.easeInOutQuad);
   }
 }
