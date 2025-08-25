@@ -22,18 +22,17 @@ The app is built with Flutter and Mobx.
 - Create feed groups (folders) to easily organize your feeds and navigate between them
 
 ## Screenshots
-
 <img alt="Home" src="./.images/home.png" width="300"/>
 
 ### Reader Mode
 <img alt="Reader mode with AI summary" src="./.images/reader_ai.png" width="300"/>
 
+#### Integrated browser:
+<img alt="Integrated browser" src="./.images/reader_browser.png" width="300"/>
+
 #### Reader mode customization
 <img alt="Reader mode customization" src="./.images/reader_customization.png" width="300"/>
 <img alt="Reader mode customization 2" src="./.images/reader_customization_2.png" width="300"/>
-
-#### Integrated browser:
-<img alt="Integrated browser" src="./.images/reader_browser.png" width="300"/>
 
 ### Reading statistics
 <img alt="Reading statistics page" src="./.images/reading_stats.png" width="300"/>
@@ -51,4 +50,6 @@ The app is built with Flutter and Mobx.
 <img alt="Settings" src="./.images/settings.png" width="300"/>
 
 <img alt="General Settings" src="./.images/settings_general.png" width="300"/>
+<img alt="Reader Settings" src="./.images/settings_reader.png" width="300"/>
+<img alt="Reader Settings cont." src="./.images/settings_reader_2.png" width="300"/>
 <img alt="Appearance Settings" src="./.images/settings_appearance.png" width="300"/>
