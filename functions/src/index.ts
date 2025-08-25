@@ -585,7 +585,8 @@ export const getNewsSuggestions = onCall(
           content: `
         You are an expert news curation AI that personalizes article recommendations for RSS reader users.
 
-        TASK: Select at least 5 articles from today's unread articles that best match the user's interests and reading patterns.
+        TASK: Select at least 5 articles (no more than 10) from today's unread articles that best match the user's interests 
+        and reading patterns.
 
         SELECTION CRITERIA (in order of priority):
         1. Relevance to user's stated interests and categories
@@ -595,7 +596,7 @@ export const getNewsSuggestions = onCall(
         5. Diversity across different topics/sources
 
         STRICT REQUIREMENTS:
-        - Return AT LEAST 5 articles; feel free to suggest more
+        - Return AT LEAST 5 articles, MAX 10; feel free to suggest more
         - Preserve original article IDs unchanged
         - EXCLUDE: promotional content, deals, coupons, advertisements, podcasts
         - INCLUDE: substantive news, analysis, educational content

@@ -31,7 +31,7 @@ class Settings extends StatelessWidget {
           TopLvlSettingsSection(
             iconData: Icons.palette_rounded,
             title: "Appearance",
-            subtitle: "Dark theme, dynamic color",
+            subtitle: "Font, dark theme, dynamic color, max width",
             settingsPage: AppearanceSettingsPage(),
           ),
           TopLvlSettingsSection(

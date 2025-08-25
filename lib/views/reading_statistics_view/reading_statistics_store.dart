@@ -95,4 +95,9 @@ abstract class _ReadingStatisticsStore with Store {
     }
     loading = false;
   }
+
+  Future<void> deleteReading(StoryReading reading) async {
+    await dbUtils.deleteReading(reading);
+    getReadingStatistics();
+  }
 }

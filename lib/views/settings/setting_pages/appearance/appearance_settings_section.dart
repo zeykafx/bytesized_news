@@ -65,26 +65,28 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
             // Font
             ListTile(
               title: Text("App Font"),
-              trailing: DropdownButton(
-                items: FontFamily.values.map((font) {
-                  return DropdownMenuItem<String>(
-                    value: fontFamilyToString(font),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fontFamilyToString(font),
-                          style: TextStyle(fontWeight: settingsStore.appFontFamily == font ? FontWeight.w600 : FontWeight.normal),
-                        ),
-                        Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  settingsStore.appFontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
-                },
-                value: fontFamilyToString(settingsStore.appFontFamily),
+              trailing: Center(
+                child: DropdownButton(
+                  items: FontFamily.values.map((font) {
+                    return DropdownMenuItem<String>(
+                      value: fontFamilyToString(font),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            fontFamilyToString(font),
+                            style: TextStyle(fontWeight: settingsStore.appFontFamily == font ? FontWeight.w600 : FontWeight.normal),
+                          ),
+                          Text(fontFamilyToExplanation(font), style: TextStyle(color: Theme.of(context).dividerColor, fontSize: 12)),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    settingsStore.appFontFamily = FontFamily.values[fontFamilyValues.indexOf(value!)];
+                  },
+                  value: fontFamilyToString(settingsStore.appFontFamily),
+                ),
               ),
             ),
 

@@ -587,26 +587,48 @@ class ReadArticleCard extends StatelessWidget {
                       ),
                     ],
 
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          LucideIcons.arrow_up_right,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => Story(feedItem: feedItem),
+                    Row(
+                      spacing: 5,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              LucideIcons.trash,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
-                          );
-                        },
-                        visualDensity: VisualDensity.compact,
-                      ),
+                            onPressed: () {
+                              store.deleteReading(reading);
+                            },
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              LucideIcons.arrow_up_right,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => Story(feedItem: feedItem),
+                                ),
+                              );
+                            },
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
