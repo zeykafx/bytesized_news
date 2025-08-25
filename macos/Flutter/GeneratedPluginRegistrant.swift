@@ -21,7 +21,7 @@ import flutter_inappwebview_macos
 import flutter_secure_storage_macos
 import google_sign_in_ios
 import in_app_purchase_storekit
-import isar_flutter_libs
+import isar_community_flutter_libs
 import package_info_plus
 import path_provider_foundation
 import share_plus

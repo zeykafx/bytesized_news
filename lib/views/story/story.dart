@@ -65,7 +65,7 @@ class _StoryState extends State<Story> {
   @override
   void dispose() {
     super.dispose();
-    storyStore.dispose();
+    // storyStore.dispose();
     reactionDisposer();
   }
 
@@ -295,7 +295,7 @@ class _StoryState extends State<Story> {
               ),
 
               FloatingBar(storyStore: storyStore, widget: widget),
-              
+
               Observer(
                 builder: (context) {
                   if (!storyStore.initialized || storyStore.loading) {

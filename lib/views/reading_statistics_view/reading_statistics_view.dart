@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:html/parser.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 

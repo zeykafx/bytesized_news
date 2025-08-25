@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:photo_view/photo_view.dart';
@@ -265,9 +265,6 @@ abstract class _StoryStore with Store {
 
   @action
   void dispose() {
-    if (kDebugMode) {
-      print('Stopping reading timer');
-    }
     if (initialized) {
       endReading();
     }
@@ -320,10 +317,11 @@ abstract class _StoryStore with Store {
       "Error 451",
       "JavaScript is required",
       "Please enable JavaScript",
+      "Some privacy related extensions may cause issues on x.com. Please disable them and try again",
     ];
     bool suggestArchiveArticle = false;
     for (String msg in detectionMessages) {
-      if (htmlContent.split("\n").contains(msg)) {
+      if (htmlContent.contains(msg)) {
         if (kDebugMode) {
           print("Block or paywall detected, suggesting Archived article");
         }

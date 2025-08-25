@@ -13,12 +13,14 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   bool get hasImageInArticle => (_$hasImageInArticleComputed ??= Computed<bool>(
-          () => super.hasImageInArticle,
-          name: '_StoryStore.hasImageInArticle'))
-      .value;
+    () => super.hasImageInArticle,
+    name: '_StoryStore.hasImageInArticle',
+  )).value;
 
-  late final _$dbUtilsAtom =
-      Atom(name: '_StoryStore.dbUtils', context: context);
+  late final _$dbUtilsAtom = Atom(
+    name: '_StoryStore.dbUtils',
+    context: context,
+  );
 
   @override
   DbUtils get dbUtils {
@@ -30,15 +32,20 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   set dbUtils(DbUtils value) {
-    _$dbUtilsAtom
-        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
-      super.dbUtils = value;
-      _dbUtilsIsInitialized = true;
-    });
+    _$dbUtilsAtom.reportWrite(
+      value,
+      _dbUtilsIsInitialized ? super.dbUtils : null,
+      () {
+        super.dbUtils = value;
+        _dbUtilsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$feedItemAtom =
-      Atom(name: '_StoryStore.feedItem', context: context);
+  late final _$feedItemAtom = Atom(
+    name: '_StoryStore.feedItem',
+    context: context,
+  );
 
   @override
   FeedItem get feedItem {
@@ -50,15 +57,20 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   set feedItem(FeedItem value) {
-    _$feedItemAtom
-        .reportWrite(value, _feedItemIsInitialized ? super.feedItem : null, () {
-      super.feedItem = value;
-      _feedItemIsInitialized = true;
-    });
+    _$feedItemAtom.reportWrite(
+      value,
+      _feedItemIsInitialized ? super.feedItem : null,
+      () {
+        super.feedItem = value;
+        _feedItemIsInitialized = true;
+      },
+    );
   }
 
-  late final _$htmlContentAtom =
-      Atom(name: '_StoryStore.htmlContent', context: context);
+  late final _$htmlContentAtom = Atom(
+    name: '_StoryStore.htmlContent',
+    context: context,
+  );
 
   @override
   String get htmlContent {
@@ -73,8 +85,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$showReaderModeAtom =
-      Atom(name: '_StoryStore.showReaderMode', context: context);
+  late final _$showReaderModeAtom = Atom(
+    name: '_StoryStore.showReaderMode',
+    context: context,
+  );
 
   @override
   bool get showReaderMode {
@@ -87,14 +101,19 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   set showReaderMode(bool value) {
     _$showReaderModeAtom.reportWrite(
-        value, _showReaderModeIsInitialized ? super.showReaderMode : null, () {
-      super.showReaderMode = value;
-      _showReaderModeIsInitialized = true;
-    });
+      value,
+      _showReaderModeIsInitialized ? super.showReaderMode : null,
+      () {
+        super.showReaderMode = value;
+        _showReaderModeIsInitialized = true;
+      },
+    );
   }
 
-  late final _$isBookmarkedAtom =
-      Atom(name: '_StoryStore.isBookmarked', context: context);
+  late final _$isBookmarkedAtom = Atom(
+    name: '_StoryStore.isBookmarked',
+    context: context,
+  );
 
   @override
   bool get isBookmarked {
@@ -109,8 +128,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$canGoForwardAtom =
-      Atom(name: '_StoryStore.canGoForward', context: context);
+  late final _$canGoForwardAtom = Atom(
+    name: '_StoryStore.canGoForward',
+    context: context,
+  );
 
   @override
   bool get canGoForward {
@@ -125,8 +146,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$canGoBackAtom =
-      Atom(name: '_StoryStore.canGoBack', context: context);
+  late final _$canGoBackAtom = Atom(
+    name: '_StoryStore.canGoBack',
+    context: context,
+  );
 
   @override
   bool get canGoBack {
@@ -141,8 +164,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$progressAtom =
-      Atom(name: '_StoryStore.progress', context: context);
+  late final _$progressAtom = Atom(
+    name: '_StoryStore.progress',
+    context: context,
+  );
 
   @override
   int get progress {
@@ -157,8 +182,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$loadingAtom =
-      Atom(name: '_StoryStore.loading', context: context);
+  late final _$loadingAtom = Atom(
+    name: '_StoryStore.loading',
+    context: context,
+  );
 
   @override
   bool get loading {
@@ -173,8 +200,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$isLockedAtom =
-      Atom(name: '_StoryStore.isLocked', context: context);
+  late final _$isLockedAtom = Atom(
+    name: '_StoryStore.isLocked',
+    context: context,
+  );
 
   @override
   bool get isLocked {
@@ -189,8 +218,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$isCollapsedAtom =
-      Atom(name: '_StoryStore.isCollapsed', context: context);
+  late final _$isCollapsedAtom = Atom(
+    name: '_StoryStore.isCollapsed',
+    context: context,
+  );
 
   @override
   bool get isCollapsed {
@@ -205,8 +236,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$isExpandedAtom =
-      Atom(name: '_StoryStore.isExpanded', context: context);
+  late final _$isExpandedAtom = Atom(
+    name: '_StoryStore.isExpanded',
+    context: context,
+  );
 
   @override
   bool get isExpanded {
@@ -221,8 +254,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$controllerAtom =
-      Atom(name: '_StoryStore.controller', context: context);
+  late final _$controllerAtom = Atom(
+    name: '_StoryStore.controller',
+    context: context,
+  );
 
   @override
   InAppWebViewController? get controller {
@@ -237,8 +272,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$initializedAtom =
-      Atom(name: '_StoryStore.initialized', context: context);
+  late final _$initializedAtom = Atom(
+    name: '_StoryStore.initialized',
+    context: context,
+  );
 
   @override
   bool get initialized {
@@ -253,8 +290,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$adUrlFiltersAtom =
-      Atom(name: '_StoryStore.adUrlFilters', context: context);
+  late final _$adUrlFiltersAtom = Atom(
+    name: '_StoryStore.adUrlFilters',
+    context: context,
+  );
 
   @override
   List<String> get adUrlFilters {
@@ -269,8 +308,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$contentBlockersAtom =
-      Atom(name: '_StoryStore.contentBlockers', context: context);
+  late final _$contentBlockersAtom = Atom(
+    name: '_StoryStore.contentBlockers',
+    context: context,
+  );
 
   @override
   List<ContentBlocker> get contentBlockers {
@@ -285,8 +326,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$settingsAtom =
-      Atom(name: '_StoryStore.settings', context: context);
+  late final _$settingsAtom = Atom(
+    name: '_StoryStore.settings',
+    context: context,
+  );
 
   @override
   InAppWebViewSettings get settings {
@@ -298,15 +341,20 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   set settings(InAppWebViewSettings value) {
-    _$settingsAtom
-        .reportWrite(value, _settingsIsInitialized ? super.settings : null, () {
-      super.settings = value;
-      _settingsIsInitialized = true;
-    });
+    _$settingsAtom.reportWrite(
+      value,
+      _settingsIsInitialized ? super.settings : null,
+      () {
+        super.settings = value;
+        _settingsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$aiUtilsAtom =
-      Atom(name: '_StoryStore.aiUtils', context: context);
+  late final _$aiUtilsAtom = Atom(
+    name: '_StoryStore.aiUtils',
+    context: context,
+  );
 
   @override
   AiUtils get aiUtils {
@@ -318,15 +366,20 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   set aiUtils(AiUtils value) {
-    _$aiUtilsAtom
-        .reportWrite(value, _aiUtilsIsInitialized ? super.aiUtils : null, () {
-      super.aiUtils = value;
-      _aiUtilsIsInitialized = true;
-    });
+    _$aiUtilsAtom.reportWrite(
+      value,
+      _aiUtilsIsInitialized ? super.aiUtils : null,
+      () {
+        super.aiUtils = value;
+        _aiUtilsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$feedItemSummarizedAtom =
-      Atom(name: '_StoryStore.feedItemSummarized', context: context);
+  late final _$feedItemSummarizedAtom = Atom(
+    name: '_StoryStore.feedItemSummarized',
+    context: context,
+  );
 
   @override
   bool get feedItemSummarized {
@@ -341,8 +394,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$aiLoadingAtom =
-      Atom(name: '_StoryStore.aiLoading', context: context);
+  late final _$aiLoadingAtom = Atom(
+    name: '_StoryStore.aiLoading',
+    context: context,
+  );
 
   @override
   bool get aiLoading {
@@ -357,8 +412,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$hideSummaryAtom =
-      Atom(name: '_StoryStore.hideSummary', context: context);
+  late final _$hideSummaryAtom = Atom(
+    name: '_StoryStore.hideSummary',
+    context: context,
+  );
 
   @override
   bool get hideSummary {
@@ -371,14 +428,19 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   set hideSummary(bool value) {
     _$hideSummaryAtom.reportWrite(
-        value, _hideSummaryIsInitialized ? super.hideSummary : null, () {
-      super.hideSummary = value;
-      _hideSummaryIsInitialized = true;
-    });
+      value,
+      _hideSummaryIsInitialized ? super.hideSummary : null,
+      () {
+        super.hideSummary = value;
+        _hideSummaryIsInitialized = true;
+      },
+    );
   }
 
-  late final _$firestoreAtom =
-      Atom(name: '_StoryStore.firestore', context: context);
+  late final _$firestoreAtom = Atom(
+    name: '_StoryStore.firestore',
+    context: context,
+  );
 
   @override
   FirebaseFirestore get firestore {
@@ -393,8 +455,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$htmlWidgetKeyAtom =
-      Atom(name: '_StoryStore.htmlWidgetKey', context: context);
+  late final _$htmlWidgetKeyAtom = Atom(
+    name: '_StoryStore.htmlWidgetKey',
+    context: context,
+  );
 
   @override
   UniqueKey get htmlWidgetKey {
@@ -409,8 +473,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$hideBarAtom =
-      Atom(name: '_StoryStore.hideBar', context: context);
+  late final _$hideBarAtom = Atom(
+    name: '_StoryStore.hideBar',
+    context: context,
+  );
 
   @override
   bool get hideBar {
@@ -425,8 +491,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$webviewLastScrollYAtom =
-      Atom(name: '_StoryStore.webviewLastScrollY', context: context);
+  late final _$webviewLastScrollYAtom = Atom(
+    name: '_StoryStore.webviewLastScrollY',
+    context: context,
+  );
 
   @override
   int get webviewLastScrollY {
@@ -441,8 +509,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$readingStatAtom =
-      Atom(name: '_StoryStore.readingStat', context: context);
+  late final _$readingStatAtom = Atom(
+    name: '_StoryStore.readingStat',
+    context: context,
+  );
 
   @override
   ReadingStats get readingStat {
@@ -457,8 +527,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$showArchiveButtonAtom =
-      Atom(name: '_StoryStore.showArchiveButton', context: context);
+  late final _$showArchiveButtonAtom = Atom(
+    name: '_StoryStore.showArchiveButton',
+    context: context,
+  );
 
   @override
   bool get showArchiveButton {
@@ -473,8 +545,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$hasAlertAtom =
-      Atom(name: '_StoryStore.hasAlert', context: context);
+  late final _$hasAlertAtom = Atom(
+    name: '_StoryStore.hasAlert',
+    context: context,
+  );
 
   @override
   bool get hasAlert {
@@ -489,8 +563,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$shortAlertAtom =
-      Atom(name: '_StoryStore.shortAlert', context: context);
+  late final _$shortAlertAtom = Atom(
+    name: '_StoryStore.shortAlert',
+    context: context,
+  );
 
   @override
   bool get shortAlert {
@@ -505,8 +581,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$alertMessageAtom =
-      Atom(name: '_StoryStore.alertMessage', context: context);
+  late final _$alertMessageAtom = Atom(
+    name: '_StoryStore.alertMessage',
+    context: context,
+  );
 
   @override
   String get alertMessage {
@@ -521,8 +599,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$readerModeHistoryAtom =
-      Atom(name: '_StoryStore.readerModeHistory', context: context);
+  late final _$readerModeHistoryAtom = Atom(
+    name: '_StoryStore.readerModeHistory',
+    context: context,
+  );
 
   @override
   ObservableList<String> get readerModeHistory {
@@ -537,8 +617,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$currentUrlAtom =
-      Atom(name: '_StoryStore.currentUrl', context: context);
+  late final _$currentUrlAtom = Atom(
+    name: '_StoryStore.currentUrl',
+    context: context,
+  );
 
   @override
   String get currentUrl {
@@ -553,8 +635,10 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$showHnButtonAtom =
-      Atom(name: '_StoryStore.showHnButton', context: context);
+  late final _$showHnButtonAtom = Atom(
+    name: '_StoryStore.showHnButton',
+    context: context,
+  );
 
   @override
   bool get showHnButton {
@@ -569,125 +653,179 @@ mixin _$StoryStore on _StoryStore, Store {
     });
   }
 
-  late final _$initAsyncAction =
-      AsyncAction('_StoryStore.init', context: context);
+  late final _$initAsyncAction = AsyncAction(
+    '_StoryStore.init',
+    context: context,
+  );
 
   @override
-  Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore,
-      AuthStore authStore) {
-    return _$initAsyncAction
-        .run(() => super.init(item, context, setStore, authStore));
+  Future<void> init(
+    FeedItem item,
+    BuildContext context,
+    SettingsStore setStore,
+    AuthStore authStore,
+  ) {
+    return _$initAsyncAction.run(
+      () => super.init(item, context, setStore, authStore),
+    );
   }
 
-  late final _$checkPaywallOrBotBlockAsyncAction =
-      AsyncAction('_StoryStore.checkPaywallOrBotBlock', context: context);
+  late final _$checkPaywallOrBotBlockAsyncAction = AsyncAction(
+    '_StoryStore.checkPaywallOrBotBlock',
+    context: context,
+  );
 
   @override
   Future<void> checkPaywallOrBotBlock() {
-    return _$checkPaywallOrBotBlockAsyncAction
-        .run(() => super.checkPaywallOrBotBlock());
+    return _$checkPaywallOrBotBlockAsyncAction.run(
+      () => super.checkPaywallOrBotBlock(),
+    );
   }
 
-  late final _$openHnCommentsPageAsyncAction =
-      AsyncAction('_StoryStore.openHnCommentsPage', context: context);
+  late final _$openHnCommentsPageAsyncAction = AsyncAction(
+    '_StoryStore.openHnCommentsPage',
+    context: context,
+  );
 
   @override
   Future<void> openHnCommentsPage() {
-    return _$openHnCommentsPageAsyncAction
-        .run(() => super.openHnCommentsPage());
+    return _$openHnCommentsPageAsyncAction.run(
+      () => super.openHnCommentsPage(),
+    );
   }
 
-  late final _$openUrlInReaderModeAsyncAction =
-      AsyncAction('_StoryStore.openUrlInReaderMode', context: context);
+  late final _$openUrlInReaderModeAsyncAction = AsyncAction(
+    '_StoryStore.openUrlInReaderMode',
+    context: context,
+  );
 
   @override
-  Future<void> openUrlInReaderMode(String url,
-      {bool replaceItemContent = true}) {
-    return _$openUrlInReaderModeAsyncAction.run(() =>
-        super.openUrlInReaderMode(url, replaceItemContent: replaceItemContent));
+  Future<void> openUrlInReaderMode(
+    String url, {
+    bool replaceItemContent = true,
+  }) {
+    return _$openUrlInReaderModeAsyncAction.run(
+      () => super.openUrlInReaderMode(
+        url,
+        replaceItemContent: replaceItemContent,
+      ),
+    );
   }
 
-  late final _$goBackInReaderHistoryAsyncAction =
-      AsyncAction('_StoryStore.goBackInReaderHistory', context: context);
+  late final _$goBackInReaderHistoryAsyncAction = AsyncAction(
+    '_StoryStore.goBackInReaderHistory',
+    context: context,
+  );
 
   @override
   Future<void> goBackInReaderHistory() {
-    return _$goBackInReaderHistoryAsyncAction
-        .run(() => super.goBackInReaderHistory());
+    return _$goBackInReaderHistoryAsyncAction.run(
+      () => super.goBackInReaderHistory(),
+    );
   }
 
-  late final _$getArchivedArticleAsyncAction =
-      AsyncAction('_StoryStore.getArchivedArticle', context: context);
+  late final _$getArchivedArticleAsyncAction = AsyncAction(
+    '_StoryStore.getArchivedArticle',
+    context: context,
+  );
 
   @override
   Future<bool> getArchivedArticle({bool fromError = false}) {
-    return _$getArchivedArticleAsyncAction
-        .run(() => super.getArchivedArticle(fromError: fromError));
+    return _$getArchivedArticleAsyncAction.run(
+      () => super.getArchivedArticle(fromError: fromError),
+    );
   }
 
   late final _$compareReaderModeLengthToPageHtmlAsyncAction = AsyncAction(
-      '_StoryStore.compareReaderModeLengthToPageHtml',
-      context: context);
+    '_StoryStore.compareReaderModeLengthToPageHtml',
+    context: context,
+  );
 
   @override
   Future<void> compareReaderModeLengthToPageHtml(BuildContext context) {
-    return _$compareReaderModeLengthToPageHtmlAsyncAction
-        .run(() => super.compareReaderModeLengthToPageHtml(context));
+    return _$compareReaderModeLengthToPageHtmlAsyncAction.run(
+      () => super.compareReaderModeLengthToPageHtml(context),
+    );
   }
 
-  late final _$onProgressChangedAsyncAction =
-      AsyncAction('_StoryStore.onProgressChanged', context: context);
+  late final _$onProgressChangedAsyncAction = AsyncAction(
+    '_StoryStore.onProgressChanged',
+    context: context,
+  );
 
   @override
   Future<void> onProgressChanged(InAppWebViewController controller, int prog) {
-    return _$onProgressChangedAsyncAction
-        .run(() => super.onProgressChanged(controller, prog));
+    return _$onProgressChangedAsyncAction.run(
+      () => super.onProgressChanged(controller, prog),
+    );
   }
 
-  late final _$onLoadStopAsyncAction =
-      AsyncAction('_StoryStore.onLoadStop', context: context);
+  late final _$onLoadStopAsyncAction = AsyncAction(
+    '_StoryStore.onLoadStop',
+    context: context,
+  );
 
   @override
   Future<void> onLoadStop(InAppWebViewController controller, WebUri? url) {
     return _$onLoadStopAsyncAction.run(() => super.onLoadStop(controller, url));
   }
 
-  late final _$summarizeArticleAsyncAction =
-      AsyncAction('_StoryStore.summarizeArticle', context: context);
+  late final _$summarizeArticleAsyncAction = AsyncAction(
+    '_StoryStore.summarizeArticle',
+    context: context,
+  );
 
   @override
-  Future<void> summarizeArticle(BuildContext context,
-      {bool longSummaryAccepted = false}) {
-    return _$summarizeArticleAsyncAction.run(() => super
-        .summarizeArticle(context, longSummaryAccepted: longSummaryAccepted));
+  Future<void> summarizeArticle(
+    BuildContext context, {
+    bool longSummaryAccepted = false,
+  }) {
+    return _$summarizeArticleAsyncAction.run(
+      () => super.summarizeArticle(
+        context,
+        longSummaryAccepted: longSummaryAccepted,
+      ),
+    );
   }
 
-  late final _$evaluateSummaryAsyncAction =
-      AsyncAction('_StoryStore.evaluateSummary', context: context);
+  late final _$evaluateSummaryAsyncAction = AsyncAction(
+    '_StoryStore.evaluateSummary',
+    context: context,
+  );
 
   @override
   Future<void> evaluateSummary(
-      String article, String summary, BuildContext context) {
-    return _$evaluateSummaryAsyncAction
-        .run(() => super.evaluateSummary(article, summary, context));
+    String article,
+    String summary,
+    BuildContext context,
+  ) {
+    return _$evaluateSummaryAsyncAction.run(
+      () => super.evaluateSummary(article, summary, context),
+    );
   }
 
-  late final _$onLoadStartAsyncAction =
-      AsyncAction('_StoryStore.onLoadStart', context: context);
+  late final _$onLoadStartAsyncAction = AsyncAction(
+    '_StoryStore.onLoadStart',
+    context: context,
+  );
 
   @override
   Future<void> onLoadStart(InAppWebViewController controller, WebUri? url) {
-    return _$onLoadStartAsyncAction
-        .run(() => super.onLoadStart(controller, url));
+    return _$onLoadStartAsyncAction.run(
+      () => super.onLoadStart(controller, url),
+    );
   }
 
-  late final _$_StoryStoreActionController =
-      ActionController(name: '_StoryStore', context: context);
+  late final _$_StoryStoreActionController = ActionController(
+    name: '_StoryStore',
+    context: context,
+  );
 
   @override
   void webviewInit() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.webviewInit');
+      name: '_StoryStore.webviewInit',
+    );
     try {
       return super.webviewInit();
     } finally {
@@ -698,7 +836,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void getSettingsStoreValues() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.getSettingsStoreValues');
+      name: '_StoryStore.getSettingsStoreValues',
+    );
     try {
       return super.getSettingsStoreValues();
     } finally {
@@ -708,8 +847,9 @@ mixin _$StoryStore on _StoryStore, Store {
 
   @override
   void dispose() {
-    final _$actionInfo =
-        _$_StoryStoreActionController.startAction(name: '_StoryStore.dispose');
+    final _$actionInfo = _$_StoryStoreActionController.startAction(
+      name: '_StoryStore.dispose',
+    );
     try {
       return super.dispose();
     } finally {
@@ -720,7 +860,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void detectHackerNews() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.detectHackerNews');
+      name: '_StoryStore.detectHackerNews',
+    );
     try {
       return super.detectHackerNews();
     } finally {
@@ -731,7 +872,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   Map<String, String>? buildStyle(BuildContext context, dom.Element element) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.buildStyle');
+      name: '_StoryStore.buildStyle',
+    );
     try {
       return super.buildStyle(context, element);
     } finally {
@@ -742,7 +884,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void toggleReaderMode() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.toggleReaderMode');
+      name: '_StoryStore.toggleReaderMode',
+    );
     try {
       return super.toggleReaderMode();
     } finally {
@@ -753,7 +896,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void hideAiSummary() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.hideAiSummary');
+      name: '_StoryStore.hideAiSummary',
+    );
     try {
       return super.hideAiSummary();
     } finally {
@@ -764,7 +908,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void bookmarkItem() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.bookmarkItem');
+      name: '_StoryStore.bookmarkItem',
+    );
     try {
       return super.bookmarkItem();
     } finally {
@@ -775,7 +920,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void showImage(String imageUrl, BuildContext context) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.showImage');
+      name: '_StoryStore.showImage',
+    );
     try {
       return super.showImage(imageUrl, context);
     } finally {
@@ -786,7 +932,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void endReading() {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.endReading');
+      name: '_StoryStore.endReading',
+    );
     try {
       return super.endReading();
     } finally {
@@ -797,7 +944,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void shareArticle(BuildContext context) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.shareArticle');
+      name: '_StoryStore.shareArticle',
+    );
     try {
       return super.shareArticle(context);
     } finally {
@@ -808,7 +956,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   bool notificationListener(ScrollNotification notification) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.notificationListener');
+      name: '_StoryStore.notificationListener',
+    );
     try {
       return super.notificationListener(notification);
     } finally {
@@ -819,7 +968,8 @@ mixin _$StoryStore on _StoryStore, Store {
   @override
   void webviewScrollListener(InAppWebViewController controller, int x, int y) {
     final _$actionInfo = _$_StoryStoreActionController.startAction(
-        name: '_StoryStore.webviewScrollListener');
+      name: '_StoryStore.webviewScrollListener',
+    );
     try {
       return super.webviewScrollListener(controller, x, y);
     } finally {

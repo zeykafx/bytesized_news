@@ -8,7 +8,7 @@ import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:opml/opml.dart';
 

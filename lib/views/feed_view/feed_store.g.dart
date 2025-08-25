@@ -24,8 +24,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$pinnedFeedsOrFeedGroupsAtom =
-      Atom(name: '_FeedStore.pinnedFeedsOrFeedGroups', context: context);
+  late final _$pinnedFeedsOrFeedGroupsAtom = Atom(
+    name: '_FeedStore.pinnedFeedsOrFeedGroups',
+    context: context,
+  );
 
   @override
   ObservableList<dynamic> get pinnedFeedsOrFeedGroups {
@@ -35,14 +37,19 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set pinnedFeedsOrFeedGroups(ObservableList<dynamic> value) {
-    _$pinnedFeedsOrFeedGroupsAtom
-        .reportWrite(value, super.pinnedFeedsOrFeedGroups, () {
-      super.pinnedFeedsOrFeedGroups = value;
-    });
+    _$pinnedFeedsOrFeedGroupsAtom.reportWrite(
+      value,
+      super.pinnedFeedsOrFeedGroups,
+      () {
+        super.pinnedFeedsOrFeedGroups = value;
+      },
+    );
   }
 
-  late final _$feedGroupsAtom =
-      Atom(name: '_FeedStore.feedGroups', context: context);
+  late final _$feedGroupsAtom = Atom(
+    name: '_FeedStore.feedGroups',
+    context: context,
+  );
 
   @override
   ObservableList<FeedGroup> get feedGroups {
@@ -57,8 +64,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$feedItemsAtom =
-      Atom(name: '_FeedStore.feedItems', context: context);
+  late final _$feedItemsAtom = Atom(
+    name: '_FeedStore.feedItems',
+    context: context,
+  );
 
   @override
   ObservableList<FeedItem> get feedItems {
@@ -73,8 +82,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$searchResultsAtom =
-      Atom(name: '_FeedStore.searchResults', context: context);
+  late final _$searchResultsAtom = Atom(
+    name: '_FeedStore.searchResults',
+    context: context,
+  );
 
   @override
   ObservableList<FeedItem> get searchResults {
@@ -89,8 +100,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$suggestedFeedItemsAtom =
-      Atom(name: '_FeedStore.suggestedFeedItems', context: context);
+  late final _$suggestedFeedItemsAtom = Atom(
+    name: '_FeedStore.suggestedFeedItems',
+    context: context,
+  );
 
   @override
   ObservableList<FeedItem> get suggestedFeedItems {
@@ -105,8 +118,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$initializedAtom =
-      Atom(name: '_FeedStore.initialized', context: context);
+  late final _$initializedAtom = Atom(
+    name: '_FeedStore.initialized',
+    context: context,
+  );
 
   @override
   bool get initialized {
@@ -136,8 +151,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$suggestionsLoadingAtom =
-      Atom(name: '_FeedStore.suggestionsLoading', context: context);
+  late final _$suggestionsLoadingAtom = Atom(
+    name: '_FeedStore.suggestionsLoading',
+    context: context,
+  );
 
   @override
   bool get suggestionsLoading {
@@ -179,11 +196,14 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set dbUtils(DbUtils value) {
-    _$dbUtilsAtom
-        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
-      super.dbUtils = value;
-      _dbUtilsIsInitialized = true;
-    });
+    _$dbUtilsAtom.reportWrite(
+      value,
+      _dbUtilsIsInitialized ? super.dbUtils : null,
+      () {
+        super.dbUtils = value;
+        _dbUtilsIsInitialized = true;
+      },
+    );
   }
 
   late final _$aiUtilsAtom = Atom(name: '_FeedStore.aiUtils', context: context);
@@ -198,11 +218,14 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set aiUtils(AiUtils value) {
-    _$aiUtilsAtom
-        .reportWrite(value, _aiUtilsIsInitialized ? super.aiUtils : null, () {
-      super.aiUtils = value;
-      _aiUtilsIsInitialized = true;
-    });
+    _$aiUtilsAtom.reportWrite(
+      value,
+      _aiUtilsIsInitialized ? super.aiUtils : null,
+      () {
+        super.aiUtils = value;
+        _aiUtilsIsInitialized = true;
+      },
+    );
   }
 
   late final _$authAtom = Atom(name: '_FeedStore.auth', context: context);
@@ -238,8 +261,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$settingsStoreAtom =
-      Atom(name: '_FeedStore.settingsStore', context: context);
+  late final _$settingsStoreAtom = Atom(
+    name: '_FeedStore.settingsStore',
+    context: context,
+  );
 
   @override
   SettingsStore get settingsStore {
@@ -252,14 +277,19 @@ mixin _$FeedStore on _FeedStore, Store {
   @override
   set settingsStore(SettingsStore value) {
     _$settingsStoreAtom.reportWrite(
-        value, _settingsStoreIsInitialized ? super.settingsStore : null, () {
-      super.settingsStore = value;
-      _settingsStoreIsInitialized = true;
-    });
+      value,
+      _settingsStoreIsInitialized ? super.settingsStore : null,
+      () {
+        super.settingsStore = value;
+        _settingsStoreIsInitialized = true;
+      },
+    );
   }
 
-  late final _$authStoreAtom =
-      Atom(name: '_FeedStore.authStore', context: context);
+  late final _$authStoreAtom = Atom(
+    name: '_FeedStore.authStore',
+    context: context,
+  );
 
   @override
   AuthStore get authStore {
@@ -272,14 +302,19 @@ mixin _$FeedStore on _FeedStore, Store {
   @override
   set authStore(AuthStore value) {
     _$authStoreAtom.reportWrite(
-        value, _authStoreIsInitialized ? super.authStore : null, () {
-      super.authStore = value;
-      _authStoreIsInitialized = true;
-    });
+      value,
+      _authStoreIsInitialized ? super.authStore : null,
+      () {
+        super.authStore = value;
+        _authStoreIsInitialized = true;
+      },
+    );
   }
 
-  late final _$isLockedAtom =
-      Atom(name: '_FeedStore.isLocked', context: context);
+  late final _$isLockedAtom = Atom(
+    name: '_FeedStore.isLocked',
+    context: context,
+  );
 
   @override
   bool get isLocked {
@@ -294,8 +329,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$isCollapsedAtom =
-      Atom(name: '_FeedStore.isCollapsed', context: context);
+  late final _$isCollapsedAtom = Atom(
+    name: '_FeedStore.isCollapsed',
+    context: context,
+  );
 
   @override
   bool get isCollapsed {
@@ -310,8 +347,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$isExpandedAtom =
-      Atom(name: '_FeedStore.isExpanded', context: context);
+  late final _$isExpandedAtom = Atom(
+    name: '_FeedStore.isExpanded',
+    context: context,
+  );
 
   @override
   bool get isExpanded {
@@ -326,8 +365,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$bsbControllerAtom =
-      Atom(name: '_FeedStore.bsbController', context: context);
+  late final _$bsbControllerAtom = Atom(
+    name: '_FeedStore.bsbController',
+    context: context,
+  );
 
   @override
   BottomSheetBarController get bsbController {
@@ -342,8 +383,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$bsbHeightAtom =
-      Atom(name: '_FeedStore.bsbHeight', context: context);
+  late final _$bsbHeightAtom = Atom(
+    name: '_FeedStore.bsbHeight',
+    context: context,
+  );
 
   @override
   double get bsbHeight {
@@ -358,8 +401,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$scrollControllerAtom =
-      Atom(name: '_FeedStore.scrollController', context: context);
+  late final _$scrollControllerAtom = Atom(
+    name: '_FeedStore.scrollController',
+    context: context,
+  );
 
   @override
   ScrollController get scrollController {
@@ -374,8 +419,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$suggestionsScrollControllerAtom =
-      Atom(name: '_FeedStore.suggestionsScrollController', context: context);
+  late final _$suggestionsScrollControllerAtom = Atom(
+    name: '_FeedStore.suggestionsScrollController',
+    context: context,
+  );
 
   @override
   ScrollController get suggestionsScrollController {
@@ -385,14 +432,19 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set suggestionsScrollController(ScrollController value) {
-    _$suggestionsScrollControllerAtom
-        .reportWrite(value, super.suggestionsScrollController, () {
-      super.suggestionsScrollController = value;
-    });
+    _$suggestionsScrollControllerAtom.reportWrite(
+      value,
+      super.suggestionsScrollController,
+      () {
+        super.suggestionsScrollController = value;
+      },
+    );
   }
 
-  late final _$showScrollToTopAtom =
-      Atom(name: '_FeedStore.showScrollToTop', context: context);
+  late final _$showScrollToTopAtom = Atom(
+    name: '_FeedStore.showScrollToTop',
+    context: context,
+  );
 
   @override
   bool get showScrollToTop {
@@ -407,8 +459,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$showSmallScrollToTopAtom =
-      Atom(name: '_FeedStore.showSmallScrollToTop', context: context);
+  late final _$showSmallScrollToTopAtom = Atom(
+    name: '_FeedStore.showSmallScrollToTop',
+    context: context,
+  );
 
   @override
   bool get showSmallScrollToTop {
@@ -418,14 +472,19 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set showSmallScrollToTop(bool value) {
-    _$showSmallScrollToTopAtom.reportWrite(value, super.showSmallScrollToTop,
-        () {
-      super.showSmallScrollToTop = value;
-    });
+    _$showSmallScrollToTopAtom.reportWrite(
+      value,
+      super.showSmallScrollToTop,
+      () {
+        super.showSmallScrollToTop = value;
+      },
+    );
   }
 
-  late final _$hasCreatedNewSuggestionAtom =
-      Atom(name: '_FeedStore.hasCreatedNewSuggestion', context: context);
+  late final _$hasCreatedNewSuggestionAtom = Atom(
+    name: '_FeedStore.hasCreatedNewSuggestion',
+    context: context,
+  );
 
   @override
   bool get hasCreatedNewSuggestion {
@@ -435,14 +494,19 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set hasCreatedNewSuggestion(bool value) {
-    _$hasCreatedNewSuggestionAtom
-        .reportWrite(value, super.hasCreatedNewSuggestion, () {
-      super.hasCreatedNewSuggestion = value;
-    });
+    _$hasCreatedNewSuggestionAtom.reportWrite(
+      value,
+      super.hasCreatedNewSuggestion,
+      () {
+        super.hasCreatedNewSuggestion = value;
+      },
+    );
   }
 
-  late final _$hasCleanedArticlesTodayAtom =
-      Atom(name: '_FeedStore.hasCleanedArticlesToday', context: context);
+  late final _$hasCleanedArticlesTodayAtom = Atom(
+    name: '_FeedStore.hasCleanedArticlesToday',
+    context: context,
+  );
 
   @override
   bool get hasCleanedArticlesToday {
@@ -452,14 +516,19 @@ mixin _$FeedStore on _FeedStore, Store {
 
   @override
   set hasCleanedArticlesToday(bool value) {
-    _$hasCleanedArticlesTodayAtom
-        .reportWrite(value, super.hasCleanedArticlesToday, () {
-      super.hasCleanedArticlesToday = value;
-    });
+    _$hasCleanedArticlesTodayAtom.reportWrite(
+      value,
+      super.hasCleanedArticlesToday,
+      () {
+        super.hasCleanedArticlesToday = value;
+      },
+    );
   }
 
-  late final _$hasAlertAtom =
-      Atom(name: '_FeedStore.hasAlert', context: context);
+  late final _$hasAlertAtom = Atom(
+    name: '_FeedStore.hasAlert',
+    context: context,
+  );
 
   @override
   bool get hasAlert {
@@ -474,8 +543,10 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$alertMessageAtom =
-      Atom(name: '_FeedStore.alertMessage', context: context);
+  late final _$alertMessageAtom = Atom(
+    name: '_FeedStore.alertMessage',
+    context: context,
+  );
 
   @override
   String get alertMessage {
@@ -490,135 +561,177 @@ mixin _$FeedStore on _FeedStore, Store {
     });
   }
 
-  late final _$initAsyncAction =
-      AsyncAction('_FeedStore.init', context: context);
+  late final _$initAsyncAction = AsyncAction(
+    '_FeedStore.init',
+    context: context,
+  );
 
   @override
-  Future<bool> init(
-      {required SettingsStore setStore, required AuthStore authStore}) {
-    return _$initAsyncAction
-        .run(() => super.init(setStore: setStore, authStore: authStore));
+  Future<bool> init({
+    required SettingsStore setStore,
+    required AuthStore authStore,
+  }) {
+    return _$initAsyncAction.run(
+      () => super.init(setStore: setStore, authStore: authStore),
+    );
   }
 
-  late final _$getFeedsAsyncAction =
-      AsyncAction('_FeedStore.getFeeds', context: context);
+  late final _$getFeedsAsyncAction = AsyncAction(
+    '_FeedStore.getFeeds',
+    context: context,
+  );
 
   @override
   Future<void> getFeeds() {
     return _$getFeedsAsyncAction.run(() => super.getFeeds());
   }
 
-  late final _$getFeedGroupsAsyncAction =
-      AsyncAction('_FeedStore.getFeedGroups', context: context);
+  late final _$getFeedGroupsAsyncAction = AsyncAction(
+    '_FeedStore.getFeedGroups',
+    context: context,
+  );
 
   @override
   Future<void> getFeedGroups() {
     return _$getFeedGroupsAsyncAction.run(() => super.getFeedGroups());
   }
 
-  late final _$getPinnedFeedsOrFeedGroupsAsyncAction =
-      AsyncAction('_FeedStore.getPinnedFeedsOrFeedGroups', context: context);
+  late final _$getPinnedFeedsOrFeedGroupsAsyncAction = AsyncAction(
+    '_FeedStore.getPinnedFeedsOrFeedGroups',
+    context: context,
+  );
 
   @override
   Future<void> getPinnedFeedsOrFeedGroups() {
-    return _$getPinnedFeedsOrFeedGroupsAsyncAction
-        .run(() => super.getPinnedFeedsOrFeedGroups());
+    return _$getPinnedFeedsOrFeedGroupsAsyncAction.run(
+      () => super.getPinnedFeedsOrFeedGroups(),
+    );
   }
 
-  late final _$getItemsAsyncAction =
-      AsyncAction('_FeedStore.getItems', context: context);
+  late final _$getItemsAsyncAction = AsyncAction(
+    '_FeedStore.getItems',
+    context: context,
+  );
 
   @override
   Future<void> getItems() {
     return _$getItemsAsyncAction.run(() => super.getItems());
   }
 
-  late final _$fetchItemsAsyncAction =
-      AsyncAction('_FeedStore.fetchItems', context: context);
+  late final _$fetchItemsAsyncAction = AsyncAction(
+    '_FeedStore.fetchItems',
+    context: context,
+  );
 
   @override
   Future<void> fetchItems() {
     return _$fetchItemsAsyncAction.run(() => super.fetchItems());
   }
 
-  late final _$toggleItemReadAsyncAction =
-      AsyncAction('_FeedStore.toggleItemRead', context: context);
+  late final _$toggleItemReadAsyncAction = AsyncAction(
+    '_FeedStore.toggleItemRead',
+    context: context,
+  );
 
   @override
   Future<void> toggleItemRead(FeedItem item, {bool toggle = false}) {
-    return _$toggleItemReadAsyncAction
-        .run(() => super.toggleItemRead(item, toggle: toggle));
+    return _$toggleItemReadAsyncAction.run(
+      () => super.toggleItemRead(item, toggle: toggle),
+    );
   }
 
-  late final _$toggleItemBookmarkedAsyncAction =
-      AsyncAction('_FeedStore.toggleItemBookmarked', context: context);
+  late final _$toggleItemBookmarkedAsyncAction = AsyncAction(
+    '_FeedStore.toggleItemBookmarked',
+    context: context,
+  );
 
   @override
   Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) {
-    return _$toggleItemBookmarkedAsyncAction
-        .run(() => super.toggleItemBookmarked(item, toggle: toggle));
+    return _$toggleItemBookmarkedAsyncAction.run(
+      () => super.toggleItemBookmarked(item, toggle: toggle),
+    );
   }
 
-  late final _$downloadItemAsyncAction =
-      AsyncAction('_FeedStore.downloadItem', context: context);
+  late final _$downloadItemAsyncAction = AsyncAction(
+    '_FeedStore.downloadItem',
+    context: context,
+  );
 
   @override
   Future<void> downloadItem(FeedItem item, {bool toggle = false}) {
-    return _$downloadItemAsyncAction
-        .run(() => super.downloadItem(item, toggle: toggle));
+    return _$downloadItemAsyncAction.run(
+      () => super.downloadItem(item, toggle: toggle),
+    );
   }
 
-  late final _$changeSortAsyncAction =
-      AsyncAction('_FeedStore.changeSort', context: context);
+  late final _$changeSortAsyncAction = AsyncAction(
+    '_FeedStore.changeSort',
+    context: context,
+  );
 
   @override
   Future<void> changeSort(FeedListSort sort) {
     return _$changeSortAsyncAction.run(() => super.changeSort(sort));
   }
 
-  late final _$createFeedGroupAsyncAction =
-      AsyncAction('_FeedStore.createFeedGroup', context: context);
+  late final _$createFeedGroupAsyncAction = AsyncAction(
+    '_FeedStore.createFeedGroup',
+    context: context,
+  );
 
   @override
   Future<void> createFeedGroup(String feedGroupName, BuildContext context) {
-    return _$createFeedGroupAsyncAction
-        .run(() => super.createFeedGroup(feedGroupName, context));
+    return _$createFeedGroupAsyncAction.run(
+      () => super.createFeedGroup(feedGroupName, context),
+    );
   }
 
-  late final _$searchFeedItemsAsyncAction =
-      AsyncAction('_FeedStore.searchFeedItems', context: context);
+  late final _$searchFeedItemsAsyncAction = AsyncAction(
+    '_FeedStore.searchFeedItems',
+    context: context,
+  );
 
   @override
   Future<void> searchFeedItems(String searchTerm) {
-    return _$searchFeedItemsAsyncAction
-        .run(() => super.searchFeedItems(searchTerm));
+    return _$searchFeedItemsAsyncAction.run(
+      () => super.searchFeedItems(searchTerm),
+    );
   }
 
-  late final _$buildUserTasteProfileAsyncAction =
-      AsyncAction('_FeedStore.buildUserTasteProfile', context: context);
+  late final _$buildUserTasteProfileAsyncAction = AsyncAction(
+    '_FeedStore.buildUserTasteProfile',
+    context: context,
+  );
 
   @override
   Future<void> buildUserTasteProfile() {
-    return _$buildUserTasteProfileAsyncAction
-        .run(() => super.buildUserTasteProfile());
+    return _$buildUserTasteProfileAsyncAction.run(
+      () => super.buildUserTasteProfile(),
+    );
   }
 
-  late final _$createNewsSuggestionAsyncAction =
-      AsyncAction('_FeedStore.createNewsSuggestion', context: context);
+  late final _$createNewsSuggestionAsyncAction = AsyncAction(
+    '_FeedStore.createNewsSuggestion',
+    context: context,
+  );
 
   @override
   Future<void> createNewsSuggestion() {
-    return _$createNewsSuggestionAsyncAction
-        .run(() => super.createNewsSuggestion());
+    return _$createNewsSuggestionAsyncAction.run(
+      () => super.createNewsSuggestion(),
+    );
   }
 
-  late final _$_FeedStoreActionController =
-      ActionController(name: '_FeedStore', context: context);
+  late final _$_FeedStoreActionController = ActionController(
+    name: '_FeedStore',
+    context: context,
+  );
 
   @override
   void onBsbChanged() {
     final _$actionInfo = _$_FeedStoreActionController.startAction(
-        name: '_FeedStore.onBsbChanged');
+      name: '_FeedStore.onBsbChanged',
+    );
     try {
       return super.onBsbChanged();
     } finally {
@@ -629,7 +742,8 @@ mixin _$FeedStore on _FeedStore, Store {
   @override
   void scrollToTop() {
     final _$actionInfo = _$_FeedStoreActionController.startAction(
-        name: '_FeedStore.scrollToTop');
+      name: '_FeedStore.scrollToTop',
+    );
     try {
       return super.scrollToTop();
     } finally {

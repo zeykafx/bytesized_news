@@ -9,8 +9,10 @@ part of 'reading_statistics_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
-  late final _$settingsStoreAtom =
-      Atom(name: '_ReadingStatisticsStore.settingsStore', context: context);
+  late final _$settingsStoreAtom = Atom(
+    name: '_ReadingStatisticsStore.settingsStore',
+    context: context,
+  );
 
   @override
   SettingsStore get settingsStore {
@@ -23,14 +25,19 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
   @override
   set settingsStore(SettingsStore value) {
     _$settingsStoreAtom.reportWrite(
-        value, _settingsStoreIsInitialized ? super.settingsStore : null, () {
-      super.settingsStore = value;
-      _settingsStoreIsInitialized = true;
-    });
+      value,
+      _settingsStoreIsInitialized ? super.settingsStore : null,
+      () {
+        super.settingsStore = value;
+        _settingsStoreIsInitialized = true;
+      },
+    );
   }
 
-  late final _$dbUtilsAtom =
-      Atom(name: '_ReadingStatisticsStore.dbUtils', context: context);
+  late final _$dbUtilsAtom = Atom(
+    name: '_ReadingStatisticsStore.dbUtils',
+    context: context,
+  );
 
   @override
   DbUtils get dbUtils {
@@ -42,15 +49,20 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
 
   @override
   set dbUtils(DbUtils value) {
-    _$dbUtilsAtom
-        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
-      super.dbUtils = value;
-      _dbUtilsIsInitialized = true;
-    });
+    _$dbUtilsAtom.reportWrite(
+      value,
+      _dbUtilsIsInitialized ? super.dbUtils : null,
+      () {
+        super.dbUtils = value;
+        _dbUtilsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$readingStreakAtom =
-      Atom(name: '_ReadingStatisticsStore.readingStreak', context: context);
+  late final _$readingStreakAtom = Atom(
+    name: '_ReadingStatisticsStore.readingStreak',
+    context: context,
+  );
 
   @override
   int get readingStreak {
@@ -65,8 +77,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$totalReadingTimeAtom =
-      Atom(name: '_ReadingStatisticsStore.totalReadingTime', context: context);
+  late final _$totalReadingTimeAtom = Atom(
+    name: '_ReadingStatisticsStore.totalReadingTime',
+    context: context,
+  );
 
   @override
   Duration get totalReadingTime {
@@ -82,7 +96,9 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
   }
 
   late final _$numberArticlesReadAtom = Atom(
-      name: '_ReadingStatisticsStore.numberArticlesRead', context: context);
+    name: '_ReadingStatisticsStore.numberArticlesRead',
+    context: context,
+  );
 
   @override
   int get numberArticlesRead {
@@ -97,8 +113,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$loadingAtom =
-      Atom(name: '_ReadingStatisticsStore.loading', context: context);
+  late final _$loadingAtom = Atom(
+    name: '_ReadingStatisticsStore.loading',
+    context: context,
+  );
 
   @override
   bool get loading {
@@ -113,8 +131,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$currentSortAtom =
-      Atom(name: '_ReadingStatisticsStore.currentSort', context: context);
+  late final _$currentSortAtom = Atom(
+    name: '_ReadingStatisticsStore.currentSort',
+    context: context,
+  );
 
   @override
   String get currentSort {
@@ -130,7 +150,9 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
   }
 
   late final _$longuestReadArticleAtom = Atom(
-      name: '_ReadingStatisticsStore.longuestReadArticle', context: context);
+    name: '_ReadingStatisticsStore.longuestReadArticle',
+    context: context,
+  );
 
   @override
   (FeedItem?, StoryReading?) get longuestReadArticle {
@@ -145,8 +167,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$mostReadDayAtom =
-      Atom(name: '_ReadingStatisticsStore.mostReadDay', context: context);
+  late final _$mostReadDayAtom = Atom(
+    name: '_ReadingStatisticsStore.mostReadDay',
+    context: context,
+  );
 
   @override
   DateTime get mostReadDay {
@@ -161,8 +185,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$mostReadDayCountAtom =
-      Atom(name: '_ReadingStatisticsStore.mostReadDayCount', context: context);
+  late final _$mostReadDayCountAtom = Atom(
+    name: '_ReadingStatisticsStore.mostReadDayCount',
+    context: context,
+  );
 
   @override
   int get mostReadDayCount {
@@ -177,8 +203,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$allArticlesReadAtom =
-      Atom(name: '_ReadingStatisticsStore.allArticlesRead', context: context);
+  late final _$allArticlesReadAtom = Atom(
+    name: '_ReadingStatisticsStore.allArticlesRead',
+    context: context,
+  );
 
   @override
   ObservableList<(StoryReading, FeedItem)> get allArticlesRead {
@@ -193,8 +221,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$showScrollToTopAtom =
-      Atom(name: '_ReadingStatisticsStore.showScrollToTop', context: context);
+  late final _$showScrollToTopAtom = Atom(
+    name: '_ReadingStatisticsStore.showScrollToTop',
+    context: context,
+  );
 
   @override
   bool get showScrollToTop {
@@ -209,8 +239,10 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
-  late final _$scrollControllerAtom =
-      Atom(name: '_ReadingStatisticsStore.scrollController', context: context);
+  late final _$scrollControllerAtom = Atom(
+    name: '_ReadingStatisticsStore.scrollController',
+    context: context,
+  );
 
   @override
   ScrollController get scrollController {
@@ -226,32 +258,39 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
   }
 
   late final _$getReadingStatisticsAsyncAction = AsyncAction(
-      '_ReadingStatisticsStore.getReadingStatistics',
-      context: context);
+    '_ReadingStatisticsStore.getReadingStatistics',
+    context: context,
+  );
 
   @override
   Future<void> getReadingStatistics() {
-    return _$getReadingStatisticsAsyncAction
-        .run(() => super.getReadingStatistics());
+    return _$getReadingStatisticsAsyncAction.run(
+      () => super.getReadingStatistics(),
+    );
   }
 
   late final _$sortButtonOnChangedAsyncAction = AsyncAction(
-      '_ReadingStatisticsStore.sortButtonOnChanged',
-      context: context);
+    '_ReadingStatisticsStore.sortButtonOnChanged',
+    context: context,
+  );
 
   @override
   Future<void> sortButtonOnChanged(String? item) {
-    return _$sortButtonOnChangedAsyncAction
-        .run(() => super.sortButtonOnChanged(item));
+    return _$sortButtonOnChangedAsyncAction.run(
+      () => super.sortButtonOnChanged(item),
+    );
   }
 
-  late final _$_ReadingStatisticsStoreActionController =
-      ActionController(name: '_ReadingStatisticsStore', context: context);
+  late final _$_ReadingStatisticsStoreActionController = ActionController(
+    name: '_ReadingStatisticsStore',
+    context: context,
+  );
 
   @override
   void init(DbUtils dbUtils, SettingsStore settingsStore) {
     final _$actionInfo = _$_ReadingStatisticsStoreActionController.startAction(
-        name: '_ReadingStatisticsStore.init');
+      name: '_ReadingStatisticsStore.init',
+    );
     try {
       return super.init(dbUtils, settingsStore);
     } finally {
@@ -262,7 +301,8 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
   @override
   void scrollToTop() {
     final _$actionInfo = _$_ReadingStatisticsStoreActionController.startAction(
-        name: '_ReadingStatisticsStore.scrollToTop');
+      name: '_ReadingStatisticsStore.scrollToTop',
+    );
     try {
       return super.scrollToTop();
     } finally {

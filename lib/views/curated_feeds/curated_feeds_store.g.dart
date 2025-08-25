@@ -9,8 +9,10 @@ part of 'curated_feeds_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
-  late final _$curatedCategoriesAtom =
-      Atom(name: '_CuratedFeedsStore.curatedCategories', context: context);
+  late final _$curatedCategoriesAtom = Atom(
+    name: '_CuratedFeedsStore.curatedCategories',
+    context: context,
+  );
 
   @override
   List<CuratedFeedCategory> get curatedCategories {
@@ -25,8 +27,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$loadingAtom =
-      Atom(name: '_CuratedFeedsStore.loading', context: context);
+  late final _$loadingAtom = Atom(
+    name: '_CuratedFeedsStore.loading',
+    context: context,
+  );
 
   @override
   bool get loading {
@@ -41,8 +45,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$selectedFeedsAtom =
-      Atom(name: '_CuratedFeedsStore.selectedFeeds', context: context);
+  late final _$selectedFeedsAtom = Atom(
+    name: '_CuratedFeedsStore.selectedFeeds',
+    context: context,
+  );
 
   @override
   ObservableSet<CuratedFeed> get selectedFeeds {
@@ -57,8 +63,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$selectedCategoriesAtom =
-      Atom(name: '_CuratedFeedsStore.selectedCategories', context: context);
+  late final _$selectedCategoriesAtom = Atom(
+    name: '_CuratedFeedsStore.selectedCategories',
+    context: context,
+  );
 
   @override
   ObservableSet<CuratedFeedCategory> get selectedCategories {
@@ -73,8 +81,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$isarAtom =
-      Atom(name: '_CuratedFeedsStore.isar', context: context);
+  late final _$isarAtom = Atom(
+    name: '_CuratedFeedsStore.isar',
+    context: context,
+  );
 
   @override
   Isar get isar {
@@ -89,8 +99,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$dbUtilsAtom =
-      Atom(name: '_CuratedFeedsStore.dbUtils', context: context);
+  late final _$dbUtilsAtom = Atom(
+    name: '_CuratedFeedsStore.dbUtils',
+    context: context,
+  );
 
   @override
   DbUtils get dbUtils {
@@ -102,15 +114,20 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
 
   @override
   set dbUtils(DbUtils value) {
-    _$dbUtilsAtom
-        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
-      super.dbUtils = value;
-      _dbUtilsIsInitialized = true;
-    });
+    _$dbUtilsAtom.reportWrite(
+      value,
+      _dbUtilsIsInitialized ? super.dbUtils : null,
+      () {
+        super.dbUtils = value;
+        _dbUtilsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$feedSyncAtom =
-      Atom(name: '_CuratedFeedsStore.feedSync', context: context);
+  late final _$feedSyncAtom = Atom(
+    name: '_CuratedFeedsStore.feedSync',
+    context: context,
+  );
 
   @override
   FeedSync get feedSync {
@@ -122,15 +139,20 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
 
   @override
   set feedSync(FeedSync value) {
-    _$feedSyncAtom
-        .reportWrite(value, _feedSyncIsInitialized ? super.feedSync : null, () {
-      super.feedSync = value;
-      _feedSyncIsInitialized = true;
-    });
+    _$feedSyncAtom.reportWrite(
+      value,
+      _feedSyncIsInitialized ? super.feedSync : null,
+      () {
+        super.feedSync = value;
+        _feedSyncIsInitialized = true;
+      },
+    );
   }
 
-  late final _$followedFeedsAtom =
-      Atom(name: '_CuratedFeedsStore.followedFeeds', context: context);
+  late final _$followedFeedsAtom = Atom(
+    name: '_CuratedFeedsStore.followedFeeds',
+    context: context,
+  );
 
   @override
   ObservableList<Feed> get followedFeeds {
@@ -145,8 +167,10 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$followedFeedGroupAtom =
-      Atom(name: '_CuratedFeedsStore.followedFeedGroup', context: context);
+  late final _$followedFeedGroupAtom = Atom(
+    name: '_CuratedFeedsStore.followedFeedGroup',
+    context: context,
+  );
 
   @override
   ObservableList<FeedGroup> get followedFeedGroup {
@@ -161,22 +185,28 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
     });
   }
 
-  late final _$readCuratedFeedsAsyncAction =
-      AsyncAction('_CuratedFeedsStore.readCuratedFeeds', context: context);
+  late final _$readCuratedFeedsAsyncAction = AsyncAction(
+    '_CuratedFeedsStore.readCuratedFeeds',
+    context: context,
+  );
 
   @override
   Future<void> readCuratedFeeds(BuildContext context, AuthStore authStore) {
-    return _$readCuratedFeedsAsyncAction
-        .run(() => super.readCuratedFeeds(context, authStore));
+    return _$readCuratedFeedsAsyncAction.run(
+      () => super.readCuratedFeeds(context, authStore),
+    );
   }
 
-  late final _$_CuratedFeedsStoreActionController =
-      ActionController(name: '_CuratedFeedsStore', context: context);
+  late final _$_CuratedFeedsStoreActionController = ActionController(
+    name: '_CuratedFeedsStore',
+    context: context,
+  );
 
   @override
   bool isFeedAlreadyFollowed(CuratedFeed feed) {
     final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
-        name: '_CuratedFeedsStore.isFeedAlreadyFollowed');
+      name: '_CuratedFeedsStore.isFeedAlreadyFollowed',
+    );
     try {
       return super.isFeedAlreadyFollowed(feed);
     } finally {
@@ -187,7 +217,8 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
   @override
   bool isCategoryAlreadyFollowed(CuratedFeedCategory cat) {
     final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
-        name: '_CuratedFeedsStore.isCategoryAlreadyFollowed');
+      name: '_CuratedFeedsStore.isCategoryAlreadyFollowed',
+    );
     try {
       return super.isCategoryAlreadyFollowed(cat);
     } finally {
@@ -198,7 +229,8 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
   @override
   void toggleFeedSelection(CuratedFeed feed, CuratedFeedCategory category) {
     final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
-        name: '_CuratedFeedsStore.toggleFeedSelection');
+      name: '_CuratedFeedsStore.toggleFeedSelection',
+    );
     try {
       return super.toggleFeedSelection(feed, category);
     } finally {
@@ -209,7 +241,8 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
   @override
   void toggleCategorySelection(CuratedFeedCategory category) {
     final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
-        name: '_CuratedFeedsStore.toggleCategorySelection');
+      name: '_CuratedFeedsStore.toggleCategorySelection',
+    );
     try {
       return super.toggleCategorySelection(category);
     } finally {
@@ -220,7 +253,8 @@ mixin _$CuratedFeedsStore on _CuratedFeedsStore, Store {
   @override
   void clearSelections() {
     final _$actionInfo = _$_CuratedFeedsStoreActionController.startAction(
-        name: '_CuratedFeedsStore.clearSelections');
+      name: '_CuratedFeedsStore.clearSelections',
+    );
     try {
       return super.clearSelections();
     } finally {

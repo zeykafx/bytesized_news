@@ -1,7 +1,7 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 class ReadingStats {
   Isar isar = Isar.getInstance()!;

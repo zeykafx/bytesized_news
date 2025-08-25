@@ -39,8 +39,10 @@ mixin _$AiStore on _AiStore, Store {
     });
   }
 
-  late final _$hasApiKeyAtom =
-      Atom(name: '_AiStore.hasApiKey', context: context);
+  late final _$hasApiKeyAtom = Atom(
+    name: '_AiStore.hasApiKey',
+    context: context,
+  );
 
   @override
   bool get hasApiKey {

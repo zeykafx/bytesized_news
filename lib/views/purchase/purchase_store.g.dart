@@ -9,8 +9,10 @@ part of 'purchase_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$PurchaseStore on _PurchaseStore, Store {
-  late final _$inAppPurchaseAtom =
-      Atom(name: '_PurchaseStore.inAppPurchase', context: context);
+  late final _$inAppPurchaseAtom = Atom(
+    name: '_PurchaseStore.inAppPurchase',
+    context: context,
+  );
 
   @override
   InAppPurchase get inAppPurchase {
@@ -25,8 +27,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$functionsAtom =
-      Atom(name: '_PurchaseStore.functions', context: context);
+  late final _$functionsAtom = Atom(
+    name: '_PurchaseStore.functions',
+    context: context,
+  );
 
   @override
   FirebaseFunctions get functions {
@@ -41,8 +45,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$authStoreAtom =
-      Atom(name: '_PurchaseStore.authStore', context: context);
+  late final _$authStoreAtom = Atom(
+    name: '_PurchaseStore.authStore',
+    context: context,
+  );
 
   @override
   AuthStore get authStore {
@@ -55,14 +61,19 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
   @override
   set authStore(AuthStore value) {
     _$authStoreAtom.reportWrite(
-        value, _authStoreIsInitialized ? super.authStore : null, () {
-      super.authStore = value;
-      _authStoreIsInitialized = true;
-    });
+      value,
+      _authStoreIsInitialized ? super.authStore : null,
+      () {
+        super.authStore = value;
+        _authStoreIsInitialized = true;
+      },
+    );
   }
 
-  late final _$storeAvailableAtom =
-      Atom(name: '_PurchaseStore.storeAvailable', context: context);
+  late final _$storeAvailableAtom = Atom(
+    name: '_PurchaseStore.storeAvailable',
+    context: context,
+  );
 
   @override
   bool get storeAvailable {
@@ -77,8 +88,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$subscriptionAtom =
-      Atom(name: '_PurchaseStore.subscription', context: context);
+  late final _$subscriptionAtom = Atom(
+    name: '_PurchaseStore.subscription',
+    context: context,
+  );
 
   @override
   StreamSubscription<List<PurchaseDetails>>? get subscription {
@@ -93,8 +106,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$productsAtom =
-      Atom(name: '_PurchaseStore.products', context: context);
+  late final _$productsAtom = Atom(
+    name: '_PurchaseStore.products',
+    context: context,
+  );
 
   @override
   ObservableList<ProductDetails> get products {
@@ -109,8 +124,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$purchasedProductsAtom =
-      Atom(name: '_PurchaseStore.purchasedProducts', context: context);
+  late final _$purchasedProductsAtom = Atom(
+    name: '_PurchaseStore.purchasedProducts',
+    context: context,
+  );
 
   @override
   ObservableList<ProductDetails> get purchasedProducts {
@@ -125,8 +142,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$loadingAtom =
-      Atom(name: '_PurchaseStore.loading', context: context);
+  late final _$loadingAtom = Atom(
+    name: '_PurchaseStore.loading',
+    context: context,
+  );
 
   @override
   bool get loading {
@@ -141,8 +160,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$hasAlertAtom =
-      Atom(name: '_PurchaseStore.hasAlert', context: context);
+  late final _$hasAlertAtom = Atom(
+    name: '_PurchaseStore.hasAlert',
+    context: context,
+  );
 
   @override
   bool get hasAlert {
@@ -157,8 +178,10 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$alertMessageAtom =
-      Atom(name: '_PurchaseStore.alertMessage', context: context);
+  late final _$alertMessageAtom = Atom(
+    name: '_PurchaseStore.alertMessage',
+    context: context,
+  );
 
   @override
   String get alertMessage {
@@ -173,40 +196,52 @@ mixin _$PurchaseStore on _PurchaseStore, Store {
     });
   }
 
-  late final _$initIAPAsyncAction =
-      AsyncAction('_PurchaseStore.initIAP', context: context);
+  late final _$initIAPAsyncAction = AsyncAction(
+    '_PurchaseStore.initIAP',
+    context: context,
+  );
 
   @override
   Future<void> initIAP(AuthStore aStore) {
     return _$initIAPAsyncAction.run(() => super.initIAP(aStore));
   }
 
-  late final _$listenToPurchaseUpdatedAsyncAction =
-      AsyncAction('_PurchaseStore.listenToPurchaseUpdated', context: context);
+  late final _$listenToPurchaseUpdatedAsyncAction = AsyncAction(
+    '_PurchaseStore.listenToPurchaseUpdated',
+    context: context,
+  );
 
   @override
   Future<void> listenToPurchaseUpdated(
-      List<PurchaseDetails> purchaseDetailsList) {
-    return _$listenToPurchaseUpdatedAsyncAction
-        .run(() => super.listenToPurchaseUpdated(purchaseDetailsList));
+    List<PurchaseDetails> purchaseDetailsList,
+  ) {
+    return _$listenToPurchaseUpdatedAsyncAction.run(
+      () => super.listenToPurchaseUpdated(purchaseDetailsList),
+    );
   }
 
-  late final _$restorePurchaseAsyncAction =
-      AsyncAction('_PurchaseStore.restorePurchase', context: context);
+  late final _$restorePurchaseAsyncAction = AsyncAction(
+    '_PurchaseStore.restorePurchase',
+    context: context,
+  );
 
   @override
   Future<void> restorePurchase(BuildContext context) {
-    return _$restorePurchaseAsyncAction
-        .run(() => super.restorePurchase(context));
+    return _$restorePurchaseAsyncAction.run(
+      () => super.restorePurchase(context),
+    );
   }
 
-  late final _$loadFirestorePurchasesAsyncAction =
-      AsyncAction('_PurchaseStore.loadFirestorePurchases', context: context);
+  late final _$loadFirestorePurchasesAsyncAction = AsyncAction(
+    '_PurchaseStore.loadFirestorePurchases',
+    context: context,
+  );
 
   @override
   Future<void> loadFirestorePurchases() {
-    return _$loadFirestorePurchasesAsyncAction
-        .run(() => super.loadFirestorePurchases());
+    return _$loadFirestorePurchasesAsyncAction.run(
+      () => super.loadFirestorePurchases(),
+    );
   }
 
   @override

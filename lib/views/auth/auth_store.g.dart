@@ -24,8 +24,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$functionsAtom =
-      Atom(name: '_AuthStore.functions', context: context);
+  late final _$functionsAtom = Atom(
+    name: '_AuthStore.functions',
+    context: context,
+  );
 
   @override
   FirebaseFunctions get functions {
@@ -40,8 +42,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$initializedAtom =
-      Atom(name: '_AuthStore.initialized', context: context);
+  late final _$initializedAtom = Atom(
+    name: '_AuthStore.initialized',
+    context: context,
+  );
 
   @override
   bool get initialized {
@@ -71,8 +75,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$userTierAtom =
-      Atom(name: '_AuthStore.userTier', context: context);
+  late final _$userTierAtom = Atom(
+    name: '_AuthStore.userTier',
+    context: context,
+  );
 
   @override
   Tier get userTier {
@@ -87,8 +93,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$hasUserRefundedAtom =
-      Atom(name: '_AuthStore.hasUserRefunded', context: context);
+  late final _$hasUserRefundedAtom = Atom(
+    name: '_AuthStore.hasUserRefunded',
+    context: context,
+  );
 
   @override
   bool get hasUserRefunded {
@@ -103,8 +111,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$userInterestsAtom =
-      Atom(name: '_AuthStore.userInterests', context: context);
+  late final _$userInterestsAtom = Atom(
+    name: '_AuthStore.userInterests',
+    context: context,
+  );
 
   @override
   List<String> get userInterests {
@@ -119,8 +129,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$builtUserProfileDateAtom =
-      Atom(name: '_AuthStore.builtUserProfileDate', context: context);
+  late final _$builtUserProfileDateAtom = Atom(
+    name: '_AuthStore.builtUserProfileDate',
+    context: context,
+  );
 
   @override
   DateTime? get builtUserProfileDate {
@@ -130,14 +142,19 @@ mixin _$AuthStore on _AuthStore, Store {
 
   @override
   set builtUserProfileDate(DateTime? value) {
-    _$builtUserProfileDateAtom.reportWrite(value, super.builtUserProfileDate,
-        () {
-      super.builtUserProfileDate = value;
-    });
+    _$builtUserProfileDateAtom.reportWrite(
+      value,
+      super.builtUserProfileDate,
+      () {
+        super.builtUserProfileDate = value;
+      },
+    );
   }
 
-  late final _$suggestionsLeftTodayAtom =
-      Atom(name: '_AuthStore.suggestionsLeftToday', context: context);
+  late final _$suggestionsLeftTodayAtom = Atom(
+    name: '_AuthStore.suggestionsLeftToday',
+    context: context,
+  );
 
   @override
   int get suggestionsLeftToday {
@@ -147,14 +164,19 @@ mixin _$AuthStore on _AuthStore, Store {
 
   @override
   set suggestionsLeftToday(int value) {
-    _$suggestionsLeftTodayAtom.reportWrite(value, super.suggestionsLeftToday,
-        () {
-      super.suggestionsLeftToday = value;
-    });
+    _$suggestionsLeftTodayAtom.reportWrite(
+      value,
+      super.suggestionsLeftToday,
+      () {
+        super.suggestionsLeftToday = value;
+      },
+    );
   }
 
-  late final _$lastSuggestionDateAtom =
-      Atom(name: '_AuthStore.lastSuggestionDate', context: context);
+  late final _$lastSuggestionDateAtom = Atom(
+    name: '_AuthStore.lastSuggestionDate',
+    context: context,
+  );
 
   @override
   DateTime? get lastSuggestionDate {
@@ -169,8 +191,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$summariesLeftTodayAtom =
-      Atom(name: '_AuthStore.summariesLeftToday', context: context);
+  late final _$summariesLeftTodayAtom = Atom(
+    name: '_AuthStore.summariesLeftToday',
+    context: context,
+  );
 
   @override
   int get summariesLeftToday {
@@ -185,8 +209,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$lastSummaryDateAtom =
-      Atom(name: '_AuthStore.lastSummaryDate', context: context);
+  late final _$lastSummaryDateAtom = Atom(
+    name: '_AuthStore.lastSummaryDate',
+    context: context,
+  );
 
   @override
   DateTime? get lastSummaryDate {
@@ -201,8 +227,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$deviceIdAtom =
-      Atom(name: '_AuthStore.deviceId', context: context);
+  late final _$deviceIdAtom = Atom(
+    name: '_AuthStore.deviceId',
+    context: context,
+  );
 
   @override
   String? get deviceId {
@@ -217,8 +245,10 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$authLoadingAtom =
-      Atom(name: '_AuthStore.authLoading', context: context);
+  late final _$authLoadingAtom = Atom(
+    name: '_AuthStore.authLoading',
+    context: context,
+  );
 
   @override
   bool get authLoading {
@@ -233,21 +263,26 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$_getIdAsyncAction =
-      AsyncAction('_AuthStore._getId', context: context);
+  late final _$_getIdAsyncAction = AsyncAction(
+    '_AuthStore._getId',
+    context: context,
+  );
 
   @override
   Future<String?> _getId() {
     return _$_getIdAsyncAction.run(() => super._getId());
   }
 
-  late final _$_AuthStoreActionController =
-      ActionController(name: '_AuthStore', context: context);
+  late final _$_AuthStoreActionController = ActionController(
+    name: '_AuthStore',
+    context: context,
+  );
 
   @override
   void signOutUser() {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
-        name: '_AuthStore.signOutUser');
+      name: '_AuthStore.signOutUser',
+    );
     try {
       return super.signOutUser();
     } finally {
@@ -258,7 +293,8 @@ mixin _$AuthStore on _AuthStore, Store {
   @override
   bool _shouldUpdateLocalFeed(Feed localFeed, Feed firestoreFeed) {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
-        name: '_AuthStore._shouldUpdateLocalFeed');
+      name: '_AuthStore._shouldUpdateLocalFeed',
+    );
     try {
       return super._shouldUpdateLocalFeed(localFeed, firestoreFeed);
     } finally {
@@ -268,12 +304,17 @@ mixin _$AuthStore on _AuthStore, Store {
 
   @override
   bool _shouldUpdateLocalFeedGroup(
-      FeedGroup localFeedGroup, FeedGroup firestoreFeedGroup) {
+    FeedGroup localFeedGroup,
+    FeedGroup firestoreFeedGroup,
+  ) {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
-        name: '_AuthStore._shouldUpdateLocalFeedGroup');
+      name: '_AuthStore._shouldUpdateLocalFeedGroup',
+    );
     try {
-      return super
-          ._shouldUpdateLocalFeedGroup(localFeedGroup, firestoreFeedGroup);
+      return super._shouldUpdateLocalFeedGroup(
+        localFeedGroup,
+        firestoreFeedGroup,
+      );
     } finally {
       _$_AuthStoreActionController.endAction(_$actionInfo);
     }
@@ -282,7 +323,8 @@ mixin _$AuthStore on _AuthStore, Store {
   @override
   bool _listsEqual(List<String> list1, List<String> list2) {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
-        name: '_AuthStore._listsEqual');
+      name: '_AuthStore._listsEqual',
+    );
     try {
       return super._listsEqual(list1, list2);
     } finally {

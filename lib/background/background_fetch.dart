@@ -1,4 +1,4 @@
-import 'package:bytesized_news/background/LifecycleEventHandler.dart';
+import 'package:bytesized_news/background/life_cycle_event_handler.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
@@ -6,7 +6,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';

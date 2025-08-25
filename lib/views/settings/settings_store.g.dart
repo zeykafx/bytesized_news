@@ -6,61 +6,71 @@ part of 'settings_store.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
-    SettingsStore()
-      ..hasShownWelcomeScreen = json['hasShownWelcomeScreen'] as bool? ?? false
-      ..darkMode = $enumDecodeNullable(_$DarkModeEnumMap, json['darkMode'],
-              unknownValue: DarkMode.system) ??
-          DarkMode.system
-      ..sort = $enumDecodeNullable(_$FeedListSortEnumMap, json['sort'],
-              unknownValue: FeedListSort.byDate) ??
-          FeedListSort.byDate
-      ..sortFeedName = json['sortFeedName'] as String?
-      ..sortFeedGroupName = json['sortFeedGroupName'] as String?
-      ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
-      ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
-      ..fetchAiSummaryOnLoad = json['fetchAiSummaryOnLoad'] as bool? ?? false
-      ..mutedKeywords = (json['mutedKeywords'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          []
-      ..keepArticles = $enumDecodeNullable(
-              _$KeepArticlesLengthEnumMap, json['keepArticles']) ??
-          KeepArticlesLength.threeMonths
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 16.0
-      ..textAlignment =
-          $enumDecodeNullable(_$TextAlignEnumMap, json['textAlignment']) ??
-              TextAlign.left
-      ..textWidth =
-          $enumDecodeNullable(_$TextWidthEnumMap, json['textWidth']) ??
-              TextWidth.normal
-      ..lineHeight = (json['lineHeight'] as num?)?.toDouble() ?? 1.2
-      ..horizontalPadding =
-          (json['horizontalPadding'] as num?)?.toDouble() ?? 8.0
-      ..fontFamily =
-          $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
-              FontFamily.openSans
-      ..markAsReadOnScroll = json['markAsReadOnScroll'] as bool? ?? false
-      ..backgroundFetchInterval = $enumDecodeNullable(
-              _$BackgroundFetchIntervalEnumMap,
-              json['backgroundFetchInterval']) ??
-          BackgroundFetchInterval.twelveHours
-      ..skipBgSyncOnLowBattery = json['skipBgSyncOnLowBattery'] as bool? ?? true
-      ..requireDeviceIdleForBgFetch =
-          json['requireDeviceIdleForBgFetch'] as bool? ?? false
-      ..storyTilesMinimalStyle =
-          json['storyTilesMinimalStyle'] as bool? ?? false
-      ..storyReaderMaxWidth =
-          (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0
-      ..isList = json['isList'] as bool? ?? true
-      ..autoSwitchReaderTooShort =
-          json['autoSwitchReaderTooShort'] as bool? ?? false
-      ..alwaysShowArchiveButton =
-          json['alwaysShowArchiveButton'] as bool? ?? false
-      ..showShareButton = json['showShareButton'] as bool? ?? true
-      ..showCommentsButton = json['showCommentsButton'] as bool? ?? true
-      ..enableCustomAiProvider =
-          json['enableCustomAiProvider'] as bool? ?? false;
+SettingsStore _$SettingsStoreFromJson(
+  Map<String, dynamic> json,
+) => SettingsStore()
+  ..hasShownWelcomeScreen = json['hasShownWelcomeScreen'] as bool? ?? false
+  ..darkMode =
+      $enumDecodeNullable(
+        _$DarkModeEnumMap,
+        json['darkMode'],
+        unknownValue: DarkMode.system,
+      ) ??
+      DarkMode.system
+  ..sort =
+      $enumDecodeNullable(
+        _$FeedListSortEnumMap,
+        json['sort'],
+        unknownValue: FeedListSort.byDate,
+      ) ??
+      FeedListSort.byDate
+  ..sortFeedName = json['sortFeedName'] as String?
+  ..sortFeedGroupName = json['sortFeedGroupName'] as String?
+  ..useReaderModeByDefault = json['useReaderModeByDefault'] as bool? ?? true
+  ..showAiSummaryOnLoad = json['showAiSummaryOnLoad'] as bool? ?? true
+  ..fetchAiSummaryOnLoad = json['fetchAiSummaryOnLoad'] as bool? ?? false
+  ..mutedKeywords =
+      (json['mutedKeywords'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      []
+  ..keepArticles =
+      $enumDecodeNullable(_$KeepArticlesLengthEnumMap, json['keepArticles']) ??
+      KeepArticlesLength.threeMonths
+  ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 16.0
+  ..textAlignment =
+      $enumDecodeNullable(_$TextAlignEnumMap, json['textAlignment']) ??
+      TextAlign.left
+  ..textWidth =
+      $enumDecodeNullable(_$TextWidthEnumMap, json['textWidth']) ??
+      TextWidth.normal
+  ..lineHeight = (json['lineHeight'] as num?)?.toDouble() ?? 1.2
+  ..horizontalPadding = (json['horizontalPadding'] as num?)?.toDouble() ?? 8.0
+  ..fontFamily =
+      $enumDecodeNullable(_$FontFamilyEnumMap, json['fontFamily']) ??
+      FontFamily.openSans
+  ..markAsReadOnScroll = json['markAsReadOnScroll'] as bool? ?? false
+  ..backgroundFetchInterval =
+      $enumDecodeNullable(
+        _$BackgroundFetchIntervalEnumMap,
+        json['backgroundFetchInterval'],
+      ) ??
+      BackgroundFetchInterval.twelveHours
+  ..skipBgSyncOnLowBattery = json['skipBgSyncOnLowBattery'] as bool? ?? true
+  ..requireDeviceIdleForBgFetch =
+      json['requireDeviceIdleForBgFetch'] as bool? ?? false
+  ..storyTilesMinimalStyle = json['storyTilesMinimalStyle'] as bool? ?? false
+  ..storyReaderMaxWidth =
+      (json['storyReaderMaxWidth'] as num?)?.toDouble() ?? 800.0
+  ..isList = json['isList'] as bool? ?? true
+  ..autoSwitchReaderTooShort =
+      json['autoSwitchReaderTooShort'] as bool? ?? false
+  ..alwaysShowArchiveButton = json['alwaysShowArchiveButton'] as bool? ?? false
+  ..showShareButton = json['showShareButton'] as bool? ?? true
+  ..showCommentsButton = json['showCommentsButton'] as bool? ?? true
+  ..enableCustomAiProvider = json['enableCustomAiProvider'] as bool? ?? false
+  ..useDynamicColor = json['useDynamicColor'] as bool? ?? true
+  ..colorSeedIndex = (json['colorSeedIndex'] as num?)?.toInt() ?? 0;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -93,6 +103,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showShareButton': instance.showShareButton,
       'showCommentsButton': instance.showCommentsButton,
       'enableCustomAiProvider': instance.enableCustomAiProvider,
+      'useDynamicColor': instance.useDynamicColor,
+      'colorSeedIndex': instance.colorSeedIndex,
     };
 
 const _$DarkModeEnumMap = {
@@ -170,8 +182,10 @@ const _$BackgroundFetchIntervalEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SettingsStore on _SettingsStore, Store {
-  late final _$hasShownWelcomeScreenAtom =
-      Atom(name: '_SettingsStore.hasShownWelcomeScreen', context: context);
+  late final _$hasShownWelcomeScreenAtom = Atom(
+    name: '_SettingsStore.hasShownWelcomeScreen',
+    context: context,
+  );
 
   @override
   bool get hasShownWelcomeScreen {
@@ -181,14 +195,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set hasShownWelcomeScreen(bool value) {
-    _$hasShownWelcomeScreenAtom.reportWrite(value, super.hasShownWelcomeScreen,
-        () {
-      super.hasShownWelcomeScreen = value;
-    });
+    _$hasShownWelcomeScreenAtom.reportWrite(
+      value,
+      super.hasShownWelcomeScreen,
+      () {
+        super.hasShownWelcomeScreen = value;
+      },
+    );
   }
 
-  late final _$darkModeAtom =
-      Atom(name: '_SettingsStore.darkMode', context: context);
+  late final _$darkModeAtom = Atom(
+    name: '_SettingsStore.darkMode',
+    context: context,
+  );
 
   @override
   DarkMode get darkMode {
@@ -218,8 +237,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$sortFeedAtom =
-      Atom(name: '_SettingsStore.sortFeed', context: context);
+  late final _$sortFeedAtom = Atom(
+    name: '_SettingsStore.sortFeed',
+    context: context,
+  );
 
   @override
   Feed? get sortFeed {
@@ -234,8 +255,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$sortFeedNameAtom =
-      Atom(name: '_SettingsStore.sortFeedName', context: context);
+  late final _$sortFeedNameAtom = Atom(
+    name: '_SettingsStore.sortFeedName',
+    context: context,
+  );
 
   @override
   String? get sortFeedName {
@@ -250,8 +273,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$sortFeedGroupAtom =
-      Atom(name: '_SettingsStore.sortFeedGroup', context: context);
+  late final _$sortFeedGroupAtom = Atom(
+    name: '_SettingsStore.sortFeedGroup',
+    context: context,
+  );
 
   @override
   FeedGroup? get sortFeedGroup {
@@ -266,8 +291,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$sortFeedGroupNameAtom =
-      Atom(name: '_SettingsStore.sortFeedGroupName', context: context);
+  late final _$sortFeedGroupNameAtom = Atom(
+    name: '_SettingsStore.sortFeedGroupName',
+    context: context,
+  );
 
   @override
   String? get sortFeedGroupName {
@@ -282,8 +309,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$useReaderModeByDefaultAtom =
-      Atom(name: '_SettingsStore.useReaderModeByDefault', context: context);
+  late final _$useReaderModeByDefaultAtom = Atom(
+    name: '_SettingsStore.useReaderModeByDefault',
+    context: context,
+  );
 
   @override
   bool get useReaderModeByDefault {
@@ -293,14 +322,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set useReaderModeByDefault(bool value) {
-    _$useReaderModeByDefaultAtom
-        .reportWrite(value, super.useReaderModeByDefault, () {
-      super.useReaderModeByDefault = value;
-    });
+    _$useReaderModeByDefaultAtom.reportWrite(
+      value,
+      super.useReaderModeByDefault,
+      () {
+        super.useReaderModeByDefault = value;
+      },
+    );
   }
 
-  late final _$showAiSummaryOnLoadAtom =
-      Atom(name: '_SettingsStore.showAiSummaryOnLoad', context: context);
+  late final _$showAiSummaryOnLoadAtom = Atom(
+    name: '_SettingsStore.showAiSummaryOnLoad',
+    context: context,
+  );
 
   @override
   bool get showAiSummaryOnLoad {
@@ -315,8 +349,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$fetchAiSummaryOnLoadAtom =
-      Atom(name: '_SettingsStore.fetchAiSummaryOnLoad', context: context);
+  late final _$fetchAiSummaryOnLoadAtom = Atom(
+    name: '_SettingsStore.fetchAiSummaryOnLoad',
+    context: context,
+  );
 
   @override
   bool get fetchAiSummaryOnLoad {
@@ -326,14 +362,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set fetchAiSummaryOnLoad(bool value) {
-    _$fetchAiSummaryOnLoadAtom.reportWrite(value, super.fetchAiSummaryOnLoad,
-        () {
-      super.fetchAiSummaryOnLoad = value;
-    });
+    _$fetchAiSummaryOnLoadAtom.reportWrite(
+      value,
+      super.fetchAiSummaryOnLoad,
+      () {
+        super.fetchAiSummaryOnLoad = value;
+      },
+    );
   }
 
-  late final _$loadingAtom =
-      Atom(name: '_SettingsStore.loading', context: context);
+  late final _$loadingAtom = Atom(
+    name: '_SettingsStore.loading',
+    context: context,
+  );
 
   @override
   bool get loading {
@@ -348,8 +389,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$mutedKeywordsAtom =
-      Atom(name: '_SettingsStore.mutedKeywords', context: context);
+  late final _$mutedKeywordsAtom = Atom(
+    name: '_SettingsStore.mutedKeywords',
+    context: context,
+  );
 
   @override
   List<String> get mutedKeywords {
@@ -364,8 +407,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$keepArticlesAtom =
-      Atom(name: '_SettingsStore.keepArticles', context: context);
+  late final _$keepArticlesAtom = Atom(
+    name: '_SettingsStore.keepArticles',
+    context: context,
+  );
 
   @override
   KeepArticlesLength get keepArticles {
@@ -380,8 +425,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$fontSizeAtom =
-      Atom(name: '_SettingsStore.fontSize', context: context);
+  late final _$fontSizeAtom = Atom(
+    name: '_SettingsStore.fontSize',
+    context: context,
+  );
 
   @override
   double? get fontSize {
@@ -396,8 +443,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$textAlignmentAtom =
-      Atom(name: '_SettingsStore.textAlignment', context: context);
+  late final _$textAlignmentAtom = Atom(
+    name: '_SettingsStore.textAlignment',
+    context: context,
+  );
 
   @override
   TextAlign get textAlignment {
@@ -412,8 +461,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$textWidthAtom =
-      Atom(name: '_SettingsStore.textWidth', context: context);
+  late final _$textWidthAtom = Atom(
+    name: '_SettingsStore.textWidth',
+    context: context,
+  );
 
   @override
   TextWidth get textWidth {
@@ -428,8 +479,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$lineHeightAtom =
-      Atom(name: '_SettingsStore.lineHeight', context: context);
+  late final _$lineHeightAtom = Atom(
+    name: '_SettingsStore.lineHeight',
+    context: context,
+  );
 
   @override
   double get lineHeight {
@@ -444,8 +497,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$horizontalPaddingAtom =
-      Atom(name: '_SettingsStore.horizontalPadding', context: context);
+  late final _$horizontalPaddingAtom = Atom(
+    name: '_SettingsStore.horizontalPadding',
+    context: context,
+  );
 
   @override
   double get horizontalPadding {
@@ -460,8 +515,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$fontFamilyAtom =
-      Atom(name: '_SettingsStore.fontFamily', context: context);
+  late final _$fontFamilyAtom = Atom(
+    name: '_SettingsStore.fontFamily',
+    context: context,
+  );
 
   @override
   FontFamily get fontFamily {
@@ -476,8 +533,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$markAsReadOnScrollAtom =
-      Atom(name: '_SettingsStore.markAsReadOnScroll', context: context);
+  late final _$markAsReadOnScrollAtom = Atom(
+    name: '_SettingsStore.markAsReadOnScroll',
+    context: context,
+  );
 
   @override
   bool get markAsReadOnScroll {
@@ -492,8 +551,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$backgroundFetchIntervalAtom =
-      Atom(name: '_SettingsStore.backgroundFetchInterval', context: context);
+  late final _$backgroundFetchIntervalAtom = Atom(
+    name: '_SettingsStore.backgroundFetchInterval',
+    context: context,
+  );
 
   @override
   BackgroundFetchInterval get backgroundFetchInterval {
@@ -503,14 +564,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set backgroundFetchInterval(BackgroundFetchInterval value) {
-    _$backgroundFetchIntervalAtom
-        .reportWrite(value, super.backgroundFetchInterval, () {
-      super.backgroundFetchInterval = value;
-    });
+    _$backgroundFetchIntervalAtom.reportWrite(
+      value,
+      super.backgroundFetchInterval,
+      () {
+        super.backgroundFetchInterval = value;
+      },
+    );
   }
 
-  late final _$skipBgSyncOnLowBatteryAtom =
-      Atom(name: '_SettingsStore.skipBgSyncOnLowBattery', context: context);
+  late final _$skipBgSyncOnLowBatteryAtom = Atom(
+    name: '_SettingsStore.skipBgSyncOnLowBattery',
+    context: context,
+  );
 
   @override
   bool get skipBgSyncOnLowBattery {
@@ -520,14 +586,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set skipBgSyncOnLowBattery(bool value) {
-    _$skipBgSyncOnLowBatteryAtom
-        .reportWrite(value, super.skipBgSyncOnLowBattery, () {
-      super.skipBgSyncOnLowBattery = value;
-    });
+    _$skipBgSyncOnLowBatteryAtom.reportWrite(
+      value,
+      super.skipBgSyncOnLowBattery,
+      () {
+        super.skipBgSyncOnLowBattery = value;
+      },
+    );
   }
 
   late final _$requireDeviceIdleForBgFetchAtom = Atom(
-      name: '_SettingsStore.requireDeviceIdleForBgFetch', context: context);
+    name: '_SettingsStore.requireDeviceIdleForBgFetch',
+    context: context,
+  );
 
   @override
   bool get requireDeviceIdleForBgFetch {
@@ -537,14 +608,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set requireDeviceIdleForBgFetch(bool value) {
-    _$requireDeviceIdleForBgFetchAtom
-        .reportWrite(value, super.requireDeviceIdleForBgFetch, () {
-      super.requireDeviceIdleForBgFetch = value;
-    });
+    _$requireDeviceIdleForBgFetchAtom.reportWrite(
+      value,
+      super.requireDeviceIdleForBgFetch,
+      () {
+        super.requireDeviceIdleForBgFetch = value;
+      },
+    );
   }
 
-  late final _$storyTilesMinimalStyleAtom =
-      Atom(name: '_SettingsStore.storyTilesMinimalStyle', context: context);
+  late final _$storyTilesMinimalStyleAtom = Atom(
+    name: '_SettingsStore.storyTilesMinimalStyle',
+    context: context,
+  );
 
   @override
   bool get storyTilesMinimalStyle {
@@ -554,14 +630,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set storyTilesMinimalStyle(bool value) {
-    _$storyTilesMinimalStyleAtom
-        .reportWrite(value, super.storyTilesMinimalStyle, () {
-      super.storyTilesMinimalStyle = value;
-    });
+    _$storyTilesMinimalStyleAtom.reportWrite(
+      value,
+      super.storyTilesMinimalStyle,
+      () {
+        super.storyTilesMinimalStyle = value;
+      },
+    );
   }
 
-  late final _$storyReaderMaxWidthAtom =
-      Atom(name: '_SettingsStore.storyReaderMaxWidth', context: context);
+  late final _$storyReaderMaxWidthAtom = Atom(
+    name: '_SettingsStore.storyReaderMaxWidth',
+    context: context,
+  );
 
   @override
   double get storyReaderMaxWidth {
@@ -576,8 +657,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$isListAtom =
-      Atom(name: '_SettingsStore.isList', context: context);
+  late final _$isListAtom = Atom(
+    name: '_SettingsStore.isList',
+    context: context,
+  );
 
   @override
   bool get isList {
@@ -592,8 +675,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$autoSwitchReaderTooShortAtom =
-      Atom(name: '_SettingsStore.autoSwitchReaderTooShort', context: context);
+  late final _$autoSwitchReaderTooShortAtom = Atom(
+    name: '_SettingsStore.autoSwitchReaderTooShort',
+    context: context,
+  );
 
   @override
   bool get autoSwitchReaderTooShort {
@@ -603,14 +688,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set autoSwitchReaderTooShort(bool value) {
-    _$autoSwitchReaderTooShortAtom
-        .reportWrite(value, super.autoSwitchReaderTooShort, () {
-      super.autoSwitchReaderTooShort = value;
-    });
+    _$autoSwitchReaderTooShortAtom.reportWrite(
+      value,
+      super.autoSwitchReaderTooShort,
+      () {
+        super.autoSwitchReaderTooShort = value;
+      },
+    );
   }
 
-  late final _$alwaysShowArchiveButtonAtom =
-      Atom(name: '_SettingsStore.alwaysShowArchiveButton', context: context);
+  late final _$alwaysShowArchiveButtonAtom = Atom(
+    name: '_SettingsStore.alwaysShowArchiveButton',
+    context: context,
+  );
 
   @override
   bool get alwaysShowArchiveButton {
@@ -620,14 +710,19 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set alwaysShowArchiveButton(bool value) {
-    _$alwaysShowArchiveButtonAtom
-        .reportWrite(value, super.alwaysShowArchiveButton, () {
-      super.alwaysShowArchiveButton = value;
-    });
+    _$alwaysShowArchiveButtonAtom.reportWrite(
+      value,
+      super.alwaysShowArchiveButton,
+      () {
+        super.alwaysShowArchiveButton = value;
+      },
+    );
   }
 
-  late final _$showShareButtonAtom =
-      Atom(name: '_SettingsStore.showShareButton', context: context);
+  late final _$showShareButtonAtom = Atom(
+    name: '_SettingsStore.showShareButton',
+    context: context,
+  );
 
   @override
   bool get showShareButton {
@@ -642,8 +737,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$showCommentsButtonAtom =
-      Atom(name: '_SettingsStore.showCommentsButton', context: context);
+  late final _$showCommentsButtonAtom = Atom(
+    name: '_SettingsStore.showCommentsButton',
+    context: context,
+  );
 
   @override
   bool get showCommentsButton {
@@ -658,8 +755,10 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
-  late final _$enableCustomAiProviderAtom =
-      Atom(name: '_SettingsStore.enableCustomAiProvider', context: context);
+  late final _$enableCustomAiProviderAtom = Atom(
+    name: '_SettingsStore.enableCustomAiProvider',
+    context: context,
+  );
 
   @override
   bool get enableCustomAiProvider {
@@ -669,19 +768,61 @@ mixin _$SettingsStore on _SettingsStore, Store {
 
   @override
   set enableCustomAiProvider(bool value) {
-    _$enableCustomAiProviderAtom
-        .reportWrite(value, super.enableCustomAiProvider, () {
-      super.enableCustomAiProvider = value;
+    _$enableCustomAiProviderAtom.reportWrite(
+      value,
+      super.enableCustomAiProvider,
+      () {
+        super.enableCustomAiProvider = value;
+      },
+    );
+  }
+
+  late final _$useDynamicColorAtom = Atom(
+    name: '_SettingsStore.useDynamicColor',
+    context: context,
+  );
+
+  @override
+  bool get useDynamicColor {
+    _$useDynamicColorAtom.reportRead();
+    return super.useDynamicColor;
+  }
+
+  @override
+  set useDynamicColor(bool value) {
+    _$useDynamicColorAtom.reportWrite(value, super.useDynamicColor, () {
+      super.useDynamicColor = value;
     });
   }
 
-  late final _$_SettingsStoreActionController =
-      ActionController(name: '_SettingsStore', context: context);
+  late final _$colorSeedIndexAtom = Atom(
+    name: '_SettingsStore.colorSeedIndex',
+    context: context,
+  );
+
+  @override
+  int get colorSeedIndex {
+    _$colorSeedIndexAtom.reportRead();
+    return super.colorSeedIndex;
+  }
+
+  @override
+  set colorSeedIndex(int value) {
+    _$colorSeedIndexAtom.reportWrite(value, super.colorSeedIndex, () {
+      super.colorSeedIndex = value;
+    });
+  }
+
+  late final _$_SettingsStoreActionController = ActionController(
+    name: '_SettingsStore',
+    context: context,
+  );
 
   @override
   void setDarkMode(DarkMode value) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setDarkMode');
+      name: '_SettingsStore.setDarkMode',
+    );
     try {
       return super.setDarkMode(value);
     } finally {
@@ -692,7 +833,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setSort(FeedListSort newSort) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setSort');
+      name: '_SettingsStore.setSort',
+    );
     try {
       return super.setSort(newSort);
     } finally {
@@ -703,7 +845,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setSortFeed(Feed feed) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setSortFeed');
+      name: '_SettingsStore.setSortFeed',
+    );
     try {
       return super.setSortFeed(feed);
     } finally {
@@ -714,7 +857,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setSortFeedName(String feedName) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setSortFeedName');
+      name: '_SettingsStore.setSortFeedName',
+    );
     try {
       return super.setSortFeedName(feedName);
     } finally {
@@ -725,7 +869,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setSortFeedGroup(FeedGroup feedGroup) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setSortFeedGroup');
+      name: '_SettingsStore.setSortFeedGroup',
+    );
     try {
       return super.setSortFeedGroup(feedGroup);
     } finally {
@@ -736,7 +881,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setSortFeedGroupName(String feedGroupName) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setSortFeedGroupName');
+      name: '_SettingsStore.setSortFeedGroupName',
+    );
     try {
       return super.setSortFeedGroupName(feedGroupName);
     } finally {
@@ -747,7 +893,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setUseReaderModeByDefault(bool value) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setUseReaderModeByDefault');
+      name: '_SettingsStore.setUseReaderModeByDefault',
+    );
     try {
       return super.setUseReaderModeByDefault(value);
     } finally {
@@ -758,7 +905,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setShowAiSummaryOnLoad(bool value) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setShowAiSummaryOnLoad');
+      name: '_SettingsStore.setShowAiSummaryOnLoad',
+    );
     try {
       return super.setShowAiSummaryOnLoad(value);
     } finally {
@@ -769,7 +917,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setFetchAiSummaryOnLoad(bool value) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setFetchAiSummaryOnLoad');
+      name: '_SettingsStore.setFetchAiSummaryOnLoad',
+    );
     try {
       return super.setFetchAiSummaryOnLoad(value);
     } finally {
@@ -780,7 +929,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setFontSize(double newSize) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setFontSize');
+      name: '_SettingsStore.setFontSize',
+    );
     try {
       return super.setFontSize(newSize);
     } finally {
@@ -791,7 +941,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setTextAlignment(TextAlign newAlignment) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setTextAlignment');
+      name: '_SettingsStore.setTextAlignment',
+    );
     try {
       return super.setTextAlignment(newAlignment);
     } finally {
@@ -802,7 +953,8 @@ mixin _$SettingsStore on _SettingsStore, Store {
   @override
   void setTextWidth(TextWidth newWidth) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
-        name: '_SettingsStore.setTextWidth');
+      name: '_SettingsStore.setTextWidth',
+    );
     try {
       return super.setTextWidth(newWidth);
     } finally {
@@ -843,7 +995,9 @@ autoSwitchReaderTooShort: ${autoSwitchReaderTooShort},
 alwaysShowArchiveButton: ${alwaysShowArchiveButton},
 showShareButton: ${showShareButton},
 showCommentsButton: ${showCommentsButton},
-enableCustomAiProvider: ${enableCustomAiProvider}
+enableCustomAiProvider: ${enableCustomAiProvider},
+useDynamicColor: ${useDynamicColor},
+colorSeedIndex: ${colorSeedIndex}
     ''';
   }
 }

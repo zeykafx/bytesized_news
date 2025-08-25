@@ -6,7 +6,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:readability/article.dart';
 import 'package:rss_dart/dart_rss.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:readability/readability.dart' as readability;
 
 part "feedItem.g.dart";

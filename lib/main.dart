@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bytesized_news/background/LifecycleEventHandler.dart';
 import 'package:bytesized_news/background/background_fetch.dart';
+import 'package:bytesized_news/background/life_cycle_event_handler.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
@@ -26,7 +26,7 @@ import 'package:bytesized_news/views/feed_view/feed_view.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:path_provider/path_provider.dart';
@@ -192,21 +192,37 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: lightColorScheme,
-      colorSchemeSeed: lightColorScheme == null ? Colors.red : null,
-      brightness: Brightness.light,
-    );
+    if (settingsStore.useDynamicColor) {
+      return ThemeData(
+        useMaterial3: true,
+        colorScheme: lightColorScheme,
+        colorSchemeSeed: lightColorScheme == null ? Colors.red : null,
+        brightness: Brightness.light,
+      );
+    } else {
+      return ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: colorSeeds[settingsStore.colorSeedIndex],
+        brightness: Brightness.light,
+      );
+    }
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: darkColorScheme,
-      colorSchemeSeed: darkColorScheme == null ? Colors.red : null,
-      brightness: Brightness.dark,
-    );
+    if (settingsStore.useDynamicColor) {
+      return ThemeData(
+        useMaterial3: true,
+        colorScheme: darkColorScheme,
+        colorSchemeSeed: darkColorScheme == null ? Colors.red : null,
+        brightness: Brightness.dark,
+      );
+    } else {
+      return ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: colorSeeds[settingsStore.colorSeedIndex],
+        brightness: Brightness.dark,
+      );
+    }
   }
 
   @override

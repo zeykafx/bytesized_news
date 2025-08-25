@@ -1,5 +1,6 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -199,6 +200,30 @@ String backgroundFetchIntervalString(BackgroundFetchInterval backgroundFetchInte
 
 const backgroundFetchIntervalValues = ["Never", "30 minutes", "1 hour", "1.5 hours", "2 hours", "3 hours", "6 hours", "12 hours", "24 hours"];
 
+
+List<Color> colorSeeds = [
+  Colors.blue,
+  Colors.lightGreen,
+  Colors.purple,
+  Colors.indigo,
+  Colors.orange,
+  Colors.pink,
+  Colors.teal,
+  Colors.red,
+  Colors.amber,
+  Colors.cyan,
+  Colors.lime,
+  Colors.deepPurple,
+  Colors.deepOrange,
+  Colors.orange,
+  Colors.orangeAccent,
+  Colors.yellow,
+  Colors.yellowAccent,
+  Colors.blueGrey,
+  Colors.brown,
+  Colors.grey,
+];
+
 @JsonSerializable()
 class SettingsStore extends _SettingsStore with _$SettingsStore {
   SettingsStore();
@@ -231,6 +256,8 @@ abstract class _SettingsStore with Store {
   static const defaultShowShareButton = true;
   static const defaultShowCommentsButton = true;
   static const defaultEnableCustomAiProvider = false;
+  static const defaultUseDynamicColor = true;
+  static const defaultColorSeedIndex = 0;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -428,4 +455,12 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultEnableCustomAiProvider)
   @observable
   bool enableCustomAiProvider = defaultEnableCustomAiProvider;
+
+  @JsonKey(defaultValue: defaultUseDynamicColor)
+  @observable
+  bool useDynamicColor = defaultUseDynamicColor;
+
+  @JsonKey(defaultValue: defaultColorSeedIndex)
+  @observable
+  int colorSeedIndex = defaultColorSeedIndex;
 }

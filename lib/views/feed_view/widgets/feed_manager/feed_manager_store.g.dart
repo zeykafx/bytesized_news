@@ -12,28 +12,31 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   Computed<bool>? _$areFeedGroupsSelectedComputed;
 
   @override
-  bool get areFeedGroupsSelected => (_$areFeedGroupsSelectedComputed ??=
-          Computed<bool>(() => super.areFeedGroupsSelected,
-              name: '_FeedManagerStore.areFeedGroupsSelected'))
-      .value;
+  bool get areFeedGroupsSelected =>
+      (_$areFeedGroupsSelectedComputed ??= Computed<bool>(
+        () => super.areFeedGroupsSelected,
+        name: '_FeedManagerStore.areFeedGroupsSelected',
+      )).value;
   Computed<bool>? _$areFeedsSelectedComputed;
 
   @override
   bool get areFeedsSelected => (_$areFeedsSelectedComputed ??= Computed<bool>(
-          () => super.areFeedsSelected,
-          name: '_FeedManagerStore.areFeedsSelected'))
-      .value;
+    () => super.areFeedsSelected,
+    name: '_FeedManagerStore.areFeedsSelected',
+  )).value;
   Computed<bool>? _$areMoreThanOneFeedGroupsSelectedComputed;
 
   @override
   bool get areMoreThanOneFeedGroupsSelected =>
       (_$areMoreThanOneFeedGroupsSelectedComputed ??= Computed<bool>(
-              () => super.areMoreThanOneFeedGroupsSelected,
-              name: '_FeedManagerStore.areMoreThanOneFeedGroupsSelected'))
-          .value;
+        () => super.areMoreThanOneFeedGroupsSelected,
+        name: '_FeedManagerStore.areMoreThanOneFeedGroupsSelected',
+      )).value;
 
-  late final _$selectionModeAtom =
-      Atom(name: '_FeedManagerStore.selectionMode', context: context);
+  late final _$selectionModeAtom = Atom(
+    name: '_FeedManagerStore.selectionMode',
+    context: context,
+  );
 
   @override
   bool get selectionMode {
@@ -48,8 +51,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$pinnedListExpandedAtom =
-      Atom(name: '_FeedManagerStore.pinnedListExpanded', context: context);
+  late final _$pinnedListExpandedAtom = Atom(
+    name: '_FeedManagerStore.pinnedListExpanded',
+    context: context,
+  );
 
   @override
   bool get pinnedListExpanded {
@@ -64,8 +69,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$selectedFeedsAtom =
-      Atom(name: '_FeedManagerStore.selectedFeeds', context: context);
+  late final _$selectedFeedsAtom = Atom(
+    name: '_FeedManagerStore.selectedFeeds',
+    context: context,
+  );
 
   @override
   ObservableList<Feed> get selectedFeeds {
@@ -80,8 +87,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$selectedFeedGroupsAtom =
-      Atom(name: '_FeedManagerStore.selectedFeedGroups', context: context);
+  late final _$selectedFeedGroupsAtom = Atom(
+    name: '_FeedManagerStore.selectedFeedGroups',
+    context: context,
+  );
 
   @override
   ObservableList<FeedGroup> get selectedFeedGroups {
@@ -96,8 +105,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$isarAtom =
-      Atom(name: '_FeedManagerStore.isar', context: context);
+  late final _$isarAtom = Atom(
+    name: '_FeedManagerStore.isar',
+    context: context,
+  );
 
   @override
   Isar get isar {
@@ -112,8 +123,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$dbUtilsAtom =
-      Atom(name: '_FeedManagerStore.dbUtils', context: context);
+  late final _$dbUtilsAtom = Atom(
+    name: '_FeedManagerStore.dbUtils',
+    context: context,
+  );
 
   @override
   DbUtils get dbUtils {
@@ -125,15 +138,20 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
 
   @override
   set dbUtils(DbUtils value) {
-    _$dbUtilsAtom
-        .reportWrite(value, _dbUtilsIsInitialized ? super.dbUtils : null, () {
-      super.dbUtils = value;
-      _dbUtilsIsInitialized = true;
-    });
+    _$dbUtilsAtom.reportWrite(
+      value,
+      _dbUtilsIsInitialized ? super.dbUtils : null,
+      () {
+        super.dbUtils = value;
+        _dbUtilsIsInitialized = true;
+      },
+    );
   }
 
-  late final _$feedSyncAtom =
-      Atom(name: '_FeedManagerStore.feedSync', context: context);
+  late final _$feedSyncAtom = Atom(
+    name: '_FeedManagerStore.feedSync',
+    context: context,
+  );
 
   @override
   FeedSync get feedSync {
@@ -145,15 +163,20 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
 
   @override
   set feedSync(FeedSync value) {
-    _$feedSyncAtom
-        .reportWrite(value, _feedSyncIsInitialized ? super.feedSync : null, () {
-      super.feedSync = value;
-      _feedSyncIsInitialized = true;
-    });
+    _$feedSyncAtom.reportWrite(
+      value,
+      _feedSyncIsInitialized ? super.feedSync : null,
+      () {
+        super.feedSync = value;
+        _feedSyncIsInitialized = true;
+      },
+    );
   }
 
-  late final _$isReorderingAtom =
-      Atom(name: '_FeedManagerStore.isReordering', context: context);
+  late final _$isReorderingAtom = Atom(
+    name: '_FeedManagerStore.isReordering',
+    context: context,
+  );
 
   @override
   bool get isReordering {
@@ -168,8 +191,10 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
     });
   }
 
-  late final _$isListAtom =
-      Atom(name: '_FeedManagerStore.isList', context: context);
+  late final _$isListAtom = Atom(
+    name: '_FeedManagerStore.isList',
+    context: context,
+  );
 
   @override
   bool get isList {
@@ -181,15 +206,20 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
 
   @override
   set isList(bool value) {
-    _$isListAtom.reportWrite(value, _isListIsInitialized ? super.isList : null,
-        () {
-      super.isList = value;
-      _isListIsInitialized = true;
-    });
+    _$isListAtom.reportWrite(
+      value,
+      _isListIsInitialized ? super.isList : null,
+      () {
+        super.isList = value;
+        _isListIsInitialized = true;
+      },
+    );
   }
 
   late final _$deleteFeedsFromFeedGroupsAtom = Atom(
-      name: '_FeedManagerStore.deleteFeedsFromFeedGroups', context: context);
+    name: '_FeedManagerStore.deleteFeedsFromFeedGroups',
+    context: context,
+  );
 
   @override
   bool get deleteFeedsFromFeedGroups {
@@ -199,14 +229,19 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
 
   @override
   set deleteFeedsFromFeedGroups(bool value) {
-    _$deleteFeedsFromFeedGroupsAtom
-        .reportWrite(value, super.deleteFeedsFromFeedGroups, () {
-      super.deleteFeedsFromFeedGroups = value;
-    });
+    _$deleteFeedsFromFeedGroupsAtom.reportWrite(
+      value,
+      super.deleteFeedsFromFeedGroups,
+      () {
+        super.deleteFeedsFromFeedGroups = value;
+      },
+    );
   }
 
-  late final _$initAsyncAction =
-      AsyncAction('_FeedManagerStore.init', context: context);
+  late final _$initAsyncAction = AsyncAction(
+    '_FeedManagerStore.init',
+    context: context,
+  );
 
   @override
   Future<void> init({required FeedStore feedStore}) {
@@ -214,62 +249,86 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   }
 
   late final _$addSelectedFeedsToAFeedGroupAsyncAction = AsyncAction(
-      '_FeedManagerStore.addSelectedFeedsToAFeedGroup',
-      context: context);
+    '_FeedManagerStore.addSelectedFeedsToAFeedGroup',
+    context: context,
+  );
 
   @override
   Future<void> addSelectedFeedsToAFeedGroup(
-      List<Feed> feeds, FeedGroup feedGroup) {
-    return _$addSelectedFeedsToAFeedGroupAsyncAction
-        .run(() => super.addSelectedFeedsToAFeedGroup(feeds, feedGroup));
+    List<Feed> feeds,
+    FeedGroup feedGroup,
+  ) {
+    return _$addSelectedFeedsToAFeedGroupAsyncAction.run(
+      () => super.addSelectedFeedsToAFeedGroup(feeds, feedGroup),
+    );
   }
 
-  late final _$addFeedsToFeedGroupAsyncAction =
-      AsyncAction('_FeedManagerStore.addFeedsToFeedGroup', context: context);
+  late final _$addFeedsToFeedGroupAsyncAction = AsyncAction(
+    '_FeedManagerStore.addFeedsToFeedGroup',
+    context: context,
+  );
 
   @override
   Future<void> addFeedsToFeedGroup(List<FeedGroup> feedGroupsToAddFeedsTo) {
-    return _$addFeedsToFeedGroupAsyncAction
-        .run(() => super.addFeedsToFeedGroup(feedGroupsToAddFeedsTo));
+    return _$addFeedsToFeedGroupAsyncAction.run(
+      () => super.addFeedsToFeedGroup(feedGroupsToAddFeedsTo),
+    );
   }
 
-  late final _$handleDeleteAsyncAction =
-      AsyncAction('_FeedManagerStore.handleDelete', context: context);
+  late final _$handleDeleteAsyncAction = AsyncAction(
+    '_FeedManagerStore.handleDelete',
+    context: context,
+  );
 
   @override
   Future<void> handleDelete({bool toggleSelection = true}) {
-    return _$handleDeleteAsyncAction
-        .run(() => super.handleDelete(toggleSelection: toggleSelection));
+    return _$handleDeleteAsyncAction.run(
+      () => super.handleDelete(toggleSelection: toggleSelection),
+    );
   }
 
-  late final _$pinOrUnpinItemAsyncAction =
-      AsyncAction('_FeedManagerStore.pinOrUnpinItem', context: context);
+  late final _$pinOrUnpinItemAsyncAction = AsyncAction(
+    '_FeedManagerStore.pinOrUnpinItem',
+    context: context,
+  );
 
   @override
-  Future<void> pinOrUnpinItem(dynamic feedOrFeedGroup, bool pin,
-      {bool toggleSelection = true}) {
-    return _$pinOrUnpinItemAsyncAction.run(() => super.pinOrUnpinItem(
-        feedOrFeedGroup, pin,
-        toggleSelection: toggleSelection));
+  Future<void> pinOrUnpinItem(
+    dynamic feedOrFeedGroup,
+    bool pin, {
+    bool toggleSelection = true,
+  }) {
+    return _$pinOrUnpinItemAsyncAction.run(
+      () => super.pinOrUnpinItem(
+        feedOrFeedGroup,
+        pin,
+        toggleSelection: toggleSelection,
+      ),
+    );
   }
 
   late final _$reorderPinnedFeedsOrFeedGroupsAsyncAction = AsyncAction(
-      '_FeedManagerStore.reorderPinnedFeedsOrFeedGroups',
-      context: context);
+    '_FeedManagerStore.reorderPinnedFeedsOrFeedGroups',
+    context: context,
+  );
 
   @override
   Future<void> reorderPinnedFeedsOrFeedGroups(int oldIndex, int newIndex) {
-    return _$reorderPinnedFeedsOrFeedGroupsAsyncAction
-        .run(() => super.reorderPinnedFeedsOrFeedGroups(oldIndex, newIndex));
+    return _$reorderPinnedFeedsOrFeedGroupsAsyncAction.run(
+      () => super.reorderPinnedFeedsOrFeedGroups(oldIndex, newIndex),
+    );
   }
 
-  late final _$_FeedManagerStoreActionController =
-      ActionController(name: '_FeedManagerStore', context: context);
+  late final _$_FeedManagerStoreActionController = ActionController(
+    name: '_FeedManagerStore',
+    context: context,
+  );
 
   @override
   void toggleSelectionMode() {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.toggleSelectionMode');
+      name: '_FeedManagerStore.toggleSelectionMode',
+    );
     try {
       return super.toggleSelectionMode();
     } finally {
@@ -280,7 +339,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void addSelectedFeed(Feed feed) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.addSelectedFeed');
+      name: '_FeedManagerStore.addSelectedFeed',
+    );
     try {
       return super.addSelectedFeed(feed);
     } finally {
@@ -291,7 +351,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void removeSelectedFeed(Feed feed) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.removeSelectedFeed');
+      name: '_FeedManagerStore.removeSelectedFeed',
+    );
     try {
       return super.removeSelectedFeed(feed);
     } finally {
@@ -302,7 +363,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void setSelectedFeed(List<Feed> feeds) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.setSelectedFeed');
+      name: '_FeedManagerStore.setSelectedFeed',
+    );
     try {
       return super.setSelectedFeed(feeds);
     } finally {
@@ -313,7 +375,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void addSelectedFeedGroup(FeedGroup feedGroup) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.addSelectedFeedGroup');
+      name: '_FeedManagerStore.addSelectedFeedGroup',
+    );
     try {
       return super.addSelectedFeedGroup(feedGroup);
     } finally {
@@ -324,7 +387,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void removeSelectedFeedGroup(FeedGroup feedGroup) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.removeSelectedFeedGroup');
+      name: '_FeedManagerStore.removeSelectedFeedGroup',
+    );
     try {
       return super.removeSelectedFeedGroup(feedGroup);
     } finally {
@@ -335,7 +399,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void setSelectedFeedGroup(List<FeedGroup> feedGroups) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.setSelectedFeedGroup');
+      name: '_FeedManagerStore.setSelectedFeedGroup',
+    );
     try {
       return super.setSelectedFeedGroup(feedGroups);
     } finally {
@@ -346,7 +411,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void createFeedGroupDialog(BuildContext context) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.createFeedGroupDialog');
+      name: '_FeedManagerStore.createFeedGroupDialog',
+    );
     try {
       return super.createFeedGroupDialog(context);
     } finally {
@@ -357,7 +423,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void handleFeedTileLongPress(Feed feed) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.handleFeedTileLongPress');
+      name: '_FeedManagerStore.handleFeedTileLongPress',
+    );
     try {
       return super.handleFeedTileLongPress(feed);
     } finally {
@@ -368,7 +435,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void handleFeedTileTap(Feed feed) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.handleFeedTileTap');
+      name: '_FeedManagerStore.handleFeedTileTap',
+    );
     try {
       return super.handleFeedTileTap(feed);
     } finally {
@@ -379,7 +447,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void handleFeedGroupLongPress(FeedGroup feedGroup) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.handleFeedGroupLongPress');
+      name: '_FeedManagerStore.handleFeedGroupLongPress',
+    );
     try {
       return super.handleFeedGroupLongPress(feedGroup);
     } finally {
@@ -390,7 +459,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void handleFeedGroupTap(FeedGroup feedGroup) {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.handleFeedGroupTap');
+      name: '_FeedManagerStore.handleFeedGroupTap',
+    );
     try {
       return super.handleFeedGroupTap(feedGroup);
     } finally {
@@ -401,7 +471,8 @@ mixin _$FeedManagerStore on _FeedManagerStore, Store {
   @override
   void handlePinnedExpandedButtonTap() {
     final _$actionInfo = _$_FeedManagerStoreActionController.startAction(
-        name: '_FeedManagerStore.handlePinnedExpandedButtonTap');
+      name: '_FeedManagerStore.handlePinnedExpandedButtonTap',
+    );
     try {
       return super.handlePinnedExpandedButtonTap();
     } finally {
