@@ -30,6 +30,7 @@ The app is built with Flutter and Mobx.
 
 #### Reader mode customization
 <img alt="Reader mode customization" src="./.images/reader_customization.png" width="300"/>
+<img alt="Reader mode customization 2" src="./.images/reader_customization_2.png" width="300"/>
 
 #### Integrated browser:
 <img alt="Integrated browser" src="./.images/reader_browser.png" width="300"/>
@@ -49,4 +50,5 @@ The app is built with Flutter and Mobx.
 ### Settings
 <img alt="Settings" src="./.images/settings.png" width="300"/>
 
-<img alt="Settings" src="./.images/settings_2.png" width="300"/>
+<img alt="General Settings" src="./.images/settings_general.png" width="300"/>
+<img alt="Appearance Settings" src="./.images/settings_appearance.png" width="300"/>
