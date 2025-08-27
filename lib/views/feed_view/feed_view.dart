@@ -193,49 +193,51 @@ class _FeedViewState extends State<FeedView> {
                                           addRepaintBoundaries: false,
                                           addAutomaticKeepAlives: false,
                                           itemBuilder: (context, idx) {
-                                            // Suggestions
-                                            if (feedStore.suggestedFeedItems.isNotEmpty && feedStore.settingsStore.sort == FeedListSort.byDate && idx == 0) {
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 10.0),
-                                                child: Card(
-                                                  margin: EdgeInsets.zero,
-                                                  elevation: 0,
-                                                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Tooltip(
-                                                        message:
-                                                            "Suggested articles based on your interests and taste profile. Suggested ${formatTime(feedStore.authStore.lastSuggestionDate!.microsecondsSinceEpoch)}",
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                                                          child: Text("Suggested Articles", style: TextStyle(fontWeight: FontWeight.w500)),
+                                            if (settingsStore.suggestionEnabled) {
+                                              // Suggestions
+                                              if (feedStore.suggestedFeedItems.isNotEmpty && feedStore.settingsStore.sort == FeedListSort.byDate && idx == 0) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 10.0),
+                                                  child: Card(
+                                                    margin: EdgeInsets.zero,
+                                                    elevation: 0,
+                                                    color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Tooltip(
+                                                          message:
+                                                              "Suggested articles based on your interests and taste profile. Suggested ${formatTime(feedStore.authStore.lastSuggestionDate!.microsecondsSinceEpoch)}",
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                                                            child: Text("Suggested Articles", style: TextStyle(fontWeight: FontWeight.w500)),
+                                                          ),
                                                         ),
-                                                      ),
 
-                                                      SizedBox(
-                                                        height: 315,
-                                                        child: CarouselView(
-                                                          itemExtent: 350,
-                                                          scrollDirection: Axis.horizontal,
-                                                          itemSnapping: true,
-                                                          enableSplash: false,
-                                                          elevation: 0,
-                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                                          children: [
-                                                            for (FeedItem item in feedStore.suggestedFeedItems) ...[
-                                                              SizedBox(
-                                                                width: 350,
-                                                                child: FeedStoryTile(feedStore: feedStore, item: item, isSuggestion: true),
-                                                              ),
+                                                        SizedBox(
+                                                          height: 315,
+                                                          child: CarouselView(
+                                                            itemExtent: 350,
+                                                            scrollDirection: Axis.horizontal,
+                                                            itemSnapping: true,
+                                                            enableSplash: false,
+                                                            elevation: 0,
+                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                                            children: [
+                                                              for (FeedItem item in feedStore.suggestedFeedItems) ...[
+                                                                SizedBox(
+                                                                  width: 350,
+                                                                  child: FeedStoryTile(feedStore: feedStore, item: item, isSuggestion: true),
+                                                                ),
+                                                              ],
                                                             ],
-                                                          ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ).animate(delay: Duration(milliseconds: 100)).fadeIn();
+                                                ).animate(delay: Duration(milliseconds: 100)).fadeIn();
+                                              }
                                             }
 
                                             int index = feedStore.suggestedFeedItems.isNotEmpty && settingsStore.sort == FeedListSort.byDate ? idx - 1 : idx;

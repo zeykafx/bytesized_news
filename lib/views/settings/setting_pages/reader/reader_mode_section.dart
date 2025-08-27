@@ -63,7 +63,7 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
 
             SwitchListTile(
               title: const Text("Show Comments button in bar"),
-              subtitle: const Text("Opens the comments web page"),
+              subtitle: const Text("Opens the comments web page (if available)"),
               value: settingsStore.showCommentsButton,
               onChanged: (value) {
                 settingsStore.showCommentsButton = value;
@@ -73,7 +73,7 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
             // Always show the archive button
             SwitchListTile(
               title: const Text("Always show archive.org button"),
-              subtitle: const Text("Bypass more bot protections & paywalls. Will be shown only when a paywall is detected if off"),
+              subtitle: Text("Bypass more bot protections & paywalls. ${settingsStore.alwaysShowArchiveButton ? "Enabled: button will always shown in the bar" : "Disabled: will be shown only when a paywall is detected"}"),
               value: settingsStore.alwaysShowArchiveButton,
               onChanged: (value) {
                 settingsStore.alwaysShowArchiveButton = value;

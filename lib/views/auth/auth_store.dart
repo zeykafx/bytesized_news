@@ -28,6 +28,7 @@ int defaultNumberOfSuggestionsDaily = 20;
 int defaultNumberOfSummariesDaily = 100;
 int suggestionsIntervalMinutes = 10;
 int summariesIntervalSeconds = 10;
+int maxUserInterests = 30;
 
 abstract class _AuthStore with Store {
   // Fields

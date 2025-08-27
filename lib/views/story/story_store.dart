@@ -185,7 +185,7 @@ abstract class _StoryStore with Store {
   Future<void> init(FeedItem item, BuildContext context, SettingsStore setStore, AuthStore authStore) async {
     settingsStore = setStore;
     this.authStore = authStore;
-    aiUtils = AiUtils(authStore);
+    aiUtils = AiUtils(authStore, settingsStore);
 
     showReaderMode = settingsStore.useReaderModeByDefault;
     hideSummary = settingsStore.showAiSummaryOnLoad;

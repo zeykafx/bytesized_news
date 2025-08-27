@@ -395,7 +395,15 @@ export const summarize = onCall(
     const title: string = request.data.title;
     const content = request.data.content;
     const uid = request.auth?.uid;
-    logger.info("Request to summarize " + articleUrl + " from user ID: " + uid);
+    const summaryLength: number = request.data.length ?? 3;
+    logger.info(
+      "Request to summarize in " +
+        summaryLength +
+        " paragraphs for " +
+        articleUrl +
+        " from user ID: " +
+        uid,
+    );
 
     const userRef = db.doc(`users/${uid}`);
     const user = await userRef.get();
@@ -448,10 +456,11 @@ export const summarize = onCall(
           You are a precise article summarizer. Extract only the essential information without adding interpretations or new content.
 
           ### Instructions
-          - Summarize the article in exactly 3 bullet points (max 5 if article is exceptionally long)
+          - Summarize the article in exactly ${summaryLength} bullet points
           - Each bullet point must start on a new line with a proper bullet character (•)
           - Convert units of measurement between metric and imperial systems (provide in parentheses)
-          - Maintain factual accuracy - include ONLY information present in the original text
+          - Maintain factual accuracy
+          - include ONLY information present in the original text
           - Keep each bullet concise and focused on one key point
           - Use Twitter's official name (Twitter) even if the article refers to it as "X"
 
@@ -468,7 +477,6 @@ export const summarize = onCall(
           - NO concluding remarks
           - NO additional context or opinions
           - STRICTLY adhere to bullet point format
-          - Add a short warning at the end of the summary if the article is from non trustworthy "news" sources from the far right
           `,
         },
         {
@@ -550,42 +558,17 @@ export const getNewsSuggestions = onCall(
 
     // get the news suggestions with ai
     const completion = await openai.chat.completions.create({
-      // model: "llama-3.1-8b-instant",
       model: betterModel,
-      // model: "meta-llama/llama-4-scout-17b-16e-instruct",
       response_format: {
-        // type: "json_schema",
         type: "json_object",
-        // json_schema: {
-        //   name: "product_review",
-        //   schema: {
-        //     type: "object",
-        //     properties: {
-        //       articles: {
-        //         type: "array",
-        //         items: {
-        //           type: "object",
-        //           properties: {
-        //             id: { type: "number" },
-        //             title: { type: "string" },
-        //             feedName: { type: "string" },
-        //           },
-        //         },
-        //       },
-        //     },
-        //     required: ["articles"],
-        //     additionalProperties: false,
-        //   },
-        // },
       },
-      // reasoning_effort: "medium",
       messages: [
         {
           role: "system",
           content: `
         You are an expert news curation AI that personalizes article recommendations for RSS reader users.
 
-        TASK: Select at least 5 articles (no more than 10) from today's unread articles that best match the user's interests 
+        TASK: Select at least 5 articles (no more than 10) from today's unread articles that best match the user's interests
         and reading patterns.
 
         SELECTION CRITERIA (in order of priority):
@@ -593,19 +576,18 @@ export const getNewsSuggestions = onCall(
         2. Source preference based on user's most-read feeds
         3. Article quality and newsworthiness (avoid clickbait)
         4. Timeliness and current relevance
-        5. Diversity across different topics/sources
 
         STRICT REQUIREMENTS:
-        - Return AT LEAST 5 articles, MAX 10; feel free to suggest more
+        - Return AT LEAST 5 articles, MAX 10
         - Preserve original article IDs unchanged
-        - EXCLUDE: promotional content, deals, coupons, advertisements, podcasts
-        - INCLUDE: substantive news, analysis, educational content
         - Prioritize articles from feeds the user reads most frequently
+        - INCLUDE: substantive news, analysis, educational content
+        - EXCLUDE: promotional content, deals, coupons, advertisements, podcasts
         - Balance between user preferences and editorial quality
 
-        OUTPUT FORMAT: Return a JSON object that follows this schema:
-        json_schema: {
-          name: "product_review",
+        OUTPUT FORMAT:
+        Return a JSON object that follows this schema, for each item, only output the id, not the title or the feedName:
+        "
           schema: {
             type: "object",
             properties: {
@@ -615,16 +597,12 @@ export const getNewsSuggestions = onCall(
                   type: "object",
                   properties: {
                     id: { type: "number" },
-                    title: { type: "string" },
-                    feedName: { type: "string" },
                   },
                 },
               },
             },
-            required: ["articles"],
-            additionalProperties: false,
           },
-        },
+          "
         `,
         },
         {

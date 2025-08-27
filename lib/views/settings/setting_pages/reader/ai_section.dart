@@ -29,16 +29,29 @@ class _AiSectionState extends State<AiSection> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
+        bool aiEnabled = (authStore.userTier == Tier.premium) || settingsStore.enableCustomAiProvider;
         return SettingsSection(
           title: "Artificial Intelligence",
           onlySection: false,
           children: [
+            // suggest articles
+            SwitchListTile(
+              title: const Text("Suggest articles"),
+              subtitle: Text("Suggest unread articles from the past day based on your preferences"),
+              value: aiEnabled ? settingsStore.suggestionEnabled : false,
+              onChanged: aiEnabled
+                  ? (value) {
+                      settingsStore.suggestionEnabled = value;
+                    }
+                  : null,
+            ),
+
             // SHOW AI SUMMARY ON STORY PAGE LOAD
             SwitchListTile(
               title: const Text("Show Summary on page load"),
-              subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
-              value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
-              onChanged: authStore.userTier == Tier.premium
+              subtitle: !aiEnabled ? Text("Available with premium") : null,
+              value: aiEnabled ? settingsStore.showAiSummaryOnLoad : false,
+              onChanged: aiEnabled
                   ? (value) {
                       settingsStore.setShowAiSummaryOnLoad(value);
                     }
@@ -48,13 +61,38 @@ class _AiSectionState extends State<AiSection> {
             // FETCH AI SUMMARY ON STORY PAGE LOAD
             SwitchListTile(
               title: const Text("Generate Summary on page load"),
-              subtitle: authStore.userTier != Tier.premium ? Text("Available with premium") : null,
-              value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
-              onChanged: authStore.userTier == Tier.premium
+              subtitle: !aiEnabled ? Text("Available with premium") : null,
+              value: aiEnabled ? settingsStore.fetchAiSummaryOnLoad : false,
+              onChanged: aiEnabled
                   ? (value) {
                       settingsStore.setFetchAiSummaryOnLoad(value);
                     }
                   : null,
+            ),
+            
+            ListTile(
+              title: const Text("Summary length (in paragraphs)"),
+              subtitle: SizedBox(
+                width: 150,
+                child: Row(
+                  children: [
+                    SizedBox(width: 35, child: Text(settingsStore.summaryLength.toStringAsFixed(0))),
+                    Expanded(
+                      child: Slider(
+                        year2023: false,
+                        label: settingsStore.summaryLength.toStringAsFixed(0),
+                        value: settingsStore.summaryLength.toDouble(),
+                        min: 1.0,
+                        max: 4.0,
+                        divisions: 3,
+                        onChanged: (newVal) {
+                          settingsStore.summaryLength = newVal.toInt();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             // BYOK settings

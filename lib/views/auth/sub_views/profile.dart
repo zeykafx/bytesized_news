@@ -182,7 +182,9 @@ class _ProfileState extends State<Profile> {
           },
           title: "News Interests",
           additionCallback: (String text) {
-            authStore.userInterests = [...authStore.userInterests, text];
+            if (authStore.userInterests.length + 1 < maxUserInterests) {
+              authStore.userInterests = [...authStore.userInterests, text];
+            }
           },
           removalCallback: (int index) {
             authStore.userInterests = [...authStore.userInterests..removeAt(index)];

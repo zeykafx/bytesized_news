@@ -284,6 +284,8 @@ abstract class _SettingsStore with Store {
   static const defaultColorSeedIndex = 0;
   static const defaultAppFontFamily = FontFamily.roboto;
   static const defaultMaxWidth = 700.0;
+  static const defaultSuggestionEnabled = true;
+  static const defaultSummaryLength = 3;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -497,4 +499,12 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultMaxWidth)
   @observable
   double maxWidth = defaultMaxWidth;
+
+  @JsonKey(defaultValue: defaultSuggestionEnabled)
+  @observable
+  bool suggestionEnabled = defaultSuggestionEnabled;
+
+  @JsonKey(defaultValue: defaultSummaryLength)
+  @observable
+  int summaryLength = defaultSummaryLength;
 }

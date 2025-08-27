@@ -93,104 +93,106 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
       appBar: AppBar(title: Text("Reading Statistics")),
       body: Observer(
         builder: (context) {
-          return Container(
-            constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Stack(
-              children: [
-                Center(
-                  child: CustomScrollView(
-                    controller: store.scrollController,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: AnimatedOpacity(
-                            duration: 200.ms,
-                            opacity: store.loading ? 1 : 0,
-                            child: LinearProgressIndicator(),
+          return Center(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Stack(
+                children: [
+                  Center(
+                    child: CustomScrollView(
+                      controller: store.scrollController,
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: AnimatedOpacity(
+                              duration: 200.ms,
+                              opacity: store.loading ? 1 : 0,
+                              child: LinearProgressIndicator(),
+                            ),
                           ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: GridView.count(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          crossAxisCount: 2,
-                          children: [
-                            buildReadingTimeCard(),
-                            buildArticlesReadCard(context),
-                            buildStreakCard(context),
-                            buildStatsCardWithArticle(),
-                          ],
-                        ).animate(delay: 150.ms).fadeIn(),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        SliverToBoxAdapter(
+                          child: GridView.count(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            crossAxisCount: 2,
                             children: [
-                              Text(
-                                "Read articles",
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
-                              ),
-                              DropdownButton<String>(
-                                borderRadius: BorderRadius.circular(12),
-                                dropdownColor: Theme.of(context).colorScheme.secondaryContainer,
-                                underline: const SizedBox.shrink(),
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                iconEnabledColor: Theme.of(context).colorScheme.primary,
-                                elevation: 0,
-                                iconSize: 25,
-                                value: store.currentSort,
-                                icon: const Icon(Icons.sort_rounded),
-                                items: [
-                                  DropdownMenuItem<String>(value: "by_date", child: Text("Sort by reading date")),
-                                  DropdownMenuItem<String>(value: "by_duration", child: Text("Sort by reading duration")),
-                                ],
-                                onChanged: (String? item) => store.sortButtonOnChanged(item),
-                              ),
+                              buildReadingTimeCard(),
+                              buildArticlesReadCard(context),
+                              buildStreakCard(context),
+                              buildStatsCardWithArticle(),
                             ],
-                          ),
-                        ).animate(delay: 200.ms).fadeIn(),
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, idx) {
-                            var (StoryReading reading, FeedItem feedItem) = store.allArticlesRead[idx];
-                            return ReadArticleCard(
-                              feedItem: feedItem,
-                              reading: reading,
-                              store: store,
-                            ).animate(delay: 250.ms).slide(duration: 300.ms, begin: Offset(0, -0.1), end: Offset(0, 0), curve: Curves.easeOut).fadeIn();
-                          },
-                          childCount: store.allArticlesRead.length,
+                          ).animate(delay: 150.ms).fadeIn(),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: SizedBox(height: 80), // space for the scroll to top button
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: AnimatedSlide(
-                    duration: 250.ms,
-                    curve: Curves.easeInOutQuad,
-                    offset: store.showScrollToTop ? Offset(0, 0) : Offset(0, 2),
-                    child: FilledButton.icon(
-                      onPressed: store.scrollToTop,
-                      icon: Icon(Icons.arrow_upward),
-                      label: Text("Scroll To Top", style: TextStyle(fontSize: 12)),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Read articles",
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+                                ),
+                                DropdownButton<String>(
+                                  borderRadius: BorderRadius.circular(12),
+                                  dropdownColor: Theme.of(context).colorScheme.secondaryContainer,
+                                  underline: const SizedBox.shrink(),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                  iconEnabledColor: Theme.of(context).colorScheme.primary,
+                                  elevation: 0,
+                                  iconSize: 25,
+                                  value: store.currentSort,
+                                  icon: const Icon(Icons.sort_rounded),
+                                  items: [
+                                    DropdownMenuItem<String>(value: "by_date", child: Text("Sort by reading date")),
+                                    DropdownMenuItem<String>(value: "by_duration", child: Text("Sort by reading duration")),
+                                  ],
+                                  onChanged: (String? item) => store.sortButtonOnChanged(item),
+                                ),
+                              ],
+                            ),
+                          ).animate(delay: 200.ms).fadeIn(),
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, idx) {
+                              var (StoryReading reading, FeedItem feedItem) = store.allArticlesRead[idx];
+                              return ReadArticleCard(
+                                feedItem: feedItem,
+                                reading: reading,
+                                store: store,
+                              ).animate(delay: 250.ms).slide(duration: 300.ms, begin: Offset(0, -0.1), end: Offset(0, 0), curve: Curves.easeOut).fadeIn();
+                            },
+                            childCount: store.allArticlesRead.length,
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: SizedBox(height: 80), // space for the scroll to top button
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    child: AnimatedSlide(
+                      duration: 250.ms,
+                      curve: Curves.easeInOutQuad,
+                      offset: store.showScrollToTop ? Offset(0, 0) : Offset(0, 2),
+                      child: FilledButton.icon(
+                        onPressed: store.scrollToTop,
+                        icon: Icon(Icons.arrow_upward),
+                        label: Text("Scroll To Top", style: TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

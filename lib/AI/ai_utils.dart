@@ -3,21 +3,22 @@ import 'dart:convert';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class AiUtils {
-  int maxSummaryLength = 3;
-
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instanceFor(region: "europe-west1");
   FirebaseAuth auth = FirebaseAuth.instance;
   late AuthStore authStore;
+  late SettingsStore settingsStore;
 
-  AiUtils(AuthStore aStore) {
+  AiUtils(AuthStore aStore, SettingsStore setStore) {
     authStore = aStore;
+    settingsStore = setStore;
   }
 
   Future<(String, int)> summarize(String text, FeedItem feedItem) async {
@@ -42,7 +43,12 @@ class AiUtils {
     if (kDebugMode) {
       print("Calling AI API...");
     }
-    final result = await functions.httpsCallable('summarize').call({"text": feedItem.url, "title": feedItem.title, "content": text});
+    final result = await functions.httpsCallable('summarize').call({
+      "text": feedItem.url,
+      "title": feedItem.title,
+      "content": text,
+      "length": settingsStore.summaryLength,
+    });
     var response = result.data as Map<String, dynamic>;
     if (response["error"] != null) {
       throw Exception(response["error"]);
@@ -64,11 +70,11 @@ class AiUtils {
       print("Calling AI API to get suggested news");
     }
 
-    String todaysArticles = feedItems.map((item) => "ID: ${item.id} - Title: ${item.title} - FeedName: ${item.feed?.name}").join(", ");
+    String todaysArticles = feedItems.map((item) => "ID:${item.id}, Title: ${item.title}, FeedName: ${item.feed?.name}").join(", ");
 
-    String mostReadFeedsString = mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}").join(",");
+    String mostReadFeedsString = mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name}, ArticlesRead: ${feed.articlesRead}").join(",");
 
-    String userInterestsString = userInterests.join(',');
+    String userInterestsString = userInterests.take(30).join(',');
 
     final result = await functions.httpsCallable('getNewsSuggestions').call({
       "todaysArticles": todaysArticles,
@@ -85,9 +91,18 @@ class AiUtils {
     var jsonData = jsonDecode(jsonOutput);
     List<FeedItem> suggestedArticles = [];
     for (var article in jsonData['articles']) {
-      int id = article['id'] ?? 0;
-      var feedItem = feedItems.firstWhere((item) => item.id == id, orElse: () => feedItems[0]);
-      suggestedArticles.add(feedItem);
+      if (article.containsKey("id")) {
+        int id = article['id'];
+        FeedItem feedItem;
+        try {
+          feedItem = feedItems.firstWhere((item) => item.id == id);
+          suggestedArticles.add(feedItem);
+        } catch (e) {
+          continue;
+        }
+      } else {
+        continue;
+      }
     }
 
     // Filter out duplicates

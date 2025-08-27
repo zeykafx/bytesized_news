@@ -126,21 +126,23 @@ class _FeedSearchState extends State<FeedSearch> {
                     ),
                   ),
                   Expanded(
-                    child: Container(
-                      constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
-                      child: ListView.builder(
-                        itemCount: widget.feedStore.searchResults.length,
-                        addAutomaticKeepAlives: false,
-                        itemBuilder: (context, idx) {
-                          FeedItem item = widget.feedStore.searchResults.elementAt(idx);
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: FeedStoryTile(
-                              feedStore: widget.feedStore,
-                              item: item,
-                            ).animate().fade(),
-                          );
-                        },
+                    child: Center(
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: settingsStore.maxWidth),
+                        child: ListView.builder(
+                          itemCount: widget.feedStore.searchResults.length,
+                          addAutomaticKeepAlives: false,
+                          itemBuilder: (context, idx) {
+                            FeedItem item = widget.feedStore.searchResults.elementAt(idx);
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: FeedStoryTile(
+                                feedStore: widget.feedStore,
+                                item: item,
+                              ).animate().fade(),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),

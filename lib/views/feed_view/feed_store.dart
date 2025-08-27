@@ -118,7 +118,7 @@ abstract class _FeedStore with Store {
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
     this.authStore = authStore;
-    aiUtils = AiUtils(authStore);
+    aiUtils = AiUtils(authStore, settingsStore);
     dbUtils = DbUtils(isar: isar);
 
     settingsStore.hasShownWelcomeScreen = true;
@@ -304,7 +304,9 @@ abstract class _FeedStore with Store {
 
     loading = false;
 
-    await createNewsSuggestion();
+    if (settingsStore.suggestionEnabled) {
+      await createNewsSuggestion();
+    }
   }
 
   @action
@@ -336,7 +338,7 @@ abstract class _FeedStore with Store {
       await item.fetchHtmlContent(item.url);
     }
 
-    await dbUtils.updateItemInDb(item); 
+    await dbUtils.updateItemInDb(item);
   }
 
   @action
@@ -499,7 +501,7 @@ abstract class _FeedStore with Store {
     }
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
-      ..take(25);
+      ..take(20);
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;
@@ -507,7 +509,7 @@ abstract class _FeedStore with Store {
 
     // Get the user interests and feed interests
     List<String> userInterest = authStore.userInterests;
-    List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+    List<Feed> mostReadFeeds = (await dbUtils.getFeedsSortedByInterest()).take(20).toList();
 
     suggestionsLoading = true;
     var (List<FeedItem> suggestedArticles, int suggestionsLeft) = ([], 0);

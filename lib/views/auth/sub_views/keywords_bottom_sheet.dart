@@ -76,7 +76,7 @@ class _KeywordsBottomSheetState extends State<KeywordsBottomSheet> {
                         },
                         autocorrect: false,
                         decoration: InputDecoration(
-                          hintText: 'Enter interest',
+                          hintText: 'Enter keyword',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none,

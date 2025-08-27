@@ -74,7 +74,9 @@ SettingsStore _$SettingsStoreFromJson(
   ..appFontFamily =
       $enumDecodeNullable(_$FontFamilyEnumMap, json['appFontFamily']) ??
       FontFamily.roboto
-  ..maxWidth = (json['maxWidth'] as num?)?.toDouble() ?? 700.0;
+  ..maxWidth = (json['maxWidth'] as num?)?.toDouble() ?? 700.0
+  ..suggestionEnabled = json['suggestionEnabled'] as bool? ?? true
+  ..summaryLength = (json['summaryLength'] as num?)?.toInt() ?? 3;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -111,6 +113,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'colorSeedIndex': instance.colorSeedIndex,
       'appFontFamily': _$FontFamilyEnumMap[instance.appFontFamily]!,
       'maxWidth': instance.maxWidth,
+      'suggestionEnabled': instance.suggestionEnabled,
+      'summaryLength': instance.summaryLength,
     };
 
 const _$DarkModeEnumMap = {
@@ -855,6 +859,42 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$suggestionEnabledAtom = Atom(
+    name: '_SettingsStore.suggestionEnabled',
+    context: context,
+  );
+
+  @override
+  bool get suggestionEnabled {
+    _$suggestionEnabledAtom.reportRead();
+    return super.suggestionEnabled;
+  }
+
+  @override
+  set suggestionEnabled(bool value) {
+    _$suggestionEnabledAtom.reportWrite(value, super.suggestionEnabled, () {
+      super.suggestionEnabled = value;
+    });
+  }
+
+  late final _$summaryLengthAtom = Atom(
+    name: '_SettingsStore.summaryLength',
+    context: context,
+  );
+
+  @override
+  int get summaryLength {
+    _$summaryLengthAtom.reportRead();
+    return super.summaryLength;
+  }
+
+  @override
+  set summaryLength(int value) {
+    _$summaryLengthAtom.reportWrite(value, super.summaryLength, () {
+      super.summaryLength = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -1041,7 +1081,9 @@ enableCustomAiProvider: ${enableCustomAiProvider},
 useDynamicColor: ${useDynamicColor},
 colorSeedIndex: ${colorSeedIndex},
 appFontFamily: ${appFontFamily},
-maxWidth: ${maxWidth}
+maxWidth: ${maxWidth},
+suggestionEnabled: ${suggestionEnabled},
+summaryLength: ${summaryLength}
     ''';
   }
 }
