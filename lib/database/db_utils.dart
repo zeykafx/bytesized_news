@@ -1,12 +1,15 @@
+import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:isar_community/isar.dart';
 
 class DbUtils {
   Isar isar;
+  FlutterSecureStorage storage = FlutterSecureStorage();
 
   DbUtils({required this.isar});
 
@@ -441,5 +444,62 @@ class DbUtils {
     }
 
     return (null, null);
+  }
+
+  // AI Provider methods
+  Future<List<AiProvider>> getAiProviders() async {
+    return await isar.aiProviders.where().findAll();
+  }
+
+  Future<void> addAiProvider(AiProvider provider) async {
+    await isar.writeTxn(() => isar.aiProviders.put(provider));
+  }
+
+  Future<void> updateAiProvider(AiProvider provider) async {
+    await addAiProvider(provider); // adding a provider that already exists updates the existing one
+  }
+
+  Future<void> deleteAllAiProviders() async {
+    await isar.writeTxn(() => isar.aiProviders.clear());
+  }
+
+  Future<void> deleteAiProvider(AiProvider provider) async {
+    await isar.writeTxn(() => isar.aiProviders.delete(provider.id));
+  }
+
+  Future<void> seedDefaultAiProvidersIfEmpty() async {
+    final existingProviders = await getAiProviders();
+
+    if (existingProviders.isEmpty) {
+      // no providers exist, seed with defaults
+      await isar.writeTxn(() async {
+        for (final provider in defaultProviders) {
+          await isar.aiProviders.put(provider);
+        }
+      });
+    }
+  }
+
+  Future<AiProvider?> getActiveAiProvider() async {
+    AiProvider? aiProvider = await isar.aiProviders.filter().inUseEqualTo(true).findFirst();
+    // if (aiProvider != null) {
+    //   aiProvider.apiKey = await storage.read(key: "apiKey") ?? "";
+    // }
+    return aiProvider;
+  }
+
+  Future<AiProvider> setActiveAiProvider(AiProvider provider, List<AiProvider> allProviders) async {
+    // set all other providers to inactive
+    await isar.writeTxn(() async {
+      for (final p in allProviders) {
+        p.inUse = false;
+        await isar.aiProviders.put(p);
+      }
+
+      // Then set the selected provider as active
+      provider.inUse = true;
+      await isar.aiProviders.put(provider);
+    });
+    return provider;
   }
 }

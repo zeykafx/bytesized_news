@@ -117,7 +117,7 @@ dev_dependencies:
 dependency_overrides:
   analyzer: ^8.1.1
 #   source_gen: ^2.0.0
-  # dart_style: ^3.0.0
+# dart_style: ^3.0.0
 
 flutter_launcher_icons:
   android: true
@@ -138,3 +138,10 @@ flutter:
 
   assets:
     - assets/feeds/curated_feeds.xml
+    - assets/provider_logos/anthropic.png
+    - assets/provider_logos/deepseek.png
+    - assets/provider_logos/gemini.png
+    - assets/provider_logos/groq.png
+    - assets/provider_logos/ollama.png
+    - assets/provider_logos/openai.png
+    - assets/provider_logos/openrouter.png

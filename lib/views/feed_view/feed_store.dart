@@ -514,9 +514,7 @@ abstract class _FeedStore with Store {
     suggestionsLoading = true;
     var (List<FeedItem> suggestedArticles, int suggestionsLeft) = ([], 0);
     try {
-      (suggestedArticles, suggestionsLeft) = await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest, mostReadFeeds);
-      authStore.suggestionsLeftToday = suggestionsLeft;
-      authStore.lastSuggestionDate = DateTime.now().toUtc();
+      suggestedArticles = await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest, mostReadFeeds);
     } catch (e) {
       if (kDebugMode) {
         print(e);

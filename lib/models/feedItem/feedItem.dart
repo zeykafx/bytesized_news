@@ -223,4 +223,9 @@ class FeedItem {
         other.feedId == feedId &&
         other.feed == feed;
   }
+
+  @override
+  String toString() {
+    return 'FeedItem{id: $id, url: $url, title: $title}';
+  }
 }

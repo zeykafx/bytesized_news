@@ -130,9 +130,13 @@ class SummaryCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
           ),
+          expandedAlignment: Alignment.topLeft,
           children: [
             // split the summary based on the paragraphs and add padding between each paragraph
             ...storyStore.feedItem.aiSummary.split("\n").map((line) {
+              if (line.isEmpty) {
+                return SizedBox.shrink();
+              }
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2.5),
                 child: Text(

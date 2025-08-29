@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:bytesized_news/AI/ai_service/firebase_ai_service.dart';
+import 'package:bytesized_news/AI/ai_service/provider_ai_service.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
@@ -15,102 +17,122 @@ class AiUtils {
   FirebaseAuth auth = FirebaseAuth.instance;
   late AuthStore authStore;
   late SettingsStore settingsStore;
+  late FirebaseAiService firebaseAiService;
+  late ProviderAiService providerAiService;
 
   AiUtils(AuthStore aStore, SettingsStore setStore) {
     authStore = aStore;
     settingsStore = setStore;
+    firebaseAiService = FirebaseAiService(aStore, setStore);
+    providerAiService = ProviderAiService(aStore, setStore);
   }
 
-  Future<(String, int)> summarize(String text, FeedItem feedItem) async {
-    if (authStore.userTier != Tier.premium) {
-      if (kDebugMode) {
-        print("Error: Not a premium account");
-      }
-      throw Exception("Error: You are not allowed to perform this operation.");
+  Future<String> summarize(String text, FeedItem feedItem) async {
+    if (settingsStore.enableCustomAiProvider) {
+      return providerAiService.summarize(text, feedItem);
+    } else {
+      return firebaseAiService.summarize(text, feedItem);
     }
-
-    if (text.length < 500) {
-      throw Exception("Error: The article is too short to summarize.");
-    }
-
-    if (authStore.summariesLeftToday <= 0) {
-      if (kDebugMode) {
-        print("Error: No more summaries today");
-      }
-      throw Exception("Error: You reached the daily limit of summaries.");
-    }
-
-    if (kDebugMode) {
-      print("Calling AI API...");
-    }
-    final result = await functions.httpsCallable('summarize').call({
-      "text": feedItem.url,
-      "title": feedItem.title,
-      "content": text,
-      "length": settingsStore.summaryLength,
-    });
-    var response = result.data as Map<String, dynamic>;
-    if (response["error"] != null) {
-      throw Exception(response["error"]);
-    }
-    String summary = response["summary"];
-    int summariesLeftToday = response["summariesLeftToday"];
-    return (summary, summariesLeftToday);
   }
 
-  Future<(List<FeedItem>, int)> getNewsSuggestions(List<FeedItem> feedItems, List<String> userInterests, List<Feed> mostReadFeeds) async {
-    if (authStore.userTier != Tier.premium) {
-      if (kDebugMode) {
-        print("Error: Not a premium account");
-      }
-      throw Exception("Error: You are not allowed to perform this operation.");
+  Future<List<FeedItem>> getNewsSuggestions(List<FeedItem> feedItems, List<String> userInterests, List<Feed> mostReadFeeds) async {
+    if (settingsStore.enableCustomAiProvider) {
+      return providerAiService.getNewsSuggestions(feedItems, userInterests, mostReadFeeds);
+    } else {
+      return firebaseAiService.getNewsSuggestions(feedItems, userInterests, mostReadFeeds);
     }
-
-    if (kDebugMode) {
-      print("Calling AI API to get suggested news");
-    }
-
-    String todaysArticles = feedItems.map((item) => "ID:${item.id}, Title: ${item.title}, FeedName: ${item.feed?.name}").join(", ");
-
-    String mostReadFeedsString = mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name}, ArticlesRead: ${feed.articlesRead}").join(",");
-
-    String userInterestsString = userInterests.take(30).join(',');
-
-    final result = await functions.httpsCallable('getNewsSuggestions').call({
-      "todaysArticles": todaysArticles,
-      "mostReadFeedsString": mostReadFeedsString,
-      "userInterestsString": userInterestsString,
-    });
-    var response = result.data as Map<String, dynamic>;
-    if (response["error"] != null) {
-      throw Exception(response["error"]);
-    }
-
-    var jsonOutput = response["suggestions"];
-
-    var jsonData = jsonDecode(jsonOutput);
-    List<FeedItem> suggestedArticles = [];
-    for (var article in jsonData['articles']) {
-      if (article.containsKey("id")) {
-        int id = article['id'];
-        FeedItem feedItem;
-        try {
-          feedItem = feedItems.firstWhere((item) => item.id == id);
-          suggestedArticles.add(feedItem);
-        } catch (e) {
-          continue;
-        }
-      } else {
-        continue;
-      }
-    }
-
-    // Filter out duplicates
-    suggestedArticles = suggestedArticles.toSet().toList();
-
-    int suggestionsLeftToday = response["suggestionsLeftToday"];
-    return (suggestedArticles, suggestionsLeftToday);
   }
+
+  // Future<(String, int)> summarize(String text, FeedItem feedItem) async {
+  //   if (authStore.userTier != Tier.premium) {
+  //     if (kDebugMode) {
+  //       print("Error: Not a premium account");
+  //     }
+  //     throw Exception("Error: You are not allowed to perform this operation.");
+  //   }
+
+  //   if (text.length < 500) {
+  //     throw Exception("Error: The article is too short to summarize.");
+  //   }
+
+  //   if (authStore.summariesLeftToday <= 0) {
+  //     if (kDebugMode) {
+  //       print("Error: No more summaries today");
+  //     }
+  //     throw Exception("Error: You reached the daily limit of summaries.");
+  //   }
+
+  //   if (kDebugMode) {
+  //     print("Calling AI API...");
+  //   }
+  //   final result = await functions.httpsCallable('summarize').call({
+  //     "text": feedItem.url,
+  //     "title": feedItem.title,
+  //     "content": text,
+  //     "length": settingsStore.summaryLength,
+  //   });
+  //   var response = result.data as Map<String, dynamic>;
+  //   if (response["error"] != null) {
+  //     throw Exception(response["error"]);
+  //   }
+  //   String summary = response["summary"];
+  //   int summariesLeftToday = response["summariesLeftToday"];
+  //   return (summary, summariesLeftToday);
+  // }
+
+  // Future<(List<FeedItem>, int)> getNewsSuggestions(List<FeedItem> feedItems, List<String> userInterests, List<Feed> mostReadFeeds) async {
+  //   if (authStore.userTier != Tier.premium) {
+  //     if (kDebugMode) {
+  //       print("Error: Not a premium account");
+  //     }
+  //     throw Exception("Error: You are not allowed to perform this operation.");
+  //   }
+
+  //   if (kDebugMode) {
+  //     print("Calling AI API to get suggested news");
+  //   }
+
+  //   String todaysArticles = feedItems.map((item) => "ID:${item.id}, Title: ${item.title}, FeedName: ${item.feed?.name}").join(", ");
+
+  //   String mostReadFeedsString = mostReadFeeds.map((Feed feed) => "FeedName: ${feed.name}, ArticlesRead: ${feed.articlesRead}").join(",");
+
+  //   String userInterestsString = userInterests.take(30).join(',');
+
+  //   final result = await functions.httpsCallable('getNewsSuggestions').call({
+  //     "todaysArticles": todaysArticles,
+  //     "mostReadFeedsString": mostReadFeedsString,
+  //     "userInterestsString": userInterestsString,
+  //   });
+  //   var response = result.data as Map<String, dynamic>;
+  //   if (response["error"] != null) {
+  //     throw Exception(response["error"]);
+  //   }
+
+  //   var jsonOutput = response["suggestions"];
+
+  //   var jsonData = jsonDecode(jsonOutput);
+  //   List<FeedItem> suggestedArticles = [];
+  //   for (var article in jsonData['articles']) {
+  //     if (article.containsKey("id")) {
+  //       int id = article['id'];
+  //       FeedItem feedItem;
+  //       try {
+  //         feedItem = feedItems.firstWhere((item) => item.id == id);
+  //         suggestedArticles.add(feedItem);
+  //       } catch (e) {
+  //         continue;
+  //       }
+  //     } else {
+  //       continue;
+  //     }
+  //   }
+
+  //   // Filter out duplicates
+  //   suggestedArticles = suggestedArticles.toSet().toList();
+
+  //   int suggestionsLeftToday = response["suggestionsLeftToday"];
+  //   return (suggestedArticles, suggestionsLeftToday);
+  // }
 
   Future<List<String>> getFeedCategories(Feed feed) async {
     if (authStore.userTier != Tier.premium) {

@@ -308,6 +308,8 @@ abstract class _StoryStore with Store {
       "disable your Adblocker",
       "disable any ad blocker",
       "Prove you're not a robot",
+      "you appear to be a bot",
+      "You appear to be a bot",
       "Your request has been blocked by our server's security policies",
       "reCAPTCHA",
       "hCAPTCHA",
@@ -364,7 +366,7 @@ abstract class _StoryStore with Store {
   @action
   Future<void> openUrlInReaderMode(String url, {bool replaceItemContent = true}) async {
     loading = true;
-    readerModeHistory.add(currentUrl);
+    // readerModeHistory.add(currentUrl);
 
     htmlContent = await feedItem.fetchHtmlContent(url);
     // we may not always want to replace the item's content in the db, e.g., if we nagivate to a link
@@ -683,10 +685,8 @@ abstract class _StoryStore with Store {
 
     aiLoading = true;
     try {
-      var (String summary, int summariesLeft) = await aiUtils.summarize(docText, feedItem);
+      String summary = await aiUtils.summarize(docText, feedItem);
       feedItem.aiSummary = summary;
-      authStore.summariesLeftToday = summariesLeft;
-      authStore.lastSummaryDate = DateTime.now().toUtc();
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
@@ -699,9 +699,6 @@ abstract class _StoryStore with Store {
       hasAlert = true;
     }
 
-    if (kDebugMode) {
-      print("Received summary from cloud function");
-    }
     aiLoading = false;
   }
 

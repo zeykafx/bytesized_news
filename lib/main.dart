@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:bytesized_news/background/background_fetch.dart';
 import 'package:bytesized_news/background/life_cycle_event_handler.dart';
+import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
@@ -20,7 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
@@ -106,7 +107,17 @@ void main() async {
   }
 
   final dir = await getApplicationDocumentsDirectory();
-  final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema], directory: dir.path);
+  final isar = await Isar.open([
+    FeedItemSchema,
+    FeedSchema,
+    FeedGroupSchema,
+    StoryReadingSchema,
+    AiProviderSchema,
+  ], directory: dir.path);
+
+  // Seed default AI providers if none exist
+  final dbUtils = DbUtils(isar: isar);
+  await dbUtils.seedDefaultAiProvidersIfEmpty();
 
   final AuthStore authStore = AuthStore();
   await authStore.init(null);
