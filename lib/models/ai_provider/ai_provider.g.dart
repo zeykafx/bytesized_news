@@ -32,26 +32,36 @@ const AiProviderSchema = CollectionSchema(
       name: r'modelToUseIndex',
       type: IsarType.long,
     ),
-    r'models': PropertySchema(
+    r'modelToUseIndexForSuggestions': PropertySchema(
       id: 7,
+      name: r'modelToUseIndexForSuggestions',
+      type: IsarType.long,
+    ),
+    r'models': PropertySchema(
+      id: 8,
       name: r'models',
       type: IsarType.stringList,
     ),
-    r'name': PropertySchema(id: 8, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 9, name: r'name', type: IsarType.string),
     r'openAiCompatible': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'openAiCompatible',
       type: IsarType.bool,
     ),
     r'providerInfo': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'providerInfo',
       type: IsarType.string,
     ),
     r'temperature': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'temperature',
       type: IsarType.double,
+    ),
+    r'useSameModelForSuggestions': PropertySchema(
+      id: 13,
+      name: r'useSameModelForSuggestions',
+      type: IsarType.bool,
     ),
   },
 
@@ -105,11 +115,13 @@ void _aiProviderSerialize(
   writer.writeString(offsets[4], object.iconFileName);
   writer.writeBool(offsets[5], object.inUse);
   writer.writeLong(offsets[6], object.modelToUseIndex);
-  writer.writeStringList(offsets[7], object.models);
-  writer.writeString(offsets[8], object.name);
-  writer.writeBool(offsets[9], object.openAiCompatible);
-  writer.writeString(offsets[10], object.providerInfo);
-  writer.writeDouble(offsets[11], object.temperature);
+  writer.writeLong(offsets[7], object.modelToUseIndexForSuggestions);
+  writer.writeStringList(offsets[8], object.models);
+  writer.writeString(offsets[9], object.name);
+  writer.writeBool(offsets[10], object.openAiCompatible);
+  writer.writeString(offsets[11], object.providerInfo);
+  writer.writeDouble(offsets[12], object.temperature);
+  writer.writeBool(offsets[13], object.useSameModelForSuggestions);
 }
 
 AiProvider _aiProviderDeserialize(
@@ -124,14 +136,16 @@ AiProvider _aiProviderDeserialize(
     devName: reader.readString(offsets[2]),
     iconFileName: reader.readString(offsets[4]),
     inUse: reader.readBool(offsets[5]),
-    models: reader.readStringList(offsets[7]) ?? [],
-    name: reader.readString(offsets[8]),
-    openAiCompatible: reader.readBool(offsets[9]),
-    providerInfo: reader.readString(offsets[10]),
-    temperature: reader.readDouble(offsets[11]),
+    models: reader.readStringList(offsets[8]) ?? [],
+    name: reader.readString(offsets[9]),
+    openAiCompatible: reader.readBool(offsets[10]),
+    providerInfo: reader.readString(offsets[11]),
+    temperature: reader.readDouble(offsets[12]),
   );
   object.id = id;
   object.modelToUseIndex = reader.readLong(offsets[6]);
+  object.modelToUseIndexForSuggestions = reader.readLong(offsets[7]);
+  object.useSameModelForSuggestions = reader.readBool(offsets[13]);
   return object;
 }
 
@@ -157,15 +171,19 @@ P _aiProviderDeserializeProp<P>(
     case 6:
       return (reader.readLong(offset)) as P;
     case 7:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 8:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 9:
-      return (reader.readBool(offset)) as P;
-    case 10:
       return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readBool(offset)) as P;
     case 11:
+      return (reader.readString(offset)) as P;
+    case 12:
       return (reader.readDouble(offset)) as P;
+    case 13:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1031,6 +1049,64 @@ extension AiProviderQueryFilter
   }
 
   QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  modelToUseIndexForSuggestionsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'modelToUseIndexForSuggestions',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  modelToUseIndexForSuggestionsGreaterThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'modelToUseIndexForSuggestions',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  modelToUseIndexForSuggestionsLessThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'modelToUseIndexForSuggestions',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  modelToUseIndexForSuggestionsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'modelToUseIndexForSuggestions',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
   modelsElementEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1593,6 +1669,18 @@ extension AiProviderQueryFilter
       );
     });
   }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  useSameModelForSuggestionsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'useSameModelForSuggestions',
+          value: value,
+        ),
+      );
+    });
+  }
 }
 
 extension AiProviderQueryObject
@@ -1688,6 +1776,20 @@ extension AiProviderQuerySortBy
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  sortByModelToUseIndexForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'modelToUseIndexForSuggestions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  sortByModelToUseIndexForSuggestionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'modelToUseIndexForSuggestions', Sort.desc);
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1734,6 +1836,20 @@ extension AiProviderQuerySortBy
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> sortByTemperatureDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'temperature', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  sortByUseSameModelForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useSameModelForSuggestions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  sortByUseSameModelForSuggestionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useSameModelForSuggestions', Sort.desc);
     });
   }
 }
@@ -1837,6 +1953,20 @@ extension AiProviderQuerySortThenBy
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  thenByModelToUseIndexForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'modelToUseIndexForSuggestions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  thenByModelToUseIndexForSuggestionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'modelToUseIndexForSuggestions', Sort.desc);
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1883,6 +2013,20 @@ extension AiProviderQuerySortThenBy
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> thenByTemperatureDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'temperature', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  thenByUseSameModelForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useSameModelForSuggestions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy>
+  thenByUseSameModelForSuggestionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useSameModelForSuggestions', Sort.desc);
     });
   }
 }
@@ -1939,6 +2083,13 @@ extension AiProviderQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QDistinct>
+  distinctByModelToUseIndexForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'modelToUseIndexForSuggestions');
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QDistinct> distinctByModels() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'models');
@@ -1970,6 +2121,13 @@ extension AiProviderQueryWhereDistinct
   QueryBuilder<AiProvider, AiProvider, QDistinct> distinctByTemperature() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'temperature');
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QDistinct>
+  distinctByUseSameModelForSuggestions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'useSameModelForSuggestions');
     });
   }
 }
@@ -2024,6 +2182,13 @@ extension AiProviderQueryProperty
     });
   }
 
+  QueryBuilder<AiProvider, int, QQueryOperations>
+  modelToUseIndexForSuggestionsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'modelToUseIndexForSuggestions');
+    });
+  }
+
   QueryBuilder<AiProvider, List<String>, QQueryOperations> modelsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'models');
@@ -2051,6 +2216,13 @@ extension AiProviderQueryProperty
   QueryBuilder<AiProvider, double, QQueryOperations> temperatureProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'temperature');
+    });
+  }
+
+  QueryBuilder<AiProvider, bool, QQueryOperations>
+  useSameModelForSuggestionsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'useSameModelForSuggestions');
     });
   }
 }

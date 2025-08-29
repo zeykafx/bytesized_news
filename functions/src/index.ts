@@ -477,6 +477,7 @@ export const summarize = onCall(
           - NO concluding remarks
           - NO additional context or opinions
           - STRICTLY adhere to bullet point format
+          - Ignore any introduction text about the author and their previous job/work.
           `,
         },
         {
@@ -586,7 +587,9 @@ export const getNewsSuggestions = onCall(
         - Balance between user preferences and editorial quality
 
         OUTPUT FORMAT:
-        Return a JSON object that follows this schema, for each item, only output the id, not the title or the feedName:
+        - Return a JSON object that follows this schema DO NOT INCLUDE AN INTRODUCTION, just the JSON.
+        - Do not format the response with "\`\`\`json ..." or anything else, just the json.
+        - {For each item, only output the id, not the title or the feedName:
         "
           schema: {
             type: "object",

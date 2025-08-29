@@ -607,20 +607,23 @@ abstract class _StoryStore with Store {
     dom.Document document = parse(htmlContent);
     String docText = document.body!.text;
 
-    // check firestore for existing summary (This doesn't count towards the user's summaries)
-    var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
+    if (authStore.userTier == Tier.premium) {
+      // check firestore for existing summary (This doesn't count towards the user's summaries)
+      // only check if the user is premium
+      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
 
-    if (existingSummary.docs.isNotEmpty) {
-      if (kDebugMode) {
-        print("Summary found in Firestore");
+      if (existingSummary.docs.isNotEmpty) {
+        if (kDebugMode) {
+          print("Summary found in Firestore");
+        }
+        String summary = existingSummary.docs.first.get("summary");
+        feedItem.aiSummary = summary;
+        feedItem.summarized = true;
+        await dbUtils.updateItemInDb(feedItem);
+        feedItemSummarized = true;
+        // evaluateSummary(docText, summary, context);
+        return;
       }
-      String summary = existingSummary.docs.first.get("summary");
-      feedItem.aiSummary = summary;
-      feedItem.summarized = true;
-      await dbUtils.updateItemInDb(feedItem);
-      feedItemSummarized = true;
-      // evaluateSummary(docText, summary, context);
-      return;
     }
 
     if (kDebugMode) {

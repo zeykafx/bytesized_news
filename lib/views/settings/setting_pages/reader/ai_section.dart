@@ -154,6 +154,8 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
   late PageController carouselController;
   late CarouselController carousel;
 
+  ExpansibleController expansibleController = ExpansibleController();
+
   late ReactionDisposer reactionDisposer;
   @override
   void initState() {
@@ -339,8 +341,67 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                         },
                       ),
 
+                      ExpansionTile(
+                        enableFeedback: true,
+                        tilePadding: EdgeInsets.zero,
+                        childrenPadding: const EdgeInsets.only(top: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        initiallyExpanded: !store.providerInUse.useSameModelForSuggestions,
+                        showTrailingIcon: false,
+                        title: SwitchListTile(
+                          contentPadding: EdgeInsets.all(2),
+                          title: const Text("Different model for suggestions"),
+                          subtitle: Text("A better model might provider better suggestions", style: Theme.of(context).textTheme.bodySmall),
+                          value: !store.providerInUse.useSameModelForSuggestions,
+                          onChanged: (value) async {
+                            await store.handleProviderUseSameModelUpdate(store.providerInUse, !value);
+
+                            if (value) {
+                              expansibleController.expand();
+                            } else {
+                              expansibleController.collapse();
+                            }
+                            setState(() {}); // hack
+                          },
+                        ),
+                        controller: expansibleController,
+                        children: [
+                          DropdownButtonFormField<String>(
+                            initialValue: store.selectedSuggestionModels[store.providerIndex],
+                            decoration: InputDecoration(
+                              labelText: "Suggestions model",
+                              prefixIcon: const Icon(Icons.psychology_outlined),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                            isExpanded: true,
+                            items: store.allProviders[store.providerIndex].models.map((model) {
+                              return DropdownMenuItem<String>(
+                                value: model,
+                                child: Text(
+                                  model,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                store.selectedSuggestionModels[store.providerIndex] = value;
+                              });
+
+                              await store.handleProviderModelUpdate(store.providerInUse, store.providerInUse.models.indexOf(value!), isSuggestion: true);
+                            },
+                          ),
+                        ],
+                      ),
+
                       ListTile(
-                        title: const Text("Temperature"),
+                        title: Text("Temperature${!store.providerInUse.useSameModelForSuggestions ? " for both models" : ""}"),
                         subtitle: SizedBox(
                           width: 150,
                           child: Row(
@@ -357,7 +418,6 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                   onChanged: (newVal) {
                                     // store.providerInUse.temperature = newVal;
                                     store.handleProviderTemperatureUpdate(store.providerInUse, newVal);
-                                    setState(() {}); // hack
                                   },
                                 ),
                               ),

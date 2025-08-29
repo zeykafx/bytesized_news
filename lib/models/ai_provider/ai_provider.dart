@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 
 part 'ai_provider.g.dart';
@@ -130,13 +131,16 @@ List<AiProvider> defaultProviders = [
       "google/gemini-2.5-pro",
       "qwen/qwen3-coder",
       "anthropic/claude-3.7-sonnet",
-      "deepseek/deepseek-r1-0528:free",
-      "deepseek/deepseek-chat-v3-0324:free",
+      "deepseek/deepseek-r1-0528-qwen3-8b:free",
+      "deepseek/deepseek-chat-v3.1:free",
       "mistralai/mistral-nemo",
       "openai/gpt-5",
       "openai/gpt-4.1",
       "openai/gpt-4o-mini",
       "openai/gpt-5-mini",
+      "openai/gpt-oss-120b:free",
+      "openai/gpt-oss-20b:free",
+      "moonshotai/kimi-k2:free",
       "z-ai/glm-4.5-air:free",
     ],
     temperature: 0.3,
@@ -149,17 +153,21 @@ List<AiProvider> defaultProviders = [
 @collection
 class AiProvider {
   Id id = Isar.autoIncrement;
+  // configs
   String name;
   String devName;
-  String apiLink;
   bool openAiCompatible;
-  String apiKey;
   List<String> models;
-  double temperature = 0.3;
-  int modelToUseIndex = 0;
-  bool inUse;
   String iconFileName;
   String providerInfo;
+  // user settings
+  String apiLink;
+  String apiKey;
+  double temperature = 0.3;
+  int modelToUseIndex = 0;
+  bool useSameModelForSuggestions = true;
+  int modelToUseIndexForSuggestions = 0;
+  bool inUse;
 
   AiProvider({
     required this.name,
@@ -182,5 +190,19 @@ class AiProvider {
     if (identical(this, other)) return true;
 
     return other is AiProvider && id == other.id && devName == other.devName;
+  }
+
+  bool hasConfigChanged(AiProvider other) {
+    if (devName == other.devName) {
+      return !listEquals(models, other.models) || iconFileName != other.iconFileName || providerInfo != other.providerInfo;
+    } else {
+      return false;
+    }
+  }
+
+  void adoptNewConfig(AiProvider other) {
+    models = other.models;
+    iconFileName = other.iconFileName;
+    providerInfo = other.providerInfo;
   }
 }

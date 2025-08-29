@@ -470,6 +470,17 @@ class DbUtils {
   Future<void> seedDefaultAiProvidersIfEmpty() async {
     final existingProviders = await getAiProviders();
 
+    // check if we need to adopt the new configs for each provider
+    for (AiProvider provider in existingProviders) {
+      for (AiProvider defaultProv in defaultProviders) {
+        if (provider.hasConfigChanged(defaultProv)) {
+          print("Provider ${provider.devName}'s config has changed, adopting new one");
+          provider.adoptNewConfig(defaultProv);
+          await updateAiProvider(provider);
+        }
+      }
+    }
+
     if (existingProviders.isEmpty) {
       // no providers exist, seed with defaults
       await isar.writeTxn(() async {

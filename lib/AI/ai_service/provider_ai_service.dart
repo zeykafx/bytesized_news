@@ -41,7 +41,7 @@ class ProviderAiService extends AiService {
 
   @override
   Future<String> summarize(String text, FeedItem feedItem) async {
-    getAiProviderAndCheckUsable();
+    await getAiProviderAndCheckUsable();
 
     if (kDebugMode) {
       print("Using custom provider ${aiProvider.name} to summarize article: ${feedItem.toString()}");
@@ -96,13 +96,14 @@ class ProviderAiService extends AiService {
         - NO concluding remarks
         - NO additional context or opinions
         - STRICTLY adhere to bullet point format
+        - Ignore any introduction text about the author and their previous job/work.
         """),
       ChatMessage.user(text),
     ];
     ChatResponse response = await provider.chat(messages);
 
     if (kDebugMode) {
-      print("Provider ${aiProvider.name} with model ${aiProvider.models[aiProvider.modelToUseIndex]} returned summary: ${response.text}");
+      print("Generated summary with provider ${aiProvider.name} (model: ${aiProvider.models[aiProvider.modelToUseIndex]})");
     }
 
     return response.text ?? "No response";
@@ -110,7 +111,7 @@ class ProviderAiService extends AiService {
 
   @override
   Future<List<FeedItem>> getNewsSuggestions(List<FeedItem> feedItems, List<String> userInterests, List<Feed> mostReadFeeds) async {
-    getAiProviderAndCheckUsable();
+    await getAiProviderAndCheckUsable();
 
     String todaysArticles = feedItems.map((item) => "ID:${item.id}, Title: ${item.title}, FeedName: ${item.feed?.name}").join(", ");
 
@@ -118,23 +119,33 @@ class ProviderAiService extends AiService {
 
     String userInterestsString = userInterests.take(30).join(',');
 
+    String modelToUse = aiProvider.useSameModelForSuggestions
+        ? aiProvider.models[aiProvider.modelToUseIndex]
+        : aiProvider.models[aiProvider.modelToUseIndexForSuggestions];
+
     ChatCapability provider;
     if (aiProvider.devName == "openrouter") {
       provider = await ai()
           .openRouter()
           .baseUrl(aiProvider.apiLink)
           .apiKey(aiProvider.apiKey)
-          .model(aiProvider.models[aiProvider.modelToUseIndex])
+          .model(modelToUse)
           .temperature(aiProvider.temperature)
+          .responseFormat("json")
           .build();
     } else {
       provider = await createProvider(
         providerId: aiProvider.devName,
         apiKey: aiProvider.apiKey,
-        model: aiProvider.models[aiProvider.modelToUseIndex],
+        model: modelToUse,
         baseUrl: aiProvider.apiLink,
         temperature: aiProvider.temperature,
+        extensions: {"responseFormat": "json"},
       );
+    }
+
+    if (kDebugMode) {
+      print("Fetching suggestions from provider ${aiProvider.name} with model ${modelToUse}");
     }
 
     List<ChatMessage> messages = [
@@ -159,8 +170,9 @@ class ProviderAiService extends AiService {
         - Balance between user preferences and editorial quality
 
         OUTPUT FORMAT:
-        Return a JSON object that follows this schema DO NOT INCLUDE AN INTRODUCTION, just the JSON.
-        For each item, only output the id, not the title or the feedName:
+        - Return a JSON object that follows this schema DO NOT INCLUDE AN INTRODUCTION, just the JSON.
+        - Do not format the response with "```json ..." or anything else, just the json.
+        - For each item, only output the id, not the title or the feedName:
         "
           schema: {
             type: "object",

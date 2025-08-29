@@ -259,6 +259,26 @@ mixin _$AiStore on _AiStore, Store {
     );
   }
 
+  late final _$handleProviderUseSameModelUpdateAsyncAction = AsyncAction(
+    '_AiStore.handleProviderUseSameModelUpdate',
+    context: context,
+  );
+
+  @override
+  Future<void> handleProviderUseSameModelUpdate(
+    AiProvider provider,
+    bool value, {
+    bool saveToDB = true,
+  }) {
+    return _$handleProviderUseSameModelUpdateAsyncAction.run(
+      () => super.handleProviderUseSameModelUpdate(
+        provider,
+        value,
+        saveToDB: saveToDB,
+      ),
+    );
+  }
+
   late final _$handleProviderModelUpdateAsyncAction = AsyncAction(
     '_AiStore.handleProviderModelUpdate',
     context: context,
@@ -269,12 +289,14 @@ mixin _$AiStore on _AiStore, Store {
     AiProvider provider,
     int modelToUse, {
     bool saveToDB = true,
+    bool isSuggestion = false,
   }) {
     return _$handleProviderModelUpdateAsyncAction.run(
       () => super.handleProviderModelUpdate(
         provider,
         modelToUse,
         saveToDB: saveToDB,
+        isSuggestion: isSuggestion,
       ),
     );
   }

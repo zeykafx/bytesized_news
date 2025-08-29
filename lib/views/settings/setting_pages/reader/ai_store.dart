@@ -1,7 +1,6 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -47,6 +46,7 @@ abstract class _AiStore with Store {
 
   @observable
   Map<int, String?> selectedModels = {};
+  Map<int, String?> selectedSuggestionModels = {};
 
   Future<void> init(SettingsStore settingsStore) async {
     this.settingsStore = settingsStore;
@@ -59,6 +59,9 @@ abstract class _AiStore with Store {
       apiKeysControllers[i] = TextEditingController(text: allProviders[i].apiKey);
       apiUrlsControllers[i] = TextEditingController(text: allProviders[i].apiLink);
       selectedModels[i] = allProviders[i].models[allProviders[i].modelToUseIndex];
+      if (!allProviders[i].useSameModelForSuggestions) {
+        selectedSuggestionModels[i] = allProviders[i].models[allProviders[i].modelToUseIndexForSuggestions];
+      }
     }
 
     initialized = true;
@@ -109,8 +112,24 @@ abstract class _AiStore with Store {
   }
 
   @action
-  Future<void> handleProviderModelUpdate(AiProvider provider, int modelToUse, {bool saveToDB = true}) async {
-    provider.modelToUseIndex = modelToUse;
+  Future<void> handleProviderUseSameModelUpdate(AiProvider provider, bool value, {bool saveToDB = true}) async {
+    provider.useSameModelForSuggestions = value;
+
+    if (saveToDB) {
+      await dbUtils.updateAiProvider(provider);
+    }
+    providerInUse = provider;
+    allProviders[providerIndex] = provider;
+  }
+
+  @action
+  Future<void> handleProviderModelUpdate(AiProvider provider, int modelToUse, {bool saveToDB = true, bool isSuggestion = false}) async {
+    if (!isSuggestion) {
+      provider.modelToUseIndex = modelToUse;
+    } else {
+      provider.modelToUseIndexForSuggestions = modelToUse;
+    }
+
     if (saveToDB) {
       await dbUtils.updateAiProvider(provider);
     }
@@ -147,6 +166,7 @@ abstract class _AiStore with Store {
             .apiKey(aiProvider.apiKey)
             .model(aiProvider.models[aiProvider.modelToUseIndex])
             .temperature(aiProvider.temperature)
+            .reasoning(false)
             .maxTokens(200)
             .build();
       } else {
@@ -156,6 +176,7 @@ abstract class _AiStore with Store {
           model: aiProvider.models[aiProvider.modelToUseIndex],
           baseUrl: aiProvider.apiLink,
           temperature: aiProvider.temperature,
+          extensions: {"reasoning": false},
         );
       }
       final messages = [ChatMessage.user('Hello, world!, respond in one sentence')];
