@@ -32,6 +32,9 @@ abstract class _AiStore with Store {
   @computed
   int get providerIndex => allProviders.indexOf(providerInUse);
 
+  @computed
+  bool get providerUseSameModelForSuggestions => providerInUse.useSameModelForSuggestions;
+
   @observable
   ObservableList<AiProvider> allProviders = <AiProvider>[].asObservable();
 
@@ -45,24 +48,42 @@ abstract class _AiStore with Store {
   Map<int, TextEditingController> apiUrlsControllers = {};
 
   @observable
-  Map<int, String?> selectedModels = {};
-  Map<int, String?> selectedSuggestionModels = {};
+  bool showCustomModelField = false;
+
+  @observable
+  late TextEditingController customModelController;
+
+  @observable
+  bool showCustomSuggestionModelField = false;
+  
+  @observable
+  ExpansibleController expansibleController = ExpansibleController();
+
+  @observable
+  late TextEditingController customSuggestionModelController;
 
   Future<void> init(SettingsStore settingsStore) async {
     this.settingsStore = settingsStore;
     dbUtils = DbUtils(isar: Isar.getInstance()!);
 
     providerInUse = await dbUtils.getActiveAiProvider() ?? allProviders.first;
+    if (providerInUse.useSameModelForSuggestions) {
+      expansibleController.collapse();
+    } else {
+      expansibleController.expand();
+    }
     allProviders = (await dbUtils.getAiProviders()).asObservable();
 
     for (int i = 0; i < allProviders.length; i++) {
       apiKeysControllers[i] = TextEditingController(text: allProviders[i].apiKey);
       apiUrlsControllers[i] = TextEditingController(text: allProviders[i].apiLink);
-      selectedModels[i] = allProviders[i].models[allProviders[i].modelToUseIndex];
-      if (!allProviders[i].useSameModelForSuggestions) {
-        selectedSuggestionModels[i] = allProviders[i].models[allProviders[i].modelToUseIndexForSuggestions];
-      }
+      // selectedModels[i] = allProviders[i].models[allProviders[i].modelToUseIndex];
+      // if (!allProviders[i].useSameModelForSuggestions) {
+      //   selectedSuggestionModels[i] = allProviders[i].models[allProviders[i].modelToUseIndexForSuggestions];
+      // }
     }
+    customModelController = TextEditingController();
+    customSuggestionModelController = TextEditingController();
 
     initialized = true;
   }
@@ -70,15 +91,17 @@ abstract class _AiStore with Store {
   @action
   Future<void> handleProviderOnTap(AiProvider provider) async {
     providerInUse = await dbUtils.setActiveAiProvider(provider, allProviders);
+    if (providerInUse.useSameModelForSuggestions) {
+      expansibleController.collapse();
+    } else {
+      expansibleController.expand();
+    }
     await refreshProviders();
   }
 
   @action
   Future<void> refreshProviders() async {
-    // final updatedProviders = await dbUtils.getAiProviders();
     allProviders = allProviders;
-    // allProviders.clear();
-    // allProviders.addAll(updatedProviders);
   }
 
   @action
@@ -142,6 +165,21 @@ abstract class _AiStore with Store {
     loading = true;
     provider.apiKey = apiKey;
     provider.apiLink = baseUrl;
+
+    if (showCustomModelField) {
+      // save the custom model name by adding it to the list of models and setting the index to it
+      String modelName = customModelController.text;
+      provider.models.add(modelName);
+      provider.modelToUseIndex = provider.models.indexOf(modelName);
+    }
+
+    if (showCustomSuggestionModelField) {
+      // save the custom model name by adding it to the list of models and setting the index to it
+      String modelName = customSuggestionModelController.text;
+      provider.models.add(modelName);
+      provider.modelToUseIndexForSuggestions = provider.models.indexOf(modelName);
+    }
+
     await dbUtils.updateAiProvider(provider);
     providerInUse = provider;
     allProviders[providerIndex] = provider;

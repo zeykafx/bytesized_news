@@ -191,6 +191,10 @@ class _StoryState extends State<Story> {
                                       if (url == null) {
                                         return false;
                                       }
+
+                                      // notify reading stats about link click before opening external browser
+                                      storyStore.readingStat.handleLinkClick();
+
                                       Uri uri = Uri.parse(url);
                                       // if (storyStore.showReaderMode && settingsStore.openLinksInReaderMode) {
                                       //   storyStore.openUrlInReaderMode(url, replaceItemContent: false);

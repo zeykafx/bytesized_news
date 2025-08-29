@@ -16,6 +16,14 @@ mixin _$AiStore on _AiStore, Store {
     () => super.providerIndex,
     name: '_AiStore.providerIndex',
   )).value;
+  Computed<bool>? _$providerUseSameModelForSuggestionsComputed;
+
+  @override
+  bool get providerUseSameModelForSuggestions =>
+      (_$providerUseSameModelForSuggestionsComputed ??= Computed<bool>(
+        () => super.providerUseSameModelForSuggestions,
+        name: '_AiStore.providerUseSameModelForSuggestions',
+      )).value;
 
   late final _$storageAtom = Atom(name: '_AiStore.storage', context: context);
 
@@ -159,22 +167,122 @@ mixin _$AiStore on _AiStore, Store {
     });
   }
 
-  late final _$selectedModelsAtom = Atom(
-    name: '_AiStore.selectedModels',
+  late final _$showCustomModelFieldAtom = Atom(
+    name: '_AiStore.showCustomModelField',
     context: context,
   );
 
   @override
-  Map<int, String?> get selectedModels {
-    _$selectedModelsAtom.reportRead();
-    return super.selectedModels;
+  bool get showCustomModelField {
+    _$showCustomModelFieldAtom.reportRead();
+    return super.showCustomModelField;
   }
 
   @override
-  set selectedModels(Map<int, String?> value) {
-    _$selectedModelsAtom.reportWrite(value, super.selectedModels, () {
-      super.selectedModels = value;
-    });
+  set showCustomModelField(bool value) {
+    _$showCustomModelFieldAtom.reportWrite(
+      value,
+      super.showCustomModelField,
+      () {
+        super.showCustomModelField = value;
+      },
+    );
+  }
+
+  late final _$customModelControllerAtom = Atom(
+    name: '_AiStore.customModelController',
+    context: context,
+  );
+
+  @override
+  TextEditingController get customModelController {
+    _$customModelControllerAtom.reportRead();
+    return super.customModelController;
+  }
+
+  bool _customModelControllerIsInitialized = false;
+
+  @override
+  set customModelController(TextEditingController value) {
+    _$customModelControllerAtom.reportWrite(
+      value,
+      _customModelControllerIsInitialized ? super.customModelController : null,
+      () {
+        super.customModelController = value;
+        _customModelControllerIsInitialized = true;
+      },
+    );
+  }
+
+  late final _$showCustomSuggestionModelFieldAtom = Atom(
+    name: '_AiStore.showCustomSuggestionModelField',
+    context: context,
+  );
+
+  @override
+  bool get showCustomSuggestionModelField {
+    _$showCustomSuggestionModelFieldAtom.reportRead();
+    return super.showCustomSuggestionModelField;
+  }
+
+  @override
+  set showCustomSuggestionModelField(bool value) {
+    _$showCustomSuggestionModelFieldAtom.reportWrite(
+      value,
+      super.showCustomSuggestionModelField,
+      () {
+        super.showCustomSuggestionModelField = value;
+      },
+    );
+  }
+
+  late final _$expansibleControllerAtom = Atom(
+    name: '_AiStore.expansibleController',
+    context: context,
+  );
+
+  @override
+  ExpansibleController get expansibleController {
+    _$expansibleControllerAtom.reportRead();
+    return super.expansibleController;
+  }
+
+  @override
+  set expansibleController(ExpansibleController value) {
+    _$expansibleControllerAtom.reportWrite(
+      value,
+      super.expansibleController,
+      () {
+        super.expansibleController = value;
+      },
+    );
+  }
+
+  late final _$customSuggestionModelControllerAtom = Atom(
+    name: '_AiStore.customSuggestionModelController',
+    context: context,
+  );
+
+  @override
+  TextEditingController get customSuggestionModelController {
+    _$customSuggestionModelControllerAtom.reportRead();
+    return super.customSuggestionModelController;
+  }
+
+  bool _customSuggestionModelControllerIsInitialized = false;
+
+  @override
+  set customSuggestionModelController(TextEditingController value) {
+    _$customSuggestionModelControllerAtom.reportWrite(
+      value,
+      _customSuggestionModelControllerIsInitialized
+          ? super.customSuggestionModelController
+          : null,
+      () {
+        super.customSuggestionModelController = value;
+        _customSuggestionModelControllerIsInitialized = true;
+      },
+    );
   }
 
   late final _$handleProviderOnTapAsyncAction = AsyncAction(
@@ -340,8 +448,13 @@ allProviders: ${allProviders},
 obscure: ${obscure},
 apiKeysControllers: ${apiKeysControllers},
 apiUrlsControllers: ${apiUrlsControllers},
-selectedModels: ${selectedModels},
-providerIndex: ${providerIndex}
+showCustomModelField: ${showCustomModelField},
+customModelController: ${customModelController},
+showCustomSuggestionModelField: ${showCustomSuggestionModelField},
+expansibleController: ${expansibleController},
+customSuggestionModelController: ${customSuggestionModelController},
+providerIndex: ${providerIndex},
+providerUseSameModelForSuggestions: ${providerUseSameModelForSuggestions}
     ''';
   }
 }

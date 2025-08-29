@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bytesized_news/AI/ai_utils.dart';
+import 'package:bytesized_news/background/life_cycle_event_handler.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/reading_stats/reading_stats.dart';
@@ -218,6 +219,8 @@ abstract class _StoryStore with Store {
 
     detectHackerNews();
 
+    _registerLifecycleCallbacks();
+
     initialized = true;
   }
 
@@ -267,6 +270,8 @@ abstract class _StoryStore with Store {
   void dispose() {
     if (initialized) {
       endReading();
+      unregisterLifecycleCallbacks();
+      readingStat.forceStopTracking();
     }
   }
 
@@ -788,6 +793,29 @@ abstract class _StoryStore with Store {
     }
     if (initialized) {
       readingStat.endReading(feedItem);
+    }
+  }
+
+
+  void _registerLifecycleCallbacks() {
+    lifecycleEventHandler.addBackgroundCallback(handleAppPaused);
+    lifecycleEventHandler.addForegroundCallback(handleAppResumed);
+  }
+
+  void unregisterLifecycleCallbacks() {
+    lifecycleEventHandler.removeBackgroundCallback(handleAppPaused);
+    lifecycleEventHandler.removeForegroundCallback(handleAppResumed);
+  }
+
+  void handleAppPaused() {
+    if (initialized) {
+      readingStat.handleAppPaused();
+    }
+  }
+
+  void handleAppResumed() {
+    if (initialized) {
+      readingStat.handleAppResumed();
     }
   }
 
