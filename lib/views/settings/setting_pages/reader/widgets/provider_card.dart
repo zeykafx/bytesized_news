@@ -1,6 +1,7 @@
 import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/views/settings/setting_pages/reader/ai_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class ProviderCard extends StatelessWidget {
   const ProviderCard({
@@ -27,6 +28,8 @@ class ProviderCard extends StatelessWidget {
       child: OverflowBox(
         maxHeight: cardHeight,
         maxWidth: cardWidth,
+        fit: OverflowBoxFit.max,
+        alignment: Alignment.center,
         child: Card.filled(
           margin: EdgeInsets.zero,
           clipBehavior: Clip.hardEdge,
@@ -64,7 +67,7 @@ class ProviderCard extends StatelessWidget {
                             fontWeight: provider.inUse ? FontWeight.w600 : FontWeight.w500,
                             color: provider.inUse ? colorScheme.primary : colorScheme.onSurface,
                           ),
-                          overflow: TextOverflow.fade,
+                          overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                       ],
@@ -82,19 +85,19 @@ class ProviderCard extends StatelessWidget {
                             color: colorScheme.onPrimary,
                             fontWeight: FontWeight.w600,
                           ),
-                          overflow: TextOverflow.fade,
+                          overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                       ),
                     ],
-
+      
                     Flexible(
                       child: Text(
                         "${provider.models.length} models available",
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
-                        overflow: TextOverflow.fade,
+                        overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),

@@ -64,7 +64,7 @@ class DbUtils {
   }
 
   Future<List<FeedItem>> getItems(List<Feed> feeds) async {
-    List<FeedItem> feedItems = await isar.feedItems.where().sortByPublishedDateDesc().findAll();
+    List<FeedItem> feedItems = await isar.feedItems.where().sortByPublishedDateDesc().limit(1000).findAll();
 
     // find the corresponding feeds for each feed item
     for (FeedItem item in feedItems) {

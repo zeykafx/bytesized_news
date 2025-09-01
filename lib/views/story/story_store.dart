@@ -280,6 +280,10 @@ abstract class _StoryStore with Store {
     const List<String> detectionMessages = [
       "Access Denied",
       "403 forbidden",
+      "403 Forbidden",
+      "403 - Forbidden",
+      "403 - forbidden",
+      "Access to this page is forbidden.Generated content, verify important information.",
       "403: Forbidden",
       "Blocked by bot protection",
       "We've detected unusual activity",
@@ -795,7 +799,6 @@ abstract class _StoryStore with Store {
       readingStat.endReading(feedItem);
     }
   }
-
 
   void _registerLifecycleCallbacks() {
     lifecycleEventHandler.addBackgroundCallback(handleAppPaused);

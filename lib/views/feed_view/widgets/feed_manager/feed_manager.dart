@@ -329,36 +329,36 @@ class _FeedManagerState extends State<FeedManager> {
                                   ],
                                 ),
 
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                // const SizedBox(
+                                //   height: 5,
+                                // ),
 
                                 // TODO: use animated fractionally sized thingy
-                                GridView.count(
-                                  crossAxisCount: feedManagerStore.isList ? 1 : 2,
-                                  childAspectRatio: mediaQuery.size.width > 700 ? (feedManagerStore.isList ? 14 : 7) : (feedManagerStore.isList ? 8 : 4.3),
-                                  mainAxisSpacing: 3,
-                                  crossAxisSpacing: 3,
+                                GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  children: [
-                                    // Feeds
-                                    ...feedStore.feeds.map((feed) {
-                                      return FeedTile(
-                                            feedManagerStore: feedManagerStore,
-                                            feedStore: feedStore,
-                                            feed: feed,
-                                            wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
-                                            wrappedGetFeeds: widget.wrappedGetFeeds,
-                                            wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
-                                            isInPinnedList: false,
-                                          )
-                                          .animate(value: feedManagerStore.isList ? 1 : 0)
-                                          .fade(curve: Curves.easeInOutQuad)
-                                          .animate(value: feedManagerStore.isList ? 0 : 1)
-                                          .fade(curve: Curves.easeInOutQuad);
-                                    }),
-                                  ],
+                                  itemCount: feedStore.feeds.length,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: feedManagerStore.isList ? 1 : 2,
+                                    mainAxisExtent: 50,
+                                  ),
+                                  itemBuilder: (_, index) {
+                                    Feed feed = feedStore.feeds[index];
+
+                                    return FeedTile(
+                                          feedManagerStore: feedManagerStore,
+                                          feedStore: feedStore,
+                                          feed: feed,
+                                          wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
+                                          wrappedGetFeeds: widget.wrappedGetFeeds,
+                                          wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
+                                          isInPinnedList: false,
+                                        )
+                                        .animate(value: feedManagerStore.isList ? 1 : 0)
+                                        .fade(curve: Curves.easeInOutQuad)
+                                        .animate(value: feedManagerStore.isList ? 0 : 1)
+                                        .fade(curve: Curves.easeInOutQuad);
+                                  },
                                 ),
 
                                 const SizedBox(

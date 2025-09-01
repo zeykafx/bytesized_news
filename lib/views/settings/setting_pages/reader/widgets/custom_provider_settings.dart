@@ -20,14 +20,13 @@ class CustomProviderSettings extends StatefulWidget {
 
 class _CustomProviderSettingsState extends State<CustomProviderSettings> {
   final double cardHeight = 120;
-  final double cardWidth = 180;
+  final double cardWidth = 210;
 
   late final SettingsStore settingsStore;
   late final AiStore store;
 
   late PageController carouselController;
   late CarouselController carousel;
-
 
   late ReactionDisposer reactionDisposer;
   @override
@@ -214,8 +213,8 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
 
+                      // const SizedBox(height: 16),
                       AnimatedCrossFade(
                         duration: 300.ms,
                         firstCurve: Curves.easeInCubic,
