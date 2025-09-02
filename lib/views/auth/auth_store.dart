@@ -87,6 +87,10 @@ abstract class _AuthStore with Store {
       return false;
     }
 
+    if (kDebugMode) {
+      print("AuthStore init started");
+    }
+
     authLoading = true;
 
     dbUtils = DbUtils(isar: isar);
@@ -338,6 +342,11 @@ abstract class _AuthStore with Store {
         throw Exception(response["error"]);
       }
     });
+
+    if (kDebugMode) {
+      print("AuthStore init finished");
+    }
+
     authLoading = false;
     initialized = true;
     return true;

@@ -76,7 +76,9 @@ SettingsStore _$SettingsStoreFromJson(
       FontFamily.roboto
   ..maxWidth = (json['maxWidth'] as num?)?.toDouble() ?? 700.0
   ..suggestionEnabled = json['suggestionEnabled'] as bool? ?? true
-  ..summaryLength = (json['summaryLength'] as num?)?.toInt() ?? 3;
+  ..summaryLength = (json['summaryLength'] as num?)?.toInt() ?? 3
+  ..showNotificationAfterBgSync =
+      json['showNotificationAfterBgSync'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -115,6 +117,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'maxWidth': instance.maxWidth,
       'suggestionEnabled': instance.suggestionEnabled,
       'summaryLength': instance.summaryLength,
+      'showNotificationAfterBgSync': instance.showNotificationAfterBgSync,
     };
 
 const _$DarkModeEnumMap = {
@@ -895,6 +898,28 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$showNotificationAfterBgSyncAtom = Atom(
+    name: '_SettingsStore.showNotificationAfterBgSync',
+    context: context,
+  );
+
+  @override
+  bool get showNotificationAfterBgSync {
+    _$showNotificationAfterBgSyncAtom.reportRead();
+    return super.showNotificationAfterBgSync;
+  }
+
+  @override
+  set showNotificationAfterBgSync(bool value) {
+    _$showNotificationAfterBgSyncAtom.reportWrite(
+      value,
+      super.showNotificationAfterBgSync,
+      () {
+        super.showNotificationAfterBgSync = value;
+      },
+    );
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -1083,7 +1108,8 @@ colorSeedIndex: ${colorSeedIndex},
 appFontFamily: ${appFontFamily},
 maxWidth: ${maxWidth},
 suggestionEnabled: ${suggestionEnabled},
-summaryLength: ${summaryLength}
+summaryLength: ${summaryLength},
+showNotificationAfterBgSync: ${showNotificationAfterBgSync}
     ''';
   }
 }

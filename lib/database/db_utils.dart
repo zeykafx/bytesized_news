@@ -6,6 +6,7 @@ import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:isar_community/isar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DbUtils {
   Isar isar;
@@ -512,5 +513,53 @@ class DbUtils {
       await isar.aiProviders.put(provider);
     });
     return provider;
+  }
+
+  // ---- migration
+  Future<void> performMigrationIfNeeded() async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentVersion = prefs.getInt('version') ?? 1;
+    switch (currentVersion) {
+      case 1:
+        await migrateV1ToV2();
+        break;
+      case 2:
+        // If the version is not set (new installation) or already 2, we do not need to migrate
+        return;
+      default:
+        throw Exception('Unknown version: $currentVersion');
+    }
+
+    // Update version
+    await prefs.setInt('version', 2);
+  }
+
+  Future<void> migrateV1ToV2() async {
+    print("Migrating from v1 to v2");
+    final feedCount = await isar.feeds.count();
+
+    // We paginate through the feeds to avoid loading all users into memory at once
+    for (var i = 0; i < feedCount; i += 50) {
+      final feeds = await isar.feeds.where().offset(i).limit(50).findAll();
+      await isar.writeTxn(() async {
+        await isar.feeds.putAll(feeds);
+      });
+    }
+
+    final feedGroupCount = await isar.feedGroups.count();
+    for (var i = 0; i < feedGroupCount; i += 50) {
+      final feedGroups = await isar.feedGroups.where().offset(i).limit(50).findAll();
+      await isar.writeTxn(() async {
+        await isar.feedGroups.putAll(feedGroups);
+      });
+    }
+
+    final feedItemsCount = await isar.feedItems.count();
+    for (var i = 0; i < feedItemsCount; i += 50) {
+      final feedItems = await isar.feedItems.where().offset(i).limit(50).findAll();
+      await isar.writeTxn(() async {
+        await isar.feedItems.putAll(feedItems);
+      });
+    }
   }
 }

@@ -31,8 +31,13 @@ const FeedSchema = CollectionSchema(
     r'isPinned': PropertySchema(id: 3, name: r'isPinned', type: IsarType.bool),
     r'link': PropertySchema(id: 4, name: r'link', type: IsarType.string),
     r'name': PropertySchema(id: 5, name: r'name', type: IsarType.string),
-    r'pinnedPosition': PropertySchema(
+    r'notifyAfterBgSync': PropertySchema(
       id: 6,
+      name: r'notifyAfterBgSync',
+      type: IsarType.bool,
+    ),
+    r'pinnedPosition': PropertySchema(
+      id: 7,
       name: r'pinnedPosition',
       type: IsarType.long,
     ),
@@ -84,7 +89,8 @@ void _feedSerialize(
   writer.writeBool(offsets[3], object.isPinned);
   writer.writeString(offsets[4], object.link);
   writer.writeString(offsets[5], object.name);
-  writer.writeLong(offsets[6], object.pinnedPosition);
+  writer.writeBool(offsets[6], object.notifyAfterBgSync);
+  writer.writeLong(offsets[7], object.pinnedPosition);
 }
 
 Feed _feedDeserialize(
@@ -102,7 +108,8 @@ Feed _feedDeserialize(
   object.categories = reader.readStringList(offsets[1]) ?? [];
   object.id = id;
   object.isPinned = reader.readBool(offsets[3]);
-  object.pinnedPosition = reader.readLong(offsets[6]);
+  object.notifyAfterBgSync = reader.readBool(offsets[6]);
+  object.pinnedPosition = reader.readLong(offsets[7]);
   return object;
 }
 
@@ -126,6 +133,8 @@ P _feedDeserializeProp<P>(
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
+      return (reader.readBool(offset)) as P;
+    case 7:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -987,6 +996,16 @@ extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> notifyAfterBgSyncEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'notifyAfterBgSync', value: value),
+      );
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterFilterCondition> pinnedPositionEqualTo(
     int value,
   ) {
@@ -1112,6 +1131,18 @@ extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByNotifyAfterBgSync() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyAfterBgSync', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByNotifyAfterBgSyncDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyAfterBgSync', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> sortByPinnedPosition() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'pinnedPosition', Sort.asc);
@@ -1198,6 +1229,18 @@ extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByNotifyAfterBgSync() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyAfterBgSync', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByNotifyAfterBgSyncDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notifyAfterBgSync', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> thenByPinnedPosition() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'pinnedPosition', Sort.asc);
@@ -1254,6 +1297,12 @@ extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
     });
   }
 
+  QueryBuilder<Feed, Feed, QDistinct> distinctByNotifyAfterBgSync() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'notifyAfterBgSync');
+    });
+  }
+
   QueryBuilder<Feed, Feed, QDistinct> distinctByPinnedPosition() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'pinnedPosition');
@@ -1301,6 +1350,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
   QueryBuilder<Feed, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Feed, bool, QQueryOperations> notifyAfterBgSyncProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'notifyAfterBgSync');
     });
   }
 

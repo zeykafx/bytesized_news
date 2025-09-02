@@ -3,6 +3,8 @@ import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/curated_feeds/curated_feeds_store.dart';
 import 'package:bytesized_news/views/feed_view/widgets/add_feed.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -21,10 +23,12 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
   CuratedFeedsStore curatedFeedsStore = CuratedFeedsStore();
 
   late AuthStore authStore;
+  late SettingsStore settingsStore;
 
   @override
   void initState() {
     authStore = context.read<AuthStore>();
+    settingsStore = context.read<SettingsStore>();
     curatedFeedsStore.readCuratedFeeds(widget.context, authStore);
     super.initState();
   }
@@ -69,7 +73,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                     label: Text('${curatedFeedsStore.selectedFeeds.length}'),
                     child: IconButton.filled(
                       onPressed: () {
-                        _showFollowConfirmation(context);
+                        showFollowConfirmation(context);
                       },
                       icon: const Icon(Icons.add),
                       style: IconButton.styleFrom(
@@ -82,72 +86,79 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
               const SizedBox(width: 8),
             ],
           ),
-          body: _buildBody(context, theme, colorScheme),
-          floatingActionButton: _buildFloatingActionButton(context, colorScheme),
+          body: buildBody(context, theme, colorScheme),
+          floatingActionButton: buildFloatingActionButton(context, colorScheme),
         );
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget buildBody(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     if (curatedFeedsStore.loading) {
-      return _buildLoadingState();
+      return buildLoadingState();
     }
 
     if (curatedFeedsStore.curatedCategories.isEmpty) {
-      return _buildEmptyState(colorScheme);
+      return buildEmptyState(colorScheme);
     }
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Discover curated news sources',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: settingsStore.maxWidth,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Discover curated news sources',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Choose feeds and/or categories to follow',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Choose feeds and/or categories to follow',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+        
+            SliverToBoxAdapter(
+              child: buildAddFeedCard(colorScheme, theme),
+            ),
+        
+            // LIST OF CARDS
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final category = curatedFeedsStore.curatedCategories[index];
+                  return buildCategoryCard(context, category, theme, colorScheme);
+                },
+                childCount: curatedFeedsStore.curatedCategories.length,
+              ),
+            ),
+            // bottom padding
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 40),
+            ),
+          ],
         ),
-
-        SliverToBoxAdapter(
-          child: _buildAddFeedCard(colorScheme, theme),
-        ),
-
-        // LIST OF CARDS
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final category = curatedFeedsStore.curatedCategories[index];
-              return _buildCategoryCard(context, category, theme, colorScheme);
-            },
-            childCount: curatedFeedsStore.curatedCategories.length,
-          ),
-        ),
-        // bottom padding
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 40),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildAddFeedCard(ColorScheme colorScheme, ThemeData theme) {
+  Widget buildAddFeedCard(ColorScheme colorScheme, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       child: Card(
@@ -205,7 +216,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget buildLoadingState() {
     return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -224,7 +235,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  Widget _buildEmptyState(ColorScheme colorScheme) {
+  Widget buildEmptyState(ColorScheme colorScheme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -248,7 +259,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, CuratedFeedCategory category, ThemeData theme, ColorScheme colorScheme) {
+  Widget buildCategoryCard(BuildContext context, CuratedFeedCategory category, ThemeData theme, ColorScheme colorScheme) {
     final isSelected = curatedFeedsStore.isCategorySelected(category);
 
     return Container(
@@ -330,7 +341,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                 ),
               ),
               child: Column(
-                children: category.curatedFeeds.map((feed) => _buildFeedTile(feed, category.name, theme, colorScheme)).toList(),
+                children: category.curatedFeeds.map((feed) => buildFeedTile(feed, category.name, theme, colorScheme)).toList(),
               ),
             ),
           ],
@@ -339,7 +350,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  Widget _buildFeedTile(CuratedFeed feed, String categoryName, ThemeData theme, ColorScheme colorScheme) {
+  Widget buildFeedTile(CuratedFeed feed, String categoryName, ThemeData theme, ColorScheme colorScheme) {
     final isSelected = curatedFeedsStore.isFeedSelected(feed);
     final category = curatedFeedsStore.curatedCategories.firstWhere((cat) => cat.name == categoryName);
 
@@ -420,14 +431,14 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  Widget? _buildFloatingActionButton(BuildContext context, ColorScheme colorScheme) {
+  Widget? buildFloatingActionButton(BuildContext context, ColorScheme colorScheme) {
     final totalSelected = curatedFeedsStore.selectedFeeds.length;
 
     if (totalSelected == 0) return null;
 
     return FloatingActionButton.extended(
       onPressed: () {
-        _showFollowConfirmation(context);
+        showFollowConfirmation(context);
       },
       icon: const Icon(Icons.add),
       label: Text('Follow ($totalSelected)'),
@@ -436,7 +447,7 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
     );
   }
 
-  void _showFollowConfirmation(BuildContext context) {
+  void showFollowConfirmation(BuildContext context) {
     final selectedFeedsCount = curatedFeedsStore.selectedFeeds.length;
     final selectedCategoriesCount = curatedFeedsStore.selectedCategories.length;
 

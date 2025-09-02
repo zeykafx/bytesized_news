@@ -20,6 +20,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
@@ -115,13 +116,7 @@ void main() async {
     AiProviderSchema,
   ], directory: dir.path);
 
-  // Seed default AI providers if none exist
-  final dbUtils = DbUtils(isar: isar);
-
   final AuthStore authStore = AuthStore();
-  await authStore.init(null);
-  
-  dbUtils.seedDefaultAiProvidersIfEmpty();
 
   if (settingsStore.sortFeedName != null) {
     settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();
@@ -201,7 +196,16 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
+
     user = auth.currentUser;
+
+    // Seed default AI providers if none exist
+    final dbUtils = DbUtils(isar: Isar.getInstance()!);
+    dbUtils.performMigrationIfNeeded();
+
+    dbUtils.seedDefaultAiProvidersIfEmpty();
+    // init the notification plugin if the user wants to be notified for even just one feed
+    initNotifications(dbUtils);
   }
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
@@ -243,6 +247,25 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         textTheme: fontFamilyToTextTheme(settingsStore.appFontFamily, baseTheme.textTheme),
       );
+    }
+  }
+
+  Future<void> initNotifications(DbUtils dbUtils) async {
+    List<Feed> feeds = await dbUtils.getFeeds();
+    if (feeds.any((feed) => feed.notifyAfterBgSync)) {
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+      // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+      const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('icon');
+      final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings();
+      final InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+        macOS: null,
+        linux: null,
+        windows: null,
+      );
+      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
     }
   }
 

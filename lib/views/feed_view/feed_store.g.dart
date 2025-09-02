@@ -728,6 +728,18 @@ mixin _$FeedStore on _FeedStore, Store {
   );
 
   @override
+  void sendAlert(String message) {
+    final _$actionInfo = _$_FeedStoreActionController.startAction(
+      name: '_FeedStore.sendAlert',
+    );
+    try {
+      return super.sendAlert(message);
+    } finally {
+      _$_FeedStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void onBsbChanged() {
     final _$actionInfo = _$_FeedStoreActionController.startAction(
       name: '_FeedStore.onBsbChanged',

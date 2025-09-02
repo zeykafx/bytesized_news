@@ -32,7 +32,7 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
 
     // animate to the page containing the selected color
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (settingsStore.colorSeedIndex >= 0 && settingsStore.useDynamicColor) {
+      if (settingsStore.colorSeedIndex >= 0 && !settingsStore.useDynamicColor) {
         int targetPage = settingsStore.colorSeedIndex ~/ 4;
         if (targetPage < tabController.length) {
           pageController.animateToPage(

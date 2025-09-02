@@ -14,9 +14,10 @@ class Feed {
   late String iconUrl;
 
   bool isPinned = false;
+  
   int pinnedPosition = -1;
   int articlesRead = 0;
-
+  bool notifyAfterBgSync = false;
   List<String> categories = [];
 
   Feed(this.name, this.link, this.iconUrl);
@@ -82,6 +83,7 @@ class Feed {
       'link': link,
       'iconUrl': iconUrl,
       'isPinned': isPinned,
+      'notifyAfterBgSync': notifyAfterBgSync,
       'pinnedPosition': pinnedPosition,
       'articlesRead': articlesRead,
       "categories": categories,
@@ -95,6 +97,7 @@ class Feed {
       link = json['link'],
       iconUrl = json['iconUrl'],
       isPinned = json['isPinned'],
+      notifyAfterBgSync = json['notifyAfterBgSync'] ?? false,
       pinnedPosition = json['pinnedPosition'],
       articlesRead = json["articlesRead"],
       categories = List.from(json["categories"]);

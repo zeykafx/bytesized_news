@@ -32,7 +32,7 @@ class DbIsolateCleaner {
         .where()
         .filter()
         .bookmarkedEqualTo(false) // don't delete bookmarked items
-        .readEqualTo(false) // don't delete read items
+        // .readEqualTo(false) // don't delete read items
         .timeFetchedLessThan(DateTime.now().subtract(Duration(days: days)))
         .findAll();
 

@@ -1,7 +1,6 @@
+import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_manager/feed_manager_store.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../models/feed/feed.dart';
 
 class EditFeed extends StatefulWidget {
   final FeedManagerStore feedManagerStore;
@@ -37,84 +36,90 @@ class _EditFeedState extends State<EditFeed> {
       body: Center(
         child: Container(
           constraints: BoxConstraints(maxWidth: feedManagerStore.feedStore.settingsStore.maxWidth),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
+          child: Card.filled(
+            color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
+            margin: const EdgeInsets.all(12.0),
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 20,
+                        children: [
+                          Text(
+                            "Edit ${widget.feed.name}",
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Theme.of(context).colorScheme.primary),
+                          ),
+                          TextField(
                             controller: feedNameController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Feed Name",
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 5.0),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
+
+                          TextField(
                             controller: feedLinkController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Feed Link",
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // floating button bar at the bottom of the screen
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 70, left: 20, right: 20, top: 10),
-                    child: Card.outlined(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // SAVE CHANGES
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () async {
-                                if (feedNameController.text.isEmpty || feedLinkController.text.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Feed Name or Feed Link cannot be empty"),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                widget.feed.name = feedNameController.text;
-                                widget.feed.link = feedLinkController.text;
-
-                                // used as an update method for the feed group in the db
-                                await feedManagerStore.dbUtils.addFeed(widget.feed);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Successfully updated Feed!"),
-                                  ),
-                                );
-                                Navigator.of(context).pop();
-                              },
-                              icon: const Icon(Icons.save_outlined),
-                              label: const Text("Save Changes"),
-                            ),
-                          ),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ],
+
+                  // floating button bar at the bottom of the screen
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Card.outlined(
+                        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            // SAVE CHANGES
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: () async {
+                                  if (feedNameController.text.isEmpty || feedLinkController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Feed Name or Feed Link cannot be empty"),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  widget.feed.name = feedNameController.text;
+                                  widget.feed.link = feedLinkController.text;
+
+                                  // used as an update method for the feed group in the db
+                                  await feedManagerStore.dbUtils.addFeed(widget.feed);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Successfully updated Feed!"),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop();
+                                },
+                                icon: const Icon(Icons.save_outlined),
+                                label: const Text("Save Changes"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

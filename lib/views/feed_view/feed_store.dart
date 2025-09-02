@@ -115,6 +115,12 @@ abstract class _FeedStore with Store {
   String alertMessage = "";
 
   @action
+  void sendAlert(String message) {
+    hasAlert = true;
+    alertMessage = message;
+  }
+
+  @action
   Future<bool> init({required SettingsStore setStore, required AuthStore authStore}) async {
     settingsStore = setStore;
     this.authStore = authStore;

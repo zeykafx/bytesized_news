@@ -1,4 +1,5 @@
 import 'package:bytesized_news/main.dart' show taskName;
+import 'package:bytesized_news/views/settings/setting_pages/general/notification_settings_page.dart';
 
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/settings/shared/settings_section.dart';
@@ -46,7 +47,7 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
     return Observer(
       builder: (context) {
         return SettingsSection(
-          title: "Background Sync",
+          title: "Background Synchronization",
           onlySection: false,
           children: [
             // background sync interval
@@ -81,6 +82,18 @@ class _BackgroundSyncSectionState extends State<BackgroundSyncSection> {
               onChanged: (value) {
                 settingsStore.requireDeviceIdleForBgFetch = value;
                 updateBackgroundTask();
+              },
+            ),
+
+            ListTile(
+              title: const Text("Notification after background synchronization"),
+              trailing: const Icon(Icons.open_in_new_rounded),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NotificationSettingsPage(),
+                  ),
+                );
               },
             ),
           ],

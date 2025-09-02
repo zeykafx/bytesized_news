@@ -127,7 +127,7 @@ class _FeedManagerState extends State<FeedManager> {
                                               await feedStore.getItems();
                                             });
                                       },
-                                      label: const Text("Add Feed"),
+                                      label: const Text("Add Source"),
                                       icon: const Icon(LucideIcons.rss),
                                     ),
                                   ),
@@ -301,10 +301,6 @@ class _FeedManagerState extends State<FeedManager> {
                               children: [
                                 // FeedGroups
                                 GridView.builder(
-                                  // crossAxisCount: 2,
-                                  // childAspectRatio: mediaQuery.size.width > 700 ? 6 : 3,
-                                  // mainAxisSpacing: 3,
-                                  // crossAxisSpacing: 3,
                                   itemCount: feedStore.feedGroups.length,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -331,11 +327,6 @@ class _FeedManagerState extends State<FeedManager> {
                                   },
                                 ),
 
-                                // const SizedBox(
-                                //   height: 5,
-                                // ),
-
-                                // TODO: use animated fractionally sized thingy
                                 GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),

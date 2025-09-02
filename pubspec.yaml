@@ -93,6 +93,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   isar_community: ^3.2.0-dev.2
   isar_community_flutter_libs: ^3.2.0-dev.2
+  flutter_local_notifications: ^19.4.1
 
 dev_dependencies:
   flutter_test:
