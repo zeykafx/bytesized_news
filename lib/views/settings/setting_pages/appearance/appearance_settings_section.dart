@@ -29,6 +29,24 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
     authStore = context.read<AuthStore>();
     tabController = TabController(length: (colorSeeds.length + 3) ~/ 4, vsync: this);
     pageController = PageController();
+
+    // animate to the page containing the selected color
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (settingsStore.colorSeedIndex >= 0 && settingsStore.useDynamicColor) {
+        int targetPage = settingsStore.colorSeedIndex ~/ 4;
+        if (targetPage < tabController.length) {
+          pageController.animateToPage(
+            targetPage,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut,
+          );
+          tabController.index = targetPage;
+          setState(() {
+            currentIndex = targetPage;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -123,7 +141,7 @@ class _AppearanceSettingsSectionState extends State<AppearanceSettingsSection> w
                 ),
               ),
             ),
-            
+
             // Font
             ListTile(
               title: Text("App Font"),

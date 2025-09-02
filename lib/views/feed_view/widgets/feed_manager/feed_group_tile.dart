@@ -47,19 +47,19 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (context) {
-      return Card.filled(
-        color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
-        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        clipBehavior: Clip.hardEdge,
-        child: Center(
+    return Observer(
+      builder: (context) {
+        return Card.filled(
+          color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
+          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          clipBehavior: Clip.hardEdge,
           child: ListTile(
+            dense: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             visualDensity: VisualDensity.compact,
-            dense: true,
             leading: widget.feedGroup.feeds.isEmpty
                 ? const Icon(
                     LucideIcons.folder,
@@ -68,7 +68,9 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ...widget.feedGroup.feeds.take(2).map(
+                      ...widget.feedGroup.feeds
+                          .take(2)
+                          .map(
                             (feed) => Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
@@ -123,19 +125,19 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
               if (!selectionMode) {
                 Navigator.of(context)
                     .push(
-                  MaterialPageRoute(
-                    builder: (context) => EditFeedGroup(
-                      feedGroup: widget.feedGroup,
-                      feedManagerStore: feedManagerStore,
-                    ),
-                  ),
-                )
+                      MaterialPageRoute(
+                        builder: (context) => EditFeedGroup(
+                          feedGroup: widget.feedGroup,
+                          feedManagerStore: feedManagerStore,
+                        ),
+                      ),
+                    )
                     .then((_) async {
-                  await widget.wrappedGetFeedGroups();
-                  await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                      await widget.wrappedGetFeedGroups();
+                      await widget.wrappedGetPinnedFeedsOrFeedGroups();
 
-                  setState(() {});
-                });
+                      setState(() {});
+                    });
               }
             },
             trailing: Row(
@@ -243,25 +245,26 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                           } else if (value == "edit") {
                             Navigator.of(context)
                                 .push(
-                              MaterialPageRoute(
-                                builder: (context) => EditFeedGroup(
-                                  feedGroup: widget.feedGroup,
-                                  feedManagerStore: feedManagerStore,
-                                ),
-                              ),
-                            )
+                                  MaterialPageRoute(
+                                    builder: (context) => EditFeedGroup(
+                                      feedGroup: widget.feedGroup,
+                                      feedManagerStore: feedManagerStore,
+                                    ),
+                                  ),
+                                )
                                 .then((_) async {
-                              await widget.wrappedGetFeedGroups();
-                              await widget.wrappedGetPinnedFeedsOrFeedGroups();
+                                  await widget.wrappedGetFeedGroups();
+                                  await widget.wrappedGetPinnedFeedsOrFeedGroups();
 
-                              setState(() {});
-                            });
+                                  setState(() {});
+                                });
                           } else if (value == "add_feeds") {
                             showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  List<Feed> selectedFeeds = [];
-                                  return StatefulBuilder(builder: (context, Function dialogSetState) {
+                              context: context,
+                              builder: (BuildContext context) {
+                                List<Feed> selectedFeeds = [];
+                                return StatefulBuilder(
+                                  builder: (context, Function dialogSetState) {
                                     return AlertDialog(
                                       title: const Text("Add Feeds to this Feed Group"),
                                       content: SingleChildScrollView(
@@ -300,7 +303,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                                       ),
                                                     )
                                                   : const SizedBox(),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -322,8 +325,10 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                         ),
                                       ],
                                     );
-                                  });
-                                }).then((_) {});
+                                  },
+                                );
+                              },
+                            ).then((_) {});
                           } else if (value == "delete") {
                             // show dialog to confirm deletion
                             showDialog(
@@ -331,24 +336,27 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: const Text("Confirm Delete?"),
-                                  content: Observer(builder: (context) {
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ListTile(
-                                          title: const Text("Are you sure you want to delete the selected item?"),
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        SwitchListTile(
+                                  content: Observer(
+                                    builder: (context) {
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                            title: const Text("Are you sure you want to delete the selected item?"),
+                                            contentPadding: EdgeInsets.zero,
+                                          ),
+                                          SwitchListTile(
                                             value: feedManagerStore.deleteFeedsFromFeedGroups,
                                             onChanged: (val) {
                                               feedManagerStore.deleteFeedsFromFeedGroups = val;
                                             },
                                             contentPadding: EdgeInsets.zero,
-                                            title: const Text("Delete feeds from feed group")),
-                                      ],
-                                    );
-                                  }),
+                                            title: const Text("Delete feeds from feed group"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -368,7 +376,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text("Delete"),
-                                    )
+                                    ),
                                   ],
                                 );
                               },
@@ -384,13 +392,13 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                       : const Icon(Icons.circle_outlined),
                 ),
                 if (widget.isInPinnedList) ...[
-                  ReorderableDragStartListener(index: feedStore.pinnedFeedsOrFeedGroups.indexOf(widget.feedGroup), child: Icon(Icons.drag_indicator))
+                  ReorderableDragStartListener(index: feedStore.pinnedFeedsOrFeedGroups.indexOf(widget.feedGroup), child: Icon(Icons.drag_indicator)),
                 ],
               ],
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }

@@ -115,12 +115,6 @@ class _FeedManagerState extends State<FeedManager> {
                                       onPressed: () {
                                         Navigator.of(context)
                                             .push(
-                                              // MaterialPageRoute(
-                                              //   builder: (context) => AddFeed(
-                                              //     getFeeds: widget.wrappedGetFeeds,
-                                              //     getItems: widget.wrappedGetItems,
-                                              //   ),
-                                              // ),
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     CuratedFeedsView(context: context, getFeeds: widget.wrappedGetFeeds, getItems: widget.wrappedGetItems),
@@ -306,27 +300,35 @@ class _FeedManagerState extends State<FeedManager> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 // FeedGroups
-                                GridView.count(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: mediaQuery.size.width > 700 ? 6 : 3,
-                                  mainAxisSpacing: 3,
-                                  crossAxisSpacing: 3,
+                                GridView.builder(
+                                  // crossAxisCount: 2,
+                                  // childAspectRatio: mediaQuery.size.width > 700 ? 6 : 3,
+                                  // mainAxisSpacing: 3,
+                                  // crossAxisSpacing: 3,
+                                  itemCount: feedStore.feedGroups.length,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  children: [
-                                    ...feedStore.feedGroups.map((FeedGroup feedGroup) {
-                                      return FeedGroupTile(
-                                        feedManagerStore: feedManagerStore,
-                                        feedStore: feedStore,
-                                        feedGroup: feedGroup,
-                                        wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
-                                        wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
-                                        wrappedGetFeeds: widget.wrappedGetFeeds,
-                                        updateParentState: updateState,
-                                        isInPinnedList: false,
-                                      );
-                                    }),
-                                  ],
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: feedManagerStore.isList ? 1 : 2,
+                                    mainAxisExtent: 60,
+                                  ),
+                                  itemBuilder: (_, index) {
+                                    FeedGroup feedGroup = feedStore.feedGroups[index];
+                                    return FeedGroupTile(
+                                          feedManagerStore: feedManagerStore,
+                                          feedStore: feedStore,
+                                          feedGroup: feedGroup,
+                                          wrappedGetPinnedFeedsOrFeedGroups: widget.wrappedGetPinnedFeedsOrFeedGroups,
+                                          wrappedGetFeedGroups: widget.wrappedGetFeedGroups,
+                                          wrappedGetFeeds: widget.wrappedGetFeeds,
+                                          updateParentState: updateState,
+                                          isInPinnedList: false,
+                                        )
+                                        .animate(value: feedManagerStore.isList ? 1 : 0)
+                                        .fade(curve: Curves.easeInOutQuad)
+                                        .animate(value: feedManagerStore.isList ? 0 : 1)
+                                        .fade(curve: Curves.easeInOutQuad);
+                                  },
                                 ),
 
                                 // const SizedBox(

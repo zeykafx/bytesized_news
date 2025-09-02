@@ -458,12 +458,12 @@ abstract class _FeedStore with Store {
 
   @action
   Future<void> createNewsSuggestion() async {
-    if (authStore.userTier != Tier.premium) {
-      if (kDebugMode) {
-        print("Cannot fetch news suggestions, not premium");
-      }
-      return;
-    }
+    // if (authStore.userTier != Tier.premium) {
+    //   if (kDebugMode) {
+    //     print("Cannot fetch news suggestions, not premium");
+    //   }
+    //   return;
+    // }
     if (settingsStore.sort != FeedListSort.byDate) {
       return;
     }

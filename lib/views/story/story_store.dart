@@ -207,7 +207,7 @@ abstract class _StoryStore with Store {
       await compareReaderModeLengthToPageHtml(context);
     } else {
       htmlContent = feedItem.htmlContent ?? "No Content";
-      await compareReaderModeLengthToPageHtml(context);
+      // await compareReaderModeLengthToPageHtml(context);
     }
 
     checkPaywallOrBotBlock();
@@ -219,7 +219,7 @@ abstract class _StoryStore with Store {
 
     detectHackerNews();
 
-    _registerLifecycleCallbacks();
+    registerLifecycleCallbacks();
 
     initialized = true;
   }
@@ -800,7 +800,7 @@ abstract class _StoryStore with Store {
     }
   }
 
-  void _registerLifecycleCallbacks() {
+  void registerLifecycleCallbacks() {
     lifecycleEventHandler.addBackgroundCallback(handleAppPaused);
     lifecycleEventHandler.addForegroundCallback(handleAppResumed);
   }

@@ -55,7 +55,7 @@ void main() async {
   Animate.restartOnHotReload;
 
   Workmanager().initialize(
-    callbackDispatcher, // The top level function, aka callbackDispatcher
+    callbackDispatcher,
   );
 
   // NOTE: this init code is largely from https://github.com/tommyxchow/frosty/blob/main/lib/main.dart
@@ -117,10 +117,11 @@ void main() async {
 
   // Seed default AI providers if none exist
   final dbUtils = DbUtils(isar: isar);
-  await dbUtils.seedDefaultAiProvidersIfEmpty();
 
   final AuthStore authStore = AuthStore();
   await authStore.init(null);
+  
+  dbUtils.seedDefaultAiProvidersIfEmpty();
 
   if (settingsStore.sortFeedName != null) {
     settingsStore.sortFeed = await isar.feeds.where().filter().nameEqualTo(settingsStore.sortFeedName!).findFirst();

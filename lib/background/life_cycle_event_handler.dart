@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 final lifecycleEventHandler = LifecycleEventHandler();
 
 class LifecycleEventHandler extends WidgetsBindingObserver {
-  var inBackground = true;
+  var inBackground = false;
 
   // callback system for components that need lifecycle notifications
   final List<VoidCallback> backgroundCallbacks = [];
