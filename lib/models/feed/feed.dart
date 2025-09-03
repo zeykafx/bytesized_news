@@ -85,6 +85,7 @@ class Feed {
       'iconUrl': iconUrl,
       'isPinned': isPinned,
       'notifyAfterBgSync': notifyAfterBgSync,
+      "alwaysOpenInWebview": alwaysOpenInWebview,
       'pinnedPosition': pinnedPosition,
       'articlesRead': articlesRead,
       "categories": categories,
@@ -99,6 +100,7 @@ class Feed {
       iconUrl = json['iconUrl'],
       isPinned = json['isPinned'],
       notifyAfterBgSync = json['notifyAfterBgSync'] ?? false,
+      alwaysOpenInWebview = json["alwaysOpenInWebview"] ?? false,
       pinnedPosition = json['pinnedPosition'],
       articlesRead = json["articlesRead"],
       categories = List.from(json["categories"]);

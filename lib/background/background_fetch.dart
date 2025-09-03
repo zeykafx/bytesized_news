@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-
-import 'package:bytesized_news/background/life_cycle_event_handler.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
@@ -10,6 +8,8 @@ import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
@@ -19,12 +19,12 @@ import 'package:rss_dart/domain/rss_item.dart';
 
 class BackgroundFetch {
   static Future<bool> runBackgroundFetch() async {
-    if (!lifecycleEventHandler.inBackground) {
-      if (kDebugMode) {
-        print("The app is also running in the foreground, bg worker stopping.");
-      }
-      return true;
-    }
+    // if (!lifecycleEventHandler.inBackground) {
+    //   if (kDebugMode) {
+    //     print("The app is also running in the foreground, bg worker stopping.");
+    //   }
+    //   return true;
+    // }
 
     if (kDebugMode) {
       print("BG Worker starting");
@@ -109,7 +109,25 @@ class BackgroundFetch {
         }
       }
 
-      if (feed.notifyAfterBgSync && flutterLocalNotificationsPlugin != null && Platform.isAndroid) {
+      items.addAll(itemsForFeed);
+    }
+
+    List<FeedItem> newItems = await dbUtils.addNewItems(items);
+    Map<Feed, List<FeedItem>> itemsForFeeds = {};
+
+    // group new items by feed
+    for (FeedItem item in newItems) {
+      if (!itemsForFeeds.containsKey(item.feed) && item.feed != null) {
+        itemsForFeeds[item.feed!] = [];
+      }
+      itemsForFeeds[item.feed]!.add(item);
+    }
+
+    for (MapEntry<Feed, List<FeedItem>> entry in itemsForFeeds.entries) {
+      Feed feed = entry.key;
+      List<FeedItem> itemsForFeed = entry.value;
+
+      if (feed.notifyAfterBgSync && flutterLocalNotificationsPlugin != null && Platform.isAndroid && itemsForFeed.isNotEmpty) {
         const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
           'Bytesized News',
           'Background Synchronization',
@@ -120,19 +138,44 @@ class BackgroundFetch {
         );
         const NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
 
-        if (itemsForFeed.isNotEmpty) {
-          int lengthOrThree = max(3, itemsForFeed.length);
-          String top3 = itemsForFeed.take(lengthOrThree).map((FeedItem feedItem) => feedItem.title).join('", "');
-          int len = itemsForFeed.length - lengthOrThree;
+        int lengthOrThree = min(3, itemsForFeed.length);
+        String top3 = itemsForFeed
+            .take(lengthOrThree)
+            .map((FeedItem feedItem) {
+              dom.Document doc = parse(feedItem.title);
+              String parsedTitle = parse(doc.body!.text).documentElement!.text;
+              return parsedTitle;
+            })
+            .join('", "');
+        int len = itemsForFeed.length - lengthOrThree;
 
-          await flutterLocalNotificationsPlugin.show(feed.id, 'Bytesized News', 'New articles: "$top3" ${len > 0 ? 'and $len more' : ''}', notificationDetails);
-        }
+        await flutterLocalNotificationsPlugin.show(
+          feed.id,
+          'Bytesized News - ${feed.name}',
+          'New articles: "$top3" ${len > 0 ? 'and $len more' : ''}',
+          notificationDetails,
+        );
       }
-      items.addAll(itemsForFeed);
     }
+    // if (feed.notifyAfterBgSync && flutterLocalNotificationsPlugin != null && Platform.isAndroid) {
+    //   const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+    //     'Bytesized News',
+    //     'Background Synchronization',
+    //     channelDescription: 'Notification about new articles for select feeds',
+    //     importance: Importance.low,
+    //     priority: Priority.low,
+    //     enableVibration: false,
+    //   );
+    //   const NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
 
-    await dbUtils.addNewItems(items);
+    //   if (itemsForFeed.isNotEmpty) {
+    //     int lengthOrThree = min(3, itemsForFeed.length);
+    //     String top3 = itemsForFeed.take(lengthOrThree).map((FeedItem feedItem) => feedItem.title).join('", "');
+    //     int len = itemsForFeed.length - lengthOrThree;
 
+    //     await flutterLocalNotificationsPlugin.show(feed.id, 'Bytesized News', 'New articles: "$top3" ${len > 0 ? 'and $len more' : ''}', notificationDetails);
+    //   }
+    // }
     return true;
   }
 }

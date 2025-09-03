@@ -257,6 +257,60 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     });
   }
 
+  late final _$pageAtom = Atom(
+    name: '_ReadingStatisticsStore.page',
+    context: context,
+  );
+
+  @override
+  int get page {
+    _$pageAtom.reportRead();
+    return super.page;
+  }
+
+  @override
+  set page(int value) {
+    _$pageAtom.reportWrite(value, super.page, () {
+      super.page = value;
+    });
+  }
+
+  late final _$isLoadingMoreAtom = Atom(
+    name: '_ReadingStatisticsStore.isLoadingMore',
+    context: context,
+  );
+
+  @override
+  bool get isLoadingMore {
+    _$isLoadingMoreAtom.reportRead();
+    return super.isLoadingMore;
+  }
+
+  @override
+  set isLoadingMore(bool value) {
+    _$isLoadingMoreAtom.reportWrite(value, super.isLoadingMore, () {
+      super.isLoadingMore = value;
+    });
+  }
+
+  late final _$hasMoreAtom = Atom(
+    name: '_ReadingStatisticsStore.hasMore',
+    context: context,
+  );
+
+  @override
+  bool get hasMore {
+    _$hasMoreAtom.reportRead();
+    return super.hasMore;
+  }
+
+  @override
+  set hasMore(bool value) {
+    _$hasMoreAtom.reportWrite(value, super.hasMore, () {
+      super.hasMore = value;
+    });
+  }
+
   late final _$getReadingStatisticsAsyncAction = AsyncAction(
     '_ReadingStatisticsStore.getReadingStatistics',
     context: context,
@@ -269,6 +323,16 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     );
   }
 
+  late final _$fetchMoreReadingsAsyncAction = AsyncAction(
+    '_ReadingStatisticsStore.fetchMoreReadings',
+    context: context,
+  );
+
+  @override
+  Future<void> fetchMoreReadings() {
+    return _$fetchMoreReadingsAsyncAction.run(() => super.fetchMoreReadings());
+  }
+
   late final _$sortButtonOnChangedAsyncAction = AsyncAction(
     '_ReadingStatisticsStore.sortButtonOnChanged',
     context: context,
@@ -279,6 +343,26 @@ mixin _$ReadingStatisticsStore on _ReadingStatisticsStore, Store {
     return _$sortButtonOnChangedAsyncAction.run(
       () => super.sortButtonOnChanged(item),
     );
+  }
+
+  late final _$deleteReadingAsyncAction = AsyncAction(
+    '_ReadingStatisticsStore.deleteReading',
+    context: context,
+  );
+
+  @override
+  Future<void> deleteReading(StoryReading reading) {
+    return _$deleteReadingAsyncAction.run(() => super.deleteReading(reading));
+  }
+
+  late final _$updateReadingAsyncAction = AsyncAction(
+    '_ReadingStatisticsStore.updateReading',
+    context: context,
+  );
+
+  @override
+  Future<void> updateReading(StoryReading reading) {
+    return _$updateReadingAsyncAction.run(() => super.updateReading(reading));
   }
 
   late final _$_ReadingStatisticsStoreActionController = ActionController(
@@ -325,7 +409,10 @@ mostReadDay: ${mostReadDay},
 mostReadDayCount: ${mostReadDayCount},
 allArticlesRead: ${allArticlesRead},
 showScrollToTop: ${showScrollToTop},
-scrollController: ${scrollController}
+scrollController: ${scrollController},
+page: ${page},
+isLoadingMore: ${isLoadingMore},
+hasMore: ${hasMore}
     ''';
   }
 }

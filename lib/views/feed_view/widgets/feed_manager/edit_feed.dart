@@ -70,6 +70,20 @@ class _EditFeedState extends State<EditFeed> {
                               labelText: "Feed Link",
                             ),
                           ),
+
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text("Always open in webview"),
+                            subtitle: const Text(
+                              "When enabled, the story reader will not attempt to parse and simplify the webpage, it will directly open the webview",
+                            ),
+                            value: widget.feed.alwaysOpenInWebview,
+                            onChanged: (value) {
+                              setState(() {
+                                widget.feed.alwaysOpenInWebview = value;
+                              });
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -102,6 +116,7 @@ class _EditFeedState extends State<EditFeed> {
 
                                   // used as an update method for the feed group in the db
                                   await feedManagerStore.dbUtils.addFeed(widget.feed);
+                                  await feedManagerStore.feedSync.updateFirestoreFeeds();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text("Successfully updated Feed!"),

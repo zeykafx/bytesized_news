@@ -21,7 +21,7 @@ class SummaryCard extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        if (storyStore.authStore.userTier != Tier.premium) {
+        if (!storyStore.settingsStore.enableCustomAiProvider && storyStore.authStore.userTier != Tier.premium) {
           return SizedBox.shrink();
         }
 
@@ -114,7 +114,7 @@ class SummaryCard extends StatelessWidget {
         child: ExpansionTile(
           enableFeedback: true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
           ),

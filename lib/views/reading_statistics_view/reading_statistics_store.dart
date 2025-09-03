@@ -48,6 +48,17 @@ abstract class _ReadingStatisticsStore with Store {
   @observable
   ScrollController scrollController = ScrollController();
 
+  @observable
+  int page = 0;
+
+  @observable
+  bool isLoadingMore = false;
+
+  @observable
+  bool hasMore = true;
+
+  final int pageSize = 20;
+
   @action
   void init(DbUtils dbUtils, SettingsStore settingsStore) {
     this.dbUtils = dbUtils;
@@ -60,12 +71,20 @@ abstract class _ReadingStatisticsStore with Store {
       } else if (scrollController.offset < 400 && showScrollToTop) {
         showScrollToTop = false;
       }
+
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        fetchMoreReadings();
+      }
     });
   }
 
   @action
   Future<void> getReadingStatistics() async {
     loading = true;
+    page = 0;
+    hasMore = true;
+    allArticlesRead.clear();
+
     readingStreak = await dbUtils.getReadingDaysStreak();
     numberArticlesRead = await dbUtils.getNumberArticlesRead();
     totalReadingTime = await dbUtils.getReadingTime();
@@ -74,8 +93,36 @@ abstract class _ReadingStatisticsStore with Store {
     mostReadDay = result.$1;
     mostReadDayCount = result.$2;
 
-    allArticlesRead = (await dbUtils.getReadArticlesWithStats(sortByReadingDuration: (currentSort == "by_duration"))).asObservable();
+    final articles = await dbUtils.getReadArticlesWithStatsPaginated(
+      sortByReadingDuration: (currentSort == "by_duration"),
+      offset: page * pageSize,
+      limit: pageSize,
+    );
+    allArticlesRead.addAll(articles);
+    page++;
+
     loading = false;
+  }
+
+  @action
+  Future<void> fetchMoreReadings() async {
+    if (isLoadingMore || !hasMore) return;
+
+    isLoadingMore = true;
+
+    final articles = await dbUtils.getReadArticlesWithStatsPaginated(
+      sortByReadingDuration: (currentSort == "by_duration"),
+      offset: page * pageSize,
+      limit: pageSize,
+    );
+
+    if (articles.length < pageSize) {
+      hasMore = false;
+    }
+
+    allArticlesRead.addAll(articles);
+    page++;
+    isLoadingMore = false;
   }
 
   @action
@@ -85,19 +132,32 @@ abstract class _ReadingStatisticsStore with Store {
 
   @action
   Future<void> sortButtonOnChanged(String? item) async {
-    loading = true;
     currentSort = item ?? "by_date";
-
-    if (item == "by_date") {
-      allArticlesRead = (await dbUtils.getReadArticlesWithStats()).asObservable();
-    } else if (item == "by_duration") {
-      allArticlesRead = (await dbUtils.getReadArticlesWithStats(sortByReadingDuration: true)).asObservable();
-    }
-    loading = false;
+    await getReadingStatistics();
   }
 
+  @action
   Future<void> deleteReading(StoryReading reading) async {
-    await dbUtils.deleteReading(reading);
-    getReadingStatistics();
+    final index = allArticlesRead.indexWhere((element) => element.$1.id == reading.id);
+    if (index != -1) {
+      final removedArticle = allArticlesRead.removeAt(index);
+      await dbUtils.deleteReading(reading);
+      numberArticlesRead--;
+      totalReadingTime -= Duration(seconds: removedArticle.$1.readingDuration);
+    }
+  }
+
+  @action
+  Future<void> updateReading(StoryReading reading) async {
+    final index = allArticlesRead.indexWhere((element) => element.$1.id == reading.id);
+    if (index != -1) {
+      final feedItem = allArticlesRead[index].$2;
+      final updatedReading = await dbUtils.getReadingWithStoryId(feedItem.id);
+      if (updatedReading != null) {
+        final oldDuration = allArticlesRead[index].$1.readingDuration;
+        allArticlesRead[index] = (updatedReading, feedItem);
+        totalReadingTime += Duration(seconds: updatedReading.readingDuration) - Duration(seconds: oldDuration);
+      }
+    }
   }
 }

@@ -322,8 +322,8 @@ class DbUtils {
     return feedItem;
   }
 
-  Future<List<(StoryReading, FeedItem)>> getReadArticlesWithStats({bool sortByReadingDuration = false}) async {
-    List<(StoryReading, FeedItem)> articles = [];
+  Future<void> getReadArticlesWithStats(Function(StoryReading, FeedItem) addToAllArticles, {bool sortByReadingDuration = false}) async {
+    // List<(StoryReading, FeedItem)> articles = [];
 
     List<Feed> feeds = await getFeeds();
 
@@ -338,6 +338,29 @@ class DbUtils {
         continue;
       }
 
+      // articles.add((reading, feedItem));
+      addToAllArticles(reading, feedItem);
+    }
+    // return articles;
+  }
+
+  Future<List<(StoryReading, FeedItem)>> getReadArticlesWithStatsPaginated({
+    bool sortByReadingDuration = false,
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    List<(StoryReading, FeedItem)> articles = [];
+    List<Feed> feeds = await getFeeds();
+
+    List<StoryReading> readings = sortByReadingDuration
+        ? await isar.storyReadings.where().sortByReadingDurationDesc().offset(offset).limit(limit).findAll()
+        : await isar.storyReadings.where().sortByFirstReadDesc().offset(offset).limit(limit).findAll();
+
+    for (StoryReading reading in readings) {
+      FeedItem? feedItem = await getArticleForReading(reading, feeds);
+      if (feedItem == null) {
+        continue;
+      }
       articles.add((reading, feedItem));
     }
     return articles;

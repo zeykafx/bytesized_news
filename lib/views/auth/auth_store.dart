@@ -383,7 +383,8 @@ abstract class _AuthStore with Store {
     if (localFeed.isPinned != firestoreFeed.isPinned ||
         localFeed.pinnedPosition != firestoreFeed.pinnedPosition ||
         localFeed.name != firestoreFeed.name ||
-        localFeed.link != firestoreFeed.link) {
+        localFeed.link != firestoreFeed.link ||
+        localFeed.notifyAfterBgSync != firestoreFeed.notifyAfterBgSync) {
       return true;
     }
     return false;

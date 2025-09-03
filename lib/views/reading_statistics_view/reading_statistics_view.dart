@@ -161,6 +161,14 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, idx) {
+                              if (idx == store.allArticlesRead.length) {
+                                return const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
                               var (StoryReading reading, FeedItem feedItem) = store.allArticlesRead[idx];
                               return ReadArticleCard(
                                 feedItem: feedItem,
@@ -168,7 +176,7 @@ class _ReadingStatisticsViewState extends State<ReadingStatisticsView> {
                                 store: store,
                               ).animate(delay: 250.ms).slide(duration: 300.ms, begin: Offset(0, -0.1), end: Offset(0, 0), curve: Curves.easeOut).fadeIn();
                             },
-                            childCount: store.allArticlesRead.length,
+                            childCount: store.allArticlesRead.length + (store.isLoadingMore ? 1 : 0),
                           ),
                         ),
                         SliverToBoxAdapter(
@@ -406,7 +414,7 @@ class StatsCardWithArticle extends StatelessWidget {
                   ),
                 )
                 .then((_) {
-                  store.getReadingStatistics();
+                  store.updateReading(reading);
                 });
           },
           child: Padding(
@@ -464,7 +472,7 @@ class StatsCardWithArticle extends StatelessWidget {
                             ),
                           )
                           .then((_) {
-                            store.getReadingStatistics();
+                            store.updateReading(reading);
                           });
                     },
                   ),
@@ -522,7 +530,7 @@ class ReadArticleCard extends StatelessWidget {
                   ),
                 )
                 .then((_) {
-                  store.getReadingStatistics();
+                  store.updateReading(reading);
                 });
           },
           child: Padding(

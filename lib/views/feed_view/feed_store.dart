@@ -479,11 +479,11 @@ abstract class _FeedStore with Store {
       print("Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
     }
 
-    if (authStore.suggestionsLeftToday <= 0 ||
+    if (!settingsStore.enableCustomAiProvider && authStore.suggestionsLeftToday <= 0 ||
         // Only fetch suggestions every suggestionsIntervalMinutes minutes max
         DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes < suggestionsIntervalMinutes) {
       if (kDebugMode) {
-        print("Fetching stored suggestions");
+        print("Fetching stored suggestions, user has ran out of premium suggestions");
       }
 
       suggestedFeedItems.clear();

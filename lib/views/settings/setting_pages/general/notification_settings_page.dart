@@ -9,7 +9,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:isar_community/isar.dart';
 import 'package:provider/provider.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
@@ -108,7 +107,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                                     feed.name,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
-                                    
                                   ),
                                 ),
                               ],

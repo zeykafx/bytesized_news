@@ -309,6 +309,7 @@ class _EditFeedGroupState extends State<EditFeedGroup> {
 
                                     // used as an update method for the feed group in the db
                                     await feedManagerStore.dbUtils.addFeedGroup(widget.feedGroup);
+                                    await feedManagerStore.feedSync.updateFirestoreFeedGroups();
                                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully updated Feed Group!")));
                                     Navigator.of(context).pop();
                                   },

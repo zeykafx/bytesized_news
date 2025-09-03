@@ -306,7 +306,7 @@ class _FeedManagerState extends State<FeedManager> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: feedManagerStore.isList ? 1 : 2,
-                                    mainAxisExtent: 60,
+                                    mainAxisExtent: 65,
                                   ),
                                   itemBuilder: (_, index) {
                                     FeedGroup feedGroup = feedStore.feedGroups[index];

@@ -13,6 +13,7 @@ import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/welcome/welcome.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
@@ -97,14 +98,14 @@ void main() async {
     GoogleProvider(clientId: "286405169123-14tsnaatjeclvf6i5k9m7nsitm8qq6h1.apps.googleusercontent.com", iOSPreferPlist: true),
   ]);
 
-  if (!Platform.isWindows) {
-    // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    //
-    // // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    // PlatformDispatcher.instance.onError = (error, stack) {
-    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    //   return true;
-    // };
+  if (kReleaseMode) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
   }
 
   final dir = await getApplicationDocumentsDirectory();

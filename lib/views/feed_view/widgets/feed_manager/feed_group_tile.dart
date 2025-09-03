@@ -67,6 +67,7 @@ class _FeedGroupTileState extends State<FeedGroupTile> {
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ...widget.feedGroup.feeds
                           .take(2)

@@ -201,13 +201,17 @@ abstract class _StoryStore with Store {
 
     webviewInit();
 
-    if (!feedItem.downloaded) {
-      htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
-      // storeHtmlPageInFeedItem(htmlContent);
-      await compareReaderModeLengthToPageHtml(context);
+    if (feedItem.feed != null && feedItem.feed!.alwaysOpenInWebview) {
+      showReaderMode = false;
     } else {
-      htmlContent = feedItem.htmlContent ?? "No Content";
-      // await compareReaderModeLengthToPageHtml(context);
+      if (!feedItem.downloaded) {
+        htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
+        // storeHtmlPageInFeedItem(htmlContent);
+        compareReaderModeLengthToPageHtml(context);
+      } else {
+        htmlContent = feedItem.htmlContent ?? "No Content";
+        // await compareReaderModeLengthToPageHtml(context);
+      }
     }
 
     checkPaywallOrBotBlock();
@@ -354,10 +358,6 @@ abstract class _StoryStore with Store {
     if (feedItem.commentsUrl != null && feedItem.commentsUrl!.isNotEmpty) {
       showHnButton = true;
     }
-    // List<String> hn = ["hnrss.org", "https://news.ycombinator.com/rss"];
-    // if (feedItem.feed != null && (hn.map((url) => feedItem.feed!.link.contains(url)).isNotEmpty)) {
-    //   showHnButton = true;
-    // }
   }
 
   @action
