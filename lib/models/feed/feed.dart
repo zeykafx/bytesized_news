@@ -14,10 +14,11 @@ class Feed {
   late String iconUrl;
 
   bool isPinned = false;
-  
+
   int pinnedPosition = -1;
   int articlesRead = 0;
   bool notifyAfterBgSync = false;
+  bool alwaysOpenInWebview = false;
   List<String> categories = [];
 
   Feed(this.name, this.link, this.iconUrl);

@@ -399,6 +399,22 @@ abstract class _StoryStore with Store {
       shortAlert = true;
       hasAlert = true;
     }
+
+    // loading = true;
+    // var (bool archiveIsAvailable, String archivedContent) = await getArchiveIsUrl(feedItem.url);
+    // if (archiveIsAvailable) {
+    //   openUrlInReaderMode("https://archive.is/newest/${feedItem.url}");
+    //   htmlContent = archivedContent;
+    //   feedItem.downloaded = true;
+    //   await dbUtils.updateItemInDb(feedItem);
+
+    //   alertMessage = "Showing archived page.";
+    //   shortAlert = true;
+    //   hasAlert = true;
+    //   loading = false;
+    //   return true;
+    // }
+
     var (bool archived, String archiveLink) = await getArchiveUrl(feedItem.url);
     if (archived) {
       openUrlInReaderMode(archiveLink);

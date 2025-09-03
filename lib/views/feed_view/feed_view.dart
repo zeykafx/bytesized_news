@@ -168,7 +168,7 @@ class _FeedViewState extends State<FeedView> {
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       if (feedStore.loading) ...[const Center(child: LinearProgressIndicator())],
-                                      if (feedStore.feedItems.isEmpty && !feedStore.loading) ...[
+                                      if (feedStore.initialized && feedStore.feedItems.isEmpty && !feedStore.loading) ...[
                                         const Center(child: Text("Nothing loaded. Refresh to fetch posts!")),
                                       ],
                                       if (feedStore.suggestionsLoading) ...[
@@ -214,7 +214,7 @@ class _FeedViewState extends State<FeedView> {
                                                         feedStore.settingsStore.sort == FeedListSort.byDate &&
                                                         idx == 0) {
                                                       return Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 10.0),
+                                                        padding: const EdgeInsets.only(bottom: 5),
                                                         child: Card(
                                                           margin: EdgeInsets.zero,
                                                           elevation: 0,
@@ -408,7 +408,7 @@ class _FeedViewState extends State<FeedView> {
 
   Container buildTopBar(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 500),
+      constraints: BoxConstraints(maxWidth: feedStore.settingsStore.maxWidth),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

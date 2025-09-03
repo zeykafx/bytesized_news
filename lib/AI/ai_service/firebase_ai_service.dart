@@ -58,7 +58,7 @@ class FirebaseAiService extends AiService {
     String summary = response["summary"];
 
     if (kDebugMode) {
-      print("Received summary from cloud function: $summary");
+      print("Received summary from cloud function");
     }
 
     authStore.summariesLeftToday = response["summariesLeftToday"];

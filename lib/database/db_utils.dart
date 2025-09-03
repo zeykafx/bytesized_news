@@ -518,24 +518,17 @@ class DbUtils {
   // ---- migration
   Future<void> performMigrationIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
-    final currentVersion = prefs.getInt('version') ?? 1;
-    switch (currentVersion) {
-      case 1:
-        await migrateV1ToV2();
-        break;
-      case 2:
-        // If the version is not set (new installation) or already 2, we do not need to migrate
-        return;
-      default:
-        throw Exception('Unknown version: $currentVersion');
+    final latestVersion = 4;
+    final currentVersion = prefs.getInt('version') ?? latestVersion;
+    if (currentVersion < latestVersion) {
+      await migrate();
     }
-
     // Update version
-    await prefs.setInt('version', 2);
+    await prefs.setInt('version', latestVersion);
   }
 
-  Future<void> migrateV1ToV2() async {
-    print("Migrating from v1 to v2");
+  Future<void> migrate() async {
+    print("Migrating database");
     final feedCount = await isar.feeds.count();
 
     // We paginate through the feeds to avoid loading all users into memory at once

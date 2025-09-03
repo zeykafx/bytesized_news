@@ -19,6 +19,33 @@ BorderRadius getItemBorderRadius(int index, int totalLength) {
   return baseRadius; // default for middle items
 }
 
+Future<(bool, String)> getArchiveIsUrl(String url) async {
+  Dio dio = Dio();
+
+  if (kDebugMode) {
+    print("Querying archive.is for url: https://archive.is/newest/$url");
+  }
+  String archivedContent = "";
+  bool archived = false;
+  try {
+    var res = await dio.get("https://archive.is/newest/$url");
+
+    if (res.statusCode == 200) {
+      if (kDebugMode) {
+        print("Archive.is result for url $url: ${res.data}");
+      }
+      archivedContent = res.data;
+      archived = true;
+    }
+  } catch (error) {
+    if (kDebugMode) {
+      print(error);
+    }
+  }
+
+  return (archived, archivedContent);
+}
+
 Future<(bool, String)> getArchiveUrl(String url) async {
   Dio dio = Dio();
 

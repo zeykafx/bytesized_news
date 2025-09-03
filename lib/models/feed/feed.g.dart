@@ -17,27 +17,32 @@ const FeedSchema = CollectionSchema(
   name: r'Feed',
   id: 8879644747771893978,
   properties: {
-    r'articlesRead': PropertySchema(
+    r'alwaysOpenInWebview': PropertySchema(
       id: 0,
+      name: r'alwaysOpenInWebview',
+      type: IsarType.bool,
+    ),
+    r'articlesRead': PropertySchema(
+      id: 1,
       name: r'articlesRead',
       type: IsarType.long,
     ),
     r'categories': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'categories',
       type: IsarType.stringList,
     ),
-    r'iconUrl': PropertySchema(id: 2, name: r'iconUrl', type: IsarType.string),
-    r'isPinned': PropertySchema(id: 3, name: r'isPinned', type: IsarType.bool),
-    r'link': PropertySchema(id: 4, name: r'link', type: IsarType.string),
-    r'name': PropertySchema(id: 5, name: r'name', type: IsarType.string),
+    r'iconUrl': PropertySchema(id: 3, name: r'iconUrl', type: IsarType.string),
+    r'isPinned': PropertySchema(id: 4, name: r'isPinned', type: IsarType.bool),
+    r'link': PropertySchema(id: 5, name: r'link', type: IsarType.string),
+    r'name': PropertySchema(id: 6, name: r'name', type: IsarType.string),
     r'notifyAfterBgSync': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'notifyAfterBgSync',
       type: IsarType.bool,
     ),
     r'pinnedPosition': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'pinnedPosition',
       type: IsarType.long,
     ),
@@ -83,14 +88,15 @@ void _feedSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.articlesRead);
-  writer.writeStringList(offsets[1], object.categories);
-  writer.writeString(offsets[2], object.iconUrl);
-  writer.writeBool(offsets[3], object.isPinned);
-  writer.writeString(offsets[4], object.link);
-  writer.writeString(offsets[5], object.name);
-  writer.writeBool(offsets[6], object.notifyAfterBgSync);
-  writer.writeLong(offsets[7], object.pinnedPosition);
+  writer.writeBool(offsets[0], object.alwaysOpenInWebview);
+  writer.writeLong(offsets[1], object.articlesRead);
+  writer.writeStringList(offsets[2], object.categories);
+  writer.writeString(offsets[3], object.iconUrl);
+  writer.writeBool(offsets[4], object.isPinned);
+  writer.writeString(offsets[5], object.link);
+  writer.writeString(offsets[6], object.name);
+  writer.writeBool(offsets[7], object.notifyAfterBgSync);
+  writer.writeLong(offsets[8], object.pinnedPosition);
 }
 
 Feed _feedDeserialize(
@@ -100,16 +106,17 @@ Feed _feedDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Feed(
+    reader.readString(offsets[6]),
     reader.readString(offsets[5]),
-    reader.readString(offsets[4]),
-    reader.readString(offsets[2]),
+    reader.readString(offsets[3]),
   );
-  object.articlesRead = reader.readLong(offsets[0]);
-  object.categories = reader.readStringList(offsets[1]) ?? [];
+  object.alwaysOpenInWebview = reader.readBool(offsets[0]);
+  object.articlesRead = reader.readLong(offsets[1]);
+  object.categories = reader.readStringList(offsets[2]) ?? [];
   object.id = id;
-  object.isPinned = reader.readBool(offsets[3]);
-  object.notifyAfterBgSync = reader.readBool(offsets[6]);
-  object.pinnedPosition = reader.readLong(offsets[7]);
+  object.isPinned = reader.readBool(offsets[4]);
+  object.notifyAfterBgSync = reader.readBool(offsets[7]);
+  object.pinnedPosition = reader.readLong(offsets[8]);
   return object;
 }
 
@@ -121,20 +128,22 @@ P _feedDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLong(offset)) as P;
-    case 1:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 2:
-      return (reader.readString(offset)) as P;
-    case 3:
       return (reader.readBool(offset)) as P;
-    case 4:
+    case 1:
+      return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 3:
       return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readBool(offset)) as P;
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 7:
+      return (reader.readBool(offset)) as P;
+    case 8:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -232,6 +241,16 @@ extension FeedQueryWhere on QueryBuilder<Feed, Feed, QWhereClause> {
 }
 
 extension FeedQueryFilter on QueryBuilder<Feed, Feed, QFilterCondition> {
+  QueryBuilder<Feed, Feed, QAfterFilterCondition> alwaysOpenInWebviewEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'alwaysOpenInWebview', value: value),
+      );
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterFilterCondition> articlesReadEqualTo(
     int value,
   ) {
@@ -1071,6 +1090,18 @@ extension FeedQueryObject on QueryBuilder<Feed, Feed, QFilterCondition> {}
 extension FeedQueryLinks on QueryBuilder<Feed, Feed, QFilterCondition> {}
 
 extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByAlwaysOpenInWebview() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'alwaysOpenInWebview', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> sortByAlwaysOpenInWebviewDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'alwaysOpenInWebview', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> sortByArticlesRead() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'articlesRead', Sort.asc);
@@ -1157,6 +1188,18 @@ extension FeedQuerySortBy on QueryBuilder<Feed, Feed, QSortBy> {
 }
 
 extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByAlwaysOpenInWebview() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'alwaysOpenInWebview', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Feed, Feed, QAfterSortBy> thenByAlwaysOpenInWebviewDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'alwaysOpenInWebview', Sort.desc);
+    });
+  }
+
   QueryBuilder<Feed, Feed, QAfterSortBy> thenByArticlesRead() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'articlesRead', Sort.asc);
@@ -1255,6 +1298,12 @@ extension FeedQuerySortThenBy on QueryBuilder<Feed, Feed, QSortThenBy> {
 }
 
 extension FeedQueryWhereDistinct on QueryBuilder<Feed, Feed, QDistinct> {
+  QueryBuilder<Feed, Feed, QDistinct> distinctByAlwaysOpenInWebview() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'alwaysOpenInWebview');
+    });
+  }
+
   QueryBuilder<Feed, Feed, QDistinct> distinctByArticlesRead() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'articlesRead');
@@ -1314,6 +1363,12 @@ extension FeedQueryProperty on QueryBuilder<Feed, Feed, QQueryProperty> {
   QueryBuilder<Feed, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Feed, bool, QQueryOperations> alwaysOpenInWebviewProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'alwaysOpenInWebview');
     });
   }
 
