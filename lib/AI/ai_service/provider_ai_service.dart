@@ -145,7 +145,7 @@ class ProviderAiService extends AiService {
     }
 
     if (kDebugMode) {
-      print("Fetching suggestions from provider ${aiProvider.name} with model ${modelToUse}");
+      print("Fetching suggestions from provider ${aiProvider.name} with model $modelToUse");
     }
 
     List<ChatMessage> messages = [
@@ -219,5 +219,102 @@ class ProviderAiService extends AiService {
 
     authStore.lastSuggestionDate = DateTime.now().toUtc();
     return suggestedArticles;
+  }
+
+  Future<List<String>> buildUserInterests(List<Feed> feeds, List<String> userInterests) async {
+    String mostReadFeedsString = feeds
+        .map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
+        .join(",");
+
+    String currentInterests = userInterests.join(", ");
+
+    String modelToUse = aiProvider.useSameModelForSuggestions
+        ? aiProvider.models[aiProvider.modelToUseIndex]
+        : aiProvider.models[aiProvider.modelToUseIndexForSuggestions];
+
+    ChatCapability provider;
+    if (aiProvider.devName == "openrouter") {
+      provider = await ai()
+          .openRouter()
+          .baseUrl(aiProvider.apiLink)
+          .apiKey(aiProvider.apiKey)
+          .model(modelToUse)
+          .temperature(0.5)
+          .responseFormat("json")
+          .build();
+    } else {
+      provider = await createProvider(
+        providerId: aiProvider.devName,
+        apiKey: aiProvider.apiKey,
+        model: modelToUse,
+        baseUrl: aiProvider.apiLink,
+        temperature: 0.5,
+        extensions: {"responseFormat": "json"},
+      );
+    }
+
+    if (kDebugMode) {
+      print("Calling ${aiProvider.name} with model $modelToUse to build user interests.");
+    }
+
+    List<ChatMessage> messages = [
+      ChatMessage.system("""
+        ### Role
+        You are an expert user interest analyzer for a news recommendation system. Your task is to analyze RSS feed data to identify the user's true interests based on their reading patterns.
+
+        ### Input Data Format
+        You'll receive feed information in this format:
+        "FeedName: [name] - ArticlesRead: [count], Categories: [category1,category2,...]" (categories may be empty)
+
+        ### Analysis Instructions
+        1. Prioritize feeds with higher article counts as stronger interest indicators
+        2. Consider both explicit feed categories and implicit topics from feed names
+        3. Balance between specific interests (e.g., "iOS Development") and broader categories (e.g., "Technology")
+        4. Identify patterns across multiple feeds that suggest common interests
+        5. Infer likely interests even when categories aren't explicitly provided
+        6. Use the user's current interests to refine their taste profile
+
+        ### Response Requirements
+        - Extract 3-5 most relevant interest categories based on reading patterns
+        - Include a mix of specific and general interests when appropriate
+        - Avoid overly broad categories unless clearly dominant
+        - Ensure categories are useful for content recommendation
+
+        ### OUTPUT FORMAT
+        Return ONLY a valid JSON object with a "categories" array containing 3-5 string values.
+        Do not include explanations, markdown formatting, or code blocks.
+
+        Example response: {"categories": ["Technology", "Politics", ...]}
+        """),
+      ChatMessage.user("Most Read Feeds: $mostReadFeedsString"),
+      ChatMessage.user("User's current interests: $currentInterests"),
+    ];
+    ChatResponse response = await provider.chat(messages);
+    var jsonOutput = response.text ?? "{}";
+
+    var jsonData = jsonDecode(jsonOutput);
+    List<String> categories = [];
+    print(jsonData);
+    for (var category in jsonData['categories']) {
+      if (!userInterests.contains(category)) {
+        categories.add(category);
+      }
+    }
+
+    if (kDebugMode) {
+      print("User interest categories: $categories");
+    }
+    return categories;
+
+    // final result = await functions.httpsCallable('buildUserInterests').call({"mostReadFeedsString": mostReadFeedsString});
+    // var response = result.data as Map<String, dynamic>;
+    // if (response["error"] != null) {
+    //   throw Exception(response["error"]);
+    // }
+
+    // var jsonOutput = response["categoriesJson"];
+    // var jsonData = jsonDecode(jsonOutput);
+
+    // return categories;
   }
 }

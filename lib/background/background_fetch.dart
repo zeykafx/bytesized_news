@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:bytesized_news/database/db_utils.dart';
+import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -32,7 +33,7 @@ class BackgroundFetch {
 
     // Open the isar instance in this thread
     final dir = await getApplicationDocumentsDirectory();
-    final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema], directory: dir.path);
+    final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema, AiProviderSchema], directory: dir.path);
 
     DbUtils dbUtils = DbUtils(isar: isar);
 

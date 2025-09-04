@@ -122,4 +122,32 @@ class FirebaseAiService extends AiService {
 
     return suggestedArticles;
   }
+
+  Future<List<String>> buildUserInterests(List<Feed> feeds, List<String> userInterests) async {
+    if (kDebugMode) {
+      print("Calling firebase AI service to build user interests.");
+    }
+
+    String mostReadFeedsString = feeds
+        .map((Feed feed) => "FeedName: ${feed.name} - ArticlesRead: ${feed.articlesRead}, Categories: ${feed.categories.join(",")}")
+        .join(",");
+
+    String currentInterests = userInterests.join(", ");
+
+    final result = await functions.httpsCallable('buildUserInterests').call({"mostReadFeedsString": mostReadFeedsString, "currentInterests": currentInterests});
+    var response = result.data as Map<String, dynamic>;
+    if (response["error"] != null) {
+      throw Exception(response["error"]);
+    }
+
+    var jsonOutput = response["categoriesJson"];
+    var jsonData = jsonDecode(jsonOutput);
+    List<String> categories = [];
+    for (var category in jsonData['categories']) {
+      if (!userInterests.contains(category)) {
+        categories.add(category);
+      }
+    }
+    return categories;
+  }
 }

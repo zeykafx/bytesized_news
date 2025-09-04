@@ -55,7 +55,7 @@ abstract class _AiStore with Store {
 
   @observable
   bool showCustomSuggestionModelField = false;
-  
+
   @observable
   ExpansibleController expansibleController = ExpansibleController();
 

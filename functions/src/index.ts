@@ -701,6 +701,7 @@ export const buildUserInterests = onCall(
   { region: "europe-west1", enforceAppCheck: ENFORCE_APPCHECK },
   async (request) => {
     const mostReadFeedsString: string = request.data.mostReadFeedsString;
+    const currentInterests: string = request.data.currentInterests;
     logger.info(
       `Building user interests based on most read feeds: ${mostReadFeedsString}`,
     );
@@ -727,14 +728,42 @@ export const buildUserInterests = onCall(
         {
           role: "system",
           content: `
-        Analyze the following RSS Feeds names, categories, and the number of articles read from that feed to infer
-        the user's categories of interest. Return a JSON array of 3-5 most relevant categories under a "categories" key. Only output JSON.
-        Example response: {"categories": ["Technology", "Politics", "Android", "Mobile Phones"]}
+          ### Role
+          You are an expert user interest analyzer for a news recommendation system. Your task is to analyze RSS feed data to
+          identify the user's true interests based on their reading patterns.
+
+          ### Input Data Format
+          You'll receive feed information in this format:
+          "FeedName: [name] - ArticlesRead: [count], Categories: [category1,category2,...]" (categories may be empty)
+
+          ### Analysis Instructions
+          1. Prioritize feeds with higher article counts as stronger interest indicators
+          2. Consider both explicit feed categories and implicit topics from feed names
+          3. Balance between specific interests (e.g., "iOS Development") and broader categories (e.g., "Technology")
+          4. Identify patterns across multiple feeds that suggest common interests
+          5. Infer likely interests even when categories aren't explicitly provided
+          6. Use the user's current interests to refine their taste profile
+
+          ### Response Requirements
+          - Extract 3-5 most relevant interest categories based on reading patterns
+          - Include a mix of specific and general interests when appropriate
+          - Avoid overly broad categories unless clearly dominant
+          - Ensure categories are useful for content recommendation
+
+          ### OUTPUT FORMAT
+          Return ONLY a valid JSON object with a "categories" array containing 3-5 string values.
+          Do not include explanations, markdown formatting, or code blocks.
+
+          Example response: {"categories": ["Technology", "Politics", "Android", "Mobile Phones"]}
         `,
         },
         {
           role: "user",
           content: `Most Read Feeds: ${mostReadFeedsString}`,
+        },
+        {
+          role: "user",
+          content: `User's current interests: ${currentInterests}`,
         },
       ],
       temperature: 0.3,

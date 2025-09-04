@@ -287,6 +287,7 @@ abstract class _SettingsStore with Store {
   static const defaultSuggestionEnabled = true;
   static const defaultSummaryLength = 3;
   static const defaultNotificationAfterBgSync = false;
+  static const defaultShowSummaryCard = true;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -508,9 +509,12 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultSummaryLength)
   @observable
   int summaryLength = defaultSummaryLength;
-  
-  
+
   @JsonKey(defaultValue: defaultNotificationAfterBgSync)
   @observable
   bool showNotificationAfterBgSync = defaultNotificationAfterBgSync;
+
+  @JsonKey(defaultValue: defaultShowSummaryCard)
+  @observable
+  bool showSummaryCard = defaultShowSummaryCard;
 }

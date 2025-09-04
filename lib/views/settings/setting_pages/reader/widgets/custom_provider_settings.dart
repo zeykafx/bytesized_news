@@ -99,8 +99,9 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
 
                   SizedBox(
                     height: cardHeight,
-                    child: CarouselView(
-                      itemExtent: cardWidth,
+                    child: CarouselView.weighted(
+                      // itemExtent: cardWidth,
+                      flexWeights: [1, 2, 1],
                       scrollDirection: Axis.horizontal,
                       itemSnapping: true,
                       enableSplash: false,
@@ -111,13 +112,17 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                       elevation: 0,
                       children: [
                         for (AiProvider provider in store.allProviders) ...[
-                          ProviderCard(
-                            cardHeight: cardHeight,
-                            cardWidth: cardWidth,
-                            provider: provider,
-                            colorScheme: colorScheme,
-                            store: store,
-                            carousel: carousel,
+                          SizedBox(
+                            // width: cardWidth,
+                            // height: cardHeight,
+                            child: ProviderCard(
+                              cardHeight: cardHeight,
+                              cardWidth: cardWidth,
+                              provider: provider,
+                              colorScheme: colorScheme,
+                              store: store,
+                              carousel: carousel,
+                            ),
                           ),
                         ],
                       ],
@@ -380,13 +385,17 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                         store.apiKeysControllers[store.providerIndex]!.text,
                                         store.apiUrlsControllers[store.providerIndex]!.text,
                                       );
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Saved succesfully"), duration: 1.seconds));
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Saved succesfully"), duration: 1.seconds));
+                                      }
                                     } catch (e) {
                                       if (kDebugMode) {
                                         print(e);
                                       }
 
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+                                      }
                                     }
                                   },
                                   icon: const Icon(Icons.save_outlined),

@@ -17,6 +17,7 @@ class _AiSectionState extends State<AiSection> {
   late final SettingsStore settingsStore;
   late final AuthStore authStore;
   final BorderRadius borderRadius = BorderRadius.circular(12);
+  ExpansibleController summaryExpansibleController = ExpansibleController();
   ExpansibleController expansibleController = ExpansibleController();
 
   @override
@@ -49,54 +50,83 @@ class _AiSectionState extends State<AiSection> {
                   : null,
             ),
 
-            // SHOW AI SUMMARY ON STORY PAGE LOAD
-            SwitchListTile(
-              title: const Text("Show Summary on page load"),
-              subtitle: !aiEnabled ? Text("Available with premium") : null,
-              value: aiEnabled ? settingsStore.showAiSummaryOnLoad : false,
-              onChanged: aiEnabled
-                  ? (value) {
-                      settingsStore.setShowAiSummaryOnLoad(value);
-                    }
-                  : null,
-            ),
-
-            // FETCH AI SUMMARY ON STORY PAGE LOAD
-            SwitchListTile(
-              title: const Text("Generate Summary on page load"),
-              subtitle: !aiEnabled ? Text("Available with premium") : null,
-              value: aiEnabled ? settingsStore.fetchAiSummaryOnLoad : false,
-              onChanged: aiEnabled
-                  ? (value) {
-                      settingsStore.setFetchAiSummaryOnLoad(value);
-                    }
-                  : null,
-            ),
-
-            ListTile(
-              title: const Text("Summary length (in paragraphs)"),
-              subtitle: SizedBox(
-                width: 150,
-                child: Row(
-                  children: [
-                    SizedBox(width: 35, child: Text(settingsStore.summaryLength.toStringAsFixed(0))),
-                    Expanded(
-                      child: Slider(
-                        year2023: false,
-                        label: settingsStore.summaryLength.toStringAsFixed(0),
-                        value: settingsStore.summaryLength.toDouble(),
-                        min: 1.0,
-                        max: 4.0,
-                        divisions: 3,
-                        onChanged: (newVal) {
-                          settingsStore.summaryLength = newVal.toInt();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+            // summary settings
+            ExpansionTile(
+              enableFeedback: true,
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: const EdgeInsets.only(bottom: 12, top: 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: borderRadius,
               ),
+              initiallyExpanded: settingsStore.showSummaryCard,
+              showTrailingIcon: false,
+              title: SwitchListTile(
+                title: const Text("Show summary button & card"),
+                subtitle: Text("Show a 'summarize' button when the page is not summarized, and show the summary once it has been summarized"),
+                value: settingsStore.showSummaryCard,
+                onChanged: (value) {
+                  settingsStore.showSummaryCard = value;
+                  if (value) {
+                    summaryExpansibleController.expand();
+                  } else {
+                    summaryExpansibleController.collapse();
+                  }
+                },
+              ),
+              controller: summaryExpansibleController,
+              children: [
+                // SHOW AI SUMMARY ON STORY PAGE LOAD
+                SwitchListTile(
+                  title: const Text("Expand summary on page load"),
+                  subtitle: !aiEnabled ? Text("Available with premium") : null,
+                  value: aiEnabled ? settingsStore.showAiSummaryOnLoad : false,
+                  onChanged: aiEnabled
+                      ? (value) {
+                          settingsStore.setShowAiSummaryOnLoad(value);
+                        }
+                      : null,
+                ),
+
+                // FETCH AI SUMMARY ON STORY PAGE LOAD
+                SwitchListTile(
+                  title: const Text("Generate summary on page load"),
+                  subtitle: !aiEnabled ? Text("Available with premium") : null,
+                  value: aiEnabled ? settingsStore.fetchAiSummaryOnLoad : false,
+                  onChanged: aiEnabled
+                      ? (value) {
+                          settingsStore.setFetchAiSummaryOnLoad(value);
+                        }
+                      : null,
+                ),
+                
+                ListTile(
+                  title: const Text("Summary length (in paragraphs)"),
+                  subtitle: SizedBox(
+                    width: 150,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 35, child: Text(settingsStore.summaryLength.toStringAsFixed(0))),
+                        Expanded(
+                          child: Slider(
+                            year2023: false,
+                            label: settingsStore.summaryLength.toStringAsFixed(0),
+                            value: settingsStore.summaryLength.toDouble(),
+                            min: 1.0,
+                            max: 4.0,
+                            divisions: 3,
+                            onChanged: (newVal) {
+                              settingsStore.summaryLength = newVal.toInt();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
+
+      
 
             // BYOK settings
             ExpansionTile(

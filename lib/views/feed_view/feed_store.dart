@@ -445,21 +445,21 @@ abstract class _FeedStore with Store {
   @action
   Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
-    if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
-      List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
-      if (mostReadFeeds.isEmpty) {
-        return;
-      }
-
-      List<String> interests = await aiUtils.buildUserInterests(mostReadFeeds, authStore.userInterests);
-      if (kDebugMode) {
-        print("Adding new interests: $interests");
-      }
-
-      // These mutations trigger firebase updates
-      authStore.userInterests.addAll(interests);
-      authStore.builtUserProfileDate = DateTime.now();
+    // if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
+    List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+    if (mostReadFeeds.isEmpty) {
+      return;
     }
+
+    List<String> interests = await aiUtils.buildUserInterests(mostReadFeeds, authStore.userInterests);
+    if (kDebugMode) {
+      print("Adding new interests: $interests");
+    }
+
+    // These mutations trigger firebase updates
+    authStore.userInterests.addAll(interests);
+    authStore.builtUserProfileDate = DateTime.now();
+    // }
   }
 
   @action
@@ -473,6 +473,8 @@ abstract class _FeedStore with Store {
     if (settingsStore.sort != FeedListSort.byDate) {
       return;
     }
+    
+    await buildUserTasteProfile();
 
     if (kDebugMode) {
       print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
@@ -483,7 +485,7 @@ abstract class _FeedStore with Store {
         // Only fetch suggestions every suggestionsIntervalMinutes minutes max
         DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes < suggestionsIntervalMinutes) {
       if (kDebugMode) {
-        print("Fetching stored suggestions, user has ran out of premium suggestions");
+        print("Fetching stored suggestions");
       }
 
       suggestedFeedItems.clear();
@@ -500,7 +502,7 @@ abstract class _FeedStore with Store {
       return;
     }
 
-    buildUserTasteProfile();
+    // buildUserTasteProfile();
 
     if (kDebugMode) {
       print("Will fetch unread items to get news suggestions");

@@ -21,7 +21,7 @@ class SummaryCard extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        if (!storyStore.settingsStore.enableCustomAiProvider && storyStore.authStore.userTier != Tier.premium) {
+        if ((storyStore.authStore.userTier != Tier.premium && !storyStore.settingsStore.enableCustomAiProvider) || !settingsStore.showSummaryCard) {
           return SizedBox.shrink();
         }
 

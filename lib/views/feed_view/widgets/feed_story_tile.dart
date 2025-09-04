@@ -66,7 +66,12 @@ class _FeedStoryTileState extends State<FeedStoryTile> {
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(15)),
       child: widget.isSuggestion
-          ? OverflowBox(maxHeight: 315, maxWidth: 350, alignment: Alignment.center, child: buildCard(cardColor, context))
+          ? OverflowBox(
+              maxHeight: 315,
+              maxWidth: 350,
+              alignment: Alignment.center,
+              child: buildCard(cardColor, context),
+            )
           : buildCard(cardColor, context),
     );
   }

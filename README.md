@@ -8,18 +8,18 @@ The app is built with Flutter and Mobx.
 
 - Add RSS & ATOM feeds
 - Synchronize your feeds and feed groups across all of your devices
-- Background fetching for articles (with customizable interval)
-- Read articles with a built-in browser
-- Instantly summarize articles (paid feature)
-- Get personalized article suggestions based on your reading history
-- Download articles for offline reading
+- Background fetching for articles (with customizable interval), optional notifications after bg fetch
+- Read articles with a reader mode or built-in browser (with ad-blocker)
+- Instantly summarize articles (paid feature, or BYOK)
+- Get personalized article suggestions based on your reading history (paid feature, or BYOK)
+- Download articles for offline reading (with images)
+- Bring Your Own Key: use custom AI providers to get summaries and suggestions
 - Reading statistics
 - Curated list of popular feeds
-- Auto dark mode in web browser
-- Ad blocker in web browser
 - Sort articles by date or title, read or unread, bookmarked, summarized, downloaded
 - Bookmark articles
 - Create feed groups (folders) to easily organize your feeds and navigate between them
+- In depth customization (lots of settings, extensive UI customization for the whole app and for the reader mode)
 
 ## Screenshots
 <img alt="Home" src="./.images/home.png" width="300"/>

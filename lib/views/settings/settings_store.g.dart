@@ -78,7 +78,8 @@ SettingsStore _$SettingsStoreFromJson(
   ..suggestionEnabled = json['suggestionEnabled'] as bool? ?? true
   ..summaryLength = (json['summaryLength'] as num?)?.toInt() ?? 3
   ..showNotificationAfterBgSync =
-      json['showNotificationAfterBgSync'] as bool? ?? false;
+      json['showNotificationAfterBgSync'] as bool? ?? false
+  ..showSummaryCard = json['showSummaryCard'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -118,6 +119,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'suggestionEnabled': instance.suggestionEnabled,
       'summaryLength': instance.summaryLength,
       'showNotificationAfterBgSync': instance.showNotificationAfterBgSync,
+      'showSummaryCard': instance.showSummaryCard,
     };
 
 const _$DarkModeEnumMap = {
@@ -920,6 +922,24 @@ mixin _$SettingsStore on _SettingsStore, Store {
     );
   }
 
+  late final _$showSummaryCardAtom = Atom(
+    name: '_SettingsStore.showSummaryCard',
+    context: context,
+  );
+
+  @override
+  bool get showSummaryCard {
+    _$showSummaryCardAtom.reportRead();
+    return super.showSummaryCard;
+  }
+
+  @override
+  set showSummaryCard(bool value) {
+    _$showSummaryCardAtom.reportWrite(value, super.showSummaryCard, () {
+      super.showSummaryCard = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -1109,7 +1129,8 @@ appFontFamily: ${appFontFamily},
 maxWidth: ${maxWidth},
 suggestionEnabled: ${suggestionEnabled},
 summaryLength: ${summaryLength},
-showNotificationAfterBgSync: ${showNotificationAfterBgSync}
+showNotificationAfterBgSync: ${showNotificationAfterBgSync},
+showSummaryCard: ${showSummaryCard}
     ''';
   }
 }

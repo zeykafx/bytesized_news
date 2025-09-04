@@ -1,3 +1,4 @@
+import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
@@ -22,7 +23,7 @@ class DbIsolateCleaner {
 
     // Open the isar instance in this thread
     final dir = await getApplicationDocumentsDirectory();
-    final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema], directory: dir.path);
+    final isar = await Isar.open([FeedItemSchema, FeedSchema, FeedGroupSchema, StoryReadingSchema, AiProviderSchema], directory: dir.path);
 
     if (kDebugMode) {
       print("Cleaning unread articles older than $days");
