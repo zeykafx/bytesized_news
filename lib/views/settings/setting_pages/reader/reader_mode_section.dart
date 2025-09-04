@@ -31,11 +31,22 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
           title: "Reader Mode",
           onlySection: false,
           children: [
+            // Download read articles
+            SwitchListTile(
+              title: const Text("Download read articles"),
+              subtitle: const Text("Save text & images for offline reading after opening the reader mode"),
+
+              value: settingsStore.downloadReadPosts,
+              onChanged: (value) {
+                settingsStore.downloadReadPosts = value;
+              },
+            ),
+
             // USE READER MODE BY DEFAULT
             SwitchListTile(
               title: const Text("Use Reader Mode by default"),
               subtitle: const Text("Text only version of the article"),
-              
+
               value: settingsStore.useReaderModeByDefault,
               onChanged: (value) {
                 settingsStore.setUseReaderModeByDefault(value);
@@ -69,11 +80,13 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
                 settingsStore.showCommentsButton = value;
               },
             ),
-            
+
             // Always show the archive button
             SwitchListTile(
               title: const Text("Always show archive.org button"),
-              subtitle: Text("Bypass more bot protections & paywalls. ${settingsStore.alwaysShowArchiveButton ? "Enabled: button will always shown in the bar" : "Disabled: will be shown only when a paywall is detected"}"),
+              subtitle: Text(
+                "Bypass more bot protections & paywalls. ${settingsStore.alwaysShowArchiveButton ? "Enabled: button will always shown in the bar" : "Disabled: will be shown only when a paywall is detected"}",
+              ),
               value: settingsStore.alwaysShowArchiveButton,
               onChanged: (value) {
                 settingsStore.alwaysShowArchiveButton = value;

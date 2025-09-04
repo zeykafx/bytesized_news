@@ -205,7 +205,7 @@ abstract class _StoryStore with Store {
       showReaderMode = false;
     } else {
       if (!feedItem.downloaded) {
-        htmlContent = await feedItem.fetchHtmlContent(feedItem.url);
+        htmlContent = await feedItem.fetchHtmlContent(feedItem.url, settingsStore.downloadReadPosts);
         // storeHtmlPageInFeedItem(htmlContent);
         compareReaderModeLengthToPageHtml(context);
       } else {
@@ -377,7 +377,7 @@ abstract class _StoryStore with Store {
     loading = true;
     // readerModeHistory.add(currentUrl);
 
-    htmlContent = await feedItem.fetchHtmlContent(url);
+    htmlContent = await feedItem.fetchHtmlContent(url, settingsStore.downloadReadPosts);
     // we may not always want to replace the item's content in the db, e.g., if we nagivate to a link
     if (replaceItemContent) {
       feedItem.downloaded = true;
@@ -388,7 +388,7 @@ abstract class _StoryStore with Store {
 
   @action
   Future<void> goBackInReaderHistory() async {
-    htmlContent = await feedItem.fetchHtmlContent(readerModeHistory.removeLast());
+    htmlContent = await feedItem.fetchHtmlContent(readerModeHistory.removeLast(), settingsStore.downloadReadPosts);
   }
 
   @action
@@ -718,7 +718,7 @@ abstract class _StoryStore with Store {
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
-      evaluateSummary(docText, summary, context);
+      // evaluateSummary(docText, summary, context);
     } catch (e) {
       if (kDebugMode) {
         print(e);

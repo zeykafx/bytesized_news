@@ -4,7 +4,10 @@ import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as html_parser;
 import 'package:isar_community/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -577,5 +580,51 @@ class DbUtils {
         await isar.feedItems.putAll(feedItems);
       });
     }
+  }
+
+  Future<int> numberOfItemsDownloaded() async {
+    return await isar.feedItems.where().filter().downloadedEqualTo(true).count();
+  }
+
+  // delete download items
+  Future<int> deleteDownloadedItems() async {
+    List<FeedItem> itemsToDelete = await isar.feedItems.where().filter().downloadedEqualTo(true).findAll();
+
+    // delete all of the images from the cache
+    for (FeedItem item in itemsToDelete) {
+      dom.Document contentElement = html_parser.parse(item.htmlContent ?? "");
+      List<dom.Element> images = contentElement.getElementsByTagName("img")
+        ..addAll(contentElement.getElementsByTagName("image"))
+        ..addAll(contentElement.getElementsByTagName("picture"));
+      for (dom.Element el in images) {
+        String imgSrc = "";
+        if (el.attributes case {'src': final String src}) {
+          imgSrc = src;
+        }
+
+        if (imgSrc.isEmpty) {
+          continue;
+        }
+
+        try {
+          await DefaultCacheManager().removeFile(imgSrc);
+        } catch (_) {}
+      }
+    }
+
+    await isar.writeTxn(() async {
+      for (FeedItem feedItem in itemsToDelete) {
+        feedItem.htmlContent = "";
+        feedItem.downloaded = false;
+        await isar.feedItems.put(feedItem);
+      }
+    });
+
+    int numberDeleted = itemsToDelete.length;
+    if (kDebugMode) {
+      print("Deleted $numberDeleted downloaded articles!");
+    }
+
+    return numberDeleted;
   }
 }

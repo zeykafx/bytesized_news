@@ -79,7 +79,8 @@ SettingsStore _$SettingsStoreFromJson(
   ..summaryLength = (json['summaryLength'] as num?)?.toInt() ?? 3
   ..showNotificationAfterBgSync =
       json['showNotificationAfterBgSync'] as bool? ?? false
-  ..showSummaryCard = json['showSummaryCard'] as bool? ?? true;
+  ..showSummaryCard = json['showSummaryCard'] as bool? ?? true
+  ..downloadReadPosts = json['downloadReadPosts'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -120,6 +121,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'summaryLength': instance.summaryLength,
       'showNotificationAfterBgSync': instance.showNotificationAfterBgSync,
       'showSummaryCard': instance.showSummaryCard,
+      'downloadReadPosts': instance.downloadReadPosts,
     };
 
 const _$DarkModeEnumMap = {
@@ -940,6 +942,24 @@ mixin _$SettingsStore on _SettingsStore, Store {
     });
   }
 
+  late final _$downloadReadPostsAtom = Atom(
+    name: '_SettingsStore.downloadReadPosts',
+    context: context,
+  );
+
+  @override
+  bool get downloadReadPosts {
+    _$downloadReadPostsAtom.reportRead();
+    return super.downloadReadPosts;
+  }
+
+  @override
+  set downloadReadPosts(bool value) {
+    _$downloadReadPostsAtom.reportWrite(value, super.downloadReadPosts, () {
+      super.downloadReadPosts = value;
+    });
+  }
+
   late final _$_SettingsStoreActionController = ActionController(
     name: '_SettingsStore',
     context: context,
@@ -1130,7 +1150,8 @@ maxWidth: ${maxWidth},
 suggestionEnabled: ${suggestionEnabled},
 summaryLength: ${summaryLength},
 showNotificationAfterBgSync: ${showNotificationAfterBgSync},
-showSummaryCard: ${showSummaryCard}
+showSummaryCard: ${showSummaryCard},
+downloadReadPosts: ${downloadReadPosts}
     ''';
   }
 }

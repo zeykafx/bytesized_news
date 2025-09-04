@@ -328,7 +328,7 @@ abstract class _FeedStore with Store {
   @action
   Future<void> toggleItemBookmarked(FeedItem item, {bool toggle = false}) async {
     item.bookmarked = toggle ? !item.bookmarked : true;
-    item.fetchHtmlContent(item.url);
+    item.fetchHtmlContent(item.url, settingsStore.downloadReadPosts);
     item.downloaded = true;
 
     await dbUtils.updateItemInDb(item);
@@ -341,7 +341,7 @@ abstract class _FeedStore with Store {
       item.htmlContent = "";
     } else {
       item.downloaded = true;
-      await item.fetchHtmlContent(item.url);
+      await item.fetchHtmlContent(item.url, settingsStore.downloadReadPosts);
     }
 
     await dbUtils.updateItemInDb(item);
@@ -446,19 +446,19 @@ abstract class _FeedStore with Store {
   Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
     if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
-    List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
-    if (mostReadFeeds.isEmpty) {
-      return;
-    }
+      List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
+      if (mostReadFeeds.isEmpty) {
+        return;
+      }
 
-    List<String> interests = await aiUtils.buildUserInterests(mostReadFeeds, authStore.userInterests);
-    if (kDebugMode) {
-      print("Adding new interests: $interests");
-    }
+      List<String> interests = await aiUtils.buildUserInterests(mostReadFeeds, authStore.userInterests);
+      if (kDebugMode) {
+        print("Adding new interests: $interests");
+      }
 
-    // These mutations trigger firebase updates
-    authStore.userInterests.addAll(interests);
-    authStore.builtUserProfileDate = DateTime.now();
+      // These mutations trigger firebase updates
+      authStore.userInterests.addAll(interests);
+      authStore.builtUserProfileDate = DateTime.now();
     }
   }
 
@@ -518,6 +518,7 @@ abstract class _FeedStore with Store {
     } catch (e) {
       if (kDebugMode) {
         print(e);
+        rethrow;
       }
       alertMessage = "Error: $e";
       hasAlert = true;
@@ -553,7 +554,11 @@ abstract class _FeedStore with Store {
       if (!feedItem.suggested) {
         feedItem.suggested = true;
         try {
-          await downloadItem(feedItem); // this also updates the item in the db
+          if (settingsStore.downloadReadPosts) {
+            await downloadItem(feedItem); // this also updates the item in the db
+          } else {
+            await dbUtils.updateItemInDb(feedItem);
+          }
         } catch (e) {
           if (kDebugMode) {
             print("Failed to download item: ${feedItem.id}, with error: ${e}");
@@ -561,7 +566,6 @@ abstract class _FeedStore with Store {
           alertMessage = "A suggested item wasn't able to be downloaded: $e";
           hasAlert = true;
         }
-        // await dbUtils.updateItemInDb(feedItem);
       }
     }
   }

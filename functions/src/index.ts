@@ -695,6 +695,7 @@ export const analyzeFeedCategories = onCall(
           OUTPUT REQUIREMENTS:
           - Return ONLY valid JSON in this exact format: {"categories": ["Category1", "Category2", "Category3"]}
           - Use proper JSON syntax with double quotes
+          - OUTPUT ONLY THE JSON STRING, no markdown formatting, nothing else
           - Include 3-5 categories maximum
           - Categories should be title-cased (first letter capitalized)
         `,

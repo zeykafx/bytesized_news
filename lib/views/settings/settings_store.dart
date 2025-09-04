@@ -288,6 +288,7 @@ abstract class _SettingsStore with Store {
   static const defaultSummaryLength = 3;
   static const defaultNotificationAfterBgSync = false;
   static const defaultShowSummaryCard = true;
+  static const defaultDownloadReadPosts = true;
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)
@@ -517,4 +518,8 @@ abstract class _SettingsStore with Store {
   @JsonKey(defaultValue: defaultShowSummaryCard)
   @observable
   bool showSummaryCard = defaultShowSummaryCard;
+
+  @JsonKey(defaultValue: defaultDownloadReadPosts)
+  @observable
+  bool downloadReadPosts = defaultDownloadReadPosts;
 }

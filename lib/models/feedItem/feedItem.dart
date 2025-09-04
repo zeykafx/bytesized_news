@@ -155,7 +155,7 @@ class FeedItem {
     return feedItem;
   }
 
-  Future<String> fetchHtmlContent(String articleUrl) async {
+  Future<String> fetchHtmlContent(String articleUrl, bool download) async {
     Article result = await readability.parseAsync(articleUrl);
     if (result.content == null || result.content!.isEmpty) {
       estReadingTimeMinutes = 0;
@@ -171,10 +171,14 @@ class FeedItem {
     // estReadingTime = Duration(minutes: (wordCount / readingSpeed).toInt());
     estReadingTimeMinutes = (wordCount / readingSpeed).toInt();
 
-    htmlContent = result.content!.split("\n").toSet().join("\n");
-    downloaded = true;
+    String downloadedHtmlContent = result.content!.split("\n").toSet().join("\n");
 
-    dom.Document contentElement = html_parser.parse(htmlContent);
+    if (download) {
+      htmlContent = downloadedHtmlContent;
+      downloaded = true;
+    }
+
+    dom.Document contentElement = html_parser.parse(downloadedHtmlContent);
     List<dom.Element> images = contentElement.getElementsByTagName("img")
       ..addAll(contentElement.getElementsByTagName("image"))
       ..addAll(contentElement.getElementsByTagName("picture"));
@@ -193,15 +197,17 @@ class FeedItem {
       }
 
       try {
-        if (!imgSrc.endsWith("svg")) {
-          await DefaultCacheManager().downloadFile(imgSrc, force: true);
+        if (download) {
+          if (!imgSrc.endsWith("svg")) {
+            await DefaultCacheManager().downloadFile(imgSrc, force: true);
+          }
         }
       } catch (_) {}
     }
 
     await dbUtils.updateItemInDb(this);
 
-    return htmlContent!;
+    return downloadedHtmlContent;
   }
 
   @override

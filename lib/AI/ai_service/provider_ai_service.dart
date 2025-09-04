@@ -371,6 +371,7 @@ class ProviderAiService extends AiService {
         - Summaries below 75% accuracy should generally not be used
 
         ### OUTPUT FORMAT
+        OUTPUT ONLY THE JSON STRING, this string is parsed as json directly
         Return ONLY a JSON object with these exact keys:
         - "useSummary" (boolean): true if summary meets minimum quality standards
         - "accuracy" (float): percentage score from 0.0 to 100.0
@@ -445,6 +446,7 @@ class ProviderAiService extends AiService {
         OUTPUT REQUIREMENTS:
         - Return ONLY valid JSON in this exact format: {"categories": ["Category1", "Category2", "Category3"]}
         - Use proper JSON syntax with double quotes
+        - OUTPUT ONLY THE JSON STRING, this string is parsed as json directly
         - Include 3-5 categories maximum
         - Categories should be title-cased (first letter capitalized)
         """),
