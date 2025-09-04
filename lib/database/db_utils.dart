@@ -544,7 +544,7 @@ class DbUtils {
   // ---- migration
   Future<void> performMigrationIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
-    final latestVersion = 4;
+    final latestVersion = 5;
     final currentVersion = prefs.getInt('version') ?? latestVersion;
     if (currentVersion < latestVersion) {
       await migrate();
@@ -582,11 +582,12 @@ class DbUtils {
     }
   }
 
+  // delete download items -----
+
   Future<int> numberOfItemsDownloaded() async {
     return await isar.feedItems.where().filter().downloadedEqualTo(true).count();
   }
 
-  // delete download items
   Future<int> deleteDownloadedItems() async {
     List<FeedItem> itemsToDelete = await isar.feedItems.where().filter().downloadedEqualTo(true).findAll();
 

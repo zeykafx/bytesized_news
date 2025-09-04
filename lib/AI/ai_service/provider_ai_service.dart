@@ -30,7 +30,7 @@ class ProviderAiService extends AiService {
 
   Future<void> getAiProviderAndCheckUsable() async {
     aiProvider = await dbUtils.getActiveAiProvider() ?? defaultProviders.first;
-    if (aiProvider.apiKey.isEmpty) {
+    if (aiProvider.apiKey.isEmpty && aiProvider.needsApiKey) {
       throw Exception("Error: Provide an api key for ${aiProvider.name}");
     }
 
@@ -197,11 +197,21 @@ class ProviderAiService extends AiService {
     ChatResponse response = await provider.chat(messages);
     var jsonOutput = response.text ?? "{}";
 
+    if (jsonOutput.startsWith("```json")) {
+      jsonOutput = jsonOutput.replaceAll("```json", "");
+      jsonOutput = jsonOutput.replaceAll("```", "");
+    }
+
     var jsonData = jsonDecode(jsonOutput);
     List<FeedItem> suggestedArticles = [];
     for (var article in jsonData['articles']) {
       if (article.containsKey("id")) {
-        int id = article['id'];
+        int id;
+        if (article["id"] is String) {
+          id = int.parse(article["id"]);
+        } else {
+          id = article['id'];
+        }
         FeedItem feedItem;
         try {
           feedItem = feedItems.firstWhere((item) => item.id == id);
@@ -291,6 +301,11 @@ class ProviderAiService extends AiService {
     ];
     ChatResponse response = await provider.chat(messages);
     var jsonOutput = response.text ?? "{}";
+
+    if (jsonOutput.startsWith("```json")) {
+      jsonOutput = jsonOutput.replaceAll("```json", "");
+      jsonOutput = jsonOutput.replaceAll("```", "");
+    }
 
     var jsonData = jsonDecode(jsonOutput);
     List<String> categories = [];
@@ -384,6 +399,11 @@ class ProviderAiService extends AiService {
     ChatResponse response = await provider.chat(messages);
     var jsonOutput = response.text ?? "{}";
 
+    if (jsonOutput.startsWith("```json")) {
+      jsonOutput = jsonOutput.replaceAll("```json", "");
+      jsonOutput = jsonOutput.replaceAll("```", "");
+    }
+
     var jsonData = jsonDecode(jsonOutput);
     bool useSummary = jsonData["useSummary"];
     double accuracy = jsonData["accuracy"];
@@ -455,6 +475,11 @@ class ProviderAiService extends AiService {
     ];
     ChatResponse response = await provider.chat(messages);
     var jsonOutput = response.text ?? "{}";
+
+    if (jsonOutput.startsWith("```json")) {
+      jsonOutput = jsonOutput.replaceAll("```json", "");
+      jsonOutput = jsonOutput.replaceAll("```", "");
+    }
 
     var jsonData = jsonDecode(jsonOutput);
     List<String> categories = [];

@@ -43,23 +43,28 @@ const AiProviderSchema = CollectionSchema(
       type: IsarType.stringList,
     ),
     r'name': PropertySchema(id: 9, name: r'name', type: IsarType.string),
-    r'openAiCompatible': PropertySchema(
+    r'needsApiKey': PropertySchema(
       id: 10,
+      name: r'needsApiKey',
+      type: IsarType.bool,
+    ),
+    r'openAiCompatible': PropertySchema(
+      id: 11,
       name: r'openAiCompatible',
       type: IsarType.bool,
     ),
     r'providerInfo': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'providerInfo',
       type: IsarType.string,
     ),
     r'temperature': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'temperature',
       type: IsarType.double,
     ),
     r'useSameModelForSuggestions': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'useSameModelForSuggestions',
       type: IsarType.bool,
     ),
@@ -118,10 +123,11 @@ void _aiProviderSerialize(
   writer.writeLong(offsets[7], object.modelToUseIndexForSuggestions);
   writer.writeStringList(offsets[8], object.models);
   writer.writeString(offsets[9], object.name);
-  writer.writeBool(offsets[10], object.openAiCompatible);
-  writer.writeString(offsets[11], object.providerInfo);
-  writer.writeDouble(offsets[12], object.temperature);
-  writer.writeBool(offsets[13], object.useSameModelForSuggestions);
+  writer.writeBool(offsets[10], object.needsApiKey);
+  writer.writeBool(offsets[11], object.openAiCompatible);
+  writer.writeString(offsets[12], object.providerInfo);
+  writer.writeDouble(offsets[13], object.temperature);
+  writer.writeBool(offsets[14], object.useSameModelForSuggestions);
 }
 
 AiProvider _aiProviderDeserialize(
@@ -138,14 +144,15 @@ AiProvider _aiProviderDeserialize(
     inUse: reader.readBool(offsets[5]),
     models: reader.readStringList(offsets[8]) ?? [],
     name: reader.readString(offsets[9]),
-    openAiCompatible: reader.readBool(offsets[10]),
-    providerInfo: reader.readString(offsets[11]),
-    temperature: reader.readDouble(offsets[12]),
+    needsApiKey: reader.readBool(offsets[10]),
+    openAiCompatible: reader.readBool(offsets[11]),
+    providerInfo: reader.readString(offsets[12]),
+    temperature: reader.readDouble(offsets[13]),
   );
   object.id = id;
   object.modelToUseIndex = reader.readLong(offsets[6]);
   object.modelToUseIndexForSuggestions = reader.readLong(offsets[7]);
-  object.useSameModelForSuggestions = reader.readBool(offsets[13]);
+  object.useSameModelForSuggestions = reader.readBool(offsets[14]);
   return object;
 }
 
@@ -179,10 +186,12 @@ P _aiProviderDeserializeProp<P>(
     case 10:
       return (reader.readBool(offset)) as P;
     case 11:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 12:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 13:
+      return (reader.readDouble(offset)) as P;
+    case 14:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1446,6 +1455,15 @@ extension AiProviderQueryFilter
   }
 
   QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
+  needsApiKeyEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'needsApiKey', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterFilterCondition>
   openAiCompatibleEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1802,6 +1820,18 @@ extension AiProviderQuerySortBy
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy> sortByNeedsApiKey() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'needsApiKey', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy> sortByNeedsApiKeyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'needsApiKey', Sort.desc);
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> sortByOpenAiCompatible() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'openAiCompatible', Sort.asc);
@@ -1979,6 +2009,18 @@ extension AiProviderQuerySortThenBy
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy> thenByNeedsApiKey() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'needsApiKey', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AiProvider, AiProvider, QAfterSortBy> thenByNeedsApiKeyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'needsApiKey', Sort.desc);
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QAfterSortBy> thenByOpenAiCompatible() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'openAiCompatible', Sort.asc);
@@ -2104,6 +2146,12 @@ extension AiProviderQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AiProvider, AiProvider, QDistinct> distinctByNeedsApiKey() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'needsApiKey');
+    });
+  }
+
   QueryBuilder<AiProvider, AiProvider, QDistinct> distinctByOpenAiCompatible() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'openAiCompatible');
@@ -2198,6 +2246,12 @@ extension AiProviderQueryProperty
   QueryBuilder<AiProvider, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<AiProvider, bool, QQueryOperations> needsApiKeyProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'needsApiKey');
     });
   }
 

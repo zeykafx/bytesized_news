@@ -167,17 +167,18 @@ abstract class _AiStore with Store {
     provider.apiLink = baseUrl;
 
     if (showCustomModelField) {
-      // save the custom model name by adding it to the list of models and setting the index to it
       String modelName = customModelController.text;
-      provider.models.add(modelName);
-      provider.modelToUseIndex = provider.models.indexOf(modelName);
+
+      // provider.models = [...provider.models, modelName];
+      // provider.modelToUseIndex = provider.models.indexOf(modelName);
+      // showCustomModelField = false;
     }
 
     if (showCustomSuggestionModelField) {
-      // save the custom model name by adding it to the list of models and setting the index to it
       String modelName = customSuggestionModelController.text;
-      provider.models.add(modelName);
-      provider.modelToUseIndexForSuggestions = provider.models.indexOf(modelName);
+      // provider.models = [...provider.models, modelName];
+      // provider.modelToUseIndexForSuggestions = provider.models.indexOf(modelName);
+      // showCustomSuggestionModelField = false;
     }
 
     await dbUtils.updateAiProvider(provider);
@@ -189,7 +190,7 @@ abstract class _AiStore with Store {
   @action
   Future<void> testProviderToUse(BuildContext context) async {
     AiProvider aiProvider = providerInUse;
-    if (aiProvider.apiKey.isEmpty) {
+    if (aiProvider.apiKey.isEmpty && aiProvider.needsApiKey) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please provide an API key")));
       return;
     }
@@ -232,7 +233,7 @@ abstract class _AiStore with Store {
         print(e);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error': ${e.toString()}")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
     }
 
     loading = false;

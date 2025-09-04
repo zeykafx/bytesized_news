@@ -10,6 +10,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://api.openai.com/v1",
     openAiCompatible: true,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "gpt-5",
       "gpt-5-mini",
@@ -35,6 +36,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://api.anthropic.com",
     openAiCompatible: false,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "claude-opus-4-1-20250805",
       "claude-opus-4-20250514",
@@ -54,6 +56,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://api.deepseek.com",
     openAiCompatible: true,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "deepseek-chat",
       "deepseek-reasoner",
@@ -66,12 +69,22 @@ List<AiProvider> defaultProviders = [
   AiProvider(
     name: "Ollama",
     devName: "ollama",
-    apiLink: "http://localhost:11434/v1",
-    openAiCompatible: true,
+    apiLink: "http://localhost:11434/",
+    openAiCompatible: false,
     apiKey: "",
+    needsApiKey: false,
     models: [
-      "gpt-oss-20b",
-      "gpt-oss-120b",
+      "gpt-oss:120b",
+      "gpt-oss:20b",
+      "gemma3:27b",
+      "gemma3:12b",
+      "gemma3:4b",
+      "gemma3:1b",
+      "deenseek-v3.1:671b",
+      "deepseek-r1:8b",
+      "qwen3:30b",
+      "qwen3:8b",
+      "qwen3:4b",
     ],
     temperature: 0.3,
     inUse: false,
@@ -84,6 +97,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://generativelanguage.googleapis.com/v1beta/openai/",
     openAiCompatible: true,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "gemini-2.5-flash-lite",
       "gemini-2.5-flash",
@@ -102,6 +116,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://api.groq.com/openai/v1",
     openAiCompatible: true,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "llama-3.1-8b-instant",
       "llama-3.3-70b-versatile",
@@ -123,6 +138,7 @@ List<AiProvider> defaultProviders = [
     apiLink: "https://openrouter.ai/api/v1",
     openAiCompatible: true,
     apiKey: "",
+    needsApiKey: true,
     models: [
       "anthropic/claude-sonnet-4",
       "google/gemini-2.5-flash",
@@ -163,6 +179,7 @@ class AiProvider {
   // user settings
   String apiLink;
   String apiKey;
+  bool needsApiKey;
   double temperature = 0.3;
   int modelToUseIndex = 0;
   bool useSameModelForSuggestions = true;
@@ -177,6 +194,7 @@ class AiProvider {
     required this.apiKey,
     required this.models,
     required this.temperature,
+    required this.needsApiKey,
     required this.inUse,
     required this.iconFileName,
     required this.providerInfo,

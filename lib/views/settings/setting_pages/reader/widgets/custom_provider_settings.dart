@@ -112,17 +112,13 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                       elevation: 0,
                       children: [
                         for (AiProvider provider in store.allProviders) ...[
-                          SizedBox(
-                            // width: cardWidth,
-                            // height: cardHeight,
-                            child: ProviderCard(
-                              cardHeight: cardHeight,
-                              cardWidth: cardWidth,
-                              provider: provider,
-                              colorScheme: colorScheme,
-                              store: store,
-                              carousel: carousel,
-                            ),
+                          ProviderCard(
+                            cardHeight: cardHeight,
+                            cardWidth: cardWidth,
+                            provider: provider,
+                            colorScheme: colorScheme,
+                            store: store,
+                            carousel: carousel,
                           ),
                         ],
                       ],
@@ -146,26 +142,27 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                           ),
                           const SizedBox(height: 16),
 
-                          TextFormField(
-                            controller: store.apiKeysControllers[store.providerIndex],
-                            decoration: InputDecoration(
-                              labelText: "API Key",
-                              hintText: "Enter your ${store.allProviders[store.providerIndex].name} API key",
-                              prefixIcon: const Icon(Icons.key_outlined),
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.visibility_outlined),
-                                onPressed: () {
-                                  store.obscure = !store.obscure;
-                                },
-                              ),
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(12.0),
+                          if (store.providerInUse.devName != "ollama")
+                            TextFormField(
+                              controller: store.apiKeysControllers[store.providerIndex],
+                              decoration: InputDecoration(
+                                labelText: "API Key",
+                                hintText: "Enter your ${store.allProviders[store.providerIndex].name} API key",
+                                prefixIcon: const Icon(Icons.key_outlined),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.visibility_outlined),
+                                  onPressed: () {
+                                    store.obscure = !store.obscure;
+                                  },
+                                ),
+                                border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(12.0),
+                                  ),
                                 ),
                               ),
+                              obscureText: store.obscure,
                             ),
-                            obscureText: store.obscure,
-                          ),
 
                           const SizedBox(height: 16),
 

@@ -45,7 +45,7 @@ class _ReaderModeSectionState extends State<ReaderModeSection> {
             // USE READER MODE BY DEFAULT
             SwitchListTile(
               title: const Text("Use Reader Mode by default"),
-              subtitle: const Text("Text only version of the article"),
+              subtitle: const Text("Text & images only version of the article, bypasses paywalls and has no ads"),
 
               value: settingsStore.useReaderModeByDefault,
               onChanged: (value) {
