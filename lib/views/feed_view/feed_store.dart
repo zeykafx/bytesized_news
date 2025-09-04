@@ -445,7 +445,7 @@ abstract class _FeedStore with Store {
   @action
   Future<void> buildUserTasteProfile() async {
     // if the user profile hasn't been built for at least a week, do that before getting suggestions
-    // if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
+    if (authStore.builtUserProfileDate == null || DateTime.now().toUtc().difference(authStore.builtUserProfileDate!).inDays >= 7) {
     List<Feed> mostReadFeeds = await dbUtils.getFeedsSortedByInterest();
     if (mostReadFeeds.isEmpty) {
       return;
@@ -459,22 +459,14 @@ abstract class _FeedStore with Store {
     // These mutations trigger firebase updates
     authStore.userInterests.addAll(interests);
     authStore.builtUserProfileDate = DateTime.now();
-    // }
+    }
   }
 
   @action
   Future<void> createNewsSuggestion() async {
-    // if (authStore.userTier != Tier.premium) {
-    //   if (kDebugMode) {
-    //     print("Cannot fetch news suggestions, not premium");
-    //   }
-    //   return;
-    // }
     if (settingsStore.sort != FeedListSort.byDate) {
       return;
     }
-    
-    await buildUserTasteProfile();
 
     if (kDebugMode) {
       print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
@@ -502,7 +494,7 @@ abstract class _FeedStore with Store {
       return;
     }
 
-    // buildUserTasteProfile();
+    buildUserTasteProfile();
 
     if (kDebugMode) {
       print("Will fetch unread items to get news suggestions");

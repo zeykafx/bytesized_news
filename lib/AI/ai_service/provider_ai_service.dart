@@ -294,7 +294,6 @@ class ProviderAiService extends AiService {
 
     var jsonData = jsonDecode(jsonOutput);
     List<String> categories = [];
-    print(jsonData);
     for (var category in jsonData['categories']) {
       if (!userInterests.contains(category)) {
         categories.add(category);
@@ -305,16 +304,165 @@ class ProviderAiService extends AiService {
       print("User interest categories: $categories");
     }
     return categories;
+  }
 
-    // final result = await functions.httpsCallable('buildUserInterests').call({"mostReadFeedsString": mostReadFeedsString});
-    // var response = result.data as Map<String, dynamic>;
-    // if (response["error"] != null) {
-    //   throw Exception(response["error"]);
-    // }
+  Future<(bool, double)> evaluateSummary(String articleText, String summaryText) async {
+    if (articleText.isEmpty || summaryText.isEmpty) {
+      throw Exception("Missing article text or summary text");
+    }
 
-    // var jsonOutput = response["categoriesJson"];
-    // var jsonData = jsonDecode(jsonOutput);
+    String modelToUse = aiProvider.useSameModelForSuggestions
+        ? aiProvider.models[aiProvider.modelToUseIndex]
+        : aiProvider.models[aiProvider.modelToUseIndexForSuggestions];
 
-    // return categories;
+    ChatCapability provider;
+    if (aiProvider.devName == "openrouter") {
+      provider = await ai()
+          .openRouter()
+          .baseUrl(aiProvider.apiLink)
+          .apiKey(aiProvider.apiKey)
+          .model(modelToUse)
+          .temperature(0.5)
+          .responseFormat("json")
+          .build();
+    } else {
+      provider = await createProvider(
+        providerId: aiProvider.devName,
+        apiKey: aiProvider.apiKey,
+        model: modelToUse,
+        baseUrl: aiProvider.apiLink,
+        temperature: 0.5,
+        extensions: {"responseFormat": "json"},
+      );
+    }
+
+    if (kDebugMode) {
+      print("Calling ${aiProvider.name} with model $modelToUse to evaluate the summary for an article");
+    }
+
+    List<ChatMessage> messages = [
+      ChatMessage.system("""
+        ### Role
+        You are an expert summary evaluation system. Your task is to assess the quality, accuracy, and usability of article summaries.
+
+        ### Evaluation Criteria
+        Carefully analyze the original article and summary for:
+
+        1. Factual Accuracy:
+           - Are all stated facts consistent with the original article?
+           - Are there any hallucinations or fabricated information?
+           - Weight: 40% of total score
+
+        2. Comprehensiveness:
+           - Does the summary include the most important points from the article?
+           - Are key statistics, names, and events preserved?
+           - Weight: 30% of total score
+
+        3. Clarity & Usability:
+           - Is the summary well-structured and easy to understand?
+           - Does it follow the requested bullet point format?
+           - Does it maintain proper context for statements?
+           - Weight: 30% of total score
+
+        ### Scoring Guidelines
+        - Critical factual errors automatically reduce accuracy below 70%
+        - Multiple hallucinations should result in a "do not use" recommendation
+        - Minor omissions of secondary details are acceptable
+        - Summaries below 75% accuracy should generally not be used
+
+        ### OUTPUT FORMAT
+        Return ONLY a JSON object with these exact keys:
+        - "useSummary" (boolean): true if summary meets minimum quality standards
+        - "accuracy" (float): percentage score from 0.0 to 100.0
+
+        Example: {"useSummary": true, "accuracy": 85.5}
+        """),
+      ChatMessage.user("Article: $articleText"),
+      ChatMessage.user("Summary: $summaryText"),
+    ];
+    ChatResponse response = await provider.chat(messages);
+    var jsonOutput = response.text ?? "{}";
+
+    var jsonData = jsonDecode(jsonOutput);
+    bool useSummary = jsonData["useSummary"];
+    double accuracy = jsonData["accuracy"];
+    return (useSummary, accuracy);
+  }
+
+  Future<List<String>> getFeedCategories(Feed feed) async {
+    String modelToUse = aiProvider.useSameModelForSuggestions
+        ? aiProvider.models[aiProvider.modelToUseIndex]
+        : aiProvider.models[aiProvider.modelToUseIndexForSuggestions];
+
+    ChatCapability provider;
+    if (aiProvider.devName == "openrouter") {
+      provider = await ai()
+          .openRouter()
+          .baseUrl(aiProvider.apiLink)
+          .apiKey(aiProvider.apiKey)
+          .model(modelToUse)
+          .temperature(0.5)
+          .responseFormat("json")
+          .build();
+    } else {
+      provider = await createProvider(
+        providerId: aiProvider.devName,
+        apiKey: aiProvider.apiKey,
+        model: modelToUse,
+        baseUrl: aiProvider.apiLink,
+        temperature: 0.5,
+        extensions: {"responseFormat": "json"},
+      );
+    }
+
+    if (kDebugMode) {
+      print("Calling ${aiProvider.name} with model $modelToUse to get ${feed.name} categories.");
+    }
+
+    List<ChatMessage> messages = [
+      ChatMessage.system("""
+        Role:
+        You are a content categorization specialist. Your task is to analyze RSS feed information and determine the most relevant content categories.
+
+        INPUT ANALYSIS:
+        - Examine the feed name for topic-specific keywords, brand indicators, and subject matter clues
+        - Analyze the URL domain and path for additional context (e.g., tech.com, sports/basketball, finance/markets)
+        - Consider both explicit terms and implicit meanings (e.g., "Hacker News" relates to Technology, not illegal activities)
+
+        CATEGORIZATION GUIDELINES:
+        - Generate 3-5 categories that best represent the feed's content scope
+        - Use clear, standardized category names (e.g., "Technology", "Sports", "Politics", "Business", "Science")
+        - Balance between specific niches and broader topics for better discoverability
+        - Prioritize categories that users would likely search for or filter by
+        - Avoid overly generic terms like "News" or "Articles" unless specifically appropriate
+
+        EXAMPLES:
+        - "TechCrunch" → Technology, Startups, Business, Innovation
+        - "ESPN NBA" → Sports, Basketball, Entertainment
+        - "The Economist" → Business, Politics, Economics, Finance
+        - "Science Daily" → Science, Research, Technology, Health
+
+        OUTPUT REQUIREMENTS:
+        - Return ONLY valid JSON in this exact format: {"categories": ["Category1", "Category2", "Category3"]}
+        - Use proper JSON syntax with double quotes
+        - Include 3-5 categories maximum
+        - Categories should be title-cased (first letter capitalized)
+        """),
+      ChatMessage.user("Feed name: ${feed.name}"),
+      ChatMessage.user("Feed link: ${feed.link}"),
+    ];
+    ChatResponse response = await provider.chat(messages);
+    var jsonOutput = response.text ?? "{}";
+
+    var jsonData = jsonDecode(jsonOutput);
+    List<String> categories = [];
+    for (var category in jsonData['categories']) {
+      categories.add(category);
+    }
+
+    if (kDebugMode) {
+      print("Categories for ${feed.name}: $categories");
+    }
+    return categories;
   }
 }

@@ -718,7 +718,7 @@ abstract class _StoryStore with Store {
       feedItem.summarized = true;
       await dbUtils.updateItemInDb(feedItem);
       feedItemSummarized = true;
-      // evaluateSummary(docText, summary, context);
+      evaluateSummary(docText, summary, context);
     } catch (e) {
       if (kDebugMode) {
         print(e);

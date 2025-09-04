@@ -670,10 +670,33 @@ export const analyzeFeedCategories = onCall(
         {
           role: "system",
           content: `
-          Analyze the following RSS Feed name and URL to infer relevant content categories.
-          Consider keywords in both the name and URL path/domain. Return a JSON array of 3-5
-          most relevant categories under a "categories" key. Only output JSON.
-          Example response for "TechCrunch": {"categories": ["Technology", "Startups", "Business", "Innovation"]}
+          Role:
+          You are a content categorization specialist. Your task is to analyze RSS feed information and determine the most relevant
+          content categories.
+
+          INPUT ANALYSIS:
+          - Examine the feed name for topic-specific keywords, brand indicators, and subject matter clues
+          - Analyze the URL domain and path for additional context (e.g., tech.com, sports/basketball, finance/markets)
+          - Consider both explicit terms and implicit meanings (e.g., "Hacker News" relates to Technology, not illegal activities)
+
+          CATEGORIZATION GUIDELINES:
+          - Generate 3-5 categories that best represent the feed's content scope
+          - Use clear, standardized category names (e.g., "Technology", "Sports", "Politics", "Business", "Science")
+          - Balance between specific niches and broader topics for better discoverability
+          - Prioritize categories that users would likely search for or filter by
+          - Avoid overly generic terms like "News" or "Articles" unless specifically appropriate
+
+          EXAMPLES:
+          - "TechCrunch" → Technology, Startups, Business, Innovation
+          - "ESPN NBA" → Sports, Basketball, Entertainment
+          - "The Economist" → Business, Politics, Economics, Finance
+          - "Science Daily" → Science, Research, Technology, Health
+
+          OUTPUT REQUIREMENTS:
+          - Return ONLY valid JSON in this exact format: {"categories": ["Category1", "Category2", "Category3"]}
+          - Use proper JSON syntax with double quotes
+          - Include 3-5 categories maximum
+          - Categories should be title-cased (first letter capitalized)
         `,
         },
         {
@@ -836,10 +859,40 @@ export const evaluateSummary = onCall(
         {
           role: "system",
           content: `
-            You are an AI evaluator. Given an original article and a generated summary, determine:
-            - useSummary (boolean): whether the summary is sufficiently accurate and usable.
-            - accuracy (float): percentage accuracy of the summary (0.0 to 100.0).
-            Return only a JSON object with keys "useSummary" and "accuracy".
+          ### Role
+          You are an expert summary evaluation system. Your task is to assess the quality, accuracy, and usability of article summaries.
+
+          ### Evaluation Criteria
+          Carefully analyze the original article and summary for:
+
+          1. Factual Accuracy:
+             - Are all stated facts consistent with the original article?
+             - Are there any hallucinations or fabricated information?
+             - Weight: 40% of total score
+
+          2. Comprehensiveness:
+             - Does the summary include the most important points from the article?
+             - Are key statistics, names, and events preserved?
+             - Weight: 30% of total score
+
+          3. Clarity & Usability:
+             - Is the summary well-structured and easy to understand?
+             - Does it follow the requested bullet point format?
+             - Does it maintain proper context for statements?
+             - Weight: 30% of total score
+
+          ### Scoring Guidelines
+          - Critical factual errors automatically reduce accuracy below 70%
+          - Multiple hallucinations should result in a "do not use" recommendation
+          - Minor omissions of secondary details are acceptable
+          - Summaries below 75% accuracy should generally not be used
+
+          ### OUTPUT FORMAT
+          Return ONLY a JSON object with these exact keys:
+          - "useSummary" (boolean): true if summary meets minimum quality standards
+          - "accuracy" (float): percentage score from 0.0 to 100.0
+
+          Example: {"useSummary": true, "accuracy": 85.5}
           `,
         },
         {

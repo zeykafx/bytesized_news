@@ -142,7 +142,7 @@ class _FeedViewState extends State<FeedView> {
                   locked: feedStore.isLocked,
                   body: RefreshIndicator(
                     onRefresh: () async {
-                      feedStore.fetchItems();
+                      feedStore.getItems();
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),

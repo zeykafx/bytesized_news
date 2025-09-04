@@ -1,7 +1,9 @@
+import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ class _AddFeedState extends State<AddFeed> {
   late Isar isar;
   late DbUtils dbUtils;
   late FeedSync feedSync;
+  late AiUtils aiUtils;
   TextEditingController feedLinkController = TextEditingController();
   TextEditingController feedNameController = TextEditingController();
   bool loading = false;
@@ -31,10 +34,15 @@ class _AddFeedState extends State<AddFeed> {
   @override
   void initState() {
     super.initState();
+
+    AuthStore authStore = context.read<AuthStore>();
+    SettingsStore settingsStore = context.read<SettingsStore>();
+
     isar = Isar.getInstance()!;
     dbUtils = DbUtils(isar: isar);
-    AuthStore authStore = context.read<AuthStore>();
+
     feedSync = FeedSync(authStore: authStore, isar: isar);
+    aiUtils = AiUtils(authStore, settingsStore);
   }
 
   Future<void> addFeedToDb(Feed feed) async {
@@ -43,13 +51,12 @@ class _AddFeedState extends State<AddFeed> {
         content: Text("Fetching categories for feed, please wait..."),
       ),
     );
-    loading = true;
-    // List<String> categories = await aiUtils.getFeedCategories(feed);
-    loading = false;
 
-    // feed.categories = categories;
-    await dbUtils.addFeed(feed);
-    await feedSync.updateSingleFeedInFirestore(feed);
+    aiUtils.getFeedCategories(feed).then((List<String> categories) async {
+      feed.categories = categories;
+      await dbUtils.addFeed(feed);
+      await feedSync.updateSingleFeedInFirestore(feed);
+    });
   }
 
   @override
@@ -83,7 +90,7 @@ class _AddFeedState extends State<AddFeed> {
                         ),
                       ),
                     ),
-            
+
                     // feed link input
                     Padding(
                       padding: const EdgeInsets.all(4),
@@ -103,9 +110,9 @@ class _AddFeedState extends State<AddFeed> {
                       ),
                       controller: feedLinkController,
                     ),
-            
+
                     const SizedBox(height: 20),
-            
+
                     // feed name input
                     Padding(
                       padding: const EdgeInsets.all(4),
@@ -124,18 +131,18 @@ class _AddFeedState extends State<AddFeed> {
                       ),
                       controller: feedNameController,
                     ),
-            
+
                     const SizedBox(height: 20),
-            
+
                     Align(
                       alignment: Alignment.centerRight,
                       child: FilledButton.tonal(
                         onPressed: () async {
                           Dio dio = Dio();
-            
+
                           String feedLink = feedLinkController.text;
                           String feedName = feedNameController.text;
-            
+
                           Response res;
                           try {
                             res = await dio.get(feedLink);
@@ -143,7 +150,7 @@ class _AddFeedState extends State<AddFeed> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid link")));
                             return;
                           }
-            
+
                           try {
                             AtomFeed.parse(res.data);
                           } catch (e) {
@@ -154,7 +161,7 @@ class _AddFeedState extends State<AddFeed> {
                               return;
                             }
                           }
-            
+
                           if (feedName.isEmpty) {
                             Feed? feed = await Feed.createFeed(feedLink);
                             if (feed == null) {
@@ -173,7 +180,7 @@ class _AddFeedState extends State<AddFeed> {
                           }
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully added feed!")));
-            
+
                           await widget.getFeeds();
                           await widget.getItems();
                         },
@@ -186,7 +193,7 @@ class _AddFeedState extends State<AddFeed> {
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
