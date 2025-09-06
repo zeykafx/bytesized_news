@@ -142,7 +142,7 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                           ),
                           const SizedBox(height: 16),
 
-                          if (store.providerInUse.devName != "ollama")
+                          if (store.providerInUse.needsApiKey)
                             TextFormField(
                               controller: store.apiKeysControllers[store.providerIndex],
                               decoration: InputDecoration(

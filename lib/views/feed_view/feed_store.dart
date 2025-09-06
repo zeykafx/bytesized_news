@@ -502,6 +502,12 @@ abstract class _FeedStore with Store {
 
     List<FeedItem> todaysUnreadItems = await dbUtils.getTodaysUnreadItems(feeds)
       ..take(20);
+
+    todaysUnreadItems.addAll(
+      await dbUtils.getBookmarkedItems(feeds)
+        ..take(10),
+    );
+    
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;
