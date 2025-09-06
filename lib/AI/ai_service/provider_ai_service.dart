@@ -195,6 +195,15 @@ class ProviderAiService extends AiService {
       ChatMessage.user("Today's articles: $todaysArticles"),
     ];
     ChatResponse response = await provider.chat(messages);
+    // String actualResponse = response.text ?? "{}";
+    // print(response.text);
+    // if (response.text != null && response.text!.contains("<answer>")) {
+    //   int answerStart = response.text!.indexOf("<answser>");
+    //   int answerEnd = response.text!.indexOf("</answser>");
+    //   print("answer start: $answerStart");
+    //   actualResponse = response.text!.substring(answerStart, answerEnd);
+    //   print(actualResponse);
+    // }
     var jsonOutput = response.text ?? "{}";
 
     if (jsonOutput.startsWith("```json")) {
@@ -205,7 +214,7 @@ class ProviderAiService extends AiService {
     var jsonData = jsonDecode(jsonOutput);
     List<FeedItem> suggestedArticles = [];
     for (var article in jsonData['articles']) {
-      if (article.containsKey("id")) {
+      if (article is Map && article.containsKey("id")) {
         int id;
         if (article["id"] is String) {
           id = int.parse(article["id"]);
@@ -215,6 +224,13 @@ class ProviderAiService extends AiService {
         FeedItem feedItem;
         try {
           feedItem = feedItems.firstWhere((item) => item.id == id);
+          suggestedArticles.add(feedItem);
+        } catch (e) {
+          continue;
+        }
+      } else if (article is int) {
+        try {
+          FeedItem feedItem = feedItems.firstWhere((item) => item.id == article);
           suggestedArticles.add(feedItem);
         } catch (e) {
           continue;

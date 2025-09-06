@@ -183,64 +183,42 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
 
                           const SizedBox(height: 16),
 
-                          DropdownButtonFormField<String>(
-                            initialValue: store.providerInUse.models[store.providerInUse.modelToUseIndex],
-                            decoration: InputDecoration(
-                              labelText: "Model",
-                              prefixIcon: const Icon(Icons.psychology_outlined),
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(12.0),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  initialValue: store.providerInUse.models[store.providerInUse.modelToUseIndex],
+                                  decoration: InputDecoration(
+                                    labelText: "Model",
+                                    prefixIcon: const Icon(Icons.psychology_outlined),
+                                    border: const OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0),
+                                      ),
+                                    ),
+                                  ),
+                                  isExpanded: true,
+                                  items: store.providerInUse.models.map((model) {
+                                    return DropdownMenuItem<String>(
+                                      value: model,
+                                      child: Text(
+                                        model,
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    store.handleProviderModelUpdate(store.providerInUse, store.providerInUse.models.indexOf(value!));
+                                  },
                                 ),
                               ),
-                            ),
-                            isExpanded: true,
-                            items: (store.allProviders[store.providerIndex].models + ["custom"]).map((model) {
-                              return DropdownMenuItem<String>(
-                                value: model,
-                                child: Text(
-                                  model,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value == "custom") {
-                                store.showCustomModelField = true;
-                              } else {
-                                store.showCustomModelField = false;
-                                store.handleProviderModelUpdate(store.providerInUse, store.providerInUse.models.indexOf(value!));
-                              }
-                            },
+                              const SizedBox(width: 8),
+                              IconButton(icon: const Icon(Icons.edit_note_outlined), onPressed: () => showManageModelsDialog(context, store)),
+                            ],
                           ),
 
                           // const SizedBox(height: 16),
-                          AnimatedCrossFade(
-                            duration: 300.ms,
-                            firstCurve: Curves.easeInCubic,
-                            secondCurve: Curves.easeInCubic,
-                            sizeCurve: Curves.easeInCubic,
-                            crossFadeState: store.showCustomModelField ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                            firstChild: Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: TextFormField(
-                                controller: store.customModelController,
-                                decoration: InputDecoration(
-                                  labelText: "Model name",
-                                  hintText: "Custom model name",
-                                  prefixIcon: const Icon(Icons.psychology_alt_rounded),
-                                  helperText: "Enter the model name, e.g., 'gpt-5' and not 'GPT 5'",
-                                  border: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(12.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            secondChild: Center(child: SizedBox.shrink()),
-                          ),
-
                           ExpansionTile(
                             enableFeedback: true,
                             tilePadding: EdgeInsets.zero,
@@ -251,16 +229,12 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                             initiallyExpanded: !store.providerUseSameModelForSuggestions,
                             showTrailingIcon: false,
                             title: SwitchListTile(
-                              contentPadding: EdgeInsets.all(2),
+                              contentPadding: const EdgeInsets.all(2),
                               title: const Text("Use other model for suggestion"),
                               subtitle: Text("Enable to choose another model for suggestions", style: Theme.of(context).textTheme.bodySmall),
                               value: !store.providerInUse.useSameModelForSuggestions,
                               onChanged: (value) async {
                                 await store.handleProviderUseSameModelUpdate(store.providerInUse, !value);
-
-                                if (store.showCustomSuggestionModelField && !value) {
-                                  store.showCustomSuggestionModelField = false;
-                                }
 
                                 if (value) {
                                   store.expansibleController.expand();
@@ -285,7 +259,7 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                   ),
                                 ),
                                 isExpanded: true,
-                                items: (store.allProviders[store.providerIndex].models + ["custom"]).map((model) {
+                                items: store.providerInUse.models.map((model) {
                                   return DropdownMenuItem<String>(
                                     value: model,
                                     child: Text(
@@ -295,41 +269,10 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                   );
                                 }).toList(),
                                 onChanged: (value) async {
-                                  if (value == "custom") {
-                                    store.showCustomSuggestionModelField = true;
-                                  } else {
-                                    store.showCustomSuggestionModelField = false;
-                                    await store.handleProviderModelUpdate(store.providerInUse, store.providerInUse.models.indexOf(value!), isSuggestion: true);
-                                  }
+                                  await store.handleProviderModelUpdate(store.providerInUse, store.providerInUse.models.indexOf(value!), isSuggestion: true);
                                 },
                               ),
                             ],
-                          ),
-
-                          AnimatedCrossFade(
-                            duration: 300.ms,
-                            firstCurve: Curves.easeInCubic,
-                            secondCurve: Curves.easeInCubic,
-                            sizeCurve: Curves.easeInCubic,
-                            crossFadeState: store.showCustomSuggestionModelField ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                            firstChild: Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: TextFormField(
-                                controller: store.customSuggestionModelController,
-                                decoration: InputDecoration(
-                                  labelText: "Suggestion model name",
-                                  hintText: "Custom model name",
-                                  prefixIcon: const Icon(Icons.psychology_alt_rounded),
-                                  helperText: "Enter the model name, e.g., 'gpt-5' and not 'GPT 5'",
-                                  border: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(12.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            secondChild: Center(child: SizedBox.shrink()),
                           ),
 
                           ListTile(
@@ -383,7 +326,7 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                         store.apiUrlsControllers[store.providerIndex]!.text,
                                       );
                                       if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Saved succesfully"), duration: 1.seconds));
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Saved succesfully"), duration: 1.seconds));
                                       }
                                     } catch (e) {
                                       if (kDebugMode) {
@@ -451,5 +394,95 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
         );
       },
     );
+  }
+
+  void showManageModelsDialog(BuildContext context, AiStore store) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController newModelController = TextEditingController();
+        final ScrollController listViewController = ScrollController();
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Manage Models"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Observer(
+                      builder: (_) => Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: store.providerInUse.models.length,
+                          controller: listViewController,
+                          itemBuilder: (context, index) {
+                            final model = store.providerInUse.models[index];
+                            return ListTile(
+                              title: Text(model),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () {
+                                  store.deleteModel(model);
+                                  setState(() {});
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: newModelController,
+                      decoration: const InputDecoration(
+                        labelText: "New model name",
+                        hintText: "Enter the new model name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12.0),
+                          ),
+                        ),
+                      ),
+                      onFieldSubmitted: (value) {
+                        if (value.isNotEmpty) {
+                          store.addModel(value);
+                          newModelController.clear();
+                          listViewController.animateTo(listViewController.position.maxScrollExtent, duration: 200.ms, curve: Curves.easeInOutCubic);
+                          setState(() {});
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Close"),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    if (newModelController.text.isNotEmpty) {
+                      store.addModel(newModelController.text);
+                      newModelController.clear();
+                      listViewController.animateTo(listViewController.position.maxScrollExtent, duration: 200.ms, curve: Curves.easeInOutCubic);
+
+                      setState(() {});
+                    }
+                  },
+                  child: const Text("Add Model"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) {
+      setState(() {});
+    });
   }
 }

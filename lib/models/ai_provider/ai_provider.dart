@@ -212,7 +212,7 @@ class AiProvider {
 
   bool hasConfigChanged(AiProvider other) {
     if (devName == other.devName) {
-      return !listEquals(models, other.models) || iconFileName != other.iconFileName || providerInfo != other.providerInfo;
+      return iconFileName != other.iconFileName || providerInfo != other.providerInfo || apiLink != other.apiLink;
     } else {
       return false;
     }

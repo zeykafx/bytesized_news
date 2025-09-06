@@ -62,6 +62,12 @@ abstract class _AiStore with Store {
   @observable
   late TextEditingController customSuggestionModelController;
 
+  @computed
+  int get modelsLength => providerInUse.models.length;
+
+  @computed
+  ObservableList get models => providerInUse.models.asObservable();
+
   Future<void> init(SettingsStore settingsStore) async {
     this.settingsStore = settingsStore;
     dbUtils = DbUtils(isar: Isar.getInstance()!);
@@ -166,25 +172,41 @@ abstract class _AiStore with Store {
     provider.apiKey = apiKey;
     provider.apiLink = baseUrl;
 
-    if (showCustomModelField) {
-      String modelName = customModelController.text;
-
-      // provider.models = [...provider.models, modelName];
-      // provider.modelToUseIndex = provider.models.indexOf(modelName);
-      // showCustomModelField = false;
-    }
-
-    if (showCustomSuggestionModelField) {
-      String modelName = customSuggestionModelController.text;
-      // provider.models = [...provider.models, modelName];
-      // provider.modelToUseIndexForSuggestions = provider.models.indexOf(modelName);
-      // showCustomSuggestionModelField = false;
-    }
-
     await dbUtils.updateAiProvider(provider);
     providerInUse = provider;
     allProviders[providerIndex] = provider;
     loading = false;
+  }
+
+  @action
+  Future<void> addModel(String model) async {
+    if (model.isEmpty || providerInUse.models.contains(model)) return;
+
+    providerInUse.models = [...providerInUse.models, model];
+
+    await dbUtils.updateAiProvider(providerInUse);
+
+    allProviders[providerIndex] = providerInUse;
+    await refreshProviders();
+  }
+
+  @action
+  Future<void> deleteModel(String model) async {
+    if (providerInUse.models.length <= 1) return;
+    List<String> models = List.from(providerInUse.models);
+    models.remove(model);
+    providerInUse.models = models.toList();
+
+    if (providerInUse.modelToUseIndex >= providerInUse.models.length) {
+      providerInUse.modelToUseIndex = providerInUse.models.length - 1;
+    }
+    if (providerInUse.modelToUseIndexForSuggestions >= providerInUse.models.length) {
+      providerInUse.modelToUseIndexForSuggestions = providerInUse.models.length - 1;
+    }
+    await dbUtils.updateAiProvider(providerInUse);
+
+    allProviders[providerIndex] = providerInUse;
+    await refreshProviders();
   }
 
   @action

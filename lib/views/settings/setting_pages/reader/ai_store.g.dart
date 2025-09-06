@@ -24,6 +24,21 @@ mixin _$AiStore on _AiStore, Store {
         () => super.providerUseSameModelForSuggestions,
         name: '_AiStore.providerUseSameModelForSuggestions',
       )).value;
+  Computed<int>? _$modelsLengthComputed;
+
+  @override
+  int get modelsLength => (_$modelsLengthComputed ??= Computed<int>(
+    () => super.modelsLength,
+    name: '_AiStore.modelsLength',
+  )).value;
+  Computed<ObservableList<dynamic>>? _$modelsComputed;
+
+  @override
+  ObservableList<dynamic> get models =>
+      (_$modelsComputed ??= Computed<ObservableList<dynamic>>(
+        () => super.models,
+        name: '_AiStore.models',
+      )).value;
 
   late final _$storageAtom = Atom(name: '_AiStore.storage', context: context);
 
@@ -425,6 +440,26 @@ mixin _$AiStore on _AiStore, Store {
     );
   }
 
+  late final _$addModelAsyncAction = AsyncAction(
+    '_AiStore.addModel',
+    context: context,
+  );
+
+  @override
+  Future<void> addModel(String model) {
+    return _$addModelAsyncAction.run(() => super.addModel(model));
+  }
+
+  late final _$deleteModelAsyncAction = AsyncAction(
+    '_AiStore.deleteModel',
+    context: context,
+  );
+
+  @override
+  Future<void> deleteModel(String model) {
+    return _$deleteModelAsyncAction.run(() => super.deleteModel(model));
+  }
+
   late final _$testProviderToUseAsyncAction = AsyncAction(
     '_AiStore.testProviderToUse',
     context: context,
@@ -454,7 +489,9 @@ showCustomSuggestionModelField: ${showCustomSuggestionModelField},
 expansibleController: ${expansibleController},
 customSuggestionModelController: ${customSuggestionModelController},
 providerIndex: ${providerIndex},
-providerUseSameModelForSuggestions: ${providerUseSameModelForSuggestions}
+providerUseSameModelForSuggestions: ${providerUseSameModelForSuggestions},
+modelsLength: ${modelsLength},
+models: ${models}
     ''';
   }
 }

@@ -204,7 +204,12 @@ abstract class _StoryStore with Store {
     if (feedItem.feed != null && feedItem.feed!.alwaysOpenInWebview) {
       showReaderMode = false;
     } else {
-      if (!feedItem.downloaded) {
+      if (feedItem.url.endsWith(".pdf")) {
+        showReaderMode = false;
+        alertMessage = "PDF Documents are shown in the webview";
+        hasAlert = true;
+        shortAlert = true;
+      } else if (!feedItem.downloaded) {
         htmlContent = await feedItem.fetchHtmlContent(feedItem.url, settingsStore.downloadReadPosts);
         // storeHtmlPageInFeedItem(htmlContent);
         compareReaderModeLengthToPageHtml(context);
