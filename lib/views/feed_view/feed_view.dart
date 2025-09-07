@@ -6,6 +6,7 @@ import 'package:bytesized_news/views/feed_view/bsb_feed_button.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_manager/feed_manager.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_search.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_story_tile.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -54,8 +55,10 @@ class _FeedViewState extends State<FeedView> {
 
       await feedStore.init(setStore: settingsStore, authStore: authStore);
       await feedStore.getItems();
-    } catch (e) {
+    } catch (e, stack) {
       feedStore.sendAlert(e.toString());
+      FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
     }
 
     setState(() {});

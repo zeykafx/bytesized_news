@@ -1,3 +1,4 @@
+import 'package:bytesized_news/views/curated_feeds/curated_feeds_view.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -12,7 +13,7 @@ class Welcome extends StatefulWidget {
 class _WelcomeState extends State<Welcome> {
   final PageController pageController = PageController();
   int currentPage = 0;
-  final int pageCount = 3;
+  final int pageCount = 4;
 
   @override
   void dispose() {
@@ -65,7 +66,7 @@ class _WelcomeState extends State<Welcome> {
                     currentPage = page;
                   });
                 },
-                children: [buildIntroSlide(), buildPricingSlide(), buildAIDisclaimerSlide()],
+                children: [buildIntroSlide(), buildPricingSlide(), buildAIDisclaimerSlide(), buildCuratedFeedsSlide()],
               ),
             ),
 
@@ -76,8 +77,8 @@ class _WelcomeState extends State<Welcome> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(pageCount, (index) {
                   return AnimatedSize(
-                    duration: 300.ms,
-                    curve: Curves.decelerate,
+                    duration: 500.ms,
+                    curve: Curves.easeOutQuad,
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       width: currentPage == index ? 24 : 8,
@@ -209,6 +210,43 @@ class _WelcomeState extends State<Welcome> {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).dividerColor),
 
                 textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCuratedFeedsSlide() {
+    return Align(
+      alignment: Alignment.center,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            spacing: 10,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.rss_feed_rounded, size: 60, color: Theme.of(context).colorScheme.primary),
+
+              Text('Add curated feeds', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+
+              Text(
+                'Bytesized News has a list of curated sources available for you to add right now.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).dividerColor),
+                textAlign: TextAlign.center,
+              ),
+
+              FilledButton.tonal(
+                child: const Text("Follow sources"),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => CuratedFeedsView(context: context, getFeeds: () => null, getItems: () => null),
+                    ),
+                  );
+                },
               ),
             ],
           ),

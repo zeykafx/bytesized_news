@@ -3,7 +3,6 @@ import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -64,19 +63,21 @@ abstract class _PurchaseStore with Store {
     }
 
     final Stream purchaseUpdated = inAppPurchase.purchaseStream;
-    subscription = purchaseUpdated.listen(
-      (purchaseDetailsList) {
-        listenToPurchaseUpdated(purchaseDetailsList);
-      },
-      onDone: () {
-        subscription?.cancel();
-      },
-      onError: (error) {
-        if (kDebugMode) {
-          print(error);
-        }
-      },
-    ) as StreamSubscription<List<PurchaseDetails>>?;
+    subscription =
+        purchaseUpdated.listen(
+              (purchaseDetailsList) {
+                listenToPurchaseUpdated(purchaseDetailsList);
+              },
+              onDone: () {
+                subscription?.cancel();
+              },
+              onError: (error) {
+                if (kDebugMode) {
+                  print(error);
+                }
+              },
+            )
+            as StreamSubscription<List<PurchaseDetails>>?;
 
     final ProductDetailsResponse response = await inAppPurchase.queryProductDetails(productIds);
 

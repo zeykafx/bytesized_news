@@ -285,6 +285,7 @@ class _MyAppState extends State<MyApp> {
                   : settingsStore.darkMode == DarkMode.dark
                   ? ThemeMode.dark
                   : ThemeMode.light,
+              // home: user == null ? const Auth() : const Welcome(),
               home: user == null ? const Auth() : (settingsStore.hasShownWelcomeScreen ? const FeedView() : const Welcome()),
             );
           },

@@ -9,6 +9,7 @@ import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -270,9 +271,11 @@ abstract class _FeedStore with Store {
         try {
           atomFeed = await Isolate.run(() => AtomFeed.parse(res.data));
           usingRssFeed = false;
-        } catch (e) {
+        } catch (e, stack) {
           alertMessage = "Error: $e";
           hasAlert = true;
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
           continue;
         }
       }
@@ -423,9 +426,10 @@ abstract class _FeedStore with Store {
       feedGroups.add(feedGroup);
       alertMessage = "Successfully created Feed Group!";
       hasAlert = true;
-    } catch (e) {
+    } catch (e, stack) {
       alertMessage = "Failed to create Feed Group: error: ${e.toString()}";
       hasAlert = true;
+      FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
     }
   }
 
@@ -507,7 +511,7 @@ abstract class _FeedStore with Store {
       await dbUtils.getBookmarkedItems(feeds)
         ..take(10),
     );
-    
+
     filterArticlesMutedKeywords(todaysUnreadItems);
     if (todaysUnreadItems.isEmpty) {
       return;
@@ -521,7 +525,7 @@ abstract class _FeedStore with Store {
     var (List<FeedItem> suggestedArticles, int suggestionsLeft) = ([], 0);
     try {
       suggestedArticles = await aiUtils.getNewsSuggestions(todaysUnreadItems, userInterest, mostReadFeeds);
-    } catch (e) {
+    } catch (e, stack) {
       if (kDebugMode) {
         print(e);
         rethrow;
@@ -529,6 +533,8 @@ abstract class _FeedStore with Store {
       alertMessage = "Error: $e";
       hasAlert = true;
       suggestionsLoading = false;
+      FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
       return;
     }
 
@@ -565,12 +571,14 @@ abstract class _FeedStore with Store {
           } else {
             await dbUtils.updateItemInDb(feedItem);
           }
-        } catch (e) {
+        } catch (e, stack) {
           if (kDebugMode) {
             print("Failed to download item: ${feedItem.id}, with error: ${e}");
           }
           alertMessage = "A suggested item wasn't able to be downloaded: $e";
           hasAlert = true;
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          
         }
       }
     }

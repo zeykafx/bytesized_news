@@ -8,6 +8,7 @@ import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseAiService extends AiService {
@@ -106,7 +107,9 @@ class FirebaseAiService extends AiService {
         try {
           feedItem = feedItems.firstWhere((item) => item.id == id);
           suggestedArticles.add(feedItem);
-        } catch (e) {
+        } catch (e, stack) {
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          
           continue;
         }
       } else {

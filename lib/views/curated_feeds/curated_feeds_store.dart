@@ -5,6 +5,7 @@ import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -96,7 +97,9 @@ abstract class _CuratedFeedsStore with Store {
           curatedCategories.add(category);
         }
       }
-    } catch (err) {
+    } catch (err, stack) {
+      FirebaseCrashlytics.instance.recordError(err, stack, fatal: false);
+
       if (kDebugMode) {
         print(err);
       }

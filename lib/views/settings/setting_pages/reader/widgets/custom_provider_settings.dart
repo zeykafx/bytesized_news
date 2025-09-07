@@ -184,7 +184,7 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                           const SizedBox(height: 16),
 
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
                                 child: DropdownButtonFormField<String>(
@@ -213,8 +213,8 @@ class _CustomProviderSettingsState extends State<CustomProviderSettings> {
                                   },
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              IconButton(icon: const Icon(Icons.edit_note_outlined), onPressed: () => showManageModelsDialog(context, store)),
+                              const SizedBox(width: 6),
+                              IconButton.filled(icon: const Icon(Icons.edit_note_outlined), onPressed: () => showManageModelsDialog(context, store)),
                             ],
                           ),
 

@@ -7,6 +7,7 @@ import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feedItem/feedItem.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import 'package:llm_dart/llm_dart.dart';
@@ -225,14 +226,18 @@ class ProviderAiService extends AiService {
         try {
           feedItem = feedItems.firstWhere((item) => item.id == id);
           suggestedArticles.add(feedItem);
-        } catch (e) {
+        } catch (e, stack) {
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
           continue;
         }
       } else if (article is int) {
         try {
           FeedItem feedItem = feedItems.firstWhere((item) => item.id == article);
           suggestedArticles.add(feedItem);
-        } catch (e) {
+        } catch (e, stack) {
+          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
           continue;
         }
       } else {

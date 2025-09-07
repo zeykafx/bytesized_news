@@ -593,6 +593,7 @@ class ReadArticleCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                     ],

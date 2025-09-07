@@ -6,6 +6,7 @@ import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:isar_community/isar.dart';
@@ -112,6 +113,12 @@ abstract class _AuthStore with Store {
 
     var userData = await FirebaseFirestore.instance.doc("/users/${user!.uid}").get();
 
+    if (userData.data() == null) {
+      authLoading = false;
+      initialized = true;
+      return false;
+    }
+
     if (userData.data()!.containsKey("tier")) {
       if (userData["tier"] == "premium") {
         userTier = Tier.premium;
@@ -176,7 +183,9 @@ abstract class _AuthStore with Store {
             "deviceId": localDeviceId,
           },
         );
-      } catch (err) {
+      } catch (err, stack) {
+        FirebaseCrashlytics.instance.recordError(err, stack, fatal: false);
+
         if (kDebugMode) {
           print(err);
         }
@@ -254,7 +263,9 @@ abstract class _AuthStore with Store {
 
             // remove from local map so we know what's been processed
             localFeedGroupsMap.remove(feedGroupName);
-          } catch (e) {
+          } catch (e, stack) {
+            FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
             if (kDebugMode) {
               print("Error processing feed group $feedGroupName: $e");
             }
@@ -308,7 +319,9 @@ abstract class _AuthStore with Store {
 
             // Remove from local map so we know what's been processed
             localFeedsMap.remove(feedId);
-          } catch (e) {
+          } catch (e, stack) {
+            FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+
             if (kDebugMode) {
               print("Error processing feed $feedId: $e");
             }

@@ -1,7 +1,9 @@
 import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/feed_view/feed_view.dart';
+import 'package:bytesized_news/views/welcome/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,23 +33,14 @@ class _EmailVerifyState extends State<EmailVerify> {
     if (user != null) {
       await user.reload();
       authStore.user = authStore.auth.currentUser;
-      bool res = await authStore.init(context);
 
-      if (!res) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const Auth(),
-          ),
-        );
-        return;
-      }
       if (user.emailVerified) {
         if (kDebugMode) {
           print("Email verified");
         }
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const FeedView(),
+            builder: (context) => const Welcome(),
           ),
           (route) => false, // remove all routes
         );
@@ -63,6 +56,7 @@ class _EmailVerifyState extends State<EmailVerify> {
         print("User is null, sleeping for 10 seconds");
       }
       await Future<void>.delayed(const Duration(seconds: 5));
+      await checkEmailVerified();
     }
   }
 
