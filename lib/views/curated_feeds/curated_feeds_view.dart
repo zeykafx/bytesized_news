@@ -1,5 +1,5 @@
-import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
-import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
+import 'package:bytesized_news/models/curated_feed/curated_feed.dart';
+import 'package:bytesized_news/models/curated_feed/curated_feed_category.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/curated_feeds/curated_feeds_store.dart';
 import 'package:bytesized_news/views/feed_view/widgets/add_feed.dart';
@@ -133,11 +133,11 @@ class _CuratedFeedsViewState extends State<CuratedFeedsView> {
                 ),
               ),
             ),
-        
+
             SliverToBoxAdapter(
               child: buildAddFeedCard(colorScheme, theme),
             ),
-        
+
             // LIST OF CARDS
             SliverList(
               delegate: SliverChildBuilderDelegate(

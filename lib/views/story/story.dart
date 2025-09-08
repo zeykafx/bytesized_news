@@ -1,4 +1,4 @@
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/alert_message.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';

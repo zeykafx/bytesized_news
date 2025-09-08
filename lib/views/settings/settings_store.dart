@@ -1,5 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -289,6 +289,49 @@ abstract class _SettingsStore with Store {
   static const defaultNotificationAfterBgSync = false;
   static const defaultShowSummaryCard = true;
   static const defaultDownloadReadPosts = true;
+
+  @action
+  void resetSettings() {
+    hasShownWelcomeScreen = defaultHasShownWelcomeScreen;
+    darkMode = defaultDarkMode;
+    sort = defaultSort;
+    sortFeed = null;
+    sortFeedName = null;
+    sortFeedGroup = null;
+    sortFeedGroupName = null;
+    useReaderModeByDefault = true;
+    showAiSummaryOnLoad = true;
+    fetchAiSummaryOnLoad = false;
+    mutedKeywords = defaultMutedKeywords;
+    keepArticles = KeepArticlesLength.threeMonths;
+    fontSize = defaultFontSize;
+    textAlignment = TextAlign.left;
+    textWidth = defaultTextWidth;
+    lineHeight = defaultLineHeight;
+    horizontalPadding = defaultHorizontalPadding;
+    fontFamily = defaultFontFamily;
+    markAsReadOnScroll = defaultMarkAsReadOnScroll;
+    backgroundFetchInterval = defaultBackgroundFetchInterval;
+    skipBgSyncOnLowBattery = defaultSkipBgFetchOnLowBattery;
+    requireDeviceIdleForBgFetch = defaultRequireDeviceIdleForBgFetch;
+    storyTilesMinimalStyle = defaultStoryTilesMinimal;
+    storyReaderMaxWidth = defaultStoryReaderMaxWidth;
+    isList = defaultIsList;
+    autoSwitchReaderTooShort = defaultAutoSwitchReaderTooShort;
+    alwaysShowArchiveButton = defaultAlwaysShowArchiveButton;
+    showShareButton = defaultShowShareButton;
+    showCommentsButton = defaultShowCommentsButton;
+    enableCustomAiProvider = defaultEnableCustomAiProvider;
+    useDynamicColor = defaultUseDynamicColor;
+    colorSeedIndex = defaultColorSeedIndex;
+    appFontFamily = defaultAppFontFamily;
+    maxWidth = defaultMaxWidth;
+    suggestionEnabled = defaultSuggestionEnabled;
+    summaryLength = defaultSummaryLength;
+    showNotificationAfterBgSync = defaultNotificationAfterBgSync;
+    showSummaryCard = defaultShowSummaryCard;
+    downloadReadPosts = defaultDownloadReadPosts;
+  }
 
   // Settings
   @JsonKey(defaultValue: defaultHasShownWelcomeScreen)

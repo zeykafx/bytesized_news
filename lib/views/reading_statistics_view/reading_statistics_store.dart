@@ -1,5 +1,5 @@
 import 'package:bytesized_news/database/db_utils.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:flutter/widgets.dart';

@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:bytesized_news/database/db_utils.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:bytesized_news/views/reading_statistics_view/reading_statistics_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';

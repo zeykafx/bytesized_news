@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bytesized_news/AI/ai_service/ai_service.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -109,7 +109,7 @@ class FirebaseAiService extends AiService {
           suggestedArticles.add(feedItem);
         } catch (e, stack) {
           FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
-          
+
           continue;
         }
       } else {
@@ -125,7 +125,7 @@ class FirebaseAiService extends AiService {
 
     return suggestedArticles;
   }
-  
+
   Future<List<String>> getFeedCategories(Feed feed) async {
     if (authStore.userTier != Tier.premium) {
       if (kDebugMode) {
@@ -180,7 +180,7 @@ class FirebaseAiService extends AiService {
     }
     return categories;
   }
-  
+
   Future<(bool, double)> evaluateSummary(String articleText, String summaryText) async {
     if (authStore.userTier != Tier.premium) {
       if (kDebugMode) {

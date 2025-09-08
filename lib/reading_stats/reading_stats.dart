@@ -1,6 +1,6 @@
 import 'package:bytesized_news/background/life_cycle_event_handler.dart';
 import 'package:bytesized_news/database/db_utils.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';

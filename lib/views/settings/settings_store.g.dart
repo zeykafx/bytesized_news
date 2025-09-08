@@ -966,6 +966,18 @@ mixin _$SettingsStore on _SettingsStore, Store {
   );
 
   @override
+  void resetSettings() {
+    final _$actionInfo = _$_SettingsStoreActionController.startAction(
+      name: '_SettingsStore.resetSettings',
+    );
+    try {
+      return super.resetSettings();
+    } finally {
+      _$_SettingsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setDarkMode(DarkMode value) {
     final _$actionInfo = _$_SettingsStoreActionController.startAction(
       name: '_SettingsStore.setDarkMode',

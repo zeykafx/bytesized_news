@@ -1,5 +1,5 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/auth/sub_views/profile.dart';
 import 'package:bytesized_news/views/feed_view/bsb_feed_button.dart';
@@ -58,7 +58,6 @@ class _FeedViewState extends State<FeedView> {
     } catch (e, stack) {
       feedStore.sendAlert(e.toString());
       FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
-
     }
 
     setState(() {});
@@ -129,7 +128,7 @@ class _FeedViewState extends State<FeedView> {
               ),
             ],
           ),
-          body: !authStore.initialized
+          body: !authStore.initialized || !feedStore.initialized
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(

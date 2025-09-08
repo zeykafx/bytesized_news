@@ -1,5 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/views/feed_view/widgets/feed_manager/feed_manager_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';

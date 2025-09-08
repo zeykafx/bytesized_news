@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/background/life_cycle_event_handler.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/reading_stats/reading_stats.dart';
 import 'package:bytesized_news/utils/utils.dart';

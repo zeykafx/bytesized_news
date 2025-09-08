@@ -1,5 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 
 abstract class AiService {
   Future<String> summarize(String text, FeedItem feedItem);

@@ -1,4 +1,4 @@
-import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
+import 'package:bytesized_news/models/curated_feed/curated_feed.dart';
 
 class CuratedFeedCategory {
   final String name;

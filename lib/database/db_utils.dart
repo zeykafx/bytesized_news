@@ -1,7 +1,7 @@
 import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
-import 'package:bytesized_news/models/feedItem/feedItem.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
+import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';

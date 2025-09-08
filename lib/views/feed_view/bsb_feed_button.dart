@@ -1,5 +1,5 @@
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -94,7 +94,9 @@ class _BsbFeedButtonState extends State<BsbFeedButton> {
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ...feedGroup.feeds.take(2).map(
+                    ...feedGroup.feeds
+                        .take(2)
+                        .map(
                           (feed) => Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),

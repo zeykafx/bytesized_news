@@ -1,9 +1,9 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/feed_sync/feed_sync.dart';
-import 'package:bytesized_news/models/curatedFeed/curated_feed.dart';
-import 'package:bytesized_news/models/curatedFeed/curated_feed_category.dart';
+import 'package:bytesized_news/models/curated_feed/curated_feed.dart';
+import 'package:bytesized_news/models/curated_feed/curated_feed_category.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';

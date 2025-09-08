@@ -1,7 +1,7 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
-import 'package:bytesized_news/models/feedGroup/feedGroup.dart';
+import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/feed_view/feed_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -105,39 +105,40 @@ abstract class _FeedManagerStore with Store {
   @action
   void createFeedGroupDialog(BuildContext context) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          TextEditingController feedGroupNameController = TextEditingController();
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController feedGroupNameController = TextEditingController();
 
-          return AlertDialog(
-            title: const Text("Create Feed Group"),
-            content: TextField(
-              controller: feedGroupNameController,
-              autocorrect: true,
-              enableSuggestions: true,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Feed Group Name",
-              ),
+        return AlertDialog(
+          title: const Text("Create Feed Group"),
+          content: TextField(
+            controller: feedGroupNameController,
+            autocorrect: true,
+            enableSuggestions: true,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Feed Group Name",
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () {
-                  feedStore.createFeedGroup(feedGroupNameController.text, context);
-                  Navigator.of(context).pop();
-                },
-                child: const Text("Create"),
-              ),
-            ],
-          );
-        });
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                feedStore.createFeedGroup(feedGroupNameController.text, context);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Create"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @action
@@ -232,7 +233,8 @@ abstract class _FeedManagerStore with Store {
     if (areFeedGroupsSelected) {
       // remove from the pinned list
       feedStore.pinnedFeedsOrFeedGroups.removeWhere(
-          (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty);
+        (feedGroup) => selectedFeedGroups.where((FeedGroup group) => group.name == feedGroup.name && group.feedUrls == feedGroup.feedUrls).isNotEmpty,
+      );
 
       for (FeedGroup feedGroup in selectedFeedGroups) {
         feedSync.deleteSingleFeedGroupInFirestore(feedGroup, authStore);
