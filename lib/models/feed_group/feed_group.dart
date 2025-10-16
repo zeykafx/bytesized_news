@@ -1,7 +1,7 @@
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:isar_community/isar.dart';
 
-part 'feedGroup.g.dart';
+part 'feed_group.g.dart';
 
 @collection
 class FeedGroup {

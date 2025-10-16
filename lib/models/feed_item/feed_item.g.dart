@@ -404,7 +404,8 @@ extension FeedItemQueryWhere on QueryBuilder<FeedItem, FeedItem, QWhereClause> {
   }
 }
 
-extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {
+extension FeedItemQueryFilter
+    on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {
   QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -543,7 +544,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> aiSummaryIsNotEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  aiSummaryIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'aiSummary', value: ''),
@@ -566,7 +568,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementGreaterThan(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -583,7 +586,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementLessThan(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -621,7 +625,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.startsWith(
@@ -633,7 +638,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.endsWith(
@@ -645,7 +651,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.contains(
@@ -672,7 +679,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementIsEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(property: r'authors', value: ''),
@@ -680,7 +688,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsElementIsNotEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'authors', value: ''),
@@ -717,7 +726,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> authorsLengthGreaterThan(int length, {bool include = false}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  authorsLengthGreaterThan(int length, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(r'authors', length, include, 999999, true);
     });
@@ -758,7 +768,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> commentsUrlIsNotNull() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  commentsUrlIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         const FilterCondition.isNotNull(property: r'commentsUrl'),
@@ -781,7 +792,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> commentsUrlGreaterThan(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  commentsUrlGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -904,7 +916,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> commentsUrlIsNotEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  commentsUrlIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'commentsUrl', value: ''),
@@ -927,7 +940,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> descriptionGreaterThan(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  descriptionGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1050,7 +1064,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> descriptionIsNotEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  descriptionIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'description', value: ''),
@@ -1068,7 +1083,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> estReadingTimeMinutesEqualTo(int value) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  estReadingTimeMinutesEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -1079,7 +1095,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> estReadingTimeMinutesGreaterThan(int value, {bool include = false}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  estReadingTimeMinutesGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
@@ -1091,7 +1108,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> estReadingTimeMinutesLessThan(int value, {bool include = false}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  estReadingTimeMinutesLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
@@ -1103,7 +1121,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> estReadingTimeMinutesBetween(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  estReadingTimeMinutesBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -1189,7 +1208,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> fetchedInBgIsNotNull() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  fetchedInBgIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         const FilterCondition.isNotNull(property: r'fetchedInBg'),
@@ -1274,7 +1294,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentIsNotNull() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  htmlContentIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         const FilterCondition.isNotNull(property: r'htmlContent'),
@@ -1297,7 +1318,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentGreaterThan(
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  htmlContentGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1420,7 +1442,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> htmlContentIsNotEmpty() {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  htmlContentIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'htmlContent', value: ''),
@@ -1641,7 +1664,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> publishedDateGreaterThan(DateTime value, {bool include = false}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  publishedDateGreaterThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
@@ -1727,7 +1751,8 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition> timeFetchedGreaterThan(DateTime value, {bool include = false}) {
+  QueryBuilder<FeedItem, FeedItem, QAfterFilterCondition>
+  timeFetchedGreaterThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
@@ -2066,9 +2091,11 @@ extension FeedItemQueryFilter on QueryBuilder<FeedItem, FeedItem, QFilterConditi
   }
 }
 
-extension FeedItemQueryObject on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
+extension FeedItemQueryObject
+    on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
 
-extension FeedItemQueryLinks on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
+extension FeedItemQueryLinks
+    on QueryBuilder<FeedItem, FeedItem, QFilterCondition> {}
 
 extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByAiSummary() {
@@ -2137,7 +2164,8 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> sortByEstReadingTimeMinutesDesc() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy>
+  sortByEstReadingTimeMinutesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'estReadingTimeMinutes', Sort.desc);
     });
@@ -2288,7 +2316,8 @@ extension FeedItemQuerySortBy on QueryBuilder<FeedItem, FeedItem, QSortBy> {
   }
 }
 
-extension FeedItemQuerySortThenBy on QueryBuilder<FeedItem, FeedItem, QSortThenBy> {
+extension FeedItemQuerySortThenBy
+    on QueryBuilder<FeedItem, FeedItem, QSortThenBy> {
   QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByAiSummary() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'aiSummary', Sort.asc);
@@ -2355,7 +2384,8 @@ extension FeedItemQuerySortThenBy on QueryBuilder<FeedItem, FeedItem, QSortThenB
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QAfterSortBy> thenByEstReadingTimeMinutesDesc() {
+  QueryBuilder<FeedItem, FeedItem, QAfterSortBy>
+  thenByEstReadingTimeMinutesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'estReadingTimeMinutes', Sort.desc);
     });
@@ -2518,7 +2548,8 @@ extension FeedItemQuerySortThenBy on QueryBuilder<FeedItem, FeedItem, QSortThenB
   }
 }
 
-extension FeedItemQueryWhereDistinct on QueryBuilder<FeedItem, FeedItem, QDistinct> {
+extension FeedItemQueryWhereDistinct
+    on QueryBuilder<FeedItem, FeedItem, QDistinct> {
   QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByAiSummary({
     bool caseSensitive = true,
   }) {
@@ -2561,7 +2592,8 @@ extension FeedItemQueryWhereDistinct on QueryBuilder<FeedItem, FeedItem, QDistin
     });
   }
 
-  QueryBuilder<FeedItem, FeedItem, QDistinct> distinctByEstReadingTimeMinutes() {
+  QueryBuilder<FeedItem, FeedItem, QDistinct>
+  distinctByEstReadingTimeMinutes() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'estReadingTimeMinutes');
     });
@@ -2648,7 +2680,8 @@ extension FeedItemQueryWhereDistinct on QueryBuilder<FeedItem, FeedItem, QDistin
   }
 }
 
-extension FeedItemQueryProperty on QueryBuilder<FeedItem, FeedItem, QQueryProperty> {
+extension FeedItemQueryProperty
+    on QueryBuilder<FeedItem, FeedItem, QQueryProperty> {
   QueryBuilder<FeedItem, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
@@ -2691,7 +2724,8 @@ extension FeedItemQueryProperty on QueryBuilder<FeedItem, FeedItem, QQueryProper
     });
   }
 
-  QueryBuilder<FeedItem, int, QQueryOperations> estReadingTimeMinutesProperty() {
+  QueryBuilder<FeedItem, int, QQueryOperations>
+  estReadingTimeMinutesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'estReadingTimeMinutes');
     });

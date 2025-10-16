@@ -1,7 +1,6 @@
 import 'dart:isolate';
 
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
-import 'package:bytesized_news/AI/ai_utils.dart';
 import 'package:bytesized_news/database/db_isolate_cleaner.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed_group/feed_group.dart';
@@ -16,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:isar_community/isar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
+import 'package:bytesized_news/ai/ai_utils.dart';
 import 'package:rss_dart/domain/atom_feed.dart';
 import 'package:rss_dart/domain/atom_item.dart';
 import 'package:rss_dart/domain/rss_feed.dart';

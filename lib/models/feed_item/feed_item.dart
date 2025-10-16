@@ -9,7 +9,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:isar_community/isar.dart';
 import 'package:readability/readability.dart' as readability;
 
-part "feedItem.g.dart";
+part "feed_item.g.dart";
 
 @collection
 class FeedItem {

@@ -121,7 +121,8 @@ void _feedGroupAttach(IsarCollection<dynamic> col, Id id, FeedGroup object) {
   object.id = id;
 }
 
-extension FeedGroupQueryWhereSort on QueryBuilder<FeedGroup, FeedGroup, QWhere> {
+extension FeedGroupQueryWhereSort
+    on QueryBuilder<FeedGroup, FeedGroup, QWhere> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
@@ -129,7 +130,8 @@ extension FeedGroupQueryWhereSort on QueryBuilder<FeedGroup, FeedGroup, QWhere> 
   }
 }
 
-extension FeedGroupQueryWhere on QueryBuilder<FeedGroup, FeedGroup, QWhereClause> {
+extension FeedGroupQueryWhere
+    on QueryBuilder<FeedGroup, FeedGroup, QWhereClause> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
@@ -199,8 +201,10 @@ extension FeedGroupQueryWhere on QueryBuilder<FeedGroup, FeedGroup, QWhereClause
   }
 }
 
-extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementEqualTo(String value, {bool caseSensitive = true}) {
+extension FeedGroupQueryFilter
+    on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -212,7 +216,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementGreaterThan(
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -229,7 +234,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementLessThan(
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -246,7 +252,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementBetween(
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -267,7 +274,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.startsWith(
@@ -279,7 +287,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.endsWith(
@@ -291,7 +300,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.contains(
@@ -303,7 +313,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.matches(
@@ -315,7 +326,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementIsEmpty() {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(property: r'feedUrls', value: ''),
@@ -323,7 +335,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsElementIsNotEmpty() {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'feedUrls', value: ''),
@@ -331,7 +344,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsLengthEqualTo(int length) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(r'feedUrls', length, true, length, true);
     });
@@ -343,25 +357,29 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsIsNotEmpty() {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(r'feedUrls', 0, false, 999999, true);
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsLengthLessThan(int length, {bool include = false}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsLengthLessThan(int length, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(r'feedUrls', 0, true, length, include);
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsLengthGreaterThan(int length, {bool include = false}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsLengthGreaterThan(int length, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(r'feedUrls', length, include, 999999, true);
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> feedUrlsLengthBetween(
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  feedUrlsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -593,7 +611,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> pinnedPositionEqualTo(int value) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  pinnedPositionEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(property: r'pinnedPosition', value: value),
@@ -601,7 +620,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> pinnedPositionGreaterThan(int value, {bool include = false}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  pinnedPositionGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
@@ -613,7 +633,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> pinnedPositionLessThan(int value, {bool include = false}) {
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  pinnedPositionLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
@@ -625,7 +646,8 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
     });
   }
 
-  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition> pinnedPositionBetween(
+  QueryBuilder<FeedGroup, FeedGroup, QAfterFilterCondition>
+  pinnedPositionBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -645,9 +667,11 @@ extension FeedGroupQueryFilter on QueryBuilder<FeedGroup, FeedGroup, QFilterCond
   }
 }
 
-extension FeedGroupQueryObject on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {}
+extension FeedGroupQueryObject
+    on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {}
 
-extension FeedGroupQueryLinks on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {}
+extension FeedGroupQueryLinks
+    on QueryBuilder<FeedGroup, FeedGroup, QFilterCondition> {}
 
 extension FeedGroupQuerySortBy on QueryBuilder<FeedGroup, FeedGroup, QSortBy> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> sortByIsPinned() {
@@ -687,7 +711,8 @@ extension FeedGroupQuerySortBy on QueryBuilder<FeedGroup, FeedGroup, QSortBy> {
   }
 }
 
-extension FeedGroupQuerySortThenBy on QueryBuilder<FeedGroup, FeedGroup, QSortThenBy> {
+extension FeedGroupQuerySortThenBy
+    on QueryBuilder<FeedGroup, FeedGroup, QSortThenBy> {
   QueryBuilder<FeedGroup, FeedGroup, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -737,7 +762,8 @@ extension FeedGroupQuerySortThenBy on QueryBuilder<FeedGroup, FeedGroup, QSortTh
   }
 }
 
-extension FeedGroupQueryWhereDistinct on QueryBuilder<FeedGroup, FeedGroup, QDistinct> {
+extension FeedGroupQueryWhereDistinct
+    on QueryBuilder<FeedGroup, FeedGroup, QDistinct> {
   QueryBuilder<FeedGroup, FeedGroup, QDistinct> distinctByFeedUrls() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'feedUrls');
@@ -765,7 +791,8 @@ extension FeedGroupQueryWhereDistinct on QueryBuilder<FeedGroup, FeedGroup, QDis
   }
 }
 
-extension FeedGroupQueryProperty on QueryBuilder<FeedGroup, FeedGroup, QQueryProperty> {
+extension FeedGroupQueryProperty
+    on QueryBuilder<FeedGroup, FeedGroup, QQueryProperty> {
   QueryBuilder<FeedGroup, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
