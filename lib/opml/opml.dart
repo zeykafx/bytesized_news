@@ -1,6 +1,7 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feed_group/feed_group.dart';
+import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import 'package:opml/opml.dart';
 
@@ -45,7 +46,7 @@ class OpmlUtils {
                   continue;
                 }
               } catch (e, stack) {
-                
+                if (kDebugMode) print("Error creating feed: $e, $stack");
                 continue;
               }
             }
