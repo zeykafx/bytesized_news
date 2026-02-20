@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:bytesized_news/AI/ai_service/ai_service.dart';
+import 'package:bytesized_news/ai/ai_service/ai_service.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import 'package:llm_dart/llm_dart.dart';
@@ -227,7 +226,7 @@ class ProviderAiService extends AiService {
           feedItem = feedItems.firstWhere((item) => item.id == id);
           suggestedArticles.add(feedItem);
         } catch (e, stack) {
-          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          if (kDebugMode) print("Error finding feed item: $e, $stack");
 
           continue;
         }
@@ -236,7 +235,7 @@ class ProviderAiService extends AiService {
           FeedItem feedItem = feedItems.firstWhere((item) => item.id == article);
           suggestedArticles.add(feedItem);
         } catch (e, stack) {
-          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          if (kDebugMode) print("Error finding feed item: $e, $stack");
 
           continue;
         }

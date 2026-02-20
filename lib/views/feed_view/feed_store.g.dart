@@ -228,39 +228,6 @@ mixin _$FeedStore on _FeedStore, Store {
     );
   }
 
-  late final _$authAtom = Atom(name: '_FeedStore.auth', context: context);
-
-  @override
-  FirebaseAuth get auth {
-    _$authAtom.reportRead();
-    return super.auth;
-  }
-
-  @override
-  set auth(FirebaseAuth value) {
-    _$authAtom.reportWrite(value, super.auth, () {
-      super.auth = value;
-    });
-  }
-
-  late final _$userAtom = Atom(name: '_FeedStore.user', context: context);
-
-  @override
-  User? get user {
-    _$userAtom.reportRead();
-    return super.user;
-  }
-
-  bool _userIsInitialized = false;
-
-  @override
-  set user(User? value) {
-    _$userAtom.reportWrite(value, _userIsInitialized ? super.user : null, () {
-      super.user = value;
-      _userIsInitialized = true;
-    });
-  }
-
   late final _$settingsStoreAtom = Atom(
     name: '_FeedStore.settingsStore',
     context: context,
@@ -778,8 +745,6 @@ suggestionsLoading: ${suggestionsLoading},
 isar: ${isar},
 dbUtils: ${dbUtils},
 aiUtils: ${aiUtils},
-auth: ${auth},
-user: ${user},
 settingsStore: ${settingsStore},
 authStore: ${authStore},
 isLocked: ${isLocked},

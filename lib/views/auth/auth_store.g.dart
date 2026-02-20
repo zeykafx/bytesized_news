@@ -9,39 +9,6 @@ part of 'auth_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$AuthStore on _AuthStore, Store {
-  late final _$authAtom = Atom(name: '_AuthStore.auth', context: context);
-
-  @override
-  FirebaseAuth get auth {
-    _$authAtom.reportRead();
-    return super.auth;
-  }
-
-  @override
-  set auth(FirebaseAuth value) {
-    _$authAtom.reportWrite(value, super.auth, () {
-      super.auth = value;
-    });
-  }
-
-  late final _$functionsAtom = Atom(
-    name: '_AuthStore.functions',
-    context: context,
-  );
-
-  @override
-  FirebaseFunctions get functions {
-    _$functionsAtom.reportRead();
-    return super.functions;
-  }
-
-  @override
-  set functions(FirebaseFunctions value) {
-    _$functionsAtom.reportWrite(value, super.functions, () {
-      super.functions = value;
-    });
-  }
-
   late final _$initializedAtom = Atom(
     name: '_AuthStore.initialized',
     context: context,
@@ -60,21 +27,6 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$userAtom = Atom(name: '_AuthStore.user', context: context);
-
-  @override
-  User? get user {
-    _$userAtom.reportRead();
-    return super.user;
-  }
-
-  @override
-  set user(User? value) {
-    _$userAtom.reportWrite(value, super.user, () {
-      super.user = value;
-    });
-  }
-
   late final _$userTierAtom = Atom(
     name: '_AuthStore.userTier',
     context: context,
@@ -90,24 +42,6 @@ mixin _$AuthStore on _AuthStore, Store {
   set userTier(Tier value) {
     _$userTierAtom.reportWrite(value, super.userTier, () {
       super.userTier = value;
-    });
-  }
-
-  late final _$hasUserRefundedAtom = Atom(
-    name: '_AuthStore.hasUserRefunded',
-    context: context,
-  );
-
-  @override
-  bool get hasUserRefunded {
-    _$hasUserRefundedAtom.reportRead();
-    return super.hasUserRefunded;
-  }
-
-  @override
-  set hasUserRefunded(bool value) {
-    _$hasUserRefundedAtom.reportWrite(value, super.hasUserRefunded, () {
-      super.hasUserRefunded = value;
     });
   }
 
@@ -227,24 +161,6 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$deviceIdAtom = Atom(
-    name: '_AuthStore.deviceId',
-    context: context,
-  );
-
-  @override
-  String? get deviceId {
-    _$deviceIdAtom.reportRead();
-    return super.deviceId;
-  }
-
-  @override
-  set deviceId(String? value) {
-    _$deviceIdAtom.reportWrite(value, super.deviceId, () {
-      super.deviceId = value;
-    });
-  }
-
   late final _$authLoadingAtom = Atom(
     name: '_AuthStore.authLoading',
     context: context,
@@ -263,91 +179,17 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$_getIdAsyncAction = AsyncAction(
-    '_AuthStore._getId',
-    context: context,
-  );
-
-  @override
-  Future<String?> _getId() {
-    return _$_getIdAsyncAction.run(() => super._getId());
-  }
-
-  late final _$_AuthStoreActionController = ActionController(
-    name: '_AuthStore',
-    context: context,
-  );
-
-  @override
-  void signOutUser() {
-    final _$actionInfo = _$_AuthStoreActionController.startAction(
-      name: '_AuthStore.signOutUser',
-    );
-    try {
-      return super.signOutUser();
-    } finally {
-      _$_AuthStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  bool _shouldUpdateLocalFeed(Feed localFeed, Feed firestoreFeed) {
-    final _$actionInfo = _$_AuthStoreActionController.startAction(
-      name: '_AuthStore._shouldUpdateLocalFeed',
-    );
-    try {
-      return super._shouldUpdateLocalFeed(localFeed, firestoreFeed);
-    } finally {
-      _$_AuthStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  bool _shouldUpdateLocalFeedGroup(
-    FeedGroup localFeedGroup,
-    FeedGroup firestoreFeedGroup,
-  ) {
-    final _$actionInfo = _$_AuthStoreActionController.startAction(
-      name: '_AuthStore._shouldUpdateLocalFeedGroup',
-    );
-    try {
-      return super._shouldUpdateLocalFeedGroup(
-        localFeedGroup,
-        firestoreFeedGroup,
-      );
-    } finally {
-      _$_AuthStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  bool _listsEqual(List<String> list1, List<String> list2) {
-    final _$actionInfo = _$_AuthStoreActionController.startAction(
-      name: '_AuthStore._listsEqual',
-    );
-    try {
-      return super._listsEqual(list1, list2);
-    } finally {
-      _$_AuthStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
   @override
   String toString() {
     return '''
-auth: ${auth},
-functions: ${functions},
 initialized: ${initialized},
-user: ${user},
 userTier: ${userTier},
-hasUserRefunded: ${hasUserRefunded},
 userInterests: ${userInterests},
 builtUserProfileDate: ${builtUserProfileDate},
 suggestionsLeftToday: ${suggestionsLeftToday},
 lastSuggestionDate: ${lastSuggestionDate},
 summariesLeftToday: ${summariesLeftToday},
 lastSummaryDate: ${lastSummaryDate},
-deviceId: ${deviceId},
 authLoading: ${authLoading}
     ''';
   }

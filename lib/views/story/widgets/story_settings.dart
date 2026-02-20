@@ -1,4 +1,3 @@
-import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/setting_pages/reader/reader_font_section.dart';
 import 'package:bytesized_news/views/settings/setting_pages/reader/reader_mode_section.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
@@ -19,14 +18,12 @@ class StorySettings extends StatefulWidget {
 class _StorySettingsState extends State<StorySettings> {
   late StoryStore storyStore;
   late SettingsStore settingsStore;
-  late AuthStore authStore;
 
   @override
   void initState() {
     super.initState();
     storyStore = widget.storyStore;
     settingsStore = storyStore.settingsStore;
-    authStore = storyStore.authStore;
   }
 
   @override
@@ -107,8 +104,8 @@ class _StorySettingsState extends State<StorySettings> {
                         // SHOW AI SUMMARY ON STORY PAGE LOAD
                         SwitchListTile(
                           title: const Text("Show Summary on page load"),
-                          value: authStore.userTier == Tier.premium ? settingsStore.showAiSummaryOnLoad : false,
-                          onChanged: authStore.userTier == Tier.premium
+                          value: settingsStore.enableCustomAiProvider ? settingsStore.showAiSummaryOnLoad : false,
+                          onChanged: settingsStore.enableCustomAiProvider
                               ? (value) {
                                   settingsStore.setShowAiSummaryOnLoad(value);
                                 }
@@ -118,8 +115,8 @@ class _StorySettingsState extends State<StorySettings> {
                         // FETCH AI SUMMARY ON STORY PAGE LOAD
                         SwitchListTile(
                           title: const Text("Generate Summary on page load"),
-                          value: authStore.userTier == Tier.premium ? settingsStore.fetchAiSummaryOnLoad : false,
-                          onChanged: authStore.userTier == Tier.premium
+                          value: settingsStore.enableCustomAiProvider ? settingsStore.fetchAiSummaryOnLoad : false,
+                          onChanged: settingsStore.enableCustomAiProvider
                               ? (value) {
                                   settingsStore.setFetchAiSummaryOnLoad(value);
                                 }

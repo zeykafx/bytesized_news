@@ -7,8 +7,6 @@ import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/models/feed_item/feed_item.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -63,12 +61,6 @@ abstract class _FeedStore with Store {
 
   @observable
   late AiUtils aiUtils;
-
-  @observable
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-  @observable
-  late User? user;
 
   @observable
   late SettingsStore settingsStore;
@@ -143,8 +135,6 @@ abstract class _FeedStore with Store {
     }
 
     await getPinnedFeedsOrFeedGroups();
-
-    user = auth.currentUser;
 
     scrollController.addListener(() {
       if (scrollController.offset > 200 && !showScrollToTop) {
@@ -274,7 +264,7 @@ abstract class _FeedStore with Store {
         } catch (e, stack) {
           alertMessage = "Error: $e";
           hasAlert = true;
-          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          if (kDebugMode) print("Error: $e, $stack");
 
           continue;
         }
@@ -429,7 +419,7 @@ abstract class _FeedStore with Store {
     } catch (e, stack) {
       alertMessage = "Failed to create Feed Group: error: ${e.toString()}";
       hasAlert = true;
-      FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+      if (kDebugMode) print("Error: $e, $stack");
     }
   }
 
@@ -473,13 +463,11 @@ abstract class _FeedStore with Store {
     }
 
     if (kDebugMode) {
-      print("SUGGESTIONS LEFT: ${authStore.suggestionsLeftToday}");
       print("Last suggestion difference in minutes: ${DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes}");
     }
 
-    if (!settingsStore.enableCustomAiProvider && authStore.suggestionsLeftToday <= 0 ||
-        // Only fetch suggestions every suggestionsIntervalMinutes minutes max
-        DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes < suggestionsIntervalMinutes) {
+    // Only fetch suggestions every suggestionsIntervalMinutes minutes max
+    if (DateTime.now().toUtc().difference(authStore.lastSuggestionDate!).inMinutes < suggestionsIntervalMinutes) {
       if (kDebugMode) {
         print("Fetching stored suggestions");
       }
@@ -533,7 +521,7 @@ abstract class _FeedStore with Store {
       alertMessage = "Error: $e";
       hasAlert = true;
       suggestionsLoading = false;
-      FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+      if (kDebugMode) print("Error: $e, $stack");
 
       return;
     }
@@ -577,7 +565,7 @@ abstract class _FeedStore with Store {
           }
           alertMessage = "A suggested item wasn't able to be downloaded: $e";
           hasAlert = true;
-          FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+          if (kDebugMode) print("Error: $e, $stack");
         }
       }
     }

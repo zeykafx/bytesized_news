@@ -1,4 +1,4 @@
-import 'package:bytesized_news/AI/ai_utils.dart';
+import 'package:bytesized_news/ai/ai_utils.dart';
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/feed_sync/feed_sync.dart';
 import 'package:bytesized_news/models/feed/feed.dart';

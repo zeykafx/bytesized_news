@@ -279,7 +279,7 @@ abstract class _SettingsStore with Store {
   static const defaultAlwaysShowArchiveButton = false;
   static const defaultShowShareButton = true;
   static const defaultShowCommentsButton = true;
-  static const defaultEnableCustomAiProvider = false;
+  static const defaultEnableCustomAiProvider = true;
   static const defaultUseDynamicColor = true;
   static const defaultColorSeedIndex = 0;
   static const defaultAppFontFamily = FontFamily.roboto;

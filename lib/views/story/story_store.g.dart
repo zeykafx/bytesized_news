@@ -437,24 +437,6 @@ mixin _$StoryStore on _StoryStore, Store {
     );
   }
 
-  late final _$firestoreAtom = Atom(
-    name: '_StoryStore.firestore',
-    context: context,
-  );
-
-  @override
-  FirebaseFirestore get firestore {
-    _$firestoreAtom.reportRead();
-    return super.firestore;
-  }
-
-  @override
-  set firestore(FirebaseFirestore value) {
-    _$firestoreAtom.reportWrite(value, super.firestore, () {
-      super.firestore = value;
-    });
-  }
-
   late final _$htmlWidgetKeyAtom = Atom(
     name: '_StoryStore.htmlWidgetKey',
     context: context,
@@ -1001,7 +983,6 @@ aiUtils: ${aiUtils},
 feedItemSummarized: ${feedItemSummarized},
 aiLoading: ${aiLoading},
 hideSummary: ${hideSummary},
-firestore: ${firestore},
 htmlWidgetKey: ${htmlWidgetKey},
 hideBar: ${hideBar},
 webviewLastScrollY: ${webviewLastScrollY},

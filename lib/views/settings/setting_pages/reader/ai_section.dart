@@ -1,4 +1,3 @@
-import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/setting_pages/reader/widgets/custom_provider_settings.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/settings/shared/settings_section.dart';
@@ -15,7 +14,6 @@ class AiSection extends StatefulWidget {
 
 class _AiSectionState extends State<AiSection> {
   late final SettingsStore settingsStore;
-  late final AuthStore authStore;
   final BorderRadius borderRadius = BorderRadius.circular(12);
   ExpansibleController summaryExpansibleController = ExpansibleController();
   ExpansibleController expansibleController = ExpansibleController();
@@ -24,14 +22,13 @@ class _AiSectionState extends State<AiSection> {
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
-    authStore = context.read<AuthStore>();
   }
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        bool aiEnabled = (authStore.userTier == Tier.premium) || settingsStore.enableCustomAiProvider;
+        bool aiEnabled = settingsStore.enableCustomAiProvider;
         return SettingsSection(
           title: "Artificial Intelligence",
           onlySection: false,

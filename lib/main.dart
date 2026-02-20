@@ -8,17 +8,9 @@ import 'package:bytesized_news/models/ai_provider/ai_provider.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feed_group/feed_group.dart';
 import 'package:bytesized_news/models/story_reading/story_reading.dart';
-import 'package:bytesized_news/views/auth/auth.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/welcome/welcome.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -32,7 +24,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:isar_community/isar.dart';
 import 'package:workmanager/workmanager.dart';
-import 'firebase_options.dart';
 import 'package:path_provider/path_provider.dart';
 
 final String taskName = "com.zeykafx.bytesized_news.btNewsBgFetch";
@@ -72,41 +63,6 @@ void main() async {
 
   // mobx reaction that will save the settings on disk every time they are changed
   autorun((_) => prefs.setString("settings", jsonEncode(settingsStore)));
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Initialize AppCheck
-  await FirebaseAppCheck.instance.activate(
-    // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
-    // your preferred provider. Choose from:
-    // 1. Debug provider
-    // 2. Safety Net provider
-    // 3. Play Integrity provider
-    androidProvider: AndroidProvider.debug,
-    // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
-    // your preferred provider. Choose from:
-    // 1. Debug provider
-    // 2. Device Check provider
-    // 3. App Attest provider
-    // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
-    appleProvider: AppleProvider.debug,
-  );
-
-  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  FirebaseUIAuth.configureProviders([
-    EmailAuthProvider(),
-    GoogleProvider(clientId: "286405169123-14tsnaatjeclvf6i5k9m7nsitm8qq6h1.apps.googleusercontent.com", iOSPreferPlist: true),
-  ]);
-
-  if (kReleaseMode) {
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
-  }
 
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open([
@@ -189,16 +145,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final SettingsStore settingsStore;
 
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-  User? user;
-
   @override
   void initState() {
     super.initState();
     settingsStore = context.read<SettingsStore>();
-
-    user = auth.currentUser;
 
     // Seed default AI providers if none exist
     final dbUtils = DbUtils(isar: Isar.getInstance()!);
@@ -286,7 +236,7 @@ class _MyAppState extends State<MyApp> {
                   ? ThemeMode.dark
                   : ThemeMode.light,
               // home: user == null ? const Auth() : const Welcome(),
-              home: user == null ? const Auth() : (settingsStore.hasShownWelcomeScreen ? const FeedView() : const Welcome()),
+              home: settingsStore.hasShownWelcomeScreen ? const FeedView() : const Welcome(),
             );
           },
         );

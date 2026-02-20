@@ -1,7 +1,6 @@
 import 'package:bytesized_news/database/db_utils.dart';
 import 'package:bytesized_news/models/feed/feed.dart';
 import 'package:bytesized_news/models/feed_group/feed_group.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:isar_community/isar.dart';
 import 'package:opml/opml.dart';
 
@@ -46,7 +45,7 @@ class OpmlUtils {
                   continue;
                 }
               } catch (e, stack) {
-                FirebaseCrashlytics.instance.recordError(e, stack, fatal: false);
+                
                 continue;
               }
             }

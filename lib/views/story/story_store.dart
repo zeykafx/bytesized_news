@@ -8,7 +8,6 @@ import 'package:bytesized_news/utils/utils.dart';
 import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -106,9 +105,6 @@ abstract class _StoryStore with Store {
 
   @observable
   late bool hideSummary;
-
-  @observable
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @observable
   UniqueKey htmlWidgetKey = UniqueKey();
@@ -636,41 +632,6 @@ abstract class _StoryStore with Store {
 
     dom.Document document = parse(htmlContent);
     String docText = document.body!.text;
-
-    if (authStore.userTier == Tier.premium) {
-      // check firestore for existing summary (This doesn't count towards the user's summaries)
-      // only check if the user is premium
-      var existingSummary = await firestore.collection("summaries").where("url", isEqualTo: feedItem.url).get();
-
-      if (existingSummary.docs.isNotEmpty) {
-        if (kDebugMode) {
-          print("Summary found in Firestore");
-        }
-        String summary = existingSummary.docs.first.get("summary");
-        feedItem.aiSummary = summary;
-        feedItem.summarized = true;
-        await dbUtils.updateItemInDb(feedItem);
-        feedItemSummarized = true;
-        // evaluateSummary(docText, summary, context);
-        return;
-      }
-    }
-
-    if (kDebugMode) {
-      print("SUMMARIES LEFT: ${authStore.summariesLeftToday}");
-      print("Last summary difference in seconds: ${DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inSeconds}");
-    }
-
-    // Only create summary every summariesIntervalSeconds seconds max
-    if (DateTime.now().toUtc().difference(authStore.lastSummaryDate!).inSeconds <= summariesIntervalSeconds) {
-      if (kDebugMode) {
-        print("Fetching summaries too fast");
-      }
-      alertMessage = "You can only request a summary every $summariesIntervalSeconds seconds, slow down (or disable auto summary creation in the settings.)";
-      hasAlert = true;
-
-      return;
-    }
 
     if (docText.length < 500) {
       if (kDebugMode) {

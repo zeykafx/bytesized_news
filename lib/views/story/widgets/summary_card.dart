@@ -1,4 +1,3 @@
-import 'package:bytesized_news/views/auth/auth_store.dart';
 import 'package:bytesized_news/views/settings/settings_store.dart';
 import 'package:bytesized_news/views/story/story_store.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +20,7 @@ class SummaryCard extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        if ((storyStore.authStore.userTier != Tier.premium && !storyStore.settingsStore.enableCustomAiProvider) || !settingsStore.showSummaryCard) {
+        if (!storyStore.settingsStore.enableCustomAiProvider || !settingsStore.showSummaryCard) {
           return SizedBox.shrink();
         }
 

@@ -151,12 +151,12 @@ class _WelcomeState extends State<Welcome> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.workspace_premium_rounded, size: 90, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.key_rounded, size: 90, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 10),
-              Text('Premium Features', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+              Text('Bring Your Own Key (BYOK)', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
               const SizedBox(height: 15),
               Text(
-                'All of the local features of the app are free. All features that incur server costs are premium features. One-time payment.',
+                'This version of Bytesized News uses your own AI provider API keys. All AI features are unlocked — just configure your API key in Settings → AI.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).dividerColor),
 
                 textAlign: TextAlign.center,
@@ -175,7 +175,7 @@ class _WelcomeState extends State<Welcome> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "• Feed Syncing\n• Instant article summarization\n• Personalized news suggestions\n• And more...",
+                              "• Instant article summarization\n• Personalized news suggestions\n• No subscription needed",
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
@@ -206,7 +206,7 @@ class _WelcomeState extends State<Welcome> {
               Text('Generative AI Disclaimer', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
               const SizedBox(height: 15),
               Text(
-                'The premium features use generative AI. LLMs are notorious for their hallucinations; please double-check all important information found in summaries.',
+                'The AI features use generative AI. LLMs are notorious for their hallucinations; please double-check all important information found in summaries.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).dividerColor),
 
                 textAlign: TextAlign.center,
